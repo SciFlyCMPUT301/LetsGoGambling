@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -31,8 +32,12 @@ android {
     }
 }
 
-dependencies {
 
+
+dependencies {
+    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
+    implementation ("com.google.zxing:core:3.3.3")
+    implementation(platform("com.google.firebase:firebase-bom:33.4.0"))
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)

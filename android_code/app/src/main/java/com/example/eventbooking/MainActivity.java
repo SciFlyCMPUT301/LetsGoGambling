@@ -19,6 +19,8 @@ import androidx.core.view.WindowInsetsCompat;
 
 public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_WRITE_STORAGE = 112;
+    private QRcodeGenerator qrGenerator;
+    private ImageView qrCodeImageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,26 +40,27 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //        }
 
-        boolean hasPermission = (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-        if (!hasPermission) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    REQUEST_WRITE_STORAGE);
+// Initialize views
+        qrCodeImageView = findViewById(R.id.qr_code_image_view);
+
+        if (qrCodeImageView == null) {
+            Toast.makeText(this, "QR Code ImageView not found", Toast.LENGTH_SHORT).show();
+            return;
         }
 
         // Initialize QR code generator
-        QRcodeGenerator qrGenerator = new QRcodeGenerator(this);
+        qrGenerator = new QRcodeGenerator(this);
 
         // Generate QR code bitmap
         Bitmap qrCodeBitmap = qrGenerator.generateQRCode("eventbooking://open");
 
-        // Save QR code bitmap to device
-        qrGenerator.saveQRCode(qrCodeBitmap);
-
-        // Display the QR code in an ImageView
-        ImageView qrCodeImageView = findViewById(R.id.qr_code_image_view);
-        qrCodeImageView.setImageBitmap(qrCodeBitmap);
+        if (qrCodeBitmap != null) {
+            qrCodeImageView.setImageBitmap(qrCodeBitmap);
+            // Save QR code bitmap to device (optional)
+            qrGenerator.saveQRCode(qrCodeBitmap);
+        } else {
+            Toast.makeText(this, "Failed to generate QR code.", Toast.LENGTH_SHORT).show();
+        }
 
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {

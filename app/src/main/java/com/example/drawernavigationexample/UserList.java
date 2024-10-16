@@ -1,6 +1,4 @@
 package com.example.drawernavigationexample;
 
-public class Notification {
-
-
+public class UserList {
 }

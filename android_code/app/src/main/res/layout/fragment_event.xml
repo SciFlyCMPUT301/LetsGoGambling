@@ -1,0 +1,28 @@
+<!-- fragment_create.xml -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_height="match_parent"
+    android:gravity="center">
+
+    <TextView
+        android:id="@+id/event_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Event Page"
+        android:textSize="18sp" />
+    <TextView
+        android:id="@+id/event_integer_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Integer: 0"
+        android:textSize="18sp" />
+
+    <!-- Button to go back to HomeFragment -->
+    <Button
+        android:id="@+id/button_back_home"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Back to Home" />
+
+</LinearLayout>

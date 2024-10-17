@@ -1,8 +1,8 @@
-package com.example.eventbooking;
+package com.example.eventbooking.QRCode;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.net.Uri;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;

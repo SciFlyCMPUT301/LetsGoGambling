@@ -5,13 +5,14 @@
     android:layout_height="match_parent"
     android:gravity="center">
 
-    <TextView
+    <EditText
         android:id="@+id/event_create_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Event Create Page"
         android:textSize="18sp" />
 
+    <!-- Button to go back to HomeFragment -->
     <TextView
         android:id="@+id/event_create_integer_text"
         android:layout_width="wrap_content"
@@ -19,11 +20,51 @@
         android:text="Integer: 0"
         android:textSize="18sp" />
 
-    <!-- Button to go back to HomeFragment -->
+    <!--all of the text field that need teh organizer to set -->
+
     <Button
         android:id="@+id/button_back_home"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Back to Home" />
+
+
+    <EditText
+        android:id="@+id/event_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Description"
+        android:inputType="textMultiLine"
+        android:layout_marginBottom="8dp" />
+    <EditText
+        android:id="@+id/event_image_url"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Image URL"
+        android:inputType="textUri"
+        android:layout_marginBottom="8dp" />
+    <EditText
+        android:id="@+id/event_location"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Location"
+        android:inputType="textPostalAddress"
+        android:layout_marginBottom="8dp" />
+    <EditText
+        android:id="@+id/max_participants"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Max Participants"
+        android:inputType="number"
+        android:layout_marginBottom="16dp" />
+    <Button
+        android:id="@+id/button_create_event"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Create Event"
+        android:layout_marginBottom="16dp" />
+
+
+
 
 </LinearLayout>

@@ -25,4 +25,17 @@
         android:layout_height="wrap_content"
         android:text="Back to Home" />
 
+    <Button
+        android:id="@+id/join_waiting_list"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="JOIN" />
+
+    <Button
+        android:id="@+id/leave_waiting_list"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:text="LEAVE"/>
+
+
 </LinearLayout>

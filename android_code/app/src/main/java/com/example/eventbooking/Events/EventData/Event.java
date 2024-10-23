@@ -1,8 +1,19 @@
 package com.example.eventbooking.Events.EventData;
 
+import android.os.UserManager;
+import android.provider.ContactsContract;
+
 import com.example.eventbooking.Location;
+import java.util.List;
+
+import com.example.eventbooking.Role;
+import com.example.eventbooking.User;
 //import waitinglist
 import com.example.eventbooking.waitinglist.WaitingList;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class Event {
 
     private String eventId;
@@ -15,21 +26,23 @@ public class Event {
     private int maxParticipants; // limit number of entrants
     private List<String> participantIds;
     private WaitingList waitingList;
+    private String organizerId;
 
 
     public Event() {}
 
-    public Event(String eventId, String eventTitle, String description, String imageUrl, long timestamp, Location location) {
+    public Event(String eventId, String eventTitle, String description, String imageUrl, long timestamp, Location location, int maxParticipants, String organizerId) {
         this.eventId = eventId;
         this.eventTitle = eventTitle;
         this.description = description;
         this.imageUrl = imageUrl;
         this.timestamp = timestamp;
         this.location = location;
-
         this.maxParticipants = maxParticipants;
         this.participantIds = new ArrayList<>();
         this.waitingList = new WaitingList(eventId);
+        this.organizerId = organizerId;
+
     }
 
 
@@ -51,31 +64,26 @@ public class Event {
     public Location getLocation() { return location; }
     public void setLocation(Location new_location) { this.location = new_location; }
 
-    //functions related to waitinglist
-    //clarification: particpant is the selected entrant
-    //update by iris
+    public int getMaxParticipants() { return maxParticipants; }
+    public void setMaxParticipants(int maxParticipants) { this.maxParticipants = maxParticipants; }
 
+    public List<String> getParticipantIds() { return participantIds; }
+    public void setParticipantIds(List<String> participantIds) { this.participantIds = participantIds; }
 
-    public WaitingList getWaitingList() {
-        return waitingList;
+    public WaitingList getWaitingList() { return waitingList; }
+    public void setWaitingList(WaitingList waitingList) { this.waitingList = waitingList; }
+
+    public String getOrganizerId() { return organizerId; }
+    public void setOrganizerId(String organizerId) { this.organizerId = organizerId; }
+
+    //manage the participants
+    public void addParticipant(String entrantId){
+        if(!participantIds.contains(entrantId)&&participantIds.size()<maxParticipants){
+            participantIds.add(entrantId);
+        }
     }
-    public void setWaitingList(){
-        this.waitingList=waitingList;
-    }
-    public int getMaxParticipants(){
-        return maxParticipants;
-    }
-    public void setMaxParticipants(){
-        this.setMaxParticipants()=maxParticipants;
-    }
-    public List<String> getParticipantIds(){
-        return participantIds;
-    }
-    public void setParticipantIds(List<String> participantIds){
-        this.participantIds=participantIds;
-    }
-    //organizer remove participant
     public void removeParticipant(String entrantId){
-        participantIds.remove(entrantId);
+        if(participantIds.contains(entrantId)){
+        participantIds.remove(entrantId);}
     }
 }

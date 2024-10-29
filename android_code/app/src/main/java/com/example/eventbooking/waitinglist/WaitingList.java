@@ -21,9 +21,9 @@ public class WaitingList{
     public boolean join(String entrantId){
         if(!entrantIds.contains(entrantId)){
             entrantIds.add(entrantId);
-            return True;
+            return true;
         }
-        return False; //already joined
+        return false; //already joined
     }
 
     //leave the waiting list

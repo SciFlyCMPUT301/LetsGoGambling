@@ -13,6 +13,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.eventbooking.Home.HomeFragment;
+import com.example.eventbooking.Login.LoginFragment;
 import com.example.eventbooking.QRCode.QRcodeGenerator;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -32,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             // Load HomeFragment by default
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new HomeFragment())
+                    .replace(R.id.fragment_container, new LoginFragment())
                     .commit();
         }
 

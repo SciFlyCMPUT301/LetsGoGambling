@@ -45,7 +45,7 @@ public class FirebaseAccess {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
                     User user = dataSnapshot.getValue(User.class);
-                    Log.d("RealtimeDB", "User: " + user.getUserame());
+                    Log.d("RealtimeDB", "User: " + user.getUsername());
                 } else {
                     Log.d("RealtimeDB", "No such user");
                 }

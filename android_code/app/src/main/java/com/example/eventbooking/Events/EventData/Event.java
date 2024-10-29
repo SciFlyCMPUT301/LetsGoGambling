@@ -46,13 +46,13 @@ public class Event {
         db = FirebaseFirestore.getInstance(); // Initialize Firestore
     }
 
-    public Event(String eventId, String eventTitle, String description, String imageUrl, long timestamp, Location location, int maxParticipants, String organizerId) {
+    public Event(String eventId, String eventTitle, String description, String imageUrl, long timestamp, String locationstr, int maxParticipants, String organizerId) {
         this.eventId = eventId;
         this.eventTitle = eventTitle;
         this.description = description;
         this.imageUrl = imageUrl;
         this.timestamp = timestamp;
-        this.location = location;
+        //this.location = location;
         this.maxParticipants = maxParticipants;
         this.participantIds = new ArrayList<>();
         this.waitingList = new WaitingList(eventId);

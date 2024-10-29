@@ -42,31 +42,28 @@ public class LoginFragment extends Fragment {
 
         FirestoreAccess fs = new FirestoreAccess();
 
-
-        fs.getUser(deviceId, documentSnapshot -> {
-            snapshot = documentSnapshot;
+        fs.getUser(deviceId).addOnSuccessListener(snapshot -> {
+            if (!snapshot.exists()) {
+                welcomeText.setText("Welcome new user");
+                new Timer().schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        getParentFragmentManager().beginTransaction()
+                                .replace(R.id.fragment_container, new HomeFragment()) // replace with create new user fragment
+                                .commit();
+                    }
+                }, 3000);
+            } else {
+                new Timer().schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        getParentFragmentManager().beginTransaction()
+                                .replace(R.id.fragment_container, new HomeFragment())
+                                .commit();
+                    }
+                }, 3000);
+            }
         });
-
-        if (snapshot == null || !snapshot.exists()) {
-            welcomeText.setText("Welcome new user");
-            new Timer().schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    getParentFragmentManager().beginTransaction()
-                            .replace(R.id.fragment_container, new HomeFragment()) // replace with create new user fragment
-                            .commit();
-                }
-            }, 3000);
-        } else {
-            new Timer().schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    getParentFragmentManager().beginTransaction()
-                            .replace(R.id.fragment_container, new HomeFragment())
-                            .commit();
-                }
-            }, 3000);
-        }
 
         return rootView;
     }

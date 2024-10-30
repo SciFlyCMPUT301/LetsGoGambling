@@ -2,13 +2,16 @@ package com.example.eventbooking;
 
 import android.net.Uri;
 
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
@@ -26,7 +29,7 @@ public class User {
     private boolean notificationAsk;
     private boolean geolocationAsk;
 
-    private Set<String> roles;
+    private List<String> roles;
     //Firebase
     private FirebaseStorage storage;
     private FirebaseFirestore db;
@@ -34,7 +37,7 @@ public class User {
 
     public User() {
         //init roles to avoid null pointer exception
-        this.roles = new HashSet<>();
+        this.roles = new ArrayList<>();
         storage = FirebaseStorage.getInstance(); // Initialize Firebase Storage
         db = FirebaseFirestore.getInstance(); // Initialize Firestore
     }
@@ -45,7 +48,7 @@ public class User {
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.profilePictureUrl = defaultProfilePictureUrl();
-        this.roles = new HashSet<>();
+        this.roles = new ArrayList<>();
         this.roles.add(Role.ENTRANT); //set default role to be entrant
         this.storage = FirebaseStorage.getInstance();
         this.db = FirebaseFirestore.getInstance();
@@ -66,9 +69,15 @@ public class User {
     public String getProfilePictureUrl() { return profilePictureUrl; }
     public void setProfilePictureUrl(String profilePictureUrl) { this.profilePictureUrl = profilePictureUrl; }
 
-    public Set<String> getRoles() {return roles;}
-    public void setRoles(Set<String> roles) {this.roles = roles;}
+    public List<String> getRoles() {return roles;}
+    public void setRoles(List<String> roles) {this.roles = roles;}
 
+    public boolean isFacilityAssociated() {
+        return facilityAssociated;
+    }
+    public void setFacilityAssociated(boolean facilityAssociated) {
+        this.facilityAssociated = facilityAssociated;
+    }
 
     public boolean hasRole(String role){
         return roles != null && roles.contains(role); //check if it already has a role
@@ -76,7 +85,7 @@ public class User {
     //add role
     public void addRole(String role){
         if(roles==null){
-            roles = new HashSet<>();
+            roles = new ArrayList<>();
         }
         roles.add(role);
     }
@@ -90,7 +99,7 @@ public class User {
         }
     }
 
-    public void saveUserDataToFirestore(){
+    public Task<Void> saveUserDataToFirestore() {
         Map<String, Object> userData = new HashMap<>();
         userData.put("username", username);
         userData.put("deviceID", deviceID);
@@ -102,15 +111,17 @@ public class User {
         userData.put("facilityAssociated", facilityAssociated);
         userData.put("notificationAsk", notificationAsk);
         userData.put("geolocationAsk", geolocationAsk);
+        userData.put("roles", roles);
 
-        // Save data under users collection
-        db.collection("Users").document(username)
+        // Save data under "Users" collection and return the Task
+        return db.collection("Users").document(username)
                 .set(userData)
-                .addOnSuccessListener(aVoid ->{
-            System.out.println("User data successfully written to Firestore!");
-        }).addOnFailureListener(e ->{
-            System.out.println("Error writing user data to Firestore.");
-        });
+                .addOnSuccessListener(aVoid -> {
+                    System.out.println("User data successfully written to Firestore!");
+                })
+                .addOnFailureListener(e -> {
+                    System.out.println("Error writing user data to Firestore: " + e.getMessage());
+                });
     }
 
     public void uploadProfilePictureToFirebase(String picture){

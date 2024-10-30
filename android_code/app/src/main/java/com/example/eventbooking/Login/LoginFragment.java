@@ -20,6 +20,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -65,13 +66,7 @@ public class LoginFragment extends Fragment {
                 }, 3000);
             } else {
                 Map<String, Object> data = snapshot.getData();
-                User user = new User();
-                user.setDeviceID(snapshot.getId());
-                user.setUsername(data.get("username").toString());
-                user.setEmail(data.get("email").toString());
-                user.setPhoneNumber(data.get("phoneNumber").toString());
-                user.setProfilePictureUrl(data.get("profilePictureUrl").toString());
-                user.setRoles(new HashSet<>((ArrayList)data.get("roles")));
+                User user = snapshot.toObject(User.class);
                 Log.d("Login", "Retrieved user "+user.getUsername());
 
                 new Timer().schedule(new TimerTask() {

@@ -17,7 +17,7 @@ public class FirestoreAccess {
 
     public FirestoreAccess() {
         db = FirebaseFirestore.getInstance();
-        usersRef = db.collection("users");
+        usersRef = db.collection("Users");
     }
 
     public Task<DocumentSnapshot> getUser(String userId) {

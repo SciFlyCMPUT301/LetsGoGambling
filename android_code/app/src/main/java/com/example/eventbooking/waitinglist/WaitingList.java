@@ -23,7 +23,7 @@ public class WaitingList implements Serializable {
 
 
     //cnstructor
-    public WaitingList(int maxParticipants, int waitingListLimit) {
+    public WaitingList(String eventId,int maxParticipants, int waitingListLimit) {
         this.maxParticipants = maxParticipants;
         this.waitingListLimit = waitingListLimit;
         this.waitingparticipantIds = new ArrayList<>();
@@ -32,6 +32,36 @@ public class WaitingList implements Serializable {
         this.signedUpParticipantIds = new ArrayList<>();
         this.random = new Random();
 
+    }
+    //setter and getters
+
+
+    public int getMaxParticipants() {
+        return maxParticipants;
+    }
+
+    public int getWaitingListLimit() {
+        return waitingListLimit;
+    }
+
+    public List<String> getWaitingparticipantIds() {
+        return waitingparticipantIds;
+    }
+
+    public List<String> getAcceptedParticipantIds() {
+        return acceptedParticipantIds;
+    }
+
+    public List<String> getCanceledParticipantIds() {
+        return canceledParticipantIds;
+    }
+
+    public List<String> getSignedUpParticipantIds() {
+        return signedUpParticipantIds;
+    }
+
+    public Random getRandom() {
+        return random;
     }
 
     /**

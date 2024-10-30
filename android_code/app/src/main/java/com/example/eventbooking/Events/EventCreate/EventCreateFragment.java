@@ -15,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.example.eventbooking.Home.HomeFragment;
+import com.example.eventbooking.waitinglist.WaitingList;
 import com.example.eventbooking.Location;
 import com.example.eventbooking.R;
 import com.example.eventbooking.Role;
@@ -22,6 +23,7 @@ import com.example.eventbooking.User;
 import com.example.eventbooking.UserManager;
 import com.example.eventbooking.profile.ProfileFragment;
 import com.example.eventbooking.Events.EventData.Event;
+import com.google.firebase.Firebase;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -71,6 +73,7 @@ public class EventCreateFragment extends Fragment {
         editTextDescription = rootView.findViewById(R.id.event_description);
         editTextLocation = rootView.findViewById(R.id.event_location);
         editMaxParticipants = rootView.findViewById(R.id.max_participants);
+        //remainder here , add the limit number to set up maximum entrant in witinglist
         editTextImageUrl = rootView.findViewById(R.id.event_image_url);
         createEventButton= rootView.findViewById(R.id.button_create_event);
 
@@ -155,6 +158,8 @@ public class EventCreateFragment extends Fragment {
 
                 Toast.makeText(getContext(), "Event created successfully!", Toast.LENGTH_SHORT).show();
                 clearEventForm();
+                //initalize the waitinglist
+                initWaitingList(eventId,maxParticipants);
             }
             if(roleAssigned){
                 Toast.makeText(getContext(), "Role updated to Organizer.", Toast.LENGTH_SHORT).show();
@@ -187,6 +192,25 @@ public class EventCreateFragment extends Fragment {
         editTextLocation.setText("");
         editTextImageUrl.setText("");
         editTextLocation.setText("");
+    }
+    /**
+     * initialize the waiting list */
+    private void initWaitingList(String eventId, int maxParticipants){
+       //just set it for now, change later
+        int waitingListLimit = 50;
+        WaitingList waitingList = new WaitingList(eventId,maxParticipants,waitingListLimit);
+        //waiting list to firebase,
+        DatabaseReference waitingListRef = FirebaseDatabase.getInstance().getReference("waitingLists");
+        waitingListRef.child(eventId).setValue(waitingList).addOnCompleteListener(task->{
+            if(task.isSuccessful()){
+                Toast.makeText(getContext(),"waiting list init success",Toast.LENGTH_SHORT).show();
+
+            }
+            else{
+                Toast.makeText(getContext(),"waiting list init failed",Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
 
 }

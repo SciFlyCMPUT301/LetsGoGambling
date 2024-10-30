@@ -17,7 +17,7 @@ public class FirestoreAccess {
 
     public FirestoreAccess() {
         db = FirebaseFirestore.getInstance();
-        usersRef = db.collection("users");
+        usersRef = db.collection("Users");
     }
 
     public Task<DocumentSnapshot> getUser(String userId) {
@@ -25,13 +25,14 @@ public class FirestoreAccess {
     }
 
     public Task<Void> addUser(User user) {
-        Map<String, Object> userdata = new HashMap<>();
-        userdata.put("username", user.getUsername());
-        userdata.put("email", user.getEmail());
-        userdata.put("phoneNumber", user.getPhoneNumber());
-        userdata.put("profilePictureUrl", user.getProfilePictureUrl());
-        userdata.put("roles", new ArrayList<>(user.getRoles())); // Serializing Collections is not supported, please use Lists instead (found in field 'roles')
+//        Map<String, Object> userdata = new HashMap<>();
+//        userdata.put("username", user.getUsername());
+//        userdata.put("email", user.getEmail());
+//        userdata.put("phoneNumber", user.getPhoneNumber());
+//        userdata.put("profilePictureUrl", user.getProfilePictureUrl());
+//        userdata.put("roles", new ArrayList<>(user.getRoles())); // Serializing Collections is not supported, please use Lists instead (found in field 'roles')
 
-        return usersRef.document(user.getDeviceID()).set(userdata);
+//        return usersRef.document(user.getDeviceID()).set(userdata);
+        return usersRef.document(user.getDeviceID()).set(user);
     }
 }

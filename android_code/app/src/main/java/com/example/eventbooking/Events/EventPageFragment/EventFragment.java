@@ -1,11 +1,12 @@
 package com.example.eventbooking.Events.EventPageFragment;
-
+import com.example.eventbooking.Events.EventData.Event;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -13,11 +14,27 @@ import androidx.fragment.app.Fragment;
 import com.example.eventbooking.Events.EventCreate.EventCreateFragment;
 import com.example.eventbooking.Home.HomeFragment;
 import com.example.eventbooking.R;
+import com.example.eventbooking.User;
+import com.example.eventbooking.UserManager;
+import com.example.eventbooking.waitinglist.WaitingList;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class EventFragment extends Fragment {
     private TextView additionalInfoTextView;
     private static final String ARG_INTEGER = "arg_integer";
     private int receivedInteger;
+    //iris's update, add button to go the waitinglist page for entrant
+    private String eventId;
+    private Button joinWaitingListButton;
+    private Button leaveWaitingListButton;
+    private Event event;
+    private String currentUserId;
+    private WaitingList waitingList;
+
 
     public static EventFragment newInstance(int integer) {
         EventFragment fragment = new EventFragment();
@@ -53,8 +70,131 @@ public class EventFragment extends Fragment {
                     .replace(R.id.fragment_container, new HomeFragment())
                     .commit();
         });
+        loadWaitingList();
+
+        joinWaitingListButton.setOnClickListener(v->joinWaitingList());
+        leaveWaitingListButton.setOnClickListener(v->leaveWaitingList());
+
 
         return rootView;
+    }
+
+
+
+    //loads the waiting list data from firebase and updates the view model
+    private void loadWaitingList(){
+        DatabaseReference waitingListRef= FirebaseDatabase.getInstance().getReference("waitingLists").child(eventId);
+        waitingListRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    waitingList =snapshot.getValue(WaitingList.class);
+                    if(waitingList == null){
+                        //shouldn't reach here
+                       Toast.makeText(getContext(),"error: waitinglist data is corrupted",Toast.LENGTH_SHORT).show();
+                       joinWaitingListButton.setEnabled(false);
+                       leaveWaitingListButton.setEnabled(false);
+                    }else{
+                        updateButtonsState();
+                    }
+
+                }else{
+                    //waiting list does not exist
+                    //shouldn't reach here
+                    Toast.makeText(getContext(),"error waiting list doesn't exist",Toast.LENGTH_SHORT).show();
+                    joinWaitingListButton.setEnabled(false);
+                    leaveWaitingListButton.setEnabled(false);
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(getContext(),"Failed to load waitinglist",Toast.LENGTH_SHORT).show();
+                joinWaitingListButton.setEnabled(false);
+                leaveWaitingListButton.setEnabled(false);
+            }
+        });
+    }
+    //allow current user to join the waiting list
+    private void joinWaitingList(){
+        if(waitingList==null){
+            Toast.makeText(getContext(),"WaitingList not loaded yet", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        User currentUser = UserManager.getInstance().getCurrentUser();
+        if(currentUser == null){
+            Toast.makeText(getContext(),"User not found",Toast.LENGTH_SHORT).show();
+            return;
+        }
+        String currentUserId = currentUser.getDeviceID();
+        boolean success = waitingList.joinWaitingList(currentUserId);
+        if(success){
+            //update firebase
+            updateWaitingListInFirebase();
+            Toast.makeText(getContext(),"Joined the wiating list",Toast.LENGTH_SHORT).show();
+            updateButtonsState();
+        }else{
+            Toast.makeText(getContext(),"Failed to join the waitingList",Toast.LENGTH_SHORT).show();
+        }
+
+
+    }
+
+    //allow current user to leave waiting list
+    private void leaveWaitingList(){
+        if(waitingList==null){
+            Toast.makeText(getContext(),"WaitingList not loaded yet", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        User currentUser = UserManager.getInstance().getCurrentUser();
+        if(currentUser == null){
+            Toast.makeText(getContext(),"User not found",Toast.LENGTH_SHORT).show();
+            return;
+        }
+        String currentUserId = currentUser.getDeviceID();
+        boolean success = waitingList.leaveWaitingList(currentUserId);
+        if(success){
+            //update firebase
+            updateWaitingListInFirebase();
+            Toast.makeText(getContext(),"left the waiting list",Toast.LENGTH_SHORT).show();
+            updateButtonsState();
+        }else{
+            Toast.makeText(getContext(),"Failed to leave the waitingList",Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    //update the waiting list in firebase
+    private void updateWaitingListInFirebase(){
+        DatabaseReference waitingListRef = FirebaseDatabase.getInstance().getReference("waitingLists").child(eventId);
+        waitingListRef.setValue(waitingList).addOnCompleteListener(task->{
+            if(task.isSuccessful()){
+                updateButtonsState();
+            }else{
+                Toast.makeText(getContext(),"failed to update firebase", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    /**
+     * update leave and join button state based on the status*/
+    private void updateButtonsState(){
+        User currentUser = UserManager.getInstance().getCurrentUser();
+        if(currentUser ==  null){
+            joinWaitingListButton.setEnabled(false);
+            leaveWaitingListButton.setEnabled(false);
+            return;
+        }
+        String currentUserId = currentUser.getDeviceID();
+        if(waitingList.getWaitingparticipantIds().contains(currentUserId)
+        ){
+            //what should I do for user in other list
+            joinWaitingListButton.setEnabled(false);
+            leaveWaitingListButton.setEnabled(true);
+        } else{
+            joinWaitingListButton.setEnabled(true);
+            leaveWaitingListButton.setEnabled(true);
+        }
     }
 
 

@@ -129,7 +129,7 @@ public class SampleTable {
                         event.cancelParticipant(entrant.getUsername());
                         break;
                     case 3:
-                        event.getWaitingList().join(entrant.getUsername());
+                        event.addParticipant(entrant.getUsername());
                         break;
                 }
             }

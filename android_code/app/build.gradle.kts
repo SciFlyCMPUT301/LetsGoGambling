@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.example.eventbooking"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.eventbooking"
@@ -30,6 +30,7 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+    buildToolsVersion = "35.0.0"
 }
 
 

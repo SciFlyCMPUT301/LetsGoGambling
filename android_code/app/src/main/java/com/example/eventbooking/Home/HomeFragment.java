@@ -27,6 +27,14 @@ import com.example.eventbooking.profile.ProfileFragment;
 public class HomeFragment extends Fragment {
     private int someInteger = 42; // Example integer to pass
 
+    public static HomeFragment newInstance(String userId) {
+        HomeFragment fragment = new HomeFragment();
+        Bundle args = new Bundle();
+        args.putString("userId", userId);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

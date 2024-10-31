@@ -1,6 +1,7 @@
 package com.example.eventbooking.Login;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -53,6 +54,7 @@ public class LoginFragment extends Fragment {
 
         FirestoreAccess fs = new FirestoreAccess();
         fs.getUser(deviceId).addOnSuccessListener(snapshot -> {
+            //nav.setVisibility(View.VISIBLE);
             if (!snapshot.exists()) {
                 welcomeText.setText("Welcome new user");
                 // testing
@@ -60,20 +62,22 @@ public class LoginFragment extends Fragment {
 //                fs.addUser(user).addOnSuccessListener(result -> {
 //                    Log.d("Login", "added user successfully");
 //                });
-                new Timer().schedule(new TimerTask() {
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         nav.setVisibility(View.VISIBLE);
                         getParentFragmentManager().beginTransaction()
-                                .replace(R.id.fragment_container, new HomeFragment()) // replace with create new user fragment
-                                .commit();
+                            .replace(R.id.fragment_container, HomeFragment.newInstance(deviceId)) // replace with create new user fragment
+                            .commit();
                     }
                 }, 3000);
             } else {
                 User user = snapshot.toObject(User.class);
                 Log.d("Login", "Retrieved user "+user.getUsername());
 
-                new Timer().schedule(new TimerTask() {
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         nav.setVisibility(View.VISIBLE);

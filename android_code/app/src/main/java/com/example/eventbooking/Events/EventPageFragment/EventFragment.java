@@ -70,10 +70,10 @@ public class EventFragment extends Fragment {
                     .replace(R.id.fragment_container, new HomeFragment())
                     .commit();
         });
-        loadWaitingList();
+//        loadWaitingList();
 
-        joinWaitingListButton.setOnClickListener(v->joinWaitingList());
-        leaveWaitingListButton.setOnClickListener(v->leaveWaitingList());
+//        joinWaitingListButton.setOnClickListener(v->joinWaitingList());
+//        leaveWaitingListButton.setOnClickListener(v->leaveWaitingList());
 
 
         return rootView;

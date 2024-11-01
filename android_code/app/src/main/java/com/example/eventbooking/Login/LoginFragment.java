@@ -28,6 +28,10 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicReference;
 
+/**
+ * Fragment that is shown on app open. Gets deviceId and checks if the
+ * user is new.
+ */
 public class LoginFragment extends Fragment {
 
     TextView deviceIdText;
@@ -39,6 +43,20 @@ public class LoginFragment extends Fragment {
         super.onCreate(savedInstanceState);
     }
 
+    /**
+     * Sets up the view for the login. Gets user from firestore and changes text accordingly.
+     * If the user is new, takes them to create fragment, otherwise takes them to the home page.
+     *
+     * @param inflater The LayoutInflater object that can be used to inflate
+     * any views in the fragment,
+     * @param container If non-null, this is the parent view that the fragment's
+     * UI should be attached to.  The fragment should not add the view itself,
+     * but this can be used to generate the LayoutParams of the view.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     * from a previous saved state as given here.
+     *
+     * @return rootView The view to be displayed
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 

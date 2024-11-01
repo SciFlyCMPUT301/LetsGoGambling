@@ -11,6 +11,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Wrapper class for firebase firestore access.
+ * Use is optional.
+ */
 public class FirestoreAccess {
     private FirebaseFirestore db;
     private CollectionReference usersRef;
@@ -20,10 +24,20 @@ public class FirestoreAccess {
         usersRef = db.collection("Users");
     }
 
+    /**
+     * Attempts to get user from Users collection
+     * @param userId userId (deviceId) that is the id of the document
+     * @return Task that you can attach listeners to
+     */
     public Task<DocumentSnapshot> getUser(String userId) {
         return usersRef.document(userId).get();
     }
 
+    /**
+     * Attempts to add user to Users collection
+     * @param user User object that will be put in firebase
+     * @return Task that you can attach listeners to
+     */
     public Task<Void> addUser(User user) {
 //        Map<String, Object> userdata = new HashMap<>();
 //        userdata.put("username", user.getUsername());

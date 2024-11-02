@@ -12,7 +12,7 @@ import java.util.List;
 
 import com.example.eventbooking.Role;
 import com.example.eventbooking.User;
-//import waitinglist
+
 import com.example.eventbooking.waitinglist.WaitingList;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
@@ -48,19 +48,22 @@ public class Event {
     public Event() {
         storage = FirebaseStorage.getInstance();
         db = FirebaseFirestore.getInstance();
-        this.waitingparticipantIds = new ArrayList<>();
-        this.acceptedParticipantIds = new ArrayList<>();
-        this.canceledParticipantIds = new ArrayList<>();
-        this.signedUpParticipantIds = new ArrayList<>();
+        this.waitingList= new WaitingList();
+        //waiting list constructor will handle these 4 list
+//        this.waitingparticipantIds = new ArrayList<>();
+//        this.acceptedParticipantIds = new ArrayList<>();
+//        this.canceledParticipantIds = new ArrayList<>();
+//        this.signedUpParticipantIds = new ArrayList<>();
     }
 
     public Event(int eventID) {
         storage = FirebaseStorage.getInstance();
         db = FirebaseFirestore.getInstance();
-        this.waitingparticipantIds = new ArrayList<>();
-        this.acceptedParticipantIds = new ArrayList<>();
-        this.canceledParticipantIds = new ArrayList<>();
-        this.signedUpParticipantIds = new ArrayList<>();
+        this.waitingList=new WaitingList();
+//        this.waitingparticipantIds = new ArrayList<>();
+//        this.acceptedParticipantIds = new ArrayList<>();
+//        this.canceledParticipantIds = new ArrayList<>();
+//        this.signedUpParticipantIds = new ArrayList<>();
 //        this.waitingList = new WaitingList(eventId);
     }
 
@@ -72,12 +75,14 @@ public class Event {
         this.description = description;
         this.imageUrl = imageUrl;
         this.timestamp = timestamp;
+
         //this.location = location;
         this.maxParticipants = maxParticipants;
-        this.waitingparticipantIds = new ArrayList<>();
-        this.acceptedParticipantIds = new ArrayList<>();
-        this.canceledParticipantIds = new ArrayList<>();
-        this.signedUpParticipantIds = new ArrayList<>();
+        this.waitingList=new WaitingList(eventId);
+//        this.waitingparticipantIds = new ArrayList<>();
+//        this.acceptedParticipantIds = new ArrayList<>();
+//        this.canceledParticipantIds = new ArrayList<>();
+//        this.signedUpParticipantIds = new ArrayList<>();
 //        this.waitingList = new WaitingList(eventId);
         this.organizerId = organizerId;
         this.storage = FirebaseStorage.getInstance();
@@ -187,10 +192,10 @@ public class Event {
         eventData.put("timestamp", timestamp);
         eventData.put("location", location != null ? location.toString() : null);
         eventData.put("maxParticipants", maxParticipants);
-        eventData.put("waitingparticipantIds", waitingparticipantIds);
-        eventData.put("acceptedParticipantIds", acceptedParticipantIds);
-        eventData.put("canceledParticipantIds", canceledParticipantIds);
-        eventData.put("signedUpParticipantIds", signedUpParticipantIds);
+        eventData.put("waitingparticipantIds",waitingList.getWaitingParticipantIds());
+        eventData.put("acceptedParticipantIds", waitingList.getAcceptedParticipantIds());
+        eventData.put("canceledParticipantIds", waitingList.getCanceledParticipantIds());
+        eventData.put("signedUpParticipantIds", waitingList.getSignedUpParticipantIds());
 //        eventData.put("waitingList", waitingList.getEntrantIds());
         eventData.put("organizerId", organizerId);
 

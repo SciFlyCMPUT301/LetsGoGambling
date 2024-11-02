@@ -7,19 +7,30 @@
 
     <!-- Title -->
     <TextView
-        android:id="@+id/text_canceled_participants_title"
+        android:id="@+id/text_waiting_list_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Canceled Participants"
+        android:text="Waiting List"
         android:textSize="20sp"
         android:textStyle="bold"
         android:paddingBottom="8dp" />
 
-    <!-- RecyclerView to display canceled participants -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_view_canceled_participants"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
+    <Button
+        android:id="@+id/button_back_to_menu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Back to Menu"/>
+
+    <ListView
+        android:id="@+id/canceled_list_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:divider="@android:color/darker_gray"
+        android:dividerHeight="1dp" />
+
+
+
+
+
 
 </LinearLayout>

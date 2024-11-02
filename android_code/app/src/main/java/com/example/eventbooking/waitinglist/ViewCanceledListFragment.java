@@ -16,19 +16,22 @@ import com.example.eventbooking.R;
 
 import java.util.List;
 
-public class ViewAcceptedListFragment extends Fragment {
-
-    private ListView acceptedListView;
+public class ViewCanceledListFragment extends Fragment {
+    private ListView canceledListView;
     private Button backButton;
     private String eventId;
     private WaitingList waitingList;
 
-    public static ViewAcceptedListFragment newInstance(String eventId) {
-        ViewAcceptedListFragment fragment = new ViewAcceptedListFragment();
+    public static ViewCanceledListFragment newInstance(String eventId) {
+        ViewCanceledListFragment fragment = new ViewCanceledListFragment();
         Bundle args = new Bundle();
         args.putString("event_id", eventId);
         fragment.setArguments(args);
         return fragment;
+    }
+
+    public ViewCanceledListFragment() {
+        // Required empty public constructor
     }
 
     @Override
@@ -39,13 +42,13 @@ public class ViewAcceptedListFragment extends Fragment {
             eventId = getArguments().getString("event_id");
         }
 
-        // Initialize WaitingList with only the event ID
+        // Initialize the WaitingList instance with only the event ID
         waitingList = new WaitingList(eventId);
 
         // Load data from Firebase for this WaitingList instance
         waitingList.loadFromFirebase().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                displayAcceptedList();
+                displayCanceledList();
             } else {
                 Toast.makeText(getContext(), "Failed to load waiting list data from Firebase.", Toast.LENGTH_SHORT).show();
             }
@@ -55,11 +58,11 @@ public class ViewAcceptedListFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_view_selected_participants, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_view_canceled_participant, container, false);
 
         // Initialize UI elements
-        acceptedListView = rootView.findViewById(R.id.accepted_list_view);
-        backButton = rootView.findViewById(R.id.back_button);
+        canceledListView = rootView.findViewById(R.id.canceled_list_view);
+        backButton = rootView.findViewById(R.id.button_back_to_menu);
 
         // Set up back button listener
         backButton.setOnClickListener(v -> navigateBackToOrganizerMenu());
@@ -67,15 +70,15 @@ public class ViewAcceptedListFragment extends Fragment {
         return rootView;
     }
 
-    private void displayAcceptedList() {
-        List<String> acceptedParticipantIds = waitingList.getAcceptedParticipantIds();
-        if (acceptedParticipantIds != null && !acceptedParticipantIds.isEmpty()) {
+    private void displayCanceledList() {
+        List<String> canceledParticipantIds = waitingList.getCanceledParticipantIds();
+        if (canceledParticipantIds != null && !canceledParticipantIds.isEmpty()) {
             ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),
-                    android.R.layout.simple_list_item_1, acceptedParticipantIds);
-            acceptedListView.setAdapter(adapter);
+                    android.R.layout.simple_list_item_1, canceledParticipantIds);
+            canceledListView.setAdapter(adapter);
         } else {
-            Toast.makeText(getContext(), "No participants have been accepted.", Toast.LENGTH_SHORT).show();
-            acceptedListView.setAdapter(null);
+            Toast.makeText(getContext(), "No participants have canceled.", Toast.LENGTH_SHORT).show();
+            canceledListView.setAdapter(null);
         }
     }
 

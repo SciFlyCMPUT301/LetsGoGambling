@@ -68,10 +68,12 @@ public class EventFragment extends Fragment {
         Button backButton = rootView.findViewById(R.id.button_back_home);
         Button organizerMenuButton = rootView.findViewById(R.id.organizer_menu);
 
-        joinWaitingListButton.findViewById(R.id.join_waiting_list);
+        joinWaitingListButton = rootView.findViewById(R.id.join_waiting_list);
+//        joinWaitingListButton.findViewById(R.id.join_waiting_list);
         joinWaitingListButton.setOnClickListener(v->joinWaitingList());
 
-        leaveWaitingListButton.findViewById(R.id.leave_waiting_list);
+        leaveWaitingListButton = rootView.findViewById(R.id.leave_waiting_list);
+//        leaveWaitingListButton.findViewById(R.id.leave_waiting_list);
         leaveWaitingListButton.setOnClickListener(v->leaveWaitingList());
 
         backButton.setOnClickListener(v -> {

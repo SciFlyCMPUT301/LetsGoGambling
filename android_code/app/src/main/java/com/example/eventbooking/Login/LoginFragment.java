@@ -34,7 +34,6 @@ public class LoginFragment extends Fragment {
     TextView deviceIdText;
     TextView welcomeText;
     BottomNavigationView nav;
-    public static boolean isLoggedIn = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -73,7 +72,6 @@ public class LoginFragment extends Fragment {
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        isLoggedIn = true;
                         nav.setVisibility(View.VISIBLE);
                         sidebar.setVisibility(View.VISIBLE);
                         getParentFragmentManager().beginTransaction()
@@ -89,7 +87,6 @@ public class LoginFragment extends Fragment {
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        isLoggedIn = true;
                         nav.setVisibility(View.VISIBLE);
                         sidebar.setVisibility(View.VISIBLE);
                         getParentFragmentManager().beginTransaction()

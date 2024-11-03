@@ -22,6 +22,7 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
+import com.example.eventbooking.Admin.AdminFragment;
 import com.example.eventbooking.Events.EventCreate.EventCreateFragment;
 import com.example.eventbooking.Events.EventPageFragment.EventFragment;
 import com.example.eventbooking.Home.HomeFragment;
@@ -66,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private ViewCanceledListFragment viewCanceledListFragment = new ViewCanceledListFragment();
     private ViewAcceptedListFragment viewAcceptedListFragment = new ViewAcceptedListFragment();
     private OrganizerMenuFragment organizerMenuFragment = new OrganizerMenuFragment();
+    private AdminFragment adminFragment = new AdminFragment();
 
 
     @Override
@@ -202,6 +204,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             } else if (itemId == R.id.nav_event_create) {
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container, eventCreateFragment)
+                        .commit();
+            } else if (itemId == R.id.nav_admin) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, adminFragment)
                         .commit();
             }
             // Close the drawer after an item is selected

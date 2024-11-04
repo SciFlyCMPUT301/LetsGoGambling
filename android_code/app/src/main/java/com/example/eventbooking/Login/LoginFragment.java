@@ -35,6 +35,7 @@ public class LoginFragment extends Fragment {
     TextView deviceIdText;
     TextView welcomeText;
     BottomNavigationView nav;
+    public static boolean isLoggedIn = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -55,7 +56,6 @@ public class LoginFragment extends Fragment {
             sidebar.setVisibility(View.GONE);
         }
 
-
         deviceIdText = rootView.findViewById(R.id.text_login_deviceid);
         welcomeText = rootView.findViewById(R.id.text_login_welcome);
         String deviceId = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
@@ -75,6 +75,7 @@ public class LoginFragment extends Fragment {
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
+                        isLoggedIn = true;
 //                        drawerLayout.setVisibility(View.VISIBLE);
                         nav.setVisibility(View.VISIBLE);
                         sidebar.setVisibility(View.VISIBLE);
@@ -91,6 +92,7 @@ public class LoginFragment extends Fragment {
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
+                        isLoggedIn = true;
 //                        drawerLayout.setVisibility(View.VISIBLE);
                         nav.setVisibility(View.VISIBLE);
                         sidebar.setVisibility(View.VISIBLE);

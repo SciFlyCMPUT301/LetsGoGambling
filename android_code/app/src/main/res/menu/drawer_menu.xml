@@ -48,5 +48,17 @@
         android:id="@+id/nav_admin"
         android:icon="@drawable/ic_admin_foreground"
         android:title="Admin" />
+    <item
+        android:id="@+id/nav_camera"
+        android:icon="@drawable/ic_camera_foreground"
+        android:title="Camera" />
+    <item
+        android:id="@+id/nav_scanned_event"
+        android:icon="@drawable/ic_scanned_event_foreground"
+        android:title="Scanned Event" />
+    <item
+        android:id="@+id/nav_event_code_generate"
+        android:icon="@drawable/ic_admin_foreground"
+        android:title="Generate QR Code" />
 
 </menu>

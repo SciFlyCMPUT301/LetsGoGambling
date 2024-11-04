@@ -11,6 +11,7 @@ navigationRuntime = "2.8.2"
 navigationFragment = "2.8.2"
 firebaseDatabase = "21.0.0"
 firebaseFirestore = "25.1.1"
+qrScanner = "4.3.0"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -24,6 +25,7 @@ navigation-runtime = { group = "androidx.navigation", name = "navigation-runtime
 navigation-fragment = { group = "androidx.navigation", name = "navigation-fragment", version.ref = "navigationFragment" }
 firebase-database = { group = "com.google.firebase", name = "firebase-database", version.ref = "firebaseDatabase" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
+qr-scanner = { group = "com.journeyapps", name = "zxing-android-embedded", version.ref = "qrScanner" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

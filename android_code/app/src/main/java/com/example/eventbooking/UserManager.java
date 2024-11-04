@@ -1,5 +1,7 @@
 package com.example.eventbooking;
 
+import android.util.Log;
+
 import com.example.eventbooking.Events.EventData.Event;
 import com.example.eventbooking.firebase.FirestoreAccess;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -44,7 +46,8 @@ public class UserManager {
      * @param user the current user
      */
     public void setCurrentUser(User user){
-        this.currentUser= user;
+        this.currentUser = user;
+        Log.d("UserManager", user.getDeviceID() + user.getUsername());
 
         findUserFacility();
         findUserEvents();
@@ -58,6 +61,7 @@ public class UserManager {
             if (!queryDocumentSnapshots.isEmpty()) {
                 for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                     userEvents.add(document.toObject(Event.class));
+                    Log.d("UserManager", this.userEvents.toString());
                 }
             }
         });
@@ -72,7 +76,7 @@ public class UserManager {
             if (!queryDocumentSnapshots.isEmpty()) {
                 DocumentSnapshot doc = queryDocumentSnapshots.getDocuments().get(0);
                 this.userFacility = doc.toObject(Facility.class);
-
+                Log.d("UserManager", this.userFacility.toString());
                 findOrganizerEvents();
             }
         });
@@ -86,6 +90,7 @@ public class UserManager {
            if (!queryDocumentSnapshots.isEmpty()) {
                for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                    organizerEvents.add(document.toObject(Event.class));
+                   Log.d("UserManager", organizerEvents.toString());
                }
            }
         });

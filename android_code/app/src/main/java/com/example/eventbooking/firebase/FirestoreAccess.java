@@ -5,6 +5,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.Filter;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -72,6 +73,16 @@ public class FirestoreAccess {
 
     public Task<QuerySnapshot> getOrganizerEvents(String userId) {
         Query query = eventsRef.whereEqualTo("organizer", userId);
+        return query.get();
+    }
+
+    public Task<QuerySnapshot> getUserEvents(String userId) {
+        Query query = eventsRef.where(Filter.or(
+                Filter.arrayContains("acceptedParticipantIds", userId),
+                Filter.arrayContains("canceledParticipantIds", userId),
+                Filter.arrayContains("signedUpParticipantIds", userId),
+                Filter.arrayContains("waitingparticipantIds", userId)
+        ));
         return query.get();
     }
 }

@@ -57,6 +57,14 @@
         android:hint="Max Participants"
         android:inputType="number"
         android:layout_marginBottom="16dp" />
+
+    <EditText
+        android:id="@+id/waiting_list_limit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Waiting List Limit"
+        android:inputType="number"
+        android:layout_marginBottom="16dp" />
     <Button
         android:id="@+id/button_create_event"
         android:layout_width="match_parent"

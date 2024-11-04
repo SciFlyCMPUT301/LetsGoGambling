@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
 import com.example.eventbooking.Events.EventCreate.EventCreateFragment;
@@ -18,6 +19,7 @@ import com.example.eventbooking.Role;
 import com.example.eventbooking.User;
 import com.example.eventbooking.firebase.FirestoreAccess;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.util.ArrayList;
@@ -37,6 +39,7 @@ public class LoginFragment extends Fragment {
     TextView deviceIdText;
     TextView welcomeText;
     BottomNavigationView nav;
+    public static boolean isLoggedIn = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -61,9 +64,15 @@ public class LoginFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.fragment_login, container, false);
-
+//        DrawerLayout drawerLayout = getActivity().findViewById(R.id.toolbar);
+//        drawerLayout.setVisibility(View.GONE);
         nav = getActivity().findViewById(R.id.bottom_navigation);
         nav.setVisibility(View.GONE);
+
+        NavigationView sidebar = getActivity().findViewById(R.id.nav_view);
+        if (sidebar != null) {
+            sidebar.setVisibility(View.GONE);
+        }
 
         deviceIdText = rootView.findViewById(R.id.text_login_deviceid);
         welcomeText = rootView.findViewById(R.id.text_login_welcome);
@@ -84,7 +93,10 @@ public class LoginFragment extends Fragment {
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
+                        isLoggedIn = true;
+//                        drawerLayout.setVisibility(View.VISIBLE);
                         nav.setVisibility(View.VISIBLE);
+                        sidebar.setVisibility(View.VISIBLE);
                         getParentFragmentManager().beginTransaction()
                             .replace(R.id.fragment_container, HomeFragment.newInstance(deviceId)) // replace with create new user fragment
                             .commit();
@@ -98,7 +110,10 @@ public class LoginFragment extends Fragment {
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
+                        isLoggedIn = true;
+//                        drawerLayout.setVisibility(View.VISIBLE);
                         nav.setVisibility(View.VISIBLE);
+                        sidebar.setVisibility(View.VISIBLE);
                         getParentFragmentManager().beginTransaction()
                                 .replace(R.id.fragment_container, HomeFragment.newInstance(deviceId))
                                 .commit();

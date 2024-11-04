@@ -55,10 +55,11 @@
         android:text="draw replacement" />
 
     <Button
-        android:id="@+id/WaitingListNotificationButton"
+        android:id="@+id/BackToEventButton"
         android:layout_width="match_parent"
         android:layout_height="58dp"
-        android:text="send notification" />
+        android:text="back to event" />
+
 
 
 </LinearLayout>

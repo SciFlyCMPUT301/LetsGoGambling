@@ -16,25 +16,27 @@ import com.example.eventbooking.Home.HomeFragment;
 import com.example.eventbooking.R;
 import com.example.eventbooking.User;
 import com.example.eventbooking.UserManager;
+import com.example.eventbooking.waitinglist.OrganizerMenuFragment;
 import com.example.eventbooking.waitinglist.WaitingList;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
+import com.example.eventbooking.waitinglist.OrganizerMenuFragment;
 public class EventFragment extends Fragment {
     private TextView additionalInfoTextView;
     private static final String ARG_INTEGER = "arg_integer";
     private int receivedInteger;
-    //iris's update, add button to go the waitinglist page for entrant
+
     private String eventId;
     private Button joinWaitingListButton;
     private Button leaveWaitingListButton;
     private Event event;
     private String currentUserId;
     private WaitingList waitingList;
-
+    //setting up a button that to organizer
+    private Button organizerMenuButton;
 
     public static EventFragment newInstance(int integer) {
         EventFragment fragment = new EventFragment();
@@ -64,58 +66,50 @@ public class EventFragment extends Fragment {
 
         // Set up button to go back to HomeFragment
         Button backButton = rootView.findViewById(R.id.button_back_home);
+        Button organizerMenuButton = rootView.findViewById(R.id.organizer_menu);
+
+        joinWaitingListButton = rootView.findViewById(R.id.join_waiting_list);
+//        joinWaitingListButton.findViewById(R.id.join_waiting_list);
+        joinWaitingListButton.setOnClickListener(v->joinWaitingList());
+
+        leaveWaitingListButton = rootView.findViewById(R.id.leave_waiting_list);
+//        leaveWaitingListButton.findViewById(R.id.leave_waiting_list);
+        leaveWaitingListButton.setOnClickListener(v->leaveWaitingList());
+
         backButton.setOnClickListener(v -> {
             // Navigate back to HomeFragment
             getParentFragmentManager().beginTransaction()
                     .replace(R.id.fragment_container, new HomeFragment())
                     .commit();
         });
-//        loadWaitingList();
 
-//        joinWaitingListButton.setOnClickListener(v->joinWaitingList());
-//        leaveWaitingListButton.setOnClickListener(v->leaveWaitingList());
+        organizerMenuButton.setOnClickListener(v->{
+            //navigate to the waiting list menu
+            OrganizerMenuFragment organizerMenuFragment=OrganizerMenuFragment.newInstance( eventId);
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, organizerMenuFragment)
+                    .commit();
+        });
 
 
         return rootView;
     }
 
-
-
-    //loads the waiting list data from firebase and updates the view model
-    private void loadWaitingList(){
-        DatabaseReference waitingListRef= FirebaseDatabase.getInstance().getReference("waitingLists").child(eventId);
-        waitingListRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.exists()){
-                    waitingList =snapshot.getValue(WaitingList.class);
-                    if(waitingList == null){
-                        //shouldn't reach here
-                       Toast.makeText(getContext(),"error: waitinglist data is corrupted",Toast.LENGTH_SHORT).show();
-                       joinWaitingListButton.setEnabled(false);
-                       leaveWaitingListButton.setEnabled(false);
-                    }else{
-                        updateButtonsState();
-                    }
-
-                }else{
-                    //waiting list does not exist
-                    //shouldn't reach here
-                    Toast.makeText(getContext(),"error waiting list doesn't exist",Toast.LENGTH_SHORT).show();
-                    joinWaitingListButton.setEnabled(false);
-                    leaveWaitingListButton.setEnabled(false);
-
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(getContext(),"Failed to load waitinglist",Toast.LENGTH_SHORT).show();
-                joinWaitingListButton.setEnabled(false);
-                leaveWaitingListButton.setEnabled(false);
-            }
-        });
+    private void checkIfUserIsOrganizer(){
+        User currentUser = UserManager.getInstance().getCurrentUser();
+        if(currentUser==null){
+            organizerMenuButton.setVisibility(View.GONE);
+            return;
+        }
+        String currentUserId = currentUser.getDeviceID();
+        String organizerId= event.getOrganizerId();
+        if(currentUserId.equals(organizerId)){
+            organizerMenuButton.setVisibility(View.VISIBLE);
+        }else{
+            organizerMenuButton.setVisibility(View.GONE);
+        }
     }
+
     //allow current user to join the waiting list
     private void joinWaitingList(){
         if(waitingList==null){
@@ -128,11 +122,11 @@ public class EventFragment extends Fragment {
             return;
         }
         String currentUserId = currentUser.getDeviceID();
-        boolean success = waitingList.joinWaitingList(currentUserId);
+        boolean success = waitingList.addParticipantToWaitingList(currentUserId);
         if(success){
             //update firebase
-            updateWaitingListInFirebase();
-            Toast.makeText(getContext(),"Joined the wiating list",Toast.LENGTH_SHORT).show();
+            //updateWaitingListInFirebase();
+            Toast.makeText(getContext(),"Joined the waiting list",Toast.LENGTH_SHORT).show();
             updateButtonsState();
         }else{
             Toast.makeText(getContext(),"Failed to join the waitingList",Toast.LENGTH_SHORT).show();
@@ -153,27 +147,15 @@ public class EventFragment extends Fragment {
             return;
         }
         String currentUserId = currentUser.getDeviceID();
-        boolean success = waitingList.leaveWaitingList(currentUserId);
+        boolean success = waitingList.cancelParticipation(currentUserId);
         if(success){
             //update firebase
-            updateWaitingListInFirebase();
+            //updateWaitingListInFirebase();
             Toast.makeText(getContext(),"left the waiting list",Toast.LENGTH_SHORT).show();
             updateButtonsState();
         }else{
             Toast.makeText(getContext(),"Failed to leave the waitingList",Toast.LENGTH_SHORT).show();
         }
-    }
-
-    //update the waiting list in firebase
-    private void updateWaitingListInFirebase(){
-        DatabaseReference waitingListRef = FirebaseDatabase.getInstance().getReference("waitingLists").child(eventId);
-        waitingListRef.setValue(waitingList).addOnCompleteListener(task->{
-            if(task.isSuccessful()){
-                updateButtonsState();
-            }else{
-                Toast.makeText(getContext(),"failed to update firebase", Toast.LENGTH_SHORT).show();
-            }
-        });
     }
 
     /**
@@ -186,7 +168,7 @@ public class EventFragment extends Fragment {
             return;
         }
         String currentUserId = currentUser.getDeviceID();
-        if(waitingList.getWaitingparticipantIds().contains(currentUserId)
+        if(waitingList.getWaitingParticipantIds().contains(currentUserId)
         ){
             //what should I do for user in other list
             joinWaitingListButton.setEnabled(false);

@@ -1,5 +1,7 @@
 package com.example.eventbooking;
 
+import android.util.Log;
+
 import com.example.eventbooking.Events.EventData.Event;
 import com.example.eventbooking.Facility;
 import com.example.eventbooking.User;
@@ -9,7 +11,10 @@ import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.*;
-
+/**
+ * Class is designed to generate random data to be used however wanted, either locally or uploaded
+ * to firebase and used as such
+ */
 public class DataGenerator {
 
     private List<User> userList;
@@ -18,6 +23,9 @@ public class DataGenerator {
 
     private FirebaseFirestore db;
 
+    /**
+     * Constructor to make sure that all references are not null when being called
+     */
     public DataGenerator() {
         db = FirebaseFirestore.getInstance();
         userList = new ArrayList<>();
@@ -25,6 +33,10 @@ public class DataGenerator {
         eventList = new ArrayList<>();
     }
 
+    /**
+     * Secondary constructor to be called only if desired but will almost always be called right
+     * after the constructor
+     */
     public void generateAndUploadData() {
         generateUsers();
         generateFacilities();
@@ -32,6 +44,10 @@ public class DataGenerator {
         uploadData();
     }
 
+    /**
+     * Randomly generating users first as without users we cannot have a facility or events
+     * No rhyme or reason to generating, mearly random
+     */
     private void generateUsers() {
         userList.clear();
         for (int i = 1; i <= 10; i++) {
@@ -53,7 +69,10 @@ public class DataGenerator {
             userList.add(user);
         }
     }
-
+    /**
+     * Randomly generating facilities next and have to pair it to a user, cannot be more facilities
+     * then users so the number is hard set for now, other generation techniques will come later
+     */
     private void generateFacilities() {
         facilityList.clear();
         for (int i = 3; i <= 5; i++) {
@@ -62,16 +81,27 @@ public class DataGenerator {
             facility.setName("Facility" + (i - 2));
             facility.setAddress("Address of Facility" + (i - 2));
             facility.setOrganizer(organizer.getUsername());
+            facility.setFacilityID("Facility"+(i - 2));
+            Log.d("HAHAHAHAHAH", "Facility ID: " + facility.getFacilityID());
+
             facilityList.add(facility);
         }
     }
-
+    /**
+     * Lastly generating events to be used, these need to be associated with a facility
+     * associating User -> Facility, the user is then an organizer
+     * Then
+     * associating User -> Event, the user organized the event
+     *
+     * Can also in the future link Event -> Facility to reduce searching time?
+     * Might also just generate local User, Facility, and Events upon login
+     */
     private void generateEvents() {
         eventList.clear();
         Random random = new Random();
         for (int i = 1; i <= 5; i++) {
             Event event = new Event();
-            event.setEventId("event" + i);
+            event.setEventId("Event" + i);
             event.setEventTitle("Event Title " + i);
             event.setDescription("Description for event " + i);
             event.setTimestamp(System.currentTimeMillis() + i * 86400000); // Next few days
@@ -81,7 +111,7 @@ public class DataGenerator {
             if (!facilityList.isEmpty()) {
                 Facility facility = facilityList.get(random.nextInt(facilityList.size()));
                 event.setLocation(facility.getLocation());
-                facility.associateEvent(event.getEventId());
+                facility.associateEvent(facility.getFacilityID(), event.getEventId());
             }
 
             // Assign organizer

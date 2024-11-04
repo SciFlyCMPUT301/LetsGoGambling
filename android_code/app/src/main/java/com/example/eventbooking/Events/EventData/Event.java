@@ -4,6 +4,8 @@ import android.net.Uri;
 import android.os.UserManager;
 import android.provider.ContactsContract;
 
+import androidx.annotation.NonNull;
+
 import com.example.eventbooking.Location;
 
 import java.io.File;
@@ -14,9 +16,11 @@ import com.example.eventbooking.Role;
 import com.example.eventbooking.User;
 
 import com.example.eventbooking.waitinglist.WaitingList;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -26,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 
 public class Event {
-
     private String eventId;
     private String eventTitle;
     private String description;
@@ -257,4 +260,22 @@ public class Event {
         uploadEventPosterToFirebase(newPoster);
     }
 
+    private String getNewEventID(){
+        final String[] eventIDString = {""};
+        db.collection("Events").get().addOnCompleteListener(new
+        OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    eventIDString[0] = String.valueOf((task.getResult().size()) +1);
+                }
+//                    } else {
+//                        Toast.makeTesxt(getContext(),"Error : " +
+//                                e.toString(),Toast.LENGHT_LONG).show;
+//                    }
+            }
+        });
+        eventIDString[0] = "Event"+eventIDString[0];
+        return eventIDString[0];
+    }
 }

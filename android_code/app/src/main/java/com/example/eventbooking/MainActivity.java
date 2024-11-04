@@ -44,8 +44,15 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
-
+/**
+ * MainActivity, this is the main portion to define navigation views and a controller to move
+ * QR code intent to pass information to other models such as the LoginFragment and ScannedFragment
+ *
+ */
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, BottomNavigationView.OnNavigationItemSelectedListener{
+    /**
+     * Generating navigation controllers and instances to be utilized later
+     */
 //    BottomNavigationView bottomNavigationView;
     private static final int REQUEST_WRITE_STORAGE = 112;
     private QRcodeGenerator qrGenerator;
@@ -57,8 +64,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private ActionBarDrawerToggle drawerToggle;
 //    private ActivityMainBinding binding;
 
-    // Setting fragments here any calls will be based off of this, easier to track what
-    // Fragments can be called to generate new views
+    /**
+     * Setting fragments here any calls will be based off of this, easier to track what fragments
+     * are being called in the navigation bar and to see if they are being used at all
+     */
     private HomeFragment homeFragment = new HomeFragment();
     private ProfileFragment profileFragment = new ProfileFragment();
     private EventFragment eventFragment = new EventFragment();
@@ -80,6 +89,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        /**
+         * Finding and setting the views for the navigation inside of activity_main
+         */
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNavigationView
                 = findViewById(R.id.bottom_navigation);
@@ -134,6 +147,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
+    /**
+     * The main navigation code here, first we check if its the bottom navigation view that was
+     * clicked on or the drawer side bar.
+     *
+     * This distinguising is used for future implimentation and ease of use with current switching
+     */
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int itemId = item.getItemId();
@@ -166,6 +185,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 return true;
             }
         }
+        /**
+         * Drawer side bar navigation
+         */
         else {
             if (itemId == R.id.nav_organizer_menu) {
                 getSupportFragmentManager().beginTransaction()
@@ -235,7 +257,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         return false;
     }
-
+    /**
+     * ability to press the back arrow on the phone to allow increased mobility for users to close
+     * the side bar.
+     */
     @Override
     public void onBackPressed() {
         // Close drawer if open
@@ -249,6 +274,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     //QR code intent here, this is to get the links intercepted such that we can then pass
     //Them into the program
+
+    /**
+     * The below two functions are intended on getting the QR code scanning outside of the app
+     * and then passing the data inside of the QR code into the app such that we can use it.
+     *
+     * handleQRCodeScan gets the data and opens scannedFragment with the data being passed into it.
+     * Future iterations should instead use bundles to enable more consistent loading across
+     * other navigation pathways
+     */
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);

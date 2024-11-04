@@ -28,6 +28,7 @@ public class Facility {
         // Initialize list to avoid NullPointerException
         allEvents = new ArrayList<>();
     }
+
     public Facility(String name, String address, String description, String organizer) {
         this.name = name;
         this.address = address;
@@ -37,50 +38,22 @@ public class Facility {
         this.allEvents = new ArrayList<>();
     }
 
-    public String getName(){
-        return name;
-    }
+    // Getters and Setters for fields
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-    public void setName(String name){
-        this.name = name;
-    }
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
 
-    public String getAddress(){
-        return address;
-    }
+    public String getOrganizer() { return organizer; }
+    public void setOrganizer(String organizer) { this.organizer = organizer; }
 
-    public void setAddress(String address){
-        this.address = address;
-    }
+    public Location getLocation() { return location; }
+    public void setLocation(Location location) { this.location = location; }
 
-    public String getOrganizer(){
-        return organizer;
-    }
+    public List<String> getAllEvents() { return allEvents; }
 
-    public void setOrganizer(String organizer){
-        this.organizer = organizer;
-    }
-
-    public Location getLocation() {
-        return location;
-    }
-
-    public void setLocation(Location location) {
-        this.location = location;
-    }
-
-    public String getEvent(){
-        return eventName;
-    }
-
-    public void setEvent(String eventName){
-        this.eventName = eventName;
-    }
-
-    public List<String> getAllEvents() {
-        return allEvents;
-    }
-
+    // Method to save or create a facility profile
     public Task<Void> saveFacilityProfile() {
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("Facility name must be provided.");
@@ -90,55 +63,40 @@ public class Facility {
         facilityData.put("address", address);
         facilityData.put("organizer", organizer);
         facilityData.put("location", location != null ? location.toString() : null);
-        facilityData.put("allEvents", allEvents); // Store associated events
+        facilityData.put("allEvents", allEvents);
 
-        // Save data under the "facilities" collection
-        return db.collection("Facilities").document(name)
+        return db.collection("facilities").document(name)
                 .set(facilityData)
-                .addOnSuccessListener(aVoid -> {
-                    System.out.println("Facility data successfully written to Firestore!");
-                })
-                .addOnFailureListener(e -> {
-                    System.out.println("Error writing facility data to Firestore: " + e.getMessage());
-                });
+                .addOnSuccessListener(aVoid -> System.out.println("Facility data successfully written to Firestore!"))
+                .addOnFailureListener(e -> System.out.println("Error writing facility data to Firestore: " + e.getMessage()));
     }
 
-    public void deleteFacilityProfile() {
+    // Method for administrators to remove the organizer from the facility
+    public void deleteFacility() {
         if (name != null && !name.isEmpty()) {
+            // Create a map to update the organizer field to null
             Map<String, Object> updates = new HashMap<>();
-            updates.put("organizer", null); // Set the 'organizer' field to null
+            updates.put("organizer", null);
 
+            // Update the facility document, setting the organizer to null
             facilitiesRef.document(name)
                     .update(updates)
-                    .addOnSuccessListener(aVoid -> {
-                        System.out.println("Facility updated successfully: organizer set to null.");
-                    })
-                    .addOnFailureListener(e -> {
-                        throw new IllegalArgumentException("Error updating facility: " + e.getMessage());
-                    });
-        }
-        else {
+                    .addOnSuccessListener(aVoid -> System.out.println("Organizer removed successfully from facility."))
+                    .addOnFailureListener(e -> System.out.println("Error removing organizer from facility: " + e.getMessage()));
+        } else {
             throw new IllegalArgumentException("Facility name is invalid.");
         }
     }
 
-    public void associateEvent(String eventName) {
-        // Check if the facility document exists
-        db.collection("facilities").document(name)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && task.getResult() != null && task.getResult().exists()) {
-                        // Document exists, proceed with the update
-                        updateEventInFacility(eventName);
-                    } else {
-                        // Document doesn't exist, create it with the event
-                        System.out.println("Facility document not found. Creating document with event.");
-                        createFacilityWithEvent(eventName);
-                    }
-                })
-                .addOnFailureListener(e -> System.out.println("Error checking facility existence: " + e.getMessage()));
+    // Organizer method to associate an event with a facility
+    public boolean associateEvent(String eventName) {
+        // Check if the event is already in the allEvents list
+        if (allEvents.contains(eventName)) {
+            System.out.println("Event already associated with this facility.");
+            return true;
+        }
+        return false;
     }
-
 
     private void updateEventInFacility(String eventName) {
         if (allEvents == null) {
@@ -157,18 +115,4 @@ public class Facility {
         }
     }
 
-    private void createFacilityWithEvent(String eventName) {
-        allEvents.add(eventName);
-        Map<String, Object> facilityData = new HashMap<>();
-        facilityData.put("name", name);
-        facilityData.put("address", address);
-        facilityData.put("organizer", organizer);
-        facilityData.put("allEvents", allEvents);
-
-        db.collection("facilities").document(name)
-                .set(facilityData)
-                .addOnSuccessListener(aVoid -> System.out.println("Facility created successfully with initial event."))
-                .addOnFailureListener(e -> System.out.println("Error creating facility: " + e.getMessage()));
-    }
 }
-

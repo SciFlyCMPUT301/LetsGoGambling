@@ -23,6 +23,7 @@ public class User {
     private String phoneNumber;
     // profile picture
     private String profilePictureUrl;
+    private String defaulutProfilePictureUrl;
     private Location location; // this is for facilities
     private boolean adminLevel;
     private boolean facilityAssociated;
@@ -38,8 +39,8 @@ public class User {
     public User() {
         //init roles to avoid null pointer exception
         this.roles = new ArrayList<>();
-        storage = FirebaseStorage.getInstance(); // Initialize Firebase Storage
-        db = FirebaseFirestore.getInstance(); // Initialize Firestore
+        this.storage = FirebaseStorage.getInstance();
+        this.db = FirebaseFirestore.getInstance();
     }
 
     public User(String deviceID, String username, String email, String phoneNumber,Set<String> roles) {
@@ -48,11 +49,13 @@ public class User {
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.profilePictureUrl = defaultProfilePictureUrl();
+        this.defaulutProfilePictureUrl = defaultProfilePictureUrl();
         this.roles = new ArrayList<>();
         this.roles.add(Role.ENTRANT); //set default role to be entrant
-        this.storage = FirebaseStorage.getInstance();
-        this.db = FirebaseFirestore.getInstance();
+        this.storage = storage;
+        this.db = db;
     }
+
 
     public String getDeviceID() { return deviceID; }
     public void setDeviceID(String deviceID) { this.deviceID = deviceID; }
@@ -124,80 +127,79 @@ public class User {
                 });
     }
 
-    public void uploadProfilePictureToFirebase(String picture){
+    public void uploadProfilePictureToFirebase(Uri pictureUri) {
         if (username == null || username.isEmpty()) {
             throw new IllegalArgumentException("Username must be set before uploading a profile picture.");
         }
-        if (picture == null || picture.isEmpty()) {
-            throw new IllegalArgumentException("Invalid picture path.");
+        if (pictureUri == null) {
+            throw new IllegalArgumentException("Invalid picture Uri.");
         }
 
         StorageReference storageRef = storage.getReference();
-
-        // Create a unique filename for the picture
         String fileName = "profile_picture_" + System.currentTimeMillis() + ".jpg";
         StorageReference profilePicRef = storageRef.child("users/" + username + "/profile_pictures/" + fileName);
 
-        // Convert the picture path to a Uri
-        Uri fileUri = Uri.fromFile(new File(picture));
+        // Start the upload task using Uri
+        profilePicRef.putFile(pictureUri)
+                .addOnSuccessListener(taskSnapshot -> {
+                    // Get the download URL after the upload is successful
+                    profilePicRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                        profilePictureUrl = uri.toString();
+                        System.out.println("Profile picture uploaded successfully: " + profilePictureUrl);
 
-        // Start the upload task
-        UploadTask uploadTask = profilePicRef.putFile(fileUri);
-        uploadTask.addOnSuccessListener(taskSnapshot -> {
-            // Get the download URL after the upload is successful
-            profilePicRef.getDownloadUrl().addOnSuccessListener(uri -> {
-                profilePictureUrl = uri.toString();
-                System.out.println("Profile picture uploaded successfully: " + profilePictureUrl);
-                Map<String, Object> updates = new HashMap<>();
-                updates.put("profilePictureUrl", profilePictureUrl);
+                        // Update the URL in Firestore
+                        Map<String, Object> updates = new HashMap<>();
+                        updates.put("profilePictureUrl", profilePictureUrl);
 
-                db.collection("Users").document(username)
-                        .update(updates)
-                        .addOnSuccessListener(updateVoid -> {
-                            System.out.println("Profile picture URL successfully updated in Firestore.");
-                        })
-                        .addOnFailureListener(e -> {
-                            System.out.println("Error updating profile picture URL in Firestore: " + e.getMessage());
-                        });
-
-            }).addOnFailureListener(exception -> {
-                throw new IllegalArgumentException("Failed to retrieve download URL from Firebase.", exception);
-            });
-        }).addOnFailureListener(exception -> {
-            throw new IllegalArgumentException("Failed to upload the profile picture to Firebase.", exception);
-        });
+                        db.collection("Users").document(username)
+                                .update(updates)
+                                .addOnSuccessListener(aVoid -> {
+                                    System.out.println("Profile picture URL successfully updated in Firestore.");
+                                })
+                                .addOnFailureListener(e -> {
+                                    System.out.println("Error updating profile picture URL in Firestore: " + e.getMessage());
+                                });
+                    }).addOnFailureListener(exception -> {
+                        System.out.println("Failed to retrieve download URL from Firebase: " + exception.getMessage());
+                    });
+                })
+                .addOnFailureListener(exception -> {
+                    System.out.println("Failed to upload the profile picture to Firebase: " + exception.getMessage());
+                });
     }
 
-    public void updateProfilePictureUrlToFirebase(String newPicture){
-        uploadProfilePictureToFirebase(newPicture);
+
+    public void updateProfilePictureUrlToFirebase(Uri newPictureUri){
+        uploadProfilePictureToFirebase(newPictureUri);
     }
 
-    public void deleteProfilePictureFromFirebase(){
-        if (profilePictureUrl != null && !profilePictureUrl.isEmpty()) {
-            StorageReference storageRef = storage.getReferenceFromUrl(profilePictureUrl);
+    public void deleteSelectedImageFromFirebase(String selectedImageUrl) {
+        if (selectedImageUrl != null && !selectedImageUrl.isEmpty()) {
+            // Create a StorageReference for the selected image
+            StorageReference storageRef = storage.getReferenceFromUrl(selectedImageUrl);
 
             // Start the deletion task
             storageRef.delete().addOnSuccessListener(aVoid -> {
-                // Reset the profile picture URL to the default after deletion
-                profilePictureUrl = defaultProfilePictureUrl();
-                Map<String, Object> updates = new HashMap<>();
-                updates.put("profilePictureUrl", profilePictureUrl);
+                System.out.println("Selected image deleted successfully from Firebase Storage.");
 
-                db.collection("users").document(username)
+                // Optionally, update the Firestore database if necessary
+                Map<String, Object> updates = new HashMap<>();
+                updates.put("profilePictureUrl", defaultProfilePictureUrl());
+                db.collection("Users").document(username)
                         .update(updates)
                         .addOnSuccessListener(updateVoid -> {
-                            System.out.println("Profile picture URL successfully updated in Firestore.");
+                            System.out.println("Profile picture URL successfully updated to default in Firestore.");
                         })
                         .addOnFailureListener(e -> {
                             System.out.println("Error updating profile picture URL in Firestore: " + e.getMessage());
                         });
-                System.out.println("Profile picture deleted successfully.");
             }).addOnFailureListener(exception -> {
-                throw new IllegalArgumentException("Failed to delete the profile picture from Firebase.", exception);
+                System.out.println("Failed to delete the selected image from Firebase Storage: " + exception.getMessage());
             });
         } else {
-            throw new IllegalArgumentException("Profile picture URL is invalid or already deleted.");
+            throw new IllegalArgumentException("Selected image URL is invalid or already deleted.");
         }
     }
+
 
 }

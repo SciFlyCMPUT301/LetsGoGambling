@@ -14,6 +14,7 @@ import java.util.*;
 /**
  * Class is designed to generate random data to be used however wanted, either locally or uploaded
  * to firebase and used as such
+ * Useless class for now
  */
 public class DataGenerator {
 

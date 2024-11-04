@@ -13,9 +13,9 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class SampleTable {
-    public List<User> UserList = new ArrayList<>();
-    public List<Facility> FacilityList = new ArrayList<>();
-    public List<Event> EventList = new ArrayList<>();
+    public static List<User> UserList = new ArrayList<>();
+    public static List<Facility> FacilityList = new ArrayList<>();
+    public static List<Event> EventList = new ArrayList<>();
 
     private int userUpdateCount;
     private int facilityUpdateCount;

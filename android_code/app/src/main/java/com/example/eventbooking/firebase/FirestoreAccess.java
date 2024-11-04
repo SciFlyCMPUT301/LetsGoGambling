@@ -6,6 +6,8 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,12 +18,25 @@ import java.util.Map;
  * Use is optional.
  */
 public class FirestoreAccess {
+    private static FirestoreAccess instance;
     private FirebaseFirestore db;
     private CollectionReference usersRef;
+    private CollectionReference facilitiesRef;
+    private CollectionReference eventsRef;
 
     public FirestoreAccess() {
         db = FirebaseFirestore.getInstance();
         usersRef = db.collection("Users");
+        facilitiesRef = db.collection("Facilities");
+        eventsRef = db.collection("Events");
+    }
+
+    public static synchronized FirestoreAccess getInstance() {
+        if (instance == null) {
+            instance = new FirestoreAccess();
+        }
+
+        return instance;
     }
 
     /**
@@ -49,4 +64,16 @@ public class FirestoreAccess {
 //        return usersRef.document(user.getDeviceID()).set(userdata);
         return usersRef.document(user.getDeviceID()).set(user);
     }
+
+    public Task<QuerySnapshot> getUserFacility(String userId) {
+        Query query = facilitiesRef.whereEqualTo("organizer", userId);
+        return query.get();
+    }
+
+    public Task<QuerySnapshot> getOrganizerEvents(String userId) {
+        Query query = eventsRef.whereEqualTo("organizer", userId);
+        return query.get();
+    }
 }
+
+

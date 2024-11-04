@@ -17,6 +17,7 @@ import com.example.eventbooking.Home.HomeFragment;
 import com.example.eventbooking.R;
 import com.example.eventbooking.Role;
 import com.example.eventbooking.User;
+import com.example.eventbooking.UserManager;
 import com.example.eventbooking.firebase.FirestoreAccess;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
@@ -79,10 +80,10 @@ public class LoginFragment extends Fragment {
         String deviceId = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
         deviceIdText.setText(deviceId);
 
-        FirestoreAccess fs = new FirestoreAccess();
+        FirestoreAccess fs = FirestoreAccess.getInstance();
         fs.getUser(deviceId).addOnSuccessListener(snapshot -> {
             //nav.setVisibility(View.VISIBLE);
-            if (!snapshot.exists()) {
+            if (!snapshot.exists()) { // if new user
                 welcomeText.setText("Welcome new user");
                 // testing
 //                User user = new User(deviceId, "Alex", "a@b.com", "9312-303", new HashSet<>());
@@ -102,9 +103,10 @@ public class LoginFragment extends Fragment {
                             .commit();
                     }
                 }, 3000);
-            } else {
+            } else { // returning user
                 User user = snapshot.toObject(User.class);
                 Log.d("Login", "Retrieved user "+user.getUsername());
+                UserManager.getInstance().setCurrentUser(user);
 
                 Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {

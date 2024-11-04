@@ -29,6 +29,7 @@ public class SampleTable {
             user.setEmail("admin" + i + "@example.com");
             user.setPhoneNumber("555-000" + i);
             user.addRole(Role.ADMIN);
+            user.addRole(Role.ENTRANT);
             UserList.add(user);
         }
 
@@ -40,6 +41,7 @@ public class SampleTable {
             user.setEmail("organizer" + i + "@example.com");
             user.setPhoneNumber("555-010" + i);
             user.addRole(Role.ORGANIZER);
+            user.addRole(Role.ENTRANT);
             UserList.add(user);
         }
 
@@ -50,7 +52,7 @@ public class SampleTable {
             user.setDeviceID("deviceID" + (i + 15));
             user.setEmail("user" + i + "@example.com");
             user.setPhoneNumber("555-020" + i);
-            // ENTRANT role is added by default in User constructor
+            user.addRole(Role.ENTRANT);
             UserList.add(user);
         }
     }

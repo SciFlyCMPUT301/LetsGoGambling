@@ -1,6 +1,7 @@
 package com.example.eventbooking;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -26,7 +27,10 @@ import com.example.eventbooking.Events.EventCreate.EventCreateFragment;
 import com.example.eventbooking.Events.EventPageFragment.EventFragment;
 import com.example.eventbooking.Home.HomeFragment;
 import com.example.eventbooking.Login.LoginFragment;
+import com.example.eventbooking.QRCode.CameraFragment;
+import com.example.eventbooking.QRCode.QRCodeEventGenerate;
 import com.example.eventbooking.QRCode.QRcodeGenerator;
+import com.example.eventbooking.QRCode.ScannedFragment;
 import com.example.eventbooking.Testing.TestFragment;
 import com.example.eventbooking.notification.NotificationFragment;
 import com.example.eventbooking.profile.ProfileFragment;
@@ -66,6 +70,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private ViewCanceledListFragment viewCanceledListFragment = new ViewCanceledListFragment();
     private ViewAcceptedListFragment viewAcceptedListFragment = new ViewAcceptedListFragment();
     private OrganizerMenuFragment organizerMenuFragment = new OrganizerMenuFragment();
+    private ScannedFragment scannedFragment = new ScannedFragment();
+    private CameraFragment cameraFragment = new CameraFragment();
+    private QRCodeEventGenerate eventCodeGenerate = new QRCodeEventGenerate();
 
 
     @Override
@@ -111,12 +118,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 ////            editor.apply();
 ////        }
 
-        if (savedInstanceState == null) {
-            // Load HomeFragment by default
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new LoginFragment())
-                    .commit();
-        }
+//        if (savedInstanceState == null) {
+//            // Load HomeFragment by default
+//            getSupportFragmentManager().beginTransaction()
+//                    .replace(R.id.fragment_container, new LoginFragment())
+//                    .commit();
+//        }
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -203,6 +210,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container, eventCreateFragment)
                         .commit();
+            } else if (itemId == R.id.nav_camera) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, cameraFragment)
+                        .commit();
+            } else if (itemId == R.id.nav_scanned_event) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, scannedFragment)
+                        .commit();
+            } else if (itemId == R.id.nav_event_code_generate) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, eventCodeGenerate)
+                        .commit();
             }
             // Close the drawer after an item is selected
             drawerLayout.closeDrawer(GravityCompat.START);
@@ -222,6 +241,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+
+    //QR code intent here, this is to get the links intercepted such that we can then pass
+    //Them into the program
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        handleQRCodeScan(intent);
+    }
+
+    private void handleQRCodeScan(Intent intent) {
+        if (LoginFragment.isLoggedIn) { // Check if user is logged in
+            String scannedData = intent.getStringExtra("scanned_data");
+            if (scannedData != null) {
+                ScannedFragment scannedFragment = ScannedFragment.newInstance(scannedData);
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, scannedFragment)
+                        .commit();
+            }
+        }
+    }
 
 
 }

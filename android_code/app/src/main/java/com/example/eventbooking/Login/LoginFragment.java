@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
 import com.example.eventbooking.Events.EventCreate.EventCreateFragment;
@@ -45,7 +46,8 @@ public class LoginFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.fragment_login, container, false);
-
+//        DrawerLayout drawerLayout = getActivity().findViewById(R.id.toolbar);
+//        drawerLayout.setVisibility(View.GONE);
         nav = getActivity().findViewById(R.id.bottom_navigation);
         nav.setVisibility(View.GONE);
 
@@ -74,6 +76,7 @@ public class LoginFragment extends Fragment {
                     @Override
                     public void run() {
                         isLoggedIn = true;
+//                        drawerLayout.setVisibility(View.VISIBLE);
                         nav.setVisibility(View.VISIBLE);
                         sidebar.setVisibility(View.VISIBLE);
                         getParentFragmentManager().beginTransaction()
@@ -90,6 +93,7 @@ public class LoginFragment extends Fragment {
                     @Override
                     public void run() {
                         isLoggedIn = true;
+//                        drawerLayout.setVisibility(View.VISIBLE);
                         nav.setVisibility(View.VISIBLE);
                         sidebar.setVisibility(View.VISIBLE);
                         getParentFragmentManager().beginTransaction()

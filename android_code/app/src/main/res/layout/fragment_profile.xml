@@ -1,29 +1,48 @@
 <!-- fragment_profile.xml -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:orientation="vertical"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
     android:gravity="center">
-    <TextView
-        android:id="@+id/profile_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Profile Page"
-        android:textSize="18sp" />
-
-    <!-- TextView to display the integer -->
-    <TextView
-        android:id="@+id/profile_integer_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Integer: 0"
-        android:textSize="18sp" />
-
-    <!-- Button to go back to HomeFragment -->
     <Button
-        android:id="@+id/button_back_home"
+        android:id="@+id/notification_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Back to Home" />
+        android:text="Notification"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="70dp"
+        android:layout_marginEnd="8dp"/>
 
-</LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="vertical">
+
+
+        <TextView
+            android:id="@+id/profile_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Profile Page"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/profile_integer_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Integer: 0"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/button_back_home"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Back to Home" />
+    </LinearLayout>
+
+</RelativeLayout>

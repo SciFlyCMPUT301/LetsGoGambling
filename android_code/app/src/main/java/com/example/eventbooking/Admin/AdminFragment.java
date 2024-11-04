@@ -59,7 +59,7 @@ public class AdminFragment extends Fragment {
 
 
     private void replaceFragment(Fragment fragment) {
-        Toast.makeText(getContext(), "Event created successfully!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "Fragment launched successfully!", Toast.LENGTH_SHORT).show();
         if (getParentFragmentManager() != null && getContext() != null) {
             FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
             transaction.replace(R.id.fragment_container, fragment);

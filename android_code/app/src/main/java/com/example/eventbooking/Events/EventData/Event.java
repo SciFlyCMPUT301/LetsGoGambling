@@ -4,6 +4,8 @@ import android.net.Uri;
 import android.os.UserManager;
 import android.provider.ContactsContract;
 
+import androidx.annotation.NonNull;
+
 import com.example.eventbooking.Location;
 
 import java.io.File;
@@ -14,9 +16,11 @@ import com.example.eventbooking.Role;
 import com.example.eventbooking.User;
 
 import com.example.eventbooking.waitinglist.WaitingList;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -26,14 +30,14 @@ import java.util.List;
 import java.util.Map;
 
 public class Event {
-
     private String eventId;
     private String eventTitle;
     private String description;
     private String imageUrl; // URL of the event image in Firebase Storage
     private long timestamp; // Event time in milliseconds
-    private Location location;
+//    private Location location;
 
+    private String address;
     private int maxParticipants; // limit number of entrants
     private List<String> waitingparticipantIds;
     private List<String> acceptedParticipantIds;
@@ -104,8 +108,10 @@ public class Event {
     public long getTimestamp() { return timestamp; }
     public void setTimestamp(long timestamp) { this.timestamp = timestamp; }
 
-    public Location getLocation() { return location; }
-    public void setLocation(Location new_location) { this.location = new_location; }
+//    public Location getLocation() { return location; }
+//    public void setLocation(Location new_location) { this.location = new_location; }
+    public String getAddress() { return address; }
+    public void setAddress(String new_location) { this.address = new_location; }
 
     public int getMaxParticipants() { return maxParticipants; }
     public void setMaxParticipants(int maxParticipants) { this.maxParticipants = maxParticipants; }
@@ -190,7 +196,8 @@ public class Event {
         eventData.put("description", description);
         eventData.put("imageUrl", imageUrl);
         eventData.put("timestamp", timestamp);
-        eventData.put("location", location != null ? location.toString() : null);
+//        eventData.put("location", location != null ? location.toString() : null);
+        eventData.put("location", address);
         eventData.put("maxParticipants", maxParticipants);
         eventData.put("waitingparticipantIds",waitingList.getWaitingParticipantIds());
         eventData.put("acceptedParticipantIds", waitingList.getAcceptedParticipantIds());
@@ -257,4 +264,22 @@ public class Event {
         uploadEventPosterToFirebase(newPoster);
     }
 
+    private String getNewEventID(){
+        final String[] eventIDString = {""};
+        db.collection("Events").get().addOnCompleteListener(new
+        OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    eventIDString[0] = String.valueOf((task.getResult().size()) +1);
+                }
+//                    } else {
+//                        Toast.makeTesxt(getContext(),"Error : " +
+//                                e.toString(),Toast.LENGHT_LONG).show;
+//                    }
+            }
+        });
+        eventIDString[0] = "Event"+eventIDString[0];
+        return eventIDString[0];
+    }
 }

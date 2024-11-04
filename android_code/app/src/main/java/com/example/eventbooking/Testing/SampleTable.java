@@ -1,5 +1,7 @@
 package com.example.eventbooking.Testing;
 
+import android.util.Log;
+
 import com.example.eventbooking.Events.EventData.Event;
 import com.example.eventbooking.Facility;
 import com.example.eventbooking.Role;
@@ -22,7 +24,7 @@ public class SampleTable {
         // Create 5 admin users
         for (int i = 1; i <= 5; i++) {
             User user = new User();
-            user.setUsername("adminUser" + i);
+            user.setUsername("User" + i);
             user.setDeviceID("deviceID" + i);
             user.setEmail("admin" + i + "@example.com");
             user.setPhoneNumber("555-000" + i);
@@ -33,7 +35,7 @@ public class SampleTable {
         // Create 10 organizer users
         for (int i = 1; i <= 10; i++) {
             User user = new User();
-            user.setUsername("organizerUser" + i);
+            user.setUsername("User" + i);
             user.setDeviceID("deviceID" + (i + 5));
             user.setEmail("organizer" + i + "@example.com");
             user.setPhoneNumber("555-010" + i);
@@ -44,7 +46,7 @@ public class SampleTable {
         // Create 15 normal users
         for (int i = 1; i <= 15; i++) {
             User user = new User();
-            user.setUsername("normalUser" + i);
+            user.setUsername("User" + i);
             user.setDeviceID("deviceID" + (i + 15));
             user.setEmail("user" + i + "@example.com");
             user.setPhoneNumber("555-020" + i);
@@ -69,6 +71,7 @@ public class SampleTable {
             facility.setName("Facility" + (i + 1));
             facility.setAddress("Address of Facility" + (i + 1));
             facility.setOrganizer(organizer.getUsername());
+            facility.setFacilityID("Facility"+(i + 1));
             FacilityList.add(facility);
             // Optionally, set facility in organizer if needed
             organizer.setFacilityAssociated(true);
@@ -90,7 +93,7 @@ public class SampleTable {
         // Create 30 events
         for (int i = 1; i <= 30; i++) {
             Event event = new Event();
-            event.setEventId("event" + i);
+            event.setEventId("event" + i);  // Ensure eventId is non-null
             event.setEventTitle("Event Title " + i);
             event.setDescription("Description for event " + i);
             event.setTimestamp(System.currentTimeMillis() + i * 100000);
@@ -101,8 +104,15 @@ public class SampleTable {
                 // Randomly decide whether to assign to a facility
                 if (random.nextBoolean()) {
                     Facility facility = FacilityList.get(random.nextInt(FacilityList.size()));
-                    event.setLocation(facility.getLocation());
-                    facility.associateEvent(event.getEventId());
+                    if (facility != null && event.getEventId() != null) {  // Null check
+                        event.setAddress(facility.getAddress());
+
+                        facility.addAllEventsItem(event.getEventId());
+                        // Old code, tires to find facility in firebase
+//                        facility.associateEvent(facility.getFacilityID(), event.getEventId());  // Associate event only if both are valid
+                    } else {
+                        Log.e("Sample Table", "Facility or Event ID is null, skipping association.");
+                    }
                 }
             }
 
@@ -137,6 +147,7 @@ public class SampleTable {
         }
     }
 
+
     public void saveDataToFirebase(Runnable onSuccess, OnFailureListener onFailure) {
         AtomicInteger pendingWrites = new AtomicInteger(UserList.size() + FacilityList.size() + EventList.size());
         AtomicInteger failures = new AtomicInteger(0);
@@ -154,13 +165,16 @@ public class SampleTable {
 
         // Save facilities
         for (Facility facility : FacilityList) {
-            facility.saveFacilityProfile()
-                    .addOnSuccessListener(aVoid -> checkCompletion(pendingWrites, failures, onSuccess, onFailure))
-                    .addOnFailureListener(e -> {
-                        failures.incrementAndGet();
-                        onFailure.onFailure(e);
-                        checkCompletion(pendingWrites, failures, onSuccess, onFailure);
-                    });
+            Log.d("FacilityDebug", "Facility name: " + facility.getFacilityID() + ", " +facility.getOrganizer());
+            if(facility.getFacilityID() != null) {
+                facility.saveFacilityProfile()
+                        .addOnSuccessListener(aVoid -> checkCompletion(pendingWrites, failures, onSuccess, onFailure))
+                        .addOnFailureListener(e -> {
+                            failures.incrementAndGet();
+                            onFailure.onFailure(e);
+                            checkCompletion(pendingWrites, failures, onSuccess, onFailure);
+                        });
+            }
         }
 
         // Save events

@@ -16,7 +16,8 @@ import java.util.List;
  * this is the custom UserManager class
  * its just for adjust the User's role
  * be careful when import, import this one follow the path
- * import the android one use Android.os.UserManager*/
+ * import the android one use Android.os.UserManager
+ */
 public class UserManager {
     private static UserManager instance;
     private User currentUser;

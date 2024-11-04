@@ -8,12 +8,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import androidx.appcompat.widget.Toolbar;
 
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
 import com.example.eventbooking.Events.EventCreate.EventCreateFragment;
+import com.example.eventbooking.Facility;
 import com.example.eventbooking.Home.HomeFragment;
+import com.example.eventbooking.Events.EventData.Event;
 import com.example.eventbooking.R;
 import com.example.eventbooking.Role;
 import com.example.eventbooking.User;
@@ -41,6 +44,7 @@ public class LoginFragment extends Fragment {
     TextView welcomeText;
     BottomNavigationView nav;
     public static boolean isLoggedIn = false;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -71,9 +75,13 @@ public class LoginFragment extends Fragment {
         nav.setVisibility(View.GONE);
 
         NavigationView sidebar = getActivity().findViewById(R.id.nav_view);
-        if (sidebar != null) {
+//        if (sidebar != null) {
             sidebar.setVisibility(View.GONE);
-        }
+//        }
+
+        // tool bar hiding possible???
+        Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
+        toolbar.setVisibility(View.GONE);
 
         deviceIdText = rootView.findViewById(R.id.text_login_deviceid);
         welcomeText = rootView.findViewById(R.id.text_login_welcome);
@@ -116,6 +124,7 @@ public class LoginFragment extends Fragment {
 //                        drawerLayout.setVisibility(View.VISIBLE);
                         nav.setVisibility(View.VISIBLE);
                         sidebar.setVisibility(View.VISIBLE);
+                        toolbar.setVisibility(View.VISIBLE);
                         getParentFragmentManager().beginTransaction()
                                 .replace(R.id.fragment_container, HomeFragment.newInstance(deviceId))
                                 .commit();

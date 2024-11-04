@@ -20,6 +20,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -55,12 +56,25 @@ public class EditUserFragment extends Fragment {
         entrantSwitch = view.findViewById(R.id.entrant_switch);
         organizerSwitch = view.findViewById(R.id.organizer_switch);
         adminSwitch = view.findViewById(R.id.admin_switch);
+
+
         Bundle args = getArguments();
         if (args != null) {
+            documentId = args.getString("deviceID");
             isNewUser = args.getBoolean("isNewUser", false);
             if (!isNewUser) {
-                documentId = args.getString("documentId");
-                loadUserData(documentId); // Load existing user data
+                // Load existing user data
+//                String documentId = args.getString("documentId");
+                usernameEditText.setText(args.getString("username"));
+                deviceIdEditText.setText(args.getString("deviceID"));
+                emailEditText.setText(args.getString("email"));
+                phoneNumberEditText.setText(args.getString("phoneNumber"));
+                profilePictureUrlEditText.setText(args.getString("profilePictureUrl"));
+                locationEditText.setText(args.getString("location"));
+                entrantSwitch.setChecked(args.getBoolean("entrant"));
+                adminSwitch.setChecked(args.getBoolean("admin"));
+                organizerSwitch.setChecked(args.getBoolean("organizer"));
+                deleteButton.setVisibility(View.VISIBLE); // Show delete button for existing users
             } else {
                 deleteButton.setVisibility(View.GONE); // Hide delete button for new user
             }
@@ -92,14 +106,14 @@ public class EditUserFragment extends Fragment {
         updatedData.put("email", emailEditText.getText().toString());
         updatedData.put("phoneNumber", phoneNumberEditText.getText().toString());
         updatedData.put("location", locationEditText.getText().toString());
-        String roleArray[] = new String[3];
+        List<String> roles = new ArrayList<>();
         if(entrantSwitch.isChecked())
-            roleArray[0] = "entrant";
+            roles.add("entrant");
         if(organizerSwitch.isChecked())
-            roleArray[1] = "organizer";
+            roles.add("organizer");
         if(adminSwitch.isChecked())
-            roleArray[2] = "admin";
-        updatedData.put("role", roleArray);
+            roles.add("admin");
+        updatedData.put("role", roles);
         updatedData.put("notificationAsk", notificiation.isChecked());
         updatedData.put("geolocationAsk", geolocation.isChecked());
         db.collection("Users").document(documentId)
@@ -115,14 +129,14 @@ public class EditUserFragment extends Fragment {
 
     // change this so it deletes it from firebase
     private void deleteUser(String documentId) {
-        userRef.removeValue().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                Toast.makeText(getContext(), "User deleted successfully.", Toast.LENGTH_SHORT).show();
-                getActivity().onBackPressed();
-            } else {
-                Toast.makeText(getContext(), "Failed to delete user.", Toast.LENGTH_SHORT).show();
-            }
-        });
+        db.collection("Users").document(documentId).delete()
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(getContext(), "User deleted successfully.", Toast.LENGTH_SHORT).show();
+                    getActivity().onBackPressed(); // Navigate back after deletion
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "Failed to delete user: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
     }
 
 

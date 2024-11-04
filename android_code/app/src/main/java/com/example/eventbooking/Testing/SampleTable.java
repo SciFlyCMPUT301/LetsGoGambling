@@ -105,7 +105,7 @@ public class SampleTable {
                 if (random.nextBoolean()) {
                     Facility facility = FacilityList.get(random.nextInt(FacilityList.size()));
                     if (facility != null && event.getEventId() != null) {  // Null check
-                        event.setLocation(facility.getLocation());
+                        event.setAddress(facility.getAddress());
 
                         facility.addAllEventsItem(event.getEventId());
                         // Old code, tires to find facility in firebase

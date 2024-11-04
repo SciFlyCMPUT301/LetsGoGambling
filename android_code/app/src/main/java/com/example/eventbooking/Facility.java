@@ -37,7 +37,7 @@ public class Facility {
     private String address;
     private String organizer;
     private String eventName;
-    private Location location;
+//    private Location location;
     private List<String> allEvents;
     private FirebaseFirestore db;
     private CollectionReference facilitiesRef;
@@ -65,32 +65,14 @@ public class Facility {
         this.address = address;
         this.organizer = organizer;
         this.db = FirebaseFirestore.getInstance();
-        this.facilitiesRef = db.collection("Facilities");
+        this.facilitiesRef = db.collection("facilities");
         this.allEvents = new ArrayList<>();
-        this.facilityID = getNewFacilityID();
     }
-
-    // Constructor to get the facility details and associate the facilityID with it
-    public Facility(String name, String address, String description, String organizer, String facilityID) {
-        this.name = name;
-        this.address = address;
-        this.organizer = organizer;
-        this.db = FirebaseFirestore.getInstance();
-        this.facilitiesRef = db.collection("Facilities");
-        this.allEvents = new ArrayList<>();
-        this.facilityID = facilityID;
-    }
-
-    public String getFacilityID() {
-        return facilityID;
-    }
-    public void setFacilityID(String facilityID) {
-        this.facilityID = facilityID;
-    }
-
+    // Getters and Setters for fields
     public String getName(){
         return name;
     }
+
     public void setName(String name){
         this.name = name;
     }
@@ -98,22 +80,23 @@ public class Facility {
     public String getAddress(){
         return address;
     }
+
     public void setAddress(String address){
         this.address = address;
     }
 
-    public String getOrganizer(){
-        return organizer;
-    }
-    public void setOrganizer(String organizer){
-        this.organizer = organizer;
+    public String getOrganizer() { return organizer; }
+    public void setOrganizer(String organizer) { this.organizer = organizer; }
+
+//    public Location getLocation() { return location; }
+//    public void setLocation(Location location) { this.location = location; }
+
+    public String getFacilityID() {
+        return facilityID;
     }
 
-    public Location getLocation() {
-        return location;
-    }
-    public void setLocation(Location location) {
-        this.location = location;
+    public void setFacilityID(String facilityID) {
+        this.facilityID = facilityID;
     }
 
     public String getEvent(){
@@ -155,19 +138,18 @@ public class Facility {
 //        Log.d("Facility", facilityID);
         return db.collection("Facilities").document(facilityID)
                 .set(facilityData)
-                .addOnSuccessListener(aVoid -> {
-                    System.out.println("Facility data successfully written to Firestore!");
-                })
-                .addOnFailureListener(e -> {
-                    System.out.println("Error writing facility data to Firestore: " + e.getMessage());
-                });
+                .addOnSuccessListener(aVoid -> System.out.println("Facility data successfully written to Firestore!"))
+                .addOnFailureListener(e -> System.out.println("Error writing facility data to Firestore: " + e.getMessage()));
     }
 
-    public void deleteFacilityProfile() {
+    // Method for administrators to remove the organizer from the facility
+    public void deleteFacility() {
         if (name != null && !name.isEmpty()) {
+            // Create a map to update the organizer field to null
             Map<String, Object> updates = new HashMap<>();
             updates.put("organizer", null); // Set the 'organizer' field to null
 
+            // Update the facility document, setting the organizer to null
             facilitiesRef.document(name)
                     .update(updates)
                     .addOnSuccessListener(aVoid -> {
@@ -199,6 +181,15 @@ public class Facility {
                 .addOnFailureListener(e -> System.out.println("Error checking facility existence: " + e.getMessage()));
     }
 
+    // Organizer method to associate an event with a facility
+    public boolean associateEvent(String eventName) {
+        // Check if the event is already in the allEvents list
+        if (allEvents.contains(eventName)) {
+            System.out.println("Event already associated with this facility.");
+            return true;
+        }
+        return false;
+    }
 
     private void updateEventInFacility(String eventName) {
         if (allEvents == null) {
@@ -210,7 +201,7 @@ public class Facility {
             Map<String, Object> updates = new HashMap<>();
             updates.put("allEvents", allEvents);
 
-            db.collection("Facilities").document(facilityID)
+            db.collection("facilities").document(name)
                     .update(updates)
                     .addOnSuccessListener(aVoid -> System.out.println("Facility updated successfully with event."))
                     .addOnFailureListener(e -> System.out.println("Error updating facility: " + e.getMessage()));

@@ -35,8 +35,9 @@ public class Event {
     private String description;
     private String imageUrl; // URL of the event image in Firebase Storage
     private long timestamp; // Event time in milliseconds
-    private Location location;
+//    private Location location;
 
+    private String address;
     private int maxParticipants; // limit number of entrants
     private List<String> waitingparticipantIds;
     private List<String> acceptedParticipantIds;
@@ -107,8 +108,10 @@ public class Event {
     public long getTimestamp() { return timestamp; }
     public void setTimestamp(long timestamp) { this.timestamp = timestamp; }
 
-    public Location getLocation() { return location; }
-    public void setLocation(Location new_location) { this.location = new_location; }
+//    public Location getLocation() { return location; }
+//    public void setLocation(Location new_location) { this.location = new_location; }
+    public String getAddress() { return address; }
+    public void setAddress(String new_location) { this.address = new_location; }
 
     public int getMaxParticipants() { return maxParticipants; }
     public void setMaxParticipants(int maxParticipants) { this.maxParticipants = maxParticipants; }
@@ -193,7 +196,8 @@ public class Event {
         eventData.put("description", description);
         eventData.put("imageUrl", imageUrl);
         eventData.put("timestamp", timestamp);
-        eventData.put("location", location != null ? location.toString() : null);
+//        eventData.put("location", location != null ? location.toString() : null);
+        eventData.put("location", address);
         eventData.put("maxParticipants", maxParticipants);
         eventData.put("waitingparticipantIds",waitingList.getWaitingParticipantIds());
         eventData.put("acceptedParticipantIds", waitingList.getAcceptedParticipantIds());

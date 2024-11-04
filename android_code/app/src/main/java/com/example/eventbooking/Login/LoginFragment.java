@@ -20,6 +20,7 @@ import com.example.eventbooking.Events.EventData.Event;
 import com.example.eventbooking.R;
 import com.example.eventbooking.Role;
 import com.example.eventbooking.User;
+import com.example.eventbooking.UserManager;
 import com.example.eventbooking.firebase.FirestoreAccess;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
@@ -33,6 +34,10 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicReference;
 
+/**
+ * Fragment that is shown on app open. Gets deviceId and checks if the
+ * user is new.
+ */
 public class LoginFragment extends Fragment {
 
     TextView deviceIdText;
@@ -46,6 +51,20 @@ public class LoginFragment extends Fragment {
         super.onCreate(savedInstanceState);
     }
 
+    /**
+     * Sets up the view for the login. Gets user from firestore and changes text accordingly.
+     * If the user is new, takes them to create fragment, otherwise takes them to the home page.
+     *
+     * @param inflater The LayoutInflater object that can be used to inflate
+     * any views in the fragment,
+     * @param container If non-null, this is the parent view that the fragment's
+     * UI should be attached to.  The fragment should not add the view itself,
+     * but this can be used to generate the LayoutParams of the view.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     * from a previous saved state as given here.
+     *
+     * @return rootView The view to be displayed
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
@@ -69,10 +88,10 @@ public class LoginFragment extends Fragment {
         String deviceId = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
         deviceIdText.setText(deviceId);
 
-        FirestoreAccess fs = new FirestoreAccess();
+        FirestoreAccess fs = FirestoreAccess.getInstance();
         fs.getUser(deviceId).addOnSuccessListener(snapshot -> {
             //nav.setVisibility(View.VISIBLE);
-            if (!snapshot.exists()) {
+            if (!snapshot.exists()) { // if new user
                 welcomeText.setText("Welcome new user");
                 // testing
 //                User user = new User(deviceId, "Alex", "a@b.com", "9312-303", new HashSet<>());
@@ -87,15 +106,16 @@ public class LoginFragment extends Fragment {
 //                        drawerLayout.setVisibility(View.VISIBLE);
                         nav.setVisibility(View.VISIBLE);
                         sidebar.setVisibility(View.VISIBLE);
-                        toolbar.setVisibility(View.VISIBLE);
                         getParentFragmentManager().beginTransaction()
                             .replace(R.id.fragment_container, HomeFragment.newInstance(deviceId)) // replace with create new user fragment
                             .commit();
                     }
                 }, 3000);
-            } else {
+            } else { // returning user
                 User user = snapshot.toObject(User.class);
                 Log.d("Login", "Retrieved user "+user.getUsername());
+                UserManager.getInstance().setCurrentUser(user);
+
                 Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
                     @Override

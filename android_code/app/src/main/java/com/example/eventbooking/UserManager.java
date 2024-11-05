@@ -22,6 +22,7 @@ public class UserManager {
     private Facility userFacility;
     private List<Event> organizerEvents;
     private List<Event> userEvents;
+    private List<Event> eventDatabase;
 
     private UserManager(){
         organizerEvents = new ArrayList<>();
@@ -73,7 +74,6 @@ public class UserManager {
             if (!queryDocumentSnapshots.isEmpty()) {
                 DocumentSnapshot doc = queryDocumentSnapshots.getDocuments().get(0);
                 this.userFacility = doc.toObject(Facility.class);
-
                 findOrganizerEvents();
             }
         });
@@ -90,6 +90,16 @@ public class UserManager {
                }
            }
         });
+    }
+
+    /**
+     * Checks to see if a facility exists for the current user or not
+     * @return boolean
+     */
+    public boolean userHasFacility() {
+        if(userFacility != null)
+            return true;
+        return false;
     }
 
     public User getCurrentUser(){

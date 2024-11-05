@@ -95,10 +95,10 @@ public class LoginFragment extends Fragment {
             if (!snapshot.exists()) { // if new user
                 welcomeText.setText("Welcome new user");
                 //testing
-                User user = new User(deviceId, "Alex", "a@b.com", "9312-303", new HashSet<>());
-                fs.addUser(user).addOnSuccessListener(result -> {
-                    Log.d("Login", "added user successfully");
-                });
+//                User user = new User(deviceId, "Alex", "a@b.com", "9312-303", new HashSet<>());
+//                fs.addUser(user).addOnSuccessListener(result -> {
+//                    Log.d("Login", "added user successfully");
+//                });
                 Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
                     @Override

@@ -212,7 +212,15 @@ public class Event {
 
     public Task<Void> saveEventDataToFirestore() {
         Map<String, Object> eventData = new HashMap<>();
-        eventData.put("eventId", eventId);
+        String new_eventID = eventId;
+        if(eventId == null){
+            new_eventID = getNewEventID();
+            eventData.put("eventId", new_eventID);
+        }
+        else{
+            eventData.put("eventId", eventId);
+        }
+
         eventData.put("eventTitle", eventTitle);
         eventData.put("description", description);
         eventData.put("imageUrl", imageUrl);
@@ -225,13 +233,12 @@ public class Event {
 //        eventData.put("canceledParticipantIds", waitingList.getCanceledParticipantIds());
 //        eventData.put("signedUpParticipantIds", waitingList.getSignedUpParticipantIds());
         // temporary fix to get test data working
-        eventData.put("waitingparticipantIds",waitingparticipantIds);
+        eventData.put("waitingparticipantIds", waitingparticipantIds);
         eventData.put("acceptedParticipantIds", acceptedParticipantIds);
         eventData.put("canceledParticipantIds", canceledParticipantIds);
         eventData.put("signedUpParticipantIds", signedUpParticipantIds);
 //        eventData.put("waitingList", waitingList.getEntrantIds());
         eventData.put("organizerId", organizerId);
-
         // Save or update the event data in Firestore
         return db.collection("Events").document(eventId)
                 .set(eventData)

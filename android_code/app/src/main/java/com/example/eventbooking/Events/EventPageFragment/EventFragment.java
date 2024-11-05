@@ -16,6 +16,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.example.eventbooking.Events.EventCreate.EventCreateFragment;
 import com.example.eventbooking.Events.EventView.EventViewFragment;
@@ -58,7 +59,7 @@ public class EventFragment extends Fragment {
     private String currentUserId = "User1";
     private WaitingList waitingList;
     private ArrayList<Event> eventList;
-    private boolean isUserEvents = true;
+    private boolean isUserEvents = true, testing = true;
     private Switch eventSwitch;
     private ListView eventListView;
     private FirebaseFirestore db;
@@ -67,12 +68,17 @@ public class EventFragment extends Fragment {
     private EventViewAdapter eventAdapter;
     private UserManager userManager;
     private List<Event> allEvents;
-
-    public static EventFragment newInstance(int integer) {
+    /**
+     * Creates a new instance of EventFragment, used in itial testing
+     *
+     *
+     * @return A new instance of fragment EventFragment
+     */
+    public static EventFragment newInstance() {
         EventFragment fragment = new EventFragment();
-        Bundle args = new Bundle();
-        args.putInt(ARG_INTEGER, integer);
-        fragment.setArguments(args);
+//        Bundle args = new Bundle();
+//        args.putInt(ARG_INTEGER, integer);
+//        fragment.setArguments(args);
         return fragment;
     }
 
@@ -86,7 +92,16 @@ public class EventFragment extends Fragment {
 
     }
 
-    // Inflate the layout and display the integer
+    /**
+     * Inflates the fragment layout and initializes UI elements and listeners.
+     *
+     * @param inflater           the LayoutInflater object that can be used to inflate
+     *                           any views in the fragment
+     * @param container          the parent view that the fragment's UI should be attached to
+     * @param savedInstanceState if non-null, this fragment is being re-constructed
+     *                           from a previous saved state as given here
+     * @return the View for the fragment's UI
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -118,6 +133,13 @@ public class EventFragment extends Fragment {
 
         // Set up add button to prompt facility creation if necessary
         addFacilityButton.setOnClickListener(v -> {
+
+            // Supersceeding if statement for testing, do not take seriously
+            if(testing){
+                navigateToEventCreate();
+            }
+
+            //Normal expected pathway
             if (!userManager.userHasFacility()) {
                 promptCreateFacility();
             } else {
@@ -302,6 +324,12 @@ public class EventFragment extends Fragment {
                 // Handle the error as needed
             }
         });
+        if (showUserEvents){
+            addFacilityButton.setVisibility(View.GONE);
+        }
+        else{
+            addFacilityButton.setVisibility(View.VISIBLE);
+        }
 
 //        if (showUserEvents) {
 //            // Load user-related events where the user is a participant or in any list
@@ -331,17 +359,24 @@ public class EventFragment extends Fragment {
 
     // Navigation method for event creation
     private void navigateToEventCreate() {
-        // Code to navigate to EventCreateFragment
-    }
-
-    // Navigation method for event details
-    private void navigateToEventDetail(Event event) {
-        // Code to navigate to EventDetailFragment with selected event data
+        if (getParentFragmentManager() != null && getContext() != null) {
+            FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+            transaction.replace(R.id.fragment_container, new EventCreateFragment());
+            transaction.addToBackStack(null);
+            transaction.commit();
+        }
     }
 
     // Navigation method for facility creation
     private void navigateToFacilityCreation() {
-        // Code to navigate to facility creation fragment
+        if (getParentFragmentManager() != null && getContext() != null) {
+            FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+            ///TODO:
+            //Here replace this fragment with the facility fragment
+            transaction.replace(R.id.fragment_container, new EventCreateFragment());
+            transaction.addToBackStack(null);
+            transaction.commit();
+        }
     }
 
 

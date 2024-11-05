@@ -88,12 +88,13 @@ public class LoginFragment extends Fragment {
         String deviceId = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
         deviceIdText.setText(deviceId);
 
+        Log.d("Login", deviceId);
         FirestoreAccess fs = FirestoreAccess.getInstance();
         fs.getUser(deviceId).addOnSuccessListener(snapshot -> {
             //nav.setVisibility(View.VISIBLE);
             if (!snapshot.exists()) { // if new user
                 welcomeText.setText("Welcome new user");
-                // testing
+                //testing
 //                User user = new User(deviceId, "Alex", "a@b.com", "9312-303", new HashSet<>());
 //                fs.addUser(user).addOnSuccessListener(result -> {
 //                    Log.d("Login", "added user successfully");
@@ -106,6 +107,7 @@ public class LoginFragment extends Fragment {
 //                        drawerLayout.setVisibility(View.VISIBLE);
                         nav.setVisibility(View.VISIBLE);
                         sidebar.setVisibility(View.VISIBLE);
+                        toolbar.setVisibility(View.VISIBLE);
                         getParentFragmentManager().beginTransaction()
                             .replace(R.id.fragment_container, HomeFragment.newInstance(deviceId)) // replace with create new user fragment
                             .commit();

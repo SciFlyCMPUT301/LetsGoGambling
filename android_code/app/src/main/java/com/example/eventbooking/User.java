@@ -1,11 +1,15 @@
 package com.example.eventbooking;
 
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.example.eventbooking.Admin.Images.ImageClass;
 import com.example.eventbooking.Events.EventData.Event;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -21,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.UUID;
 
 /**
  * The User class where we are storing the data and is the main model for User.
@@ -34,10 +39,6 @@ public class User{
     // Once loaded do we keep this constantly? How is this saved in Firebase?
 
     public static String standardProfileURL;
-
-
-
-
     private String username;
     private String deviceID;//changed from int to string here
     private String email;
@@ -54,7 +55,7 @@ public class User{
 
     private List<String> roles;
     //Firebase
-    private FirebaseStorage storage;
+    private final StorageReference storageReference;
     private FirebaseFirestore db;
 
     /**
@@ -64,7 +65,7 @@ public class User{
     public User() {
         //init roles to avoid null pointer exception
         this.roles = new ArrayList<>();
-        this.storage = FirebaseStorage.getInstance();
+        this.storageReference = FirebaseStorage.getInstance().getReference();
         this.db = FirebaseFirestore.getInstance();
     }
 
@@ -72,17 +73,16 @@ public class User{
      * This constructor is used to put in data to the User object such that the "base" user is defined.
      * Other parts of the user need to be defined as the fields are generated
      */
-    public User(String deviceID, String username, String email, String phoneNumber,Set<String> roles) {
+    public User(String deviceID, String username, String email, String phoneNumber, Set<String> roles, StorageReference storageReference) {
         this.deviceID = deviceID;
         this.username = username;
         this.email = email;
         this.phoneNumber = phoneNumber;
+        this.storageReference = storageReference;
         this.profilePictureUrl = defaultProfilePictureUrl();
         this.defaulutProfilePictureUrl = defaultProfilePictureUrl();
         this.roles = new ArrayList<>();
         this.roles.add(Role.ENTRANT); //set default role to be entrant
-        this.storage = storage;
-        this.db = db;
     }
 
 
@@ -152,12 +152,11 @@ public class User{
      * This makes sure we dont have null values when looking for images to load when reaching the
      * given page
      */
-    public String defaultProfilePictureUrl(){
-        if(username != null && !username.isEmpty()){
-            return "https://firebasestorage.googleapis.com/v0/b/YOUR_FIREBASE_PROJECT_ID/o/default%2F" + username + ".png?alt=media";
-        }
-        else {
-            throw new IllegalArgumentException("User is invalid");
+    private String defaultProfilePictureUrl() {
+        if (username != null && !username.isEmpty()) {
+            return "https://firebasestorage.googleapis.com/v0/b/letsgogambling-9ebb8.appspot.com/o/default%2F" + username + ".png?alt=media";
+        } else {
+            throw new IllegalArgumentException("Username is invalid.");
         }
     }
 
@@ -200,99 +199,155 @@ public class User{
      * instead.
      */
 //    public void uploadProfilePictureToFirebase(String picture){
-    public void uploadProfilePictureToFirebase(Uri pictureUri) {
+    public void uploadImage(Uri imageUri, UploadCallbacks callbacks) {
         if (username == null || username.isEmpty()) {
             throw new IllegalArgumentException("Username must be set before uploading a profile picture.");
         }
-        if (pictureUri == null) {
+        if (imageUri == null) {
             throw new IllegalArgumentException("Invalid picture Uri.");
         }
 
-        StorageReference storageRef = storage.getReference();
+        StorageReference ref = storageReference.child("images/" + UUID.randomUUID().toString());
 
-        // Create a unique filename for the picture
-        String fileName = "profile_picture_" + System.currentTimeMillis() + ".jpg";
-        StorageReference profilePicRef = storageRef.child("users/" + username + "/profile_pictures/" + fileName);
+        ref.putFile(imageUri)
+                .addOnSuccessListener(taskSnapshot -> ref.getDownloadUrl()
+                        .addOnSuccessListener(downloadUrl -> {
+                            String imageURL = downloadUrl.toString();
+                            saveImageUrl(imageURL, callbacks);
 
-        // Start the upload task using Uri
-        profilePicRef.putFile(pictureUri)
-                .addOnSuccessListener(taskSnapshot -> {
-                    // Get the download URL after the upload is successful
-                    profilePicRef.getDownloadUrl().addOnSuccessListener(uri -> {
-                        profilePictureUrl = uri.toString();
-                        System.out.println("Profile picture uploaded successfully: " + profilePictureUrl);
-
-                        // Update the URL in Firestore
-                        Map<String, Object> updates = new HashMap<>();
-                        updates.put("profilePictureUrl", profilePictureUrl);
-
-                        db.collection("Users").document(username)
-                                .update(updates)
-                                .addOnSuccessListener(aVoid -> {
-                                    System.out.println("Profile picture URL successfully updated in Firestore.");
-                                })
-                                .addOnFailureListener(e -> {
-                                    System.out.println("Error updating profile picture URL in Firestore: " + e.getMessage());
-                                });
-                    }).addOnFailureListener(exception -> {
-                        System.out.println("Failed to retrieve download URL from Firebase: " + exception.getMessage());
-                    });
+                            if (callbacks != null) {
+                                callbacks.onUploadSuccess(imageURL);
+                            }
+                            Log.d("DownloadURL", "URL: " + imageURL);
+                        })
+                        .addOnFailureListener(e -> {
+                            if (callbacks != null) {
+                                callbacks.onUploadFailure("Failed to get download URL!");
+                            }
+                        }))
+                .addOnFailureListener(e -> {
+                    if (callbacks != null) {
+                        callbacks.onUploadFailure("Upload failed: " + e.getMessage());
+                    }
                 })
-                .addOnFailureListener(exception -> {
-                    System.out.println("Failed to upload the profile picture to Firebase: " + exception.getMessage());
+                .addOnProgressListener(taskSnapshot -> {
+                    if (callbacks != null) {
+                        long totalBytes = taskSnapshot.getTotalByteCount();
+                        long bytesTransferred = taskSnapshot.getBytesTransferred();
+                        callbacks.onProgress(totalBytes, bytesTransferred);
+                    }
                 });
     }
 
+    // Save image URL to Firestore
+    private void saveImageUrl(String imageURL, UploadCallbacks callbacks) {
+        Map<String, Object> imageData = new HashMap<>();
+        imageData.put("profilePictureUrl", imageURL);
 
-    public void updateProfilePictureUrlToFirebase(Uri newPictureUri) {
-        uploadProfilePictureToFirebase(newPictureUri);
+        db.collection("Users").document(username)
+                .update(imageData)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("Firestore", "Image URL updated successfully.");
+                    if (callbacks != null) {
+                        callbacks.onFirestoreSuccess("Image URL updated successfully.");
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Firestore", "Error updating image URL: " + e.getMessage());
+                    if (callbacks != null) {
+                        callbacks.onFirestoreFailure("Failed to save image URL to Firestore!");
+                    }
+                });
     }
-    // I dont understand why this is here, it doesnt make sense when you call the above function
-    // With no new functionality?
 
+    // Interface for callbacks
+    public interface UploadCallbacks {
+        void onUploadSuccess(String imageUrl);
+        void onUploadFailure(String errorMessage);
+        void onProgress(long totalBytes, long bytesTransferred);
+        void onFirestoreSuccess(String message);
+        void onFirestoreFailure(String errorMessage);
+    }
 
-//    public void deleteSelectedImageFromFirebase(String selectedImageUrl) {
-//        if (selectedImageUrl != null && !selectedImageUrl.isEmpty()) {
-//            // Create a StorageReference for the selected image
-//            StorageReference storageRef = storage.getReferenceFromUrl(selectedImageUrl);
-    /**
-     * Deleting a photo from firebase requires we find the reference inside of the storage and if
-     * that reference is there then delete it and then make the default picture the photo
-     */
+    // Update profile picture
+    public void updateProfilePicture(Uri newPictureUri, UploadCallbacks callbacks) {
+        uploadImage(newPictureUri, callbacks);
+    }
 
-    ///TODO:
-    // For future implementation we need to add the default picture if we are making the link
-    // Unique, ie. not using one photo and linking it to everything rather having one default photo
-    // per account.
-    // Ideas for the future, also if we are doing a default image, consider what happens when we
-    // delete the user (if they have uploaded an image we need to delete both) or if the link
-    // is automatically generated for us then save it somewhere rather than generating a new one
-    // time incase the photo is deleted
-    public void deleteProfilePictureFromFirebase(){
-        if (profilePictureUrl != null && !profilePictureUrl.isEmpty()) {
-            StorageReference storageRef = storage.getReferenceFromUrl(profilePictureUrl);
-
-            // Start the deletion task
-            storageRef.delete().addOnSuccessListener(aVoid -> {
-                System.out.println("Selected image deleted successfully from Firebase Storage.");
-
-                // Optionally, update the Firestore database if necessary
-                Map<String, Object> updates = new HashMap<>();
-                updates.put("profilePictureUrl", defaultProfilePictureUrl());
-                db.collection("Users").document(username)
-                        .update(updates)
-                        .addOnSuccessListener(updateVoid -> {
-                            System.out.println("Profile picture URL successfully updated to default in Firestore.");
-                        })
-                        .addOnFailureListener(e -> {
-                            System.out.println("Error updating profile picture URL in Firestore: " + e.getMessage());
-                        });
-            }).addOnFailureListener(exception -> {
-                System.out.println("Failed to delete the selected image from Firebase Storage: " + exception.getMessage());
-            });
-        } else {
+    // Delete selected image from Firebase Storage
+    public void deleteSelectedImageFromFirebase(String selectedImageUrl, UploadCallbacks callbacks) {
+        if (selectedImageUrl == null || selectedImageUrl.isEmpty()) {
             throw new IllegalArgumentException("Selected image URL is invalid or already deleted.");
         }
+
+        StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl(selectedImageUrl);
+
+        storageRef.delete()
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("FirebaseStorage", "Selected image deleted successfully.");
+                    Map<String, Object> updates = new HashMap<>();
+                    updates.put("profilePictureUrl", defaulutProfilePictureUrl);
+
+                    db.collection("Users").document(username)
+                            .update(updates)
+                            .addOnSuccessListener(updateVoid -> {
+                                Log.d("Firestore", "Profile picture URL updated to default.");
+                                if (callbacks != null) {
+                                    callbacks.onFirestoreSuccess("Profile picture URL updated to default.");
+                                }
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.e("Firestore", "Error updating profile picture URL: " + e.getMessage());
+                                if (callbacks != null) {
+                                    callbacks.onFirestoreFailure("Error updating profile picture URL: " + e.getMessage());
+                                }
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("FirebaseStorage", "Failed to delete image: " + e.getMessage());
+                    if (callbacks != null) {
+                        callbacks.onUploadFailure("Failed to delete image: " + e.getMessage());
+                    }
+                });
     }
 
+    public void getProfileImageClass(Context context, ImageClassCallback callback) {
+        if (profilePictureUrl == null || profilePictureUrl.isEmpty()) {
+            callback.onImageClassReady(null);
+            return;
+        }
+
+        ImageClass imageClass = new ImageClass();
+        imageClass.setURL(profilePictureUrl);
+        imageClass.setSource("Users") ;
+        imageClass.setSubsource(username);
+
+        // Load the image using Glide and set it in the ImageClass object
+        Glide.with(context)
+                .asBitmap()
+                .load(profilePictureUrl)
+                .into(new CustomTarget<Bitmap>() {
+                    @Override
+                    public void onResourceReady(@NonNull Bitmap resource, Transition<? super Bitmap> transition) {
+                        imageClass.setImage(resource);
+                        callback.onImageClassReady(imageClass);
+                    }
+
+                    @Override
+                    public void onLoadCleared(Drawable placeholder) {
+                        // Handle cleanup if needed
+                    }
+
+                    @Override
+                    public void onLoadFailed(Drawable errorDrawable) {
+                        callback.onImageClassReady(null);
+                    }
+                });
+    }
+
+    // Interface for ImageClass callback
+    public interface ImageClassCallback {
+        void onImageClassReady(ImageClass imageClass);
+    }
+}
 }

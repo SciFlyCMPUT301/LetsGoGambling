@@ -44,6 +44,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.FirebaseApp;
+
 /**
  * MainActivity, this is the main portion to define navigation views and a controller to move
  * QR code intent to pass information to other models such as the LoginFragment and ScannedFragment

@@ -26,7 +26,8 @@ public class ViewSignedListFragment extends Fragment {
     public static ViewSignedListFragment newInstance(String eventId) {
         ViewSignedListFragment fragment = new ViewSignedListFragment();
         Bundle args = new Bundle();
-        args.putString("event_id", eventId);
+        //args.putString("event_id", eventId);
+        args.putString("eventId",eventId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -40,7 +41,7 @@ public class ViewSignedListFragment extends Fragment {
         super.onCreate(savedInstanceState);
         // Retrieve the eventId from arguments
         if (getArguments() != null) {
-            eventId = getArguments().getString("event_id");
+            eventId = getArguments().getString("eventId");
         }
 
         // Initialize WaitingList with only the event ID

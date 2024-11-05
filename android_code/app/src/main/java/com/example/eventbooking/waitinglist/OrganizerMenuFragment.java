@@ -30,6 +30,7 @@ public class OrganizerMenuFragment extends Fragment {
     private Button backToEventPageButton;
     private int replacementSize;
     private WaitingList waitingList;
+    private int maxParticipant;
 
     public OrganizerMenuFragment() {
         // Required empty public constructor
@@ -54,12 +55,25 @@ public class OrganizerMenuFragment extends Fragment {
         super.onCreate(savedInstanceState);
         // Retrieve eventId from arguments
         if (getArguments() != null) {
-            eventId = getArguments().getString(ARG_EVENT_ID);
+            eventId = getArguments().getString("eventId");
         }
 
 
         // Initialize the WaitingList instance as a placeholder
         waitingList = new WaitingList(eventId);
+
+        //just for testing
+        // For testing purposes, add hardcoded participant IDs
+        waitingList.getWaitingParticipantIds().add("participant1");
+        waitingList.getWaitingParticipantIds().add("participant2");
+
+// Update to Firebase (if necessary)
+        waitingList.updateToFirebase().addOnSuccessListener(aVoid -> {
+            // Data updated successfully
+        }).addOnFailureListener(e -> {
+            // Handle error
+        });
+
 
         // Load the waiting list data from Firebase
         waitingList.loadFromFirebase().addOnCompleteListener(task -> {

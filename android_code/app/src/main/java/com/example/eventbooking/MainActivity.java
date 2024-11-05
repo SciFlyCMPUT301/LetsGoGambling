@@ -168,22 +168,44 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         else {
             if (itemId == R.id.nav_organizer_menu) {
+                //here is testing by iris added
+                Bundle bundle = new Bundle();
+                bundle.putString("eventId","event1");//hardcode the event id
+                //bundle.putInt("maxParticipants",100);
+                OrganizerMenuFragment organizerMenuFragment = new OrganizerMenuFragment();
+                organizerMenuFragment.setArguments(bundle);
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container, organizerMenuFragment)
                         .commit();
             } else if (itemId == R.id.nav_view_accepted) {
+                Bundle bundle = new Bundle();
+                bundle.putString("eventId","event1");
+                ViewAcceptedListFragment viewAcceptedListFragment = new ViewAcceptedListFragment();
+                viewAcceptedListFragment.setArguments(bundle);
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container, viewAcceptedListFragment)
                         .commit();
             } else if (itemId == R.id.nav_view_canceled) {
+                Bundle bundle = new Bundle();
+                bundle.putString("eventId","event1");
+                ViewCanceledListFragment viewCanceledListFragment = new ViewCanceledListFragment();
+                viewCanceledListFragment.setArguments(bundle);
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container, viewCanceledListFragment)
                         .commit();
             } else if (itemId == R.id.nav_view_signed) {
+                Bundle bundle = new Bundle();
+                bundle.putString("eventId","event1");
+                ViewSignedListFragment viewSignedListFragment = new ViewSignedListFragment();
+                viewSignedListFragment.setArguments(bundle);
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container, viewSignedListFragment)
                         .commit();
             } else if (itemId == R.id.nav_view_waiting) {
+                Bundle bundle = new Bundle();
+                bundle.putString("eventId","event1");
+                ViewWaitingListFragment viewWaitingListFragment = new ViewWaitingListFragment();
+                viewWaitingListFragment.setArguments(bundle);
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container, viewWaitingListFragment)
                         .commit();

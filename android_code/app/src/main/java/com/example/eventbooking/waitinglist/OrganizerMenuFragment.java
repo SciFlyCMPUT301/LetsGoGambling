@@ -3,6 +3,7 @@ package com.example.eventbooking.waitinglist;
 import android.app.AlertDialog;
 import android.os.Bundle;
 import android.text.InputType;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,6 +58,7 @@ public class OrganizerMenuFragment extends Fragment {
         if (getArguments() != null) {
             eventId = getArguments().getString("eventId");
         }
+//        Log.e("Organizer", "Event found with ID: " + eventId);
 
 
         // Initialize the WaitingList instance as a placeholder

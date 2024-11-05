@@ -22,6 +22,7 @@ public class WaitingList {
     private List<String> acceptedParticipantIds;
     private List<String> signedUpParticipantIds;
     private List<String> canceledParticipantIds;
+    private List<String> enrolledParticipantIds;
 
     // Default constructor required for calls to DataSnapshot.getValue(WaitingList.class)
     public WaitingList() {

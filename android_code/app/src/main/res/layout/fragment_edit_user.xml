@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginTop="65dp">
+
+
+    <LinearLayout
+        android:id="@+id/infoSection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        tools:ignore="MissingConstraints">
+
+        <EditText
+            android:id="@+id/user_edit_username"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:text="username"
+            android:textSize="18sp" />
+
+        <EditText
+            android:id="@+id/user_edit_deviceID"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:text="deviceID"
+            android:textSize="18sp" />
+
+        <EditText
+            android:id="@+id/user_edit_email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:text="email"
+            android:textSize="18sp" />
+
+        <EditText
+            android:id="@+id/user_edit_phoneNumber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:text="phoneNumber"
+            android:textSize="18sp" />
+
+        <EditText
+            android:id="@+id/user_edit_profilePictureUrl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:text="profilePictureUrl"
+            android:textSize="18sp" />
+
+        <EditText
+            android:id="@+id/user_edit_location"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:text="location"
+            android:textSize="18sp" />
+
+        <EditText
+            android:id="@+id/user_edit_dateJoined"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:text="dateJoined"
+            android:textSize="18sp" />
+
+        <EditText
+            android:id="@+id/user_edit_roles"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:text="roles"
+            android:textSize="18sp" />
+
+        <Switch
+            android:id="@+id/notificationAsk"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="notifications" />
+
+        <Switch
+            android:id="@+id/geolocationAsk"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="geolocation" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <Switch
+            android:id="@+id/entrant_switch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Entrant" />
+
+        <Switch
+            android:id="@+id/organizer_switch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Organizer" />
+
+        <Switch
+            android:id="@+id/admin_switch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Admin" />
+
+    </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <Button
+                android:id="@+id/save_button_user"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Save" />
+
+            <Button
+                android:id="@+id/delete_button_user"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Delete" />
+
+            <Button
+                android:id="@+id/cancel_button_user"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cancel" />
+        </LinearLayout>
+    </LinearLayout>
+
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <!-- Event Title -->
+    <TextView
+        android:id="@+id/text_event_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Event Title"
+        android:textStyle="bold"
+        android:textSize="20sp" />
+
+    <Button
+        android:id="@+id/waitingListButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#491B1B"
+        android:text="view WaitingList" />
+
+    <Button
+        android:id="@+id/sampleAttendeesButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#A86868"
+        android:text="Draw winners" />
+
+    <Button
+        android:id="@+id/accptedParticipantButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#6F3B3B"
+        android:text="View selected participant" />
+
+    <Button
+        android:id="@+id/canceledParticipantButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="View canceled participant" />
+
+    <Button
+        android:id="@+id/SignedParticipantButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="View signed up participant" />
+
+    <Button
+        android:id="@+id/DrawReplacementButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="draw replacement" />
+
+    <Button
+        android:id="@+id/BackToEventButton"
+        android:layout_width="match_parent"
+        android:layout_height="58dp"
+        android:text="back to event" />
+
+
+
+</LinearLayout>

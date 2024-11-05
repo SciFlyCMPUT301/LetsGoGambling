@@ -15,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.example.eventbooking.Home.HomeFragment;
+import com.example.eventbooking.waitinglist.WaitingList;
 import com.example.eventbooking.Location;
 import com.example.eventbooking.R;
 import com.example.eventbooking.Role;
@@ -22,8 +23,19 @@ import com.example.eventbooking.User;
 import com.example.eventbooking.UserManager;
 import com.example.eventbooking.profile.ProfileFragment;
 import com.example.eventbooking.Events.EventData.Event;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.Firebase;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 public class EventCreateFragment extends Fragment {
     private static final String ARG_INTEGER = "arg_integer";
@@ -34,8 +46,10 @@ public class EventCreateFragment extends Fragment {
     private EditText editTextImageUrl;
     private EditText editTextLocation;
     private EditText editMaxParticipants;
+    private EditText editWaitingListLimit;
     private Button createEventButton;
     private Button backButton;
+    private FirebaseFirestore db;
     //empty constructor
     private boolean roleAssigned = false;
     public EventCreateFragment(){}
@@ -67,10 +81,11 @@ public class EventCreateFragment extends Fragment {
         TextView integerTextView = rootView.findViewById(R.id.event_create_integer_text);
         integerTextView.setText("Integer: " + receivedInteger);
         editTextTitle = rootView.findViewById(R.id.event_create_title);
-
+        editWaitingListLimit = rootView.findViewById(R.id.waiting_list_limit);
         editTextDescription = rootView.findViewById(R.id.event_description);
         editTextLocation = rootView.findViewById(R.id.event_location);
         editMaxParticipants = rootView.findViewById(R.id.max_participants);
+        //remainder here , add the limit number to set up maximum entrant in witinglist
         editTextImageUrl = rootView.findViewById(R.id.event_image_url);
         createEventButton= rootView.findViewById(R.id.button_create_event);
 
@@ -91,16 +106,16 @@ public class EventCreateFragment extends Fragment {
 
         return rootView;
     }
-    //set the function createEvent
-    // i need soemthing event id
+
     private void createEvent(){
-        //retrive user input
+
 
         String title = editTextTitle.getText().toString().trim();
         String description = editTextDescription.getText().toString().trim();
         String imageUrl = editTextImageUrl.getText().toString().trim();
         String locationStr = editTextLocation.getText().toString().trim();
-        String maxParticipantsStr= editMaxParticipants.getText().toString().trim(); // make it to int later
+        String maxParticipantsStr= editMaxParticipants.getText().toString().trim();
+        String waitingListLimitStr = editWaitingListLimit.getText().toString().trim();// make it to int later
 
         //error handling
         if(TextUtils.isEmpty(title)||TextUtils.isEmpty(description)||TextUtils.isEmpty(locationStr)
@@ -117,6 +132,15 @@ public class EventCreateFragment extends Fragment {
             Toast.makeText(getContext(),"Please enter valid participant", Toast.LENGTH_SHORT).show();
             return;
         }
+
+        int waitingListLimit;
+        try{
+            waitingListLimit = Integer.parseInt(waitingListLimitStr);
+            if(waitingListLimit<=0) throw new NumberFormatException();
+        }catch(NumberFormatException e){
+            Toast.makeText(getContext(),"Please enter valid participant", Toast.LENGTH_SHORT).show();
+            return;
+        }
         //location, revise later after location class implemented
         //Location location = new Location(locationStr);
 
@@ -125,61 +149,43 @@ public class EventCreateFragment extends Fragment {
             Toast.makeText(getContext(),"User not found",Toast.LENGTH_SHORT).show();
             return;
         }
+        //generate event id
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference eventRef = db.collection("Events");
+        DocumentReference newEventRef = eventRef.document();
+        String eventId = newEventRef.getId();
+        Event event = new Event(eventId, title, description,imageUrl,System.currentTimeMillis(),locationStr,maxParticipants,currentUser.getDeviceID());
+
 
         //assign organizer to the current user
 
         if(!currentUser.hasRole(Role.ORGANIZER)){
             currentUser.addRole(Role.ORGANIZER);
             roleAssigned= true;
-            //handle firebase later
-            //updateUserInDatabase(currentUser);
+
 
         }
 
-        //everything ready, create the event object now
-        DatabaseReference eventRef = FirebaseDatabase.getInstance().getReference("events");
-        String eventId = eventRef.push().getKey(); //get the event id
-        if(eventId==null){
-            Toast.makeText(getContext(),"Failed to generate event id", Toast.LENGTH_SHORT).show();
-            return;
+        //update role in firebase
+        if (roleAssigned) {
+            db = FirebaseFirestore.getInstance();
+            CollectionReference usersRef = db.collection("Users");
+            usersRef.document(currentUser.getDeviceID())
+                    .update("roles", currentUser.getRoles())
+                    .addOnSuccessListener(aVoid -> {
+                        Toast.makeText(getContext(), "User role updated successfully", Toast.LENGTH_SHORT).show();
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(getContext(), "Failed to update user role", Toast.LENGTH_SHORT).show();
+                    });
         }
-        //modify event to add the paramter current User
-        //leave location to that location str now
 
-        Event newEvent = new Event(eventId, title, description,imageUrl,System.currentTimeMillis(),locationStr, maxParticipants,currentUser.getDeviceID());
+        event.saveEventDataToFirestore();
 
-        //Firebase to save everything at this step
-        //save event to firebase
-        eventRef.child(eventId).setValue(newEvent).addOnCompleteListener(task->{
-            if(task.isSuccessful()){
-
-                Toast.makeText(getContext(), "Event created successfully!", Toast.LENGTH_SHORT).show();
-                clearEventForm();
-            }
-            if(roleAssigned){
-                Toast.makeText(getContext(), "Role updated to Organizer.", Toast.LENGTH_SHORT).show();
-            }
-            else{
-                Toast.makeText(getContext(), "Failed to create event.", Toast.LENGTH_SHORT).show();
-
-            }
-        });
 
 
     }
 
-    //update user in firebase
-    private void updateUserInDatabase(User user){
-        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
-        usersRef.child(user.getDeviceID()).setValue(user).addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                // Role updated successfully
-                // Optionally, notify user or perform additional actions
-            } else {
-                Toast.makeText(getContext(), "Failed to update user role.", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
 
     private void clearEventForm(){
         editTextTitle.setText("");
@@ -188,5 +194,6 @@ public class EventCreateFragment extends Fragment {
         editTextImageUrl.setText("");
         editTextLocation.setText("");
     }
+
 
 }

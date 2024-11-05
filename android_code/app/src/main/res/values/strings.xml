@@ -3,4 +3,11 @@
     <string name="submit">Event Page\n</string>
     <string name="qr_code_image_description">QR Code Generated</string>
     <string name="menu_home">Home</string>
+    <string name="menu_profile">Profile</string>
+    <string name="menu_admin">Admin</string>
+    <string name="menu_events">Events</string>
+    <string name="menu_test">Test</string>
+    <string name="navigation_drawer_open">Open Navigation Drawer</string>
+    <string name="navigation_drawer_close">Close Navigation Drawer</string>
+    <string name="event_description">Event Description</string>
 </resources>

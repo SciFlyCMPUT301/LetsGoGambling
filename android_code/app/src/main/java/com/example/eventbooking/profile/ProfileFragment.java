@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import com.example.eventbooking.Events.EventCreate.EventCreateFragment;
 import com.example.eventbooking.Home.HomeFragment;
 import com.example.eventbooking.R;
+import com.example.eventbooking.notification.NotificationFragment;
 
 
 public class ProfileFragment extends Fragment {
@@ -45,6 +46,14 @@ public class ProfileFragment extends Fragment {
         integerTextView.setText("Integer: " + receivedInteger);
         TextView page_name = rootView.findViewById(R.id.profile_title);
         // Set up button to go back to HomeFragment
+        Button notification_button = rootView.findViewById(R.id.notification_button);
+        notification_button.setOnClickListener(v -> {
+            // Navigate back to HomeFragment
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, new NotificationFragment())
+                    .commit();
+        });
+
         Button backButton = rootView.findViewById(R.id.button_back_home);
         backButton.setOnClickListener(v -> {
             // Navigate back to HomeFragment

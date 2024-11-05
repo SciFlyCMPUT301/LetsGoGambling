@@ -9,6 +9,7 @@ import android.os.Parcelable;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
@@ -155,7 +156,7 @@ public class User{
      * This makes sure we dont have null values when looking for images to load when reaching the
      * given page
      */
-    String defaultProfilePictureUrl() {
+    private String defaultProfilePictureUrl() {
         if (username != null && !username.isEmpty()) {
             return "https://firebasestorage.googleapis.com/v0/b/letsgogambling-9ebb8.appspot.com/o/default%2F" + username + ".png?alt=media";
         } else {
@@ -277,7 +278,7 @@ public class User{
         uploadImage(newPictureUri, callbacks);
     }
 
-    // Delete selected image from Firebase Storage
+
     public void deleteSelectedImageFromFirebase(String ImageUrl, UploadCallbacks callbacks) {
         if (ImageUrl == null || ImageUrl.isEmpty()) {
             throw new IllegalArgumentException("Selected image URL is invalid or already deleted.");

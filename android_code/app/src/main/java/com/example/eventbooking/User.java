@@ -274,13 +274,13 @@ public class User{
         uploadImage(newPictureUri, callbacks);
     }
 
-    // Delete selected image from Firebase Storage
-    public void deleteSelectedImageFromFirebase(String selectedImageUrl, UploadCallbacks callbacks) {
-        if (selectedImageUrl == null || selectedImageUrl.isEmpty()) {
+
+    public void deleteSelectedImageFromFirebase(String ImageUrl, UploadCallbacks callbacks) {
+        if (ImageUrl == null || ImageUrl.isEmpty()) {
             throw new IllegalArgumentException("Selected image URL is invalid or already deleted.");
         }
 
-        StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl(selectedImageUrl);
+        StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl(ImageUrl);
 
         storageRef.delete()
                 .addOnSuccessListener(aVoid -> {

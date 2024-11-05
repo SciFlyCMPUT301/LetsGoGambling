@@ -311,43 +311,42 @@ public class User{
                 });
     }
 
-    public void getProfileImageClass(Context context, ImageClassCallback callback) {
-        if (profilePictureUrl == null || profilePictureUrl.isEmpty()) {
-            callback.onImageClassReady(null);
-            return;
-        }
-
-        ImageClass imageClass = new ImageClass();
-        imageClass.setURL(profilePictureUrl);
-        imageClass.setSource("Users") ;
-        imageClass.setSubsource(username);
-
-        // Load the image using Glide and set it in the ImageClass object
-        Glide.with(context)
-                .asBitmap()
-                .load(profilePictureUrl)
-                .into(new CustomTarget<Bitmap>() {
-                    @Override
-                    public void onResourceReady(@NonNull Bitmap resource, Transition<? super Bitmap> transition) {
-                        imageClass.setImage(resource);
-                        callback.onImageClassReady(imageClass);
-                    }
-
-                    @Override
-                    public void onLoadCleared(Drawable placeholder) {
-                        // Handle cleanup if needed
-                    }
-
-                    @Override
-                    public void onLoadFailed(Drawable errorDrawable) {
-                        callback.onImageClassReady(null);
-                    }
-                });
-    }
-
-    // Interface for ImageClass callback
-    public interface ImageClassCallback {
-        void onImageClassReady(ImageClass imageClass);
-    }
-}
+//    public void getProfileImageClass(Context context, ImageClassCallback callback) {
+//        if (profilePictureUrl == null || profilePictureUrl.isEmpty()) {
+//            callback.onImageClassReady(null);
+//            return;
+//        }
+//
+//        ImageClass imageClass = new ImageClass();
+//        imageClass.setURL(profilePictureUrl);
+//        imageClass.setSource("Users") ;
+//        imageClass.setSubsource(username);
+//
+//        // Load the image using Glide and set it in the ImageClass object
+//        Glide.with(context)
+//                .asBitmap()
+//                .load(profilePictureUrl)
+//                .into(new CustomTarget<Bitmap>() {
+//                    @Override
+//                    public void onResourceReady(@NonNull Bitmap resource, Transition<? super Bitmap> transition) {
+//                        imageClass.setImage(resource);
+//                        callback.onImageClassReady(imageClass);
+//                    }
+//
+//                    @Override
+//                    public void onLoadCleared(Drawable placeholder) {
+//                        // Handle cleanup if needed
+//                    }
+//
+//                    @Override
+//                    public void onLoadFailed(Drawable errorDrawable) {
+//                        callback.onImageClassReady(null);
+//                    }
+//                });
+//    }
+//
+//    // Interface for ImageClass callback
+//    public interface ImageClassCallback {
+//        void onImageClassReady(ImageClass imageClass);
+//    }
 }

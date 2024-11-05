@@ -1,5 +1,6 @@
 package com.example.eventbooking;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -8,7 +9,9 @@ import android.os.Parcelable;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.example.eventbooking.Admin.Images.ImageClass;
 import com.example.eventbooking.Events.EventData.Event;
 import com.google.android.gms.tasks.Task;
@@ -152,7 +155,7 @@ public class User{
      * This makes sure we dont have null values when looking for images to load when reaching the
      * given page
      */
-    private String defaultProfilePictureUrl() {
+    String defaultProfilePictureUrl() {
         if (username != null && !username.isEmpty()) {
             return "https://firebasestorage.googleapis.com/v0/b/letsgogambling-9ebb8.appspot.com/o/default%2F" + username + ".png?alt=media";
         } else {
@@ -275,12 +278,12 @@ public class User{
     }
 
     // Delete selected image from Firebase Storage
-    public void deleteSelectedImageFromFirebase(String selectedImageUrl, UploadCallbacks callbacks) {
-        if (selectedImageUrl == null || selectedImageUrl.isEmpty()) {
+    public void deleteSelectedImageFromFirebase(String ImageUrl, UploadCallbacks callbacks) {
+        if (ImageUrl == null || ImageUrl.isEmpty()) {
             throw new IllegalArgumentException("Selected image URL is invalid or already deleted.");
         }
 
-        StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl(selectedImageUrl);
+        StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl(ImageUrl);
 
         storageRef.delete()
                 .addOnSuccessListener(aVoid -> {
@@ -349,5 +352,4 @@ public class User{
     public interface ImageClassCallback {
         void onImageClassReady(ImageClass imageClass);
     }
-}
 }

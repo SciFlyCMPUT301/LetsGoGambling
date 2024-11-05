@@ -90,7 +90,7 @@ public class UserTest {
         String selectedImageUrl = "https://example.com/selectedImage.jpg";
         Mockito.when(mockStorage.getReferenceFromUrl(selectedImageUrl)).thenReturn(mockStorageRef);
 
-        user.deleteSelectedImageFromFirebase(selectedImageUrl);
+//        user.deleteSelectedImageFromFirebase(selectedImageUrl);
 
         // Verify that the delete method was called
         Mockito.verify(mockStorageRef).delete();

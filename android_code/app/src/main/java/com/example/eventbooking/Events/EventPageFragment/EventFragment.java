@@ -161,7 +161,7 @@ public class EventFragment extends Fragment {
 
                 /// TODO:
                 // remove the list add when actually using the app
-                bundle.putString("listAdd", user1list);
+//                bundle.putString("listAdd", user1list);
 
                 EventViewFragment eventViewFragment = new EventViewFragment();
                 eventViewFragment.setArguments(bundle);

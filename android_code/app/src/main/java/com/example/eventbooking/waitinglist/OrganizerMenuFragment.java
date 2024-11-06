@@ -238,7 +238,7 @@ public class OrganizerMenuFragment extends Fragment {
      */
     private void generateAndDisplayQRCode(String eventID) {
         // URL to be encoded into the QR code (example URL with eventId)
-        String eventUrl = "app://eventDetail?eventID=" + eventId;
+        String eventUrl = "eventbooking://eventDetail?eventID=" + eventId;
 
         // Generate QR code using the QRcodeGenerator class
         Bitmap qrCodeBitmap = qrCodeGenerator.generateQRCode(eventUrl);

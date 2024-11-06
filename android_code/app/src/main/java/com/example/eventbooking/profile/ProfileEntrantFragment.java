@@ -16,6 +16,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
+import com.example.eventbooking.Events.EventView.EventViewFragment;
 import com.example.eventbooking.Home.HomeFragment;
 import com.example.eventbooking.QRCode.ScannedFragment;
 import com.example.eventbooking.R;
@@ -34,14 +35,15 @@ public class ProfileEntrantFragment extends Fragment {
     private User currentUser;
     private boolean isEditing = false;
     private boolean isNewUser = false;
-
+    private String deviceId;
     private String eventIDFromQR = "";
 
-    public static ProfileEntrantFragment newInstance(boolean isNewUser, String eventIdFromQR) {
+    public static ProfileEntrantFragment newInstance(boolean isNewUser, String eventIdFromQR, String deviceId) {
         ProfileEntrantFragment fragment = new ProfileEntrantFragment();
         Bundle args = new Bundle();
         args.putBoolean("isNewUser", isNewUser);
         args.putString("eventID", eventIdFromQR);
+        args.putString("deviceId", deviceId);
 
         fragment.setArguments(args);
         return fragment;
@@ -52,6 +54,7 @@ public class ProfileEntrantFragment extends Fragment {
         if (getArguments() != null) {
             isNewUser = getArguments().getBoolean("isNewUser");
             eventIDFromQR = getArguments().getString("eventID");
+            deviceId = getArguments().getString("deviceId");
 
         }
     }
@@ -176,9 +179,15 @@ public class ProfileEntrantFragment extends Fragment {
                         .replace(R.id.fragment_container, HomeFragment.newInstance(getDeviceID()))
                         .commit();
             } else {
+
                 getParentFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, ScannedFragment.newInstance(eventIDFromQR))
+                        .replace(R.id.fragment_container, EventViewFragment.newInstance(eventIDFromQR, deviceId))
+//                      .replace(R.id.fragment_container, EventViewFragment.newInstance(eventIdFromQR, deviceId))
+                        .addToBackStack(null)
                         .commit();
+//                getParentFragmentManager().beginTransaction()
+//                        .replace(R.id.fragment_container, ScannedFragment.newInstance(eventIDFromQR))
+//                        .commit();
             }
 
 

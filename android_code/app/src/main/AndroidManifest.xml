@@ -40,7 +40,8 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data
                     android:scheme="eventbooking"
-                    android:host="eventDetail" />
+                    android:host="eventDetail"
+                    tools:ignore="AppLinkUrlError" />
             </intent-filter>
         </activity>
     </application>

@@ -56,10 +56,21 @@
         android:text="draw replacement" />
 
     <Button
+        android:id="@+id/generate_qr_code"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Show QR Code" />
+
+    <Button
         android:id="@+id/BackToEventButton"
         android:layout_width="match_parent"
         android:layout_height="58dp"
         android:text="back to event" />
+
+    <ImageView
+        android:id="@+id/QR_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 
 
 

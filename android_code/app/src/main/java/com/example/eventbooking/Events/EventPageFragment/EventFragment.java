@@ -174,7 +174,7 @@ public class EventFragment extends Fragment {
             } else {
                 // Organizer Event List: Navigate to OrganizerMenuFragment
                 Bundle bundle = new Bundle();
-                bundle.putString("event_id", selectedEvent.getEventId());
+                bundle.putString("eventId", selectedEvent.getEventId());
 //                Log.e("Bundle", "Event ID: " + selectedEvent.getEventId());
                 OrganizerMenuFragment organizerMenuFragment = new OrganizerMenuFragment();
                 organizerMenuFragment.setArguments(bundle);

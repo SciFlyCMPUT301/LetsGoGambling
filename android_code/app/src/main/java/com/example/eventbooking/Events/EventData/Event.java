@@ -216,6 +216,7 @@ public class Event {
         if(eventId == null){
             new_eventID = getNewEventID();
             eventData.put("eventId", new_eventID);
+            this.eventId = new_eventID;
         }
         else{
             eventData.put("eventId", eventId);

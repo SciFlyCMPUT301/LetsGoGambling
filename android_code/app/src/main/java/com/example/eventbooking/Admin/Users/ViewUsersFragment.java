@@ -101,6 +101,7 @@ public class ViewUsersFragment extends Fragment {
 
         Bundle bundle = new Bundle();
         bundle.putString("deviceId", selectedUser.getDeviceID());
+        Log.d("Loading User", "Document ID: "+ selectedUser.getDeviceID());
         bundle.putString("username", selectedUser.getUsername());
         bundle.putString("email", selectedUser.getEmail());
         bundle.putString("phoneNumber", selectedUser.getPhoneNumber());
@@ -132,6 +133,7 @@ public class ViewUsersFragment extends Fragment {
                 for (QueryDocumentSnapshot document : task.getResult()) {
                     User user = document.toObject(User.class);
                     userList.add(user);
+                    Log.d("ViewUsersFragment", "User deviceId: " + user.getDeviceID());
                 }
                 userAdapter.notifyDataSetChanged();
                 Log.d("ViewUsersFragment", "Users loaded: " + userList.size());

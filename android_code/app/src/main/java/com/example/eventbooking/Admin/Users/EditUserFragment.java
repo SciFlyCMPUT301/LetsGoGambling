@@ -60,8 +60,9 @@ public class EditUserFragment extends Fragment {
 
         Bundle args = getArguments();
         if (args != null) {
-            documentId = args.getString("deviceID");
+            documentId = args.getString("deviceId");
             isNewUser = args.getBoolean("isNewUser", false);
+            Log.d("Edit User Fragment", "Document ID: "+ documentId);
             if (!isNewUser) {
                 // Load existing user data
 //                String documentId = args.getString("documentId");
@@ -88,8 +89,10 @@ public class EditUserFragment extends Fragment {
             }
         });
         deleteButton.setOnClickListener(v -> {
+            Log.d("Edit User", "Document ID: "+ documentId);
             if (documentId != null) {
                 deleteUser(documentId);
+
             }
         });
 
@@ -124,6 +127,7 @@ public class EditUserFragment extends Fragment {
                 .addOnFailureListener(e -> {
                     Log.d("FirestoreError", "Error updating user", e);
                 });
+        getActivity().onBackPressed();
     }
 
 
@@ -137,6 +141,7 @@ public class EditUserFragment extends Fragment {
                 .addOnFailureListener(e -> {
                     Toast.makeText(getContext(), "Failed to delete user: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
+//        getActivity().onBackPressed();
     }
 
 

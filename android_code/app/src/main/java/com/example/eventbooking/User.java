@@ -32,13 +32,13 @@ public class User {
 
     public static String standardProfileURL;
     private String username;
-    private String deviceID;//changed from int to string here
+    private String deviceId;//changed from int to string here
     private String email;
     private String phoneNumber;
     // profile picture
     private String profilePictureUrl;
     private String defaultprofilepictureurl;
-    private Location location; // this is for facilities
+    private String location; // this is for facilities
     private String address = "123 Applewood St.";
     private boolean adminLevel;
     private boolean facilityAssociated;
@@ -66,7 +66,7 @@ public class User {
      * Other parts of the user need to be defined as the fields are generated
      */
     public User(String deviceID, String username, String email, String phoneNumber, Set<String> roles) {
-        this.deviceID = deviceID;
+        this.deviceId = deviceID;
         this.username = username;
         this.email = email;
         this.phoneNumber = phoneNumber;
@@ -79,15 +79,24 @@ public class User {
     }
 
 
+    public boolean isAdminLevel() {
+        return adminLevel;
+    }
+    public void setAdminLevel(boolean adminLevel) {
+        this.adminLevel = adminLevel;
+    }
+
     /**
      * Getters and Setters for the given fields that can be easily set or we want to get
      */
+
+
     public String getDeviceID() {
-        return deviceID;
+        return deviceId;
     }
 
     public void setDeviceID(String deviceID) {
-        this.deviceID = deviceID;
+        this.deviceId = deviceID;
     }
 
     public String getUsername() {
@@ -142,6 +151,13 @@ public class User {
     }
     public void setAddress(String newAddress) {
         this.address = newAddress;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+    public void setLocation(String location) {
+        this.location = location;
     }
 
     public boolean isGeolocationAsk() {
@@ -206,8 +222,8 @@ public class User {
      */
     public Task<Void> saveUserDataToFirestore() {
         Map<String, Object> userData = new HashMap<>();
-        final String[] new_userID = {deviceID};
-        if(deviceID == null){
+        final String[] new_userID = {deviceId};
+        if(deviceId == null){
             getNewUserID(new OnUserIDGenerated() {
                 @Override
                 public void onUserIDGenerated(String userID) {
@@ -221,13 +237,13 @@ public class User {
                 }
             });
 
-            userData.put("eventId", new_userID[0]);
-            this.deviceID = new_userID[0];
+            userData.put("deviceId", new_userID[0]);
+            this.deviceId = new_userID[0];
         }
         else{
-            userData.put("eventId", deviceID);
+            userData.put("deviceId", deviceId);
         }
-        Log.d("User", "User ID: " + deviceID);
+        Log.d("User", "User ID: " + deviceId);
         userData.put("username", username);
         userData.put("email", email);
         userData.put("phoneNumber", phoneNumber);
@@ -240,7 +256,7 @@ public class User {
         userData.put("roles", roles);
 
         // Save data under "Users" collection and return the Task
-        return db.collection("Users").document(deviceID)
+        return db.collection("Users").document(deviceId)
                 .set(userData)
                 .addOnSuccessListener(aVoid -> {
                     System.out.println("User data successfully written to Firestore!");
@@ -257,16 +273,16 @@ public class User {
     public Task<Void> saveUserDataToFirestore(final OnUserIDGenerated callback) {
         Map<String, Object> userData = new HashMap<>();
 
-        if (deviceID == null) {
+        if (deviceId == null) {
             getNewUserID(new OnUserIDGenerated() {
                 @Override
                 public void onUserIDGenerated(String userID) {
                     if (userID != null) {
-                        deviceID = userID;
-                        userData.put("eventId", deviceID);
-                        Log.d("User", "User ID: " + deviceID);
+                        deviceId = userID;
+                        userData.put("eventId", deviceId);
+                        Log.d("User", "User ID: " + deviceId);
                         saveDataToFirestore(userData);  // Save data after ID is set
-                        callback.onUserIDGenerated(deviceID);
+                        callback.onUserIDGenerated(deviceId);
                     } else {
                         Log.e("New User", "Failed to generate user ID.");
                         callback.onUserIDGenerated(null); // Notify callback about failure
@@ -274,9 +290,9 @@ public class User {
                 }
             });
         } else {
-            userData.put("eventId", deviceID);
+            userData.put("eventId", deviceId);
             saveDataToFirestore(userData);  // Save data if ID is already set
-            callback.onUserIDGenerated(deviceID);  // Notify callback with the ID
+            callback.onUserIDGenerated(deviceId);  // Notify callback with the ID
         }
 
         return null;  // You can also return the result of save operation here
@@ -295,7 +311,7 @@ public class User {
         userData.put("roles", roles);
 
         // Save data under "Users" collection and return the Task
-        db.collection("Users").document(deviceID)
+        db.collection("Users").document(deviceId)
                 .set(userData)
                 .addOnSuccessListener(aVoid -> {
                     Log.d("User", "User data successfully written to Firestore!");

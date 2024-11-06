@@ -54,6 +54,7 @@ public class Event {
     private List<String> canceledParticipantIds;
     private List<String> signedUpParticipantIds;
     private List<String> enrolledParticipantIds;
+    private List<String> declinedParticipantIds = new ArrayList<>();
     private WaitingList waitingList;
     private String organizerId;
     private FirebaseFirestore db;
@@ -331,6 +332,18 @@ public class Event {
                     }
                 })
                 .addOnFailureListener(onFailureListener);
+    }
+
+    // Method to add a user to the declined list
+    public void addDeclinedParticipantId(String userId) {
+        if (!declinedParticipantIds.contains(userId)) {
+            declinedParticipantIds.add(userId);
+        }
+    }
+
+    // Getter for declined participant IDs (optional, if needed elsewhere in code)
+    public List<String> getDeclinedParticipantIds() {
+        return declinedParticipantIds;
     }
 
 

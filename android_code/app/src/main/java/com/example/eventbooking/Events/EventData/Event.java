@@ -38,6 +38,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * The Event class represents an event in the system, encapsulating details such as title,
+ * description, location, maximum participants, and lists for participant statuses (e.g., accepted,
+ * canceled). This class provides methods for managing event data and interacting with Firebase
+ * services for storage, retrieval, and updates.
+ */
 public class Event {
     private String eventId;
     private String eventTitle;
@@ -59,7 +65,10 @@ public class Event {
     private String organizerId;
     private FirebaseFirestore db;
     private FirebaseStorage storage;
-
+    /**
+     * Default constructor that initializes Firebase Firestore and Storage instances, as well as
+     * participant lists.
+     */
 
     public Event() {
         storage = FirebaseStorage.getInstance();
@@ -83,6 +92,18 @@ public class Event {
 //        this.signedUpParticipantIds = new ArrayList<>();
 //        this.waitingList = new WaitingList(eventId);
     }
+    /**
+     * Constructs an Event with specific parameters.
+     *
+     * @param eventId          The unique identifier of the event.
+     * @param eventTitle       The title of the event.
+     * @param description      The description of the event.
+     * @param imageUrl         The URL of the event image.
+     * @param timestamp        The timestamp of the event.
+     * @param locationstr      The location of the event.
+     * @param maxParticipants  The maximum number of participants allowed.
+     * @param organizerId      The ID of the organizer for this event.
+     */
 
     public Event(String eventId, String eventTitle, String description, String imageUrl, long timestamp, String locationstr, int maxParticipants, String organizerId) {
         storage = FirebaseStorage.getInstance();
@@ -105,6 +126,8 @@ public class Event {
         this.storage = FirebaseStorage.getInstance();
         this.db = FirebaseFirestore.getInstance();
     }
+
+
 
     public String getEventId() { return eventId; }
     public void setEventId(String eventId) { this.eventId = eventId; }
@@ -165,38 +188,60 @@ public class Event {
         return waitingparticipantIds;
     }
     public void addWaitingParticipantIds(String participantId){waitingparticipantIds.add(participantId);}
-
+    /**
+     * Accepts a participant, moving their ID to the accepted list and removing them from the waiting list.
+     *
+     * @param entrantId The ID of the participant to accept.
+     */
     public void acceptParticipant(String entrantId) {
         if (!acceptedParticipantIds.contains(entrantId)) {
             acceptedParticipantIds.add(entrantId);
             waitingparticipantIds.remove(entrantId);
-//            waitingList.leave(entrantId);
         }
     }
+    /**
+     * Cancels a participant's entry, moving their ID to the canceled list and removing them from the accepted list.
+     *
+     * @param entrantId The ID of the participant to cancel.
+     */
 
     public void cancelParticipant(String entrantId) {
         if (!canceledParticipantIds.contains(entrantId)) {
             canceledParticipantIds.add(entrantId);
             acceptedParticipantIds.remove(entrantId);
-//            waitingList.leave(entrantId);
+
         }
     }
+    /**
+     * Signs up a participant by adding their ID to the signed-up list and removing them from the accepted list.
+     *
+     * @param entrantId The ID of the participant to sign up.
+     */
 
     public void signUpParticipant(String entrantId) {
         if (!signedUpParticipantIds.contains(entrantId)) {
             signedUpParticipantIds.add(entrantId);
             acceptedParticipantIds.remove(entrantId);
-//            waitingList.leave(entrantId);
+
         }
     }
 
 
-    //manage the participants
+    /**
+     * Adds a participant to the waiting list if the maximum participant count is not reached.
+     *
+     * @param entrantId The ID of the participant to add.
+     */
     public void addParticipant(String entrantId){
         if(!waitingparticipantIds.contains(entrantId)&&waitingparticipantIds.size()<maxParticipants){
             waitingparticipantIds.add(entrantId);
         }
     }
+    /**
+     * Removes a participant from the waiting list.
+     *
+     * @param entrantId The ID of the participant to remove.
+     */
     public void removeParticipant(String entrantId){
         if(waitingparticipantIds.contains(entrantId)){
             waitingparticipantIds.remove(entrantId);}
@@ -210,6 +255,11 @@ public class Event {
             throw new IllegalArgumentException("Event ID is invalid");
         }
     }
+    /**
+     * Saves event data to Firestore with event details and participant lists.
+     *
+     * @return A task representing the asynchronous save operation.
+     */
 
     public Task<Void> saveEventDataToFirestore() {
         Map<String, Object> eventData = new HashMap<>();

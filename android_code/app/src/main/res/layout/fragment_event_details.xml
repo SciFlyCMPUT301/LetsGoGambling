@@ -24,8 +24,7 @@
             android:id="@+id/image_event_poster"
             android:layout_width="match_parent"
             android:layout_height="200dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_event_poster_placeholder" />
+            android:scaleType="centerCrop" />
 
         <TextView
             android:id="@+id/text_event_description"

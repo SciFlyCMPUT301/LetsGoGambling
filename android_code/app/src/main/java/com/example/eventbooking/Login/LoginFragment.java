@@ -62,8 +62,10 @@ public class LoginFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d("LoginOnCreate", "Before Argument");
         if (getArguments() != null) {
             eventIdFromQR = getArguments().getString("eventIdFromQR");
+            Log.d("LoginOnCreate", "After Argument " + eventIdFromQR);
         }
     }
 
@@ -115,6 +117,7 @@ public class LoginFragment extends Fragment {
         FirestoreAccess fs = FirestoreAccess.getInstance();
 //        fs.getUser(deviceId).addOnSuccessListener(snapshot -> {
         fs.getUser(tempval).addOnSuccessListener(snapshot -> {
+            Log.d("Login New User", "New User found");
             //nav.setVisibility(View.VISIBLE);
             if (!snapshot.exists()) { // if new user
                 welcomeText.setText("Welcome new user");
@@ -134,6 +137,7 @@ public class LoginFragment extends Fragment {
                         toolbar.setVisibility(View.VISIBLE);
                         if (eventIdFromQR != null) {
                             // If the user is new and QR code was scanned, go to ProfileCreation then ScannedFragment
+                            Log.d("Login Fragment", "New User going to Profile Entrant QR code");
                             getParentFragmentManager().beginTransaction()
                                     .replace(R.id.fragment_container,
                                             ProfileEntrantFragment.newInstance
@@ -141,6 +145,7 @@ public class LoginFragment extends Fragment {
                                     .commit();
                         } else {
                             // If the user is new and no QR code scanned, just go to ProfileCreation
+                            Log.d("Login Fragment", "New User going to Profile Entrant no QR code");
                             getParentFragmentManager().beginTransaction()
                                     .replace(R.id.fragment_container,
                                             ProfileEntrantFragment.newInstance
@@ -163,7 +168,7 @@ public class LoginFragment extends Fragment {
                         nav.setVisibility(View.VISIBLE);
                         sidebar.setVisibility(View.VISIBLE);
                         toolbar.setVisibility(View.VISIBLE);
-
+                        Log.d("Login", "EventID from QR code " + eventIdFromQR);
                         if (eventIdFromQR != null) {
 
 

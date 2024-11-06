@@ -28,7 +28,7 @@ import java.util.List;
 
 public class OrganizerMenuFragment extends Fragment {
     //initialize variables
-    private static final String ARG_EVENT_ID = "event_id";
+    private static final String ARG_EVENT_ID = "eventId";
     private String eventId;
     private Button viewWaitingListButton;
     private Button sampleAttendeesButton;
@@ -147,7 +147,7 @@ public class OrganizerMenuFragment extends Fragment {
         viewAcceptedListButton.setOnClickListener(v->navigateToViewAcceptedList());
         sampleAttendeesButton.setOnClickListener(v -> sampleAttendees());
         drawReplacementButton.setOnClickListener(v -> drawReplacement(replacementSize));
-        //backToEventPageButton.setOnClickListener(v -> navigateBackToEventPage());
+        backToEventPageButton.setOnClickListener(v -> navigateBackToEventPage());
 
         generateQRCode.setOnClickListener(v -> generateAndDisplayQRCode(eventId));
 
@@ -298,6 +298,14 @@ public class OrganizerMenuFragment extends Fragment {
         } else {
             Toast.makeText(getContext(), "Failed to generate QR code.", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void navigateBackToEventPage(){
+        getActivity().getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, new EventFragment())
+                .addToBackStack(null)
+                .commit();
+
     }
 
 

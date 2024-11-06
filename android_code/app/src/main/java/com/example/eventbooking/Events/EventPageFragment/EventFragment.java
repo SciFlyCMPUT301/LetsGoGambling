@@ -48,26 +48,16 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 public class EventFragment extends Fragment {
-    private TextView additionalInfoTextView;
-    private static final String ARG_INTEGER = "arg_integer";
-    private int receivedInteger;
-
-    private String eventId;
-    private Button joinWaitingListButton;
-    private Button leaveWaitingListButton;
     private Button addFacilityButton, backButton;
     private String currentUserId = "User1";
-    private WaitingList waitingList;
     private ArrayList<Event> eventList;
-    private boolean isUserEvents = true, testing = true;
+    private boolean testing = true;
     private Switch eventSwitch;
     private ListView eventListView;
     private FirebaseFirestore db;
     private User currentUser;
-    private Facility userFacility;
     private EventViewAdapter eventAdapter;
     private UserManager userManager;
-    private List<Event> allEvents;
     /**
      * Creates a new instance of EventFragment, used in itial testing
      *
@@ -120,7 +110,7 @@ public class EventFragment extends Fragment {
         addFacilityButton = view.findViewById(R.id.add_button);
 
         // Set up adapter for ListView
-        eventAdapter = new EventViewAdapter(getContext(), eventList);
+        eventAdapter = new EventViewAdapter(getContext(), eventList, true);
         eventListView.setAdapter(eventAdapter);
 
         // Fetch the current user and events from UserManager

@@ -37,6 +37,7 @@ public class AdminFragment extends Fragment {
         viewUsersButton = view.findViewById(R.id.viewUsersButton);
         viewEventsButton = view.findViewById(R.id.viewEventsButton);
         viewFacilitiesButton = view.findViewById(R.id.viewFacilitiesButton);
+        viewImagesButton = view.findViewById(R.id.viewImagesButton);
 
         //for now hiding it because not dealing with images
 //        viewImagesButton = view.findViewById(R.id.viewImagesButton);
@@ -50,7 +51,7 @@ public class AdminFragment extends Fragment {
         viewEventsButton.setOnClickListener(v -> replaceFragment(eventsFragment));
         viewFacilitiesButton.setOnClickListener(v -> replaceFragment(facilitiesFragment));
         //for now hiding it because not dealing with images, it doesnt work
-//        viewImagesButton.setOnClickListener(v -> replaceFragment(new ViewImagesFragment()));
+        viewImagesButton.setOnClickListener(v -> replaceFragment(new ViewImagesFragment()));
 
         return view;
     }

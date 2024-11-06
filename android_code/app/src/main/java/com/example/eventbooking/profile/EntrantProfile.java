@@ -1,4 +1,4 @@
-package com.example.eventbooking;
+package com.example.eventbooking.profile;
 
 public class EntrantProfile {
     private String name;

@@ -141,7 +141,6 @@ public class LoginFragment extends Fragment {
                                     .replace(R.id.fragment_container, ProfileEntrantFragment.newInstance(true, null)) // replace with create new user fragment
                                     .commit();
                         }
-
                     }
                 }, 3000);
             } else { // returning user

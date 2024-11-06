@@ -20,6 +20,7 @@ import com.example.eventbooking.Home.HomeFragment;
 import com.example.eventbooking.QRCode.ScannedFragment;
 import com.example.eventbooking.R;
 import com.example.eventbooking.User;
+
 import com.google.android.material.navigation.NavigationView;
 
 public class ProfileEntrantFragment extends Fragment {
@@ -33,6 +34,7 @@ public class ProfileEntrantFragment extends Fragment {
     private User currentUser;
     private boolean isEditing = false;
     private boolean isNewUser = false;
+
     private String eventIDFromQR = "";
 
     public static ProfileEntrantFragment newInstance(boolean isNewUser, String eventIdFromQR) {
@@ -40,6 +42,7 @@ public class ProfileEntrantFragment extends Fragment {
         Bundle args = new Bundle();
         args.putBoolean("isNewUser", isNewUser);
         args.putString("eventID", eventIdFromQR);
+
         fragment.setArguments(args);
         return fragment;
     }
@@ -49,6 +52,7 @@ public class ProfileEntrantFragment extends Fragment {
         if (getArguments() != null) {
             isNewUser = getArguments().getBoolean("isNewUser");
             eventIDFromQR = getArguments().getString("eventID");
+
         }
     }
 
@@ -176,6 +180,7 @@ public class ProfileEntrantFragment extends Fragment {
                         .replace(R.id.fragment_container, ScannedFragment.newInstance(eventIDFromQR))
                         .commit();
             }
+
 
         }
     }

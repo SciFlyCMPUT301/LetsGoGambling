@@ -295,7 +295,7 @@ public class EventFragment extends Fragment {
 //        }
 //    }
     private User getUserData() {
-        User Johhny = new User("deviceID1", "User1", "admin1@example.com", "555-001", null);
+        User Johhny = new User("deviceID1", "User1", "admin1@example.com", "555-001", null, null);
         Johhny.addRole("admin");
         UserManager temp = UserManager.getInstance();
         temp.setCurrentUser(Johhny);

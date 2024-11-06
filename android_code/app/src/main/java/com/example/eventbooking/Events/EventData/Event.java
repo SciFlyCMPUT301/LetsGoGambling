@@ -222,6 +222,8 @@ public class Event {
         else{
             eventData.put("eventId", eventId);
         }
+        if(canceledParticipantIds.contains("User1"))
+            Log.d("Saving Event", "User1 rejected");
 
         eventData.put("eventTitle", eventTitle);
         eventData.put("description", description);

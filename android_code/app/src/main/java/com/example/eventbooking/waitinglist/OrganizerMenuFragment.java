@@ -1,6 +1,7 @@
 package com.example.eventbooking.waitinglist;
 
 import android.app.AlertDialog;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
@@ -9,14 +10,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import com.example.eventbooking.QRCode.QRcodeGenerator;
 import com.example.eventbooking.R;
 import com.example.eventbooking.Events.EventPageFragment.EventFragment;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
+import com.google.zxing.qrcode.QRCodeWriter;
 
+import java.util.Hashtable;
 import java.util.List;
 
 public class OrganizerMenuFragment extends Fragment {
@@ -29,6 +36,9 @@ public class OrganizerMenuFragment extends Fragment {
     private Button viewSignedListButton;
     private Button drawReplacementButton;
     private Button backToEventPageButton;
+    private Button generateQRCode;
+    private ImageView QRImage;
+    private QRcodeGenerator qrCodeGenerator;
     private int replacementSize;
     private WaitingList waitingList;
     private int maxParticipant;
@@ -58,7 +68,7 @@ public class OrganizerMenuFragment extends Fragment {
         if (getArguments() != null) {
             eventId = getArguments().getString("eventId");
         }
-//        Log.e("Organizer", "Event found with ID: " + eventId);
+        Log.e("Organizer", "Event found with ID: " + eventId);
 
 
         // Initialize the WaitingList instance as a placeholder
@@ -91,6 +101,8 @@ public class OrganizerMenuFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_waiting_list, container, false);
 
+        qrCodeGenerator = new QRcodeGenerator(getContext());
+
         // Initialize UI elements
         viewWaitingListButton = rootView.findViewById(R.id.waitingListButton);
         sampleAttendeesButton = rootView.findViewById(R.id.sampleAttendeesButton);
@@ -98,6 +110,8 @@ public class OrganizerMenuFragment extends Fragment {
         viewCanceledListButton = rootView.findViewById(R.id.canceledParticipantButton);
         drawReplacementButton = rootView.findViewById(R.id.DrawReplacementButton);
         backToEventPageButton = rootView.findViewById(R.id.BackToEventButton);
+        generateQRCode = rootView.findViewById(R.id.generate_qr_code);
+        QRImage = rootView.findViewById(R.id.QR_image);
 
         // Set up listeners
         viewWaitingListButton.setOnClickListener(v -> navigateToViewWaitingList());
@@ -106,6 +120,8 @@ public class OrganizerMenuFragment extends Fragment {
         sampleAttendeesButton.setOnClickListener(v -> sampleAttendees());
         drawReplacementButton.setOnClickListener(v -> drawReplacement(replacementSize));
         //backToEventPageButton.setOnClickListener(v -> navigateBackToEventPage());
+
+        generateQRCode.setOnClickListener(v -> generateAndDisplayQRCode(eventId));
 
         return rootView;
     }
@@ -215,6 +231,28 @@ public class OrganizerMenuFragment extends Fragment {
         }
     }
 
+
+    /**
+     * This function will get the QR code associated with the event to be scanned and displayed when scanned
+     * Once the QR code is generated then we display the QR code
+     */
+    private void generateAndDisplayQRCode(String eventID) {
+        // URL to be encoded into the QR code (example URL with eventId)
+        String eventUrl = "app://eventDetail?eventID=" + eventId;
+
+        // Generate QR code using the QRcodeGenerator class
+        Bitmap qrCodeBitmap = qrCodeGenerator.generateQRCode(eventUrl);
+
+        if (qrCodeBitmap != null) {
+            QRImage.setImageBitmap(qrCodeBitmap);
+
+            qrCodeGenerator.saveQRCode(qrCodeBitmap, eventID);
+
+            Toast.makeText(getContext(), "QR code generated and saved.", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getContext(), "Failed to generate QR code.", Toast.LENGTH_SHORT).show();
+        }
+    }
 
 
 

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,6 +21,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
@@ -64,6 +66,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private ActionBarDrawerToggle drawerToggle;
+    private static final String TAG = "MainActivity";
+    private String eventIdFromQR = null;
+    public static boolean isLoggedIn = false;
 //    private ActivityMainBinding binding;
 
     /**
@@ -91,7 +96,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-//        FirebaseApp.initializeApp(this);
 
         /**
          * Finding and setting the views for the navigation inside of activity_main
@@ -120,6 +124,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.addDrawerListener(drawerToggle);
         drawerToggle.syncState();
+
+        // Getting the login fragment given
+        handleIntent(getIntent());
 
 
 //        SharedPreferences preferences = getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);
@@ -312,19 +319,76 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        handleQRCodeScan(intent);
+//        handleQRCodeScan(intent);
+        handleIntent(intent);
     }
 
-    private void handleQRCodeScan(Intent intent) {
-        if (LoginFragment.isLoggedIn) { // Check if user is logged in
-            String scannedData = intent.getStringExtra("scanned_data");
-            if (scannedData != null) {
-                ScannedFragment scannedFragment = ScannedFragment.newInstance(scannedData);
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, scannedFragment)
-                        .commit();
+//    private void handleQRCodeScan(Intent intent) {
+//        if (LoginFragment.isLoggedIn) { // Check if user is logged in
+//            String scannedData = intent.getStringExtra("scanned_data");
+//            if (scannedData != null) {
+//                ScannedFragment scannedFragment = ScannedFragment.newInstance(scannedData);
+//                getSupportFragmentManager().beginTransaction()
+//                        .replace(R.id.fragment_container, scannedFragment)
+//                        .commit();
+//            }
+//        }
+//    }
+
+    private void handleIntent(Intent intent) {
+        if (intent != null && intent.getData() != null) {
+            String url = intent.getData().toString();
+            Log.d(TAG, "Incoming URL: " + url);
+
+            eventIdFromQR = extractEventIdFromUrl(url);
+
+            if (eventIdFromQR != null) {
+                Log.d(TAG, "Event ID from QR code: " + eventIdFromQR);
+
+                // If the user is already logged in, redirect immediately to ScannedFragment
+                if (LoginFragment.isLoggedIn) {
+                    navigateToScannedFragment(eventIdFromQR);
+                } else {
+                    // Show login screen first
+                    showLoginFragment();
+                }
+            } else {
+                Log.e(TAG, "No event ID found in URL");
             }
         }
+    }
+
+    private String extractEventIdFromUrl(String url) {
+        // Assuming the URL is in the format: app://eventDetail?eventID=12345
+        String[] parts = url.split("eventID=");
+        if (parts.length > 1) {
+            return parts[1];
+        }
+        return null;
+    }
+    private void showLoginFragment() {
+        // Show LoginFragment first
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        LoginFragment loginFragment = new LoginFragment();
+        fragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, loginFragment)
+                .commit();
+    }
+
+
+    public void onLoginSuccess() {
+        if (eventIdFromQR != null) {
+            navigateToScannedFragment(eventIdFromQR);
+        }
+    }
+
+    private void navigateToScannedFragment(String eventId) {
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        ScannedFragment scannedFragment = ScannedFragment.newInstance(eventId);
+        fragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, scannedFragment)
+                .commit();
     }
 
 

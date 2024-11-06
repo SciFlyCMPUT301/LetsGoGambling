@@ -107,19 +107,30 @@ public class UserManager {
             return true;
         return false;
     }
-
+    /**getter of current user
+     * @return the current User */
     public User getCurrentUser(){
         return currentUser;
     }
+    /**
+     * getter of user facility
+     * @return userFacility */
 
     public Facility getUserFacility() {
         return userFacility;
     }
-
+    /**
+     * getter of organizer events
+     * @return  organizerEvents*/
+    //delete this later, no usage
     public List<Event> getOrganizerEvents() {
         return organizerEvents;
     }
-
+    /**
+     * getter of user events, they were designed for
+     * restrict permissions for entrant and organizer
+     * @return userEvents*/
+    //might delete later
     public List<Event> getUserEvents() {
         return userEvents;
     }

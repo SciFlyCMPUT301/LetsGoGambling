@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-//        FirebaseApp.initializeApp(this);
+        //FirebaseApp.initializeApp(this);
 
         /**
          * Finding and setting the views for the navigation inside of activity_main

@@ -125,7 +125,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawerLayout.addDrawerListener(drawerToggle);
         drawerToggle.syncState();
 
-        // Getting the login fragment given
+        // Getting the login fragment given intent
         handleIntent(getIntent());
 
 
@@ -350,11 +350,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     navigateToScannedFragment(eventIdFromQR);
                 } else {
                     // Show login screen first
-                    showLoginFragment();
+                    showLoginFragment(eventIdFromQR);
                 }
             } else {
                 Log.e(TAG, "No event ID found in URL");
             }
+        }
+        if (!LoginFragment.isLoggedIn) {
+            showLoginFragment(null);
         }
     }
 
@@ -366,10 +369,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         return null;
     }
-    private void showLoginFragment() {
+    private void showLoginFragment(String eventIdFromQR) {
         // Show LoginFragment first
         FragmentManager fragmentManager = getSupportFragmentManager();
-        LoginFragment loginFragment = new LoginFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("eventIdFromQR", eventIdFromQR);
+        loginFragment.setArguments(bundle);
         fragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, loginFragment)
                 .commit();
@@ -385,7 +390,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void navigateToScannedFragment(String eventId) {
 
         FragmentManager fragmentManager = getSupportFragmentManager();
-        ScannedFragment scannedFragment = ScannedFragment.newInstance(eventId);
+        Bundle bundle = new Bundle();
+        bundle.putString("eventId", eventId);
+        scannedFragment.setArguments(bundle);
         fragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, scannedFragment)
                 .commit();

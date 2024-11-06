@@ -13,9 +13,14 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
+import com.example.eventbooking.Home.HomeFragment;
+import com.example.eventbooking.QRCode.ScannedFragment;
 import com.example.eventbooking.R;
+import com.example.eventbooking.User;
+import com.google.android.material.navigation.NavigationView;
 
 public class ProfileEntrantFragment extends Fragment {
 
@@ -25,12 +30,32 @@ public class ProfileEntrantFragment extends Fragment {
     private Switch notificationsSwitch;
     private EntrantProfileManager profileManager;
     private EntrantProfile currentProfile;
+    private User currentUser;
     private boolean isEditing = false;
+    private boolean isNewUser = false;
+    private String eventIDFromQR = "";
+
+    public static ProfileEntrantFragment newInstance(boolean isNewUser, String eventIdFromQR) {
+        ProfileEntrantFragment fragment = new ProfileEntrantFragment();
+        Bundle args = new Bundle();
+        args.putBoolean("isNewUser", isNewUser);
+        args.putString("eventID", eventIdFromQR);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            isNewUser = getArguments().getBoolean("isNewUser");
+            eventIDFromQR = getArguments().getString("eventID");
+        }
+    }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_profile, container, false);
+        View view = inflater.inflate(R.layout.fragment_entrant_profile, container, false);
 
         // Initialize views
         profileTitle = view.findViewById(R.id.profile_title);
@@ -54,8 +79,19 @@ public class ProfileEntrantFragment extends Fragment {
         editButton.setOnClickListener(v -> toggleEditMode());
 
         // Initially, set save button and switch to be disabled
-        setEditMode(false);
-
+        if (isNewUser) {
+            setEditMode(true);
+            editButton.setVisibility(View.GONE);
+            backButton.setVisibility(View.GONE);
+            NavigationView sidebar = getActivity().findViewById(R.id.nav_view);
+            sidebar.setVisibility(View.GONE);
+            Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
+            toolbar.setVisibility(View.GONE);
+            View nav = getActivity().findViewById(R.id.bottom_navigation);
+            nav.setVisibility(View.GONE);
+        } else {
+            setEditMode(false);
+        }
         return view;
     }
 
@@ -76,6 +112,18 @@ public class ProfileEntrantFragment extends Fragment {
         }
     }
 
+    private void onProfileLoaded(User loadingUser) {
+        if (loadingUser != null) {
+            currentUser = loadingUser;
+            editName.setText(loadingUser.getUsername());
+            editEmail.setText(loadingUser.getEmail());
+            editPhone.setText(loadingUser.getPhoneNumber());
+            notificationsSwitch.setChecked(loadingUser.isNotificationAsk());
+        } else {
+            Toast.makeText(getContext(), "No profile data found.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     private void saveUserProfile() {
         if (currentProfile == null) {
             currentProfile = new EntrantProfile();
@@ -86,11 +134,50 @@ public class ProfileEntrantFragment extends Fragment {
         currentProfile.setPhoneNumber(editPhone.getText().toString().trim());
         currentProfile.setNotificationsEnabled(notificationsSwitch.isChecked());
 
+        User savingUser = new User();
+        savingUser.setUsername(editName.getText().toString().trim());
+        savingUser.setEmail(editEmail.getText().toString().trim());
+        savingUser.setPhoneNumber(editPhone.getText().toString().trim());
+        savingUser.setNotificationAsk(notificationsSwitch.isChecked());
+        savingUser.addRole("entrant");
+        savingUser.saveUserDataToFirestore(new User.OnUserIDGenerated() {
+            @Override
+            public void onUserIDGenerated(String userID) {
+                if (userID != null) {
+                    // Handle successful save operation here
+                } else {
+                    // Handle failure (e.g., show an error message to the user)
+                }
+            }
+        });
+
         String deviceID = getDeviceID();
-        profileManager.createOrUpdateProfile(deviceID, currentProfile);
+//        profileManager.createOrUpdateProfile(deviceID, currentProfile);
 
         Toast.makeText(getContext(), "Profile saved successfully.", Toast.LENGTH_SHORT).show();
         setEditMode(false);
+
+        if (isNewUser) {
+            editButton.setVisibility(View.VISIBLE);
+            backButton.setVisibility(View.VISIBLE);
+            NavigationView sidebar = getActivity().findViewById(R.id.nav_view);
+            sidebar.setVisibility(View.VISIBLE);
+            Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
+            toolbar.setVisibility(View.VISIBLE);
+            View nav = getActivity().findViewById(R.id.bottom_navigation);
+            nav.setVisibility(View.VISIBLE);
+
+            if(eventIDFromQR == null){
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, HomeFragment.newInstance(getDeviceID()))
+                        .commit();
+            } else {
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, ScannedFragment.newInstance(eventIDFromQR))
+                        .commit();
+            }
+
+        }
     }
 
     private void toggleEditMode() {

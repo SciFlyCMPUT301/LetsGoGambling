@@ -56,14 +56,16 @@ public class EventViewFragment extends Fragment {
             Event.findEventById(eventId, event -> {
                 if (event != null) {
 //                     Update participant list based on listchoice
-                    if(listchoice.equals("Accepted"))
-                        event.addAcceptedParticipantId("User1");
-                    if(listchoice.equals("Waiting"))
-                        event.addWaitingParticipantIds("User1");
-                    if(listchoice.equals("Canceled"))
-                        event.addCanceledParticipantIds("User1");
-                    if(listchoice.equals("SignedUp"))
-                        event.addSignedUpParticipantIds("User1");
+                    if(listchoice != null) {
+                        if (listchoice.equals("Accepted"))
+                            event.addAcceptedParticipantId("User1");
+                        if (listchoice.equals("Waiting"))
+                            event.addWaitingParticipantIds("User1");
+                        if (listchoice.equals("Canceled"))
+                            event.addCanceledParticipantIds("User1");
+                        if (listchoice.equals("SignedUp"))
+                            event.addSignedUpParticipantIds("User1");
+                    }
                     Log.e("eventId", "Event found with ID: " + event.getEventId());
                     displayEventDetails(event);
                     configureButtons(event, userId);

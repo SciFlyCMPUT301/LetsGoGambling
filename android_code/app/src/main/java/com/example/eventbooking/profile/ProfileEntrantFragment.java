@@ -2,10 +2,12 @@ package com.example.eventbooking.profile;
 
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -30,6 +32,13 @@ public class ProfileEntrantFragment extends Fragment {
     private TextView profileTitle;
     private Button saveButton, backButton, editButton;
     private Switch notificationsSwitch;
+
+    // Start of Testing values
+    private Switch testingSwitch;
+    private EditText deviceIDEntry;
+    private boolean testing;
+    // End of Testing Values
+
     private EntrantProfileManager profileManager;
     private EntrantProfile currentProfile;
     private User currentUser;
@@ -42,7 +51,7 @@ public class ProfileEntrantFragment extends Fragment {
         ProfileEntrantFragment fragment = new ProfileEntrantFragment();
         Bundle args = new Bundle();
         args.putBoolean("isNewUser", isNewUser);
-        args.putString("eventID", eventIdFromQR);
+        args.putString("eventId", eventIdFromQR);
         args.putString("deviceId", deviceId);
 
         fragment.setArguments(args);
@@ -51,10 +60,12 @@ public class ProfileEntrantFragment extends Fragment {
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d("Profile On Create", "Before arg");
         if (getArguments() != null) {
             isNewUser = getArguments().getBoolean("isNewUser");
-            eventIDFromQR = getArguments().getString("eventID");
+            eventIDFromQR = getArguments().getString("eventId");
             deviceId = getArguments().getString("deviceId");
+            Log.d("Profile On Create", "After arg: " + isNewUser + " " + eventIDFromQR + " " + deviceId);
 
         }
     }
@@ -70,10 +81,11 @@ public class ProfileEntrantFragment extends Fragment {
         editEmail = view.findViewById(R.id.edit_email);
         editPhone = view.findViewById(R.id.edit_phone);
         notificationsSwitch = view.findViewById(R.id.notifications_switch);
+        testingSwitch = view.findViewById(R.id.testing_switch);
         saveButton = view.findViewById(R.id.button_save_profile);
         backButton = view.findViewById(R.id.button_back_home);
         editButton = view.findViewById(R.id.button_edit_profile);
-
+        deviceIDEntry = view.findViewById(R.id.device_id_entry);
         // Initialize EntrantProfileManager
         profileManager = new EntrantProfileManager();
 
@@ -84,6 +96,16 @@ public class ProfileEntrantFragment extends Fragment {
         saveButton.setOnClickListener(v -> saveUserProfile());
         backButton.setOnClickListener(v -> requireActivity().onBackPressed()); // Updated line
         editButton.setOnClickListener(v -> toggleEditMode());
+
+        testingSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    testing = true;
+                } else {
+                    testing = false;
+                }
+            }
+        });
 
         // Initially, set save button and switch to be disabled
         if (isNewUser) {
@@ -147,6 +169,10 @@ public class ProfileEntrantFragment extends Fragment {
         savingUser.setPhoneNumber(editPhone.getText().toString().trim());
         savingUser.setNotificationAsk(notificationsSwitch.isChecked());
         savingUser.addRole("entrant");
+        if(testing == true){
+            savingUser.setDeviceID(deviceIDEntry.getText().toString().trim());
+        }
+
         savingUser.saveUserDataToFirestore(new User.OnUserIDGenerated() {
             @Override
             public void onUserIDGenerated(String userID) {
@@ -175,11 +201,12 @@ public class ProfileEntrantFragment extends Fragment {
             nav.setVisibility(View.VISIBLE);
 
             if(eventIDFromQR == null){
+                Log.d("ProfileEntrant", "Nothing found");
                 getParentFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container, HomeFragment.newInstance(getDeviceID()))
                         .commit();
             } else {
-
+                Log.d("ProfileEntrant", "Found QR link: " + eventIDFromQR);
                 getParentFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container, EventViewFragment.newInstance(eventIDFromQR, deviceId))
 //                      .replace(R.id.fragment_container, EventViewFragment.newInstance(eventIdFromQR, deviceId))

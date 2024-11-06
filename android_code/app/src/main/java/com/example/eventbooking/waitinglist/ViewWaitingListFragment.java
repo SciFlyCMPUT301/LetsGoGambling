@@ -1,6 +1,7 @@
 package com.example.eventbooking.waitinglist;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,11 +47,12 @@ public class ViewWaitingListFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         // Retrieve the eventId from arguments
         if (getArguments() != null) {
             eventId = getArguments().getString("eventId");
         }
-
+        Log.d("Waiting List View", "EventID: " + eventId);
         // Initialize WaitingList instance with only the event ID
         waitingList = new WaitingList(eventId);
 
@@ -72,7 +74,7 @@ public class ViewWaitingListFragment extends Fragment {
         // Initialize UI elements
         waitingListView = rootView.findViewById(R.id.waiting_list_view);
         backButton = rootView.findViewById(R.id.back_button);
-
+        Log.d("Waiting List View", "On Create View EventID: " + eventId);
         // Set up back button listener
         backButton.setOnClickListener(v -> navigateBackToOrganizerMenu());
 

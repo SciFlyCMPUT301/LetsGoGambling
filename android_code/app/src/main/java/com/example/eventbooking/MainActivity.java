@@ -338,6 +338,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //    }
 
     private void handleIntent(Intent intent) {
+        boolean loggingin = false;
         if (intent != null && intent.getData() != null) {
             String url = intent.getData().toString();
             Log.d(TAG, "Incoming URL: " + url);
@@ -349,10 +350,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 // If the user is already logged in, redirect immediately to ScannedFragment
                 if (LoginFragment.isLoggedIn) {
+                    Log.d("MainActivity Is Loggedin", "Logged in");
                     openEventViewFragment(eventIdFromQR);
 //                    navigateToScannedFragment(eventIdFromQR);
                 } else {
                     // Show login screen first
+                    Log.d("MainActivity Is not Loggedin", "Not Logged in");
+                    loggingin = true;
                     showLoginFragment(eventIdFromQR);
                 }
             } else {
@@ -374,6 +378,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
     private void showLoginFragment(String eventIdFromQR) {
         // Show LoginFragment first
+        Log.d("MainActivity Login Move", "Event ID: " + eventIdFromQR);
         FragmentManager fragmentManager = getSupportFragmentManager();
         Bundle bundle = new Bundle();
         bundle.putString("eventIdFromQR", eventIdFromQR);
@@ -405,7 +410,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void openEventViewFragment(String eventID) {
-        Log.d("Moving to Event", "HSHASHDASHD");
+        Log.d("Moving to Event", "HSHASHDASHD " + eventID);
         EventViewFragment eventViewFragment = new EventViewFragment();
         Bundle args = new Bundle();
         args.putString("eventId", eventID);

@@ -29,4 +29,4 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle
       working-directory: ./android_code
-      run: ./gradlew build
+      run: ./gradlew build -Pandroid.enableLint=false

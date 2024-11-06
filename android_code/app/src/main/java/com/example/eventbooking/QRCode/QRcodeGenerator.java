@@ -32,8 +32,8 @@ public class QRcodeGenerator {
         }
     }
 
-    public void saveQRCode(Bitmap bitmap) {
-        String filename = "eventbooking_qrcode.png";
+    public void saveQRCode(Bitmap bitmap, String eventID) {
+        String filename = "eventbooking_qrcode-" + eventID + ".png";
         try {
             File file = new File(context.getExternalFilesDir(null), filename);
             OutputStream stream = new FileOutputStream(file);

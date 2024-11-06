@@ -17,6 +17,8 @@ import com.example.eventbooking.Events.EventCreate.EventCreateFragment;
 import com.example.eventbooking.Facility;
 import com.example.eventbooking.Home.HomeFragment;
 import com.example.eventbooking.Events.EventData.Event;
+import com.example.eventbooking.MainActivity;
+import com.example.eventbooking.QRCode.ScannedFragment;
 import com.example.eventbooking.R;
 import com.example.eventbooking.Role;
 import com.example.eventbooking.User;
@@ -45,11 +47,22 @@ public class LoginFragment extends Fragment {
     TextView welcomeText;
     BottomNavigationView nav;
     public static boolean isLoggedIn = false;
+    private String eventIdFromQR;
 
+    public LoginFragment() {
+
+    }
+
+    public void setEventId(String eventId) {
+        this.eventIdFromQR = eventId;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            eventIdFromQR = getArguments().getString("eventIdFromQR");
+        }
     }
 
     /**
@@ -77,7 +90,7 @@ public class LoginFragment extends Fragment {
 
         NavigationView sidebar = getActivity().findViewById(R.id.nav_view);
 //        if (sidebar != null) {
-            sidebar.setVisibility(View.GONE);
+        sidebar.setVisibility(View.GONE);
 //        }
 
         // tool bar hiding possible???
@@ -87,11 +100,19 @@ public class LoginFragment extends Fragment {
         deviceIdText = rootView.findViewById(R.id.text_login_deviceid);
         welcomeText = rootView.findViewById(R.id.text_login_welcome);
         String deviceId = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
-        deviceIdText.setText(deviceId);
 
-        Log.d("Login", deviceId);
+        // Test code here to fake the device ID
+        final String tempval = "deviceID31";
+//        deviceId = tempval;
+
+//        deviceIdText.setText(deviceId);
+//
+//        Log.d("Login", deviceId);
+        deviceIdText.setText(tempval);
+        Log.d("Login", tempval);
         FirestoreAccess fs = FirestoreAccess.getInstance();
-        fs.getUser(deviceId).addOnSuccessListener(snapshot -> {
+//        fs.getUser(deviceId).addOnSuccessListener(snapshot -> {
+        fs.getUser(tempval).addOnSuccessListener(snapshot -> {
             //nav.setVisibility(View.VISIBLE);
             if (!snapshot.exists()) { // if new user
                 welcomeText.setText("Welcome new user");
@@ -109,9 +130,17 @@ public class LoginFragment extends Fragment {
                         nav.setVisibility(View.VISIBLE);
                         sidebar.setVisibility(View.VISIBLE);
                         toolbar.setVisibility(View.VISIBLE);
-                        getParentFragmentManager().beginTransaction()
-                            .replace(R.id.fragment_container, ProfileEntrantFragment.newInstance(true)) // replace with create new user fragment
-                            .commit();
+                        if (eventIdFromQR != null) {
+                            // If the user is new and QR code was scanned, go to ProfileCreation then ScannedFragment
+                            getParentFragmentManager().beginTransaction()
+                                    .replace(R.id.fragment_container, ProfileEntrantFragment.newInstance(true, eventIdFromQR)) // replace with create new user fragment
+                                    .commit();
+                        } else {
+                            // If the user is new and no QR code scanned, just go to ProfileCreation
+                            getParentFragmentManager().beginTransaction()
+                                    .replace(R.id.fragment_container, ProfileEntrantFragment.newInstance(true, null)) // replace with create new user fragment
+                                    .commit();
+                        }
                     }
                 }, 3000);
             } else { // returning user
@@ -128,9 +157,20 @@ public class LoginFragment extends Fragment {
                         nav.setVisibility(View.VISIBLE);
                         sidebar.setVisibility(View.VISIBLE);
                         toolbar.setVisibility(View.VISIBLE);
-                        getParentFragmentManager().beginTransaction()
-                                .replace(R.id.fragment_container, HomeFragment.newInstance(deviceId))
-                                .commit();
+                        if (eventIdFromQR != null) {
+                            getParentFragmentManager().beginTransaction()
+                                    .replace(R.id.fragment_container, ScannedFragment.newInstance(eventIdFromQR))
+                                    .commit();
+                        } else {
+//                            getParentFragmentManager().beginTransaction()
+//                                    .replace(R.id.fragment_container, HomeFragment.newInstance(deviceId))
+//                                    .commit();
+                            getParentFragmentManager().beginTransaction()
+                                    .replace(R.id.fragment_container, HomeFragment.newInstance(tempval))
+                                    .commit();
+
+                        }
+
                     }
                 }, 3000);
             }

@@ -13,9 +13,12 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
+import com.example.eventbooking.Home.HomeFragment;
 import com.example.eventbooking.R;
+import com.google.android.material.navigation.NavigationView;
 
 public class ProfileEntrantFragment extends Fragment {
 
@@ -26,6 +29,22 @@ public class ProfileEntrantFragment extends Fragment {
     private EntrantProfileManager profileManager;
     private EntrantProfile currentProfile;
     private boolean isEditing = false;
+    private boolean isNewUser = false;
+
+    public static ProfileEntrantFragment newInstance(boolean isNewUser) {
+        ProfileEntrantFragment fragment = new ProfileEntrantFragment();
+        Bundle args = new Bundle();
+        args.putBoolean("isNewUser", isNewUser);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+     public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            isNewUser = getArguments().getBoolean("isNewUser");
+        }
+    }
 
     @Nullable
     @Override
@@ -54,8 +73,19 @@ public class ProfileEntrantFragment extends Fragment {
         editButton.setOnClickListener(v -> toggleEditMode());
 
         // Initially, set save button and switch to be disabled
-        setEditMode(false);
-
+        if (isNewUser) {
+            setEditMode(true);
+            editButton.setVisibility(View.GONE);
+            backButton.setVisibility(View.GONE);
+            NavigationView sidebar = getActivity().findViewById(R.id.nav_view);
+            sidebar.setVisibility(View.GONE);
+            Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
+            toolbar.setVisibility(View.GONE);
+            View nav = getActivity().findViewById(R.id.bottom_navigation);
+            nav.setVisibility(View.GONE);
+        } else {
+            setEditMode(false);
+        }
         return view;
     }
 
@@ -91,6 +121,20 @@ public class ProfileEntrantFragment extends Fragment {
 
         Toast.makeText(getContext(), "Profile saved successfully.", Toast.LENGTH_SHORT).show();
         setEditMode(false);
+
+        if (isNewUser) {
+            editButton.setVisibility(View.VISIBLE);
+            backButton.setVisibility(View.VISIBLE);
+            NavigationView sidebar = getActivity().findViewById(R.id.nav_view);
+            sidebar.setVisibility(View.VISIBLE);
+            Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
+            toolbar.setVisibility(View.VISIBLE);
+            View nav = getActivity().findViewById(R.id.bottom_navigation);
+            nav.setVisibility(View.VISIBLE);
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, HomeFragment.newInstance(getDeviceID()))
+                    .commit();
+        }
     }
 
     private void toggleEditMode() {

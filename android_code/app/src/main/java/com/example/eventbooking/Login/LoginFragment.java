@@ -22,6 +22,7 @@ import com.example.eventbooking.Role;
 import com.example.eventbooking.User;
 import com.example.eventbooking.UserManager;
 import com.example.eventbooking.firebase.FirestoreAccess;
+import com.example.eventbooking.profile.ProfileEntrantFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -109,7 +110,7 @@ public class LoginFragment extends Fragment {
                         sidebar.setVisibility(View.VISIBLE);
                         toolbar.setVisibility(View.VISIBLE);
                         getParentFragmentManager().beginTransaction()
-                            .replace(R.id.fragment_container, HomeFragment.newInstance(deviceId)) // replace with create new user fragment
+                            .replace(R.id.fragment_container, ProfileEntrantFragment.newInstance(true)) // replace with create new user fragment
                             .commit();
                     }
                 }, 3000);

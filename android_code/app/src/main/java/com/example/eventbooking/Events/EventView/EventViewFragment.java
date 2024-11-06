@@ -14,6 +14,7 @@ import android.widget.Toast;
 import androidx.fragment.app.Fragment;
 
 import com.example.eventbooking.Events.EventData.Event;
+import com.example.eventbooking.Events.EventPageFragment.EventFragment;
 import com.example.eventbooking.R;
 
 public class EventViewFragment extends Fragment {
@@ -54,7 +55,7 @@ public class EventViewFragment extends Fragment {
             // Fetch event data based on eventId
             Event.findEventById(eventId, event -> {
                 if (event != null) {
-                    // Update participant list based on listchoice
+//                     Update participant list based on listchoice
                     if(listchoice.equals("Accepted"))
                         event.addAcceptedParticipantId("User1");
                     if(listchoice.equals("Waiting"))
@@ -106,19 +107,21 @@ public class EventViewFragment extends Fragment {
             addButton("Sign Up", v -> {
                 selectedEvent.signUpParticipant(selectedUserId);
                 updateEventInFirestore(selectedEvent);
+                goBackToEventFragment();
             });
 
             // Add "Reject" button to move user to canceled list
             addButton("Reject", v -> {
                 selectedEvent.cancelParticipant(selectedUserId);
                 updateEventInFirestore(selectedEvent);
+                goBackToEventFragment();
             });
 
             // Add "Decline" button to move user to declined list
-            addButton("Decline", v -> {
-                selectedEvent.addDeclinedParticipantId(selectedUserId); // Adds user to declined list
-                updateEventInFirestore(selectedEvent);
-            });
+//            addButton("Decline", v -> {
+//                selectedEvent.addDeclinedParticipantId(selectedUserId); // Adds user to declined list
+//                updateEventInFirestore(selectedEvent);
+//            });
         } else if (!selectedEvent.getWaitingParticipantIds().contains(selectedUserId) &&
                 !selectedEvent.getSignedUpParticipantIds().contains(selectedUserId) &&
                 !selectedEvent.getCanceledParticipantIds().contains(selectedUserId)) {
@@ -126,6 +129,7 @@ public class EventViewFragment extends Fragment {
             addButton("Waitlist", v -> {
                 selectedEvent.addWaitingParticipantIds(selectedUserId);
                 updateEventInFirestore(selectedEvent);
+                goBackToEventFragment();
             });
         }
 
@@ -146,5 +150,12 @@ public class EventViewFragment extends Fragment {
         }).addOnFailureListener(e -> {
             Toast.makeText(getContext(), "Failed to update event", Toast.LENGTH_SHORT).show();
         });
+    }
+
+    private void goBackToEventFragment(){
+        getActivity().getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, new EventFragment())
+                .addToBackStack(null)
+                .commit();
     }
 }

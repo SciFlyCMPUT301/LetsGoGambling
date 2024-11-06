@@ -26,19 +26,10 @@ public class EventViewFragment extends Fragment {
     private TextView eventTitleText, eventDescriptionText;
     private LinearLayout buttonContainer;
 
-    public static EventViewFragment newInstance(String eventID, String deviceID) {
-        EventViewFragment fragment = new EventViewFragment();
-        Bundle args = new Bundle();
-        args.putString("eventId", eventID);
-        args.putString("deviceId", deviceID);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_event_view, container, false);
-        Log.d("In event", "Got into the event");
+
         // Initialize views
         eventPosterImage = view.findViewById(R.id.event_poster_image);
         eventTitleText = view.findViewById(R.id.event_title_text);
@@ -49,38 +40,31 @@ public class EventViewFragment extends Fragment {
         if (getArguments() != null) {
             eventId = getArguments().getString("eventId");
             deviceId = getArguments().getString("deviceId");
-            Log.d("In event", "eventid: "+ eventId);
-            Log.d("In event", "deviceId: "+ deviceId);
-//            String listchoice = getArguments().getString("listAdd");
-
-
+            String listchoice = getArguments().getString("listAdd");
 
             // Fetch event data based on eventId
-//            event = findEventById(eventId);
             Event.findEventById(eventId, event -> {
-//                if (event != null) {
-//                    if(listchoice == "Accepted")
-//                        event.addAcceptedParticipantId("User1");
-//                    if(listchoice == "Waiting")
-//                        event.addWaitingParticipantIds("User1");
-//                    if(listchoice == "Canceled")
-//                        event.addCanceledParticipantIds("User1");
-//                    if(listchoice == "SignedUp")
-//                        event.addSignedUpParticipantIds("User1");
-//                    Log.e("eventId", "Event found with ID: " + event.getEventId());
+                if (event != null) {
+                    // Update participant list based on listchoice
+                    if(listchoice.equals("Accepted"))
+                        event.addAcceptedParticipantId("User1");
+                    if(listchoice.equals("Waiting"))
+                        event.addWaitingParticipantIds("User1");
+                    if(listchoice.equals("Canceled"))
+                        event.addCanceledParticipantIds("User1");
+                    if(listchoice.equals("SignedUp"))
+                        event.addSignedUpParticipantIds("User1");
+                    Log.e("eventId", "Event found with ID: " + event.getEventId());
                     displayEventDetails(event);
                     configureButtons(event, userId);
-//                } else {
-//                    Toast.makeText(getContext(), "Event not found", Toast.LENGTH_SHORT).show();
-//                    getActivity().getSupportFragmentManager().popBackStack();
-//                }
+                } else {
+                    Toast.makeText(getContext(), "Event not found", Toast.LENGTH_SHORT).show();
+                    getActivity().getSupportFragmentManager().popBackStack();
+                }
             }, e -> {
                 Toast.makeText(getContext(), "Error fetching event: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 getActivity().getSupportFragmentManager().popBackStack();
             });
-//            // Populate UI with event details
-//            displayEventDetails(event);
-//            configureButtons();
         }
 
         return view;
@@ -98,7 +82,7 @@ public class EventViewFragment extends Fragment {
         Log.e("Done Display Event", "Event found with ID: " + event.getEventId());
 
         // Load event poster image (assume you have a method to do this)
-//        loadImageIntoView(event.getImageUrl(), eventPosterImage);
+        // loadImageIntoView(event.getImageUrl(), eventPosterImage);
     }
 
     private void configureButtons(Event selectedEvent, String selectedUserId) {
@@ -106,22 +90,32 @@ public class EventViewFragment extends Fragment {
         buttonContainer.removeAllViews();
         Log.d("Event View", "Button add: " + selectedEvent + ", " +
                 selectedEvent.getAcceptedParticipantIds().contains(selectedUserId));
+
+        // If the user is in the accepted list
         if (selectedEvent.getAcceptedParticipantIds().contains(selectedUserId)) {
-            // User is in the accepted list
+            // Add "Sign Up" button to move user to signed-up list
             addButton("Sign Up", v -> {
-                selectedEvent.signUpParticipant(selectedUserId);  // Moves user to signed-up list
+                selectedEvent.signUpParticipant(selectedUserId);
                 updateEventInFirestore(selectedEvent);
             });
+
+            // Add "Reject" button to move user to canceled list
             addButton("Reject", v -> {
-                selectedEvent.cancelParticipant(selectedUserId);  // Moves user to canceled list
+                selectedEvent.cancelParticipant(selectedUserId);
+                updateEventInFirestore(selectedEvent);
+            });
+
+            // Add "Decline" button to move user to declined list
+            addButton("Decline", v -> {
+                selectedEvent.addDeclinedParticipantId(selectedUserId); // Adds user to declined list
                 updateEventInFirestore(selectedEvent);
             });
         } else if (!selectedEvent.getWaitingParticipantIds().contains(selectedUserId) &&
                 !selectedEvent.getSignedUpParticipantIds().contains(selectedUserId) &&
                 !selectedEvent.getCanceledParticipantIds().contains(selectedUserId)) {
-            // User is not in any list
+            // If user is not in any list, add "Waitlist" button to add user to waiting list
             addButton("Waitlist", v -> {
-                selectedEvent.addWaitingParticipantIds(selectedUserId);  // Adds user to waiting list
+                selectedEvent.addWaitingParticipantIds(selectedUserId);
                 updateEventInFirestore(selectedEvent);
             });
         }

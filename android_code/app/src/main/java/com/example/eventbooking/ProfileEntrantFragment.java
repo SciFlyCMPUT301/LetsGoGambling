@@ -29,7 +29,7 @@ public class ProfileEntrantFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_profile, container, false);
+        View view = inflater.inflate(R.layout.fragment_entrant_profile, container, false);
 
         // Initialize views
         profileTitle = view.findViewById(R.id.profile_title);

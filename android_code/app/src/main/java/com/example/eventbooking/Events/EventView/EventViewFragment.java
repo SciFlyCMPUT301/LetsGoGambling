@@ -138,4 +138,6 @@ public class EventViewFragment extends Fragment {
             Toast.makeText(getContext(), "Failed to update event", Toast.LENGTH_SHORT).show();
         });
     }
+
+
 }

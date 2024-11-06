@@ -22,6 +22,13 @@ public class ViewWaitingListFragment extends Fragment {
     private Button backButton;
     private String eventId;
     private WaitingList waitingList;
+    /**
+     * Creates a new instance of ViewWaitingListFragment with the specified event ID.
+     * Sets up the fragment's arguments to include the provided event ID.
+     *
+     * @param eventId The ID of the event for which the joined waiting list participant list is to be displayed.
+     * @return A new instance of ViewAcceptedListFragment with the event ID argument set.
+     */
 
     public static ViewWaitingListFragment newInstance(String eventId) {
         ViewWaitingListFragment fragment = new ViewWaitingListFragment();
@@ -30,7 +37,8 @@ public class ViewWaitingListFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
-
+    /**
+     * empty constructor*/
     public ViewWaitingListFragment() {
         // Required empty public constructor
     }
@@ -70,7 +78,12 @@ public class ViewWaitingListFragment extends Fragment {
 
         return rootView;
     }
-
+    /**
+     * Displays the list of waitinglist participants in the UI. This method retrieves the list of
+     * waitinglist  participant IDs from the  WaitingList instance and sets it as the data source
+     * for the ListView displaying waitinglist participants.
+     * it shows a message indicating that no participants have been joined and clears the adapter.
+     */
     private void displayWaitingList() {
         List<String> waitingParticipantIds = waitingList.getWaitingParticipantIds();
         if (waitingParticipantIds != null && !waitingParticipantIds.isEmpty()) {
@@ -82,7 +95,11 @@ public class ViewWaitingListFragment extends Fragment {
             waitingListView.setAdapter(null);
         }
     }
-
+    /**
+     * Navigates back to the organizer menu by replacing the current fragment with an instance of
+     * OrganizerMenuFragment This method is triggered when the back button is clicked, allowing
+     *  the user to return to the main organizer view for event management.*/
+    //not working right now
     private void navigateBackToOrganizerMenu() {
         OrganizerMenuFragment fragment = OrganizerMenuFragment.newInstance(eventId);
         getParentFragmentManager().beginTransaction()

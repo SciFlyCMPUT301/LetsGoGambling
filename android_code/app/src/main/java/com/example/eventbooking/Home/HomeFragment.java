@@ -52,7 +52,7 @@ public class HomeFragment extends Fragment {
         eventCreateButton.setOnClickListener(v -> {
             // Navigate to EventCreateFragment and pass the integer
             getParentFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, EventCreateFragment.newInstance(someInteger))
+                    .replace(R.id.fragment_container, EventCreateFragment.newInstance(true))
                     .commit();
         });
 
@@ -60,21 +60,21 @@ public class HomeFragment extends Fragment {
         Button eventButton = rootView.findViewById(R.id.button_event);
         eventButton.setOnClickListener(v -> {
             getParentFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, EventFragment.newInstance(someInteger))
+                    .replace(R.id.fragment_container, EventFragment.newInstance())
                     .commit();
         });
 
         Button notificationButton = rootView.findViewById(R.id.button_notification);
         notificationButton.setOnClickListener(v -> {
             getParentFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, NotificationFragment.newInstance(someInteger))
+                    .replace(R.id.fragment_container, NotificationFragment.newInstance())
                     .commit();
         });
 
         Button profileButton = rootView.findViewById(R.id.button_profile);
         profileButton.setOnClickListener(v -> {
             getParentFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, ProfileFragment.newInstance(someInteger))
+                    .replace(R.id.fragment_container, ProfileFragment.newInstance())
                     .commit();
         });
 

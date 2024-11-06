@@ -18,11 +18,11 @@ public class NotificationFragment extends Fragment {
     private static final String ARG_INTEGER = "arg_integer";
     private int receivedInteger;
 
-    public static NotificationFragment newInstance(int integer) {
+    public static NotificationFragment newInstance() {
         NotificationFragment fragment = new NotificationFragment();
-        Bundle args = new Bundle();
-        args.putInt(ARG_INTEGER, integer);
-        fragment.setArguments(args);
+//        Bundle args = new Bundle();
+//        args.putInt(ARG_INTEGER, integer);
+//        fragment.setArguments(args);
         return fragment;
     }
 

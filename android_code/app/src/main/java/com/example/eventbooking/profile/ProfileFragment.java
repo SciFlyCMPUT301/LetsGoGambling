@@ -20,11 +20,11 @@ public class ProfileFragment extends Fragment {
     private static final String ARG_INTEGER = "arg_integer";
     private int receivedInteger;
 
-    public static ProfileFragment newInstance(int integer) {
+    public static ProfileFragment newInstance() {
         ProfileFragment fragment = new ProfileFragment();
-        Bundle args = new Bundle();
-        args.putInt(ARG_INTEGER, integer);
-        fragment.setArguments(args);
+//        Bundle args = new Bundle();
+//        args.putInt(ARG_INTEGER, integer);
+//        fragment.setArguments(args);
         return fragment;
     }
 

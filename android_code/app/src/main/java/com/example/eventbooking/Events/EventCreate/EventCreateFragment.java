@@ -38,9 +38,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class EventCreateFragment extends Fragment {
-    private static final String ARG_INTEGER = "arg_integer";
-    private int receivedInteger;
-    //UI
     private EditText editTextTitle;
     private EditText editTextDescription;
     private EditText editTextImageUrl;
@@ -51,14 +48,14 @@ public class EventCreateFragment extends Fragment {
     private Button backButton;
     private FirebaseFirestore db;
     //empty constructor
-    private boolean roleAssigned = false;
+    private boolean roleAssigned = false, testingFlag;
     public EventCreateFragment(){}
 
 
-    public static EventCreateFragment newInstance(int integer) {
+    public static EventCreateFragment newInstance(boolean testing) {
         EventCreateFragment fragment = new EventCreateFragment();
         Bundle args = new Bundle();
-        args.putInt(ARG_INTEGER, integer);
+        args.putBoolean("testing flag", testing);
         fragment.setArguments(args);
         return fragment;
     }
@@ -68,7 +65,7 @@ public class EventCreateFragment extends Fragment {
         super.onCreate(savedInstanceState);
         // Retrieve the integer from arguments
         if (getArguments() != null) {
-            receivedInteger = getArguments().getInt(ARG_INTEGER);
+            testingFlag = getArguments().getBoolean("testing flag");
         }
     }
 
@@ -78,8 +75,6 @@ public class EventCreateFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_event_create, container, false);
         //init UI elements
-        TextView integerTextView = rootView.findViewById(R.id.event_create_integer_text);
-        integerTextView.setText("Integer: " + receivedInteger);
         editTextTitle = rootView.findViewById(R.id.event_create_title);
         editWaitingListLimit = rootView.findViewById(R.id.waiting_list_limit);
         editTextDescription = rootView.findViewById(R.id.event_description);

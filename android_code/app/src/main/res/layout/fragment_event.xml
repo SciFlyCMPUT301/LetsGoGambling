@@ -1,24 +1,40 @@
 <!-- fragment_create.xml -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:orientation="vertical"
     android:layout_height="match_parent"
-    android:gravity="center">
+    android:gravity="center"
+    android:layout_marginTop="65dp">
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/event_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Event Page"
-        android:textSize="18sp" />
-    <TextView
-        android:id="@+id/event_integer_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Integer: 0"
-        android:textSize="18sp" />
+        <Switch
+            android:id="@+id/event_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="User Events"
+            android:layout_gravity="center_horizontal"
+            tools:ignore="UseSwitchCompatOrMaterialXml" />
 
-    <!-- Button to go back to HomeFragment -->
+        <ListView
+            android:id="@+id/event_list_view"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+
+        <Button
+            android:id="@+id/add_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add" />
+
+    </LinearLayout>
+
+
     <Button
         android:id="@+id/button_back_home"
         android:layout_width="wrap_content"
@@ -26,16 +42,24 @@
         android:text="Back to Home" />
 
     <Button
-        android:id="@+id/join_waiting_list"
+        android:id="@+id/add_facility_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="JOIN" />
+        android:text="Create Facility"
+        android:layout_gravity="center"
+        android:visibility="gone"/>
 
-    <Button
-        android:id="@+id/leave_waiting_list"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:text="LEAVE"/>
+<!--    <Button-->
+<!--        android:id="@+id/join_waiting_list"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="JOIN" />-->
+
+<!--    <Button-->
+<!--        android:id="@+id/leave_waiting_list"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:text="LEAVE"/>-->
 
     <Button
         android:id="@+id/organizer_menu"

@@ -43,7 +43,7 @@ public class User {
 
     private List<String> roles;
     //Firebase
-    private final StorageReference storageReference;
+    private StorageReference storageReference;
     private FirebaseFirestore db;
 
     /**
@@ -61,16 +61,17 @@ public class User {
      * This constructor is used to put in data to the User object such that the "base" user is defined.
      * Other parts of the user need to be defined as the fields are generated
      */
-    public User(String deviceID, String username, String email, String phoneNumber, Set<String> roles, StorageReference storageReference) {
+    public User(String deviceID, String username, String email, String phoneNumber, Set<String> roles) {
         this.deviceID = deviceID;
         this.username = username;
         this.email = email;
         this.phoneNumber = phoneNumber;
-        this.storageReference = storageReference;
         this.profilePictureUrl = defaultProfilePictureUrl();
         this.defaulutProfilePictureUrl = defaultProfilePictureUrl();
         this.roles = new ArrayList<>();
         this.roles.add(Role.ENTRANT); //set default role to be entrant
+        this.storageReference = FirebaseStorage.getInstance().getReference();
+        this.db = FirebaseFirestore.getInstance();
     }
 
 
@@ -172,7 +173,7 @@ public class User {
      * This makes sure we dont have null values when looking for images to load when reaching the
      * given page
      */
-    private String defaultProfilePictureUrl() {
+    public String defaultProfilePictureUrl() {
         if (username != null && !username.isEmpty()) {
             return "https://firebasestorage.googleapis.com/v0/b/letsgogambling-9ebb8.appspot.com/o/default%2F" + username + ".png?alt=media";
         } else {

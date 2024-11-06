@@ -8,8 +8,10 @@
     <uses-permission
         android:name="android.permission.POST_NOTIFICATIONS"
         tools:ignore="NotificationPermission"/>
-
-    <uses-feature android:name="android.permission.CAMERA" android:required="false"/>
+    
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
 
     <application
         android:allowBackup="true"

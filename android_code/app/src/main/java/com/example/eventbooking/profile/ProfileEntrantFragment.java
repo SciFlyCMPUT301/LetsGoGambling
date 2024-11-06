@@ -1,6 +1,5 @@
-package com.example.eventbooking;
+package com.example.eventbooking.profile;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.LayoutInflater;
@@ -15,6 +14,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
+import com.example.eventbooking.R;
 
 public class ProfileEntrantFragment extends Fragment {
 

@@ -250,6 +250,43 @@ public class Event {
                 });
     }
 
+    public Task<Void> updateEventData(String newTitle, String newDescription, String newLocation, int newMaxParticipants, String newOrganizerId,
+                                      List<String> newWaitingparticipantIds, List<String> newAcceptedParticipantIds,
+                                      List<String> newCanceledParticipantIds, List<String> newSignedUpParticipantIds) {
+        // Update the event properties with the new values
+        this.eventTitle = newTitle;
+        this.description = newDescription;
+        this.location = newLocation;
+        this.maxParticipants = newMaxParticipants;
+        this.organizerId = newOrganizerId;
+        this.waitingparticipantIds = newWaitingparticipantIds;
+        this.acceptedParticipantIds = newAcceptedParticipantIds;
+        this.canceledParticipantIds = newCanceledParticipantIds;
+        this.signedUpParticipantIds = newSignedUpParticipantIds;
+        // Prepare the updated event data map
+        Map<String, Object> eventData = new HashMap<>();
+        eventData.put("eventId", eventId);
+        eventData.put("eventTitle", eventTitle);
+        eventData.put("description", description);
+        eventData.put("location", location);
+        eventData.put("maxParticipants", maxParticipants);
+        eventData.put("waitingparticipantIds", waitingparticipantIds);
+        eventData.put("acceptedParticipantIds", acceptedParticipantIds);
+        eventData.put("canceledParticipantIds", canceledParticipantIds);
+        eventData.put("signedUpParticipantIds", signedUpParticipantIds);
+        eventData.put("organizerId", organizerId);
+
+        // Save or update the event data in Firestore
+        return db.collection("Events").document(eventId)
+                .set(eventData)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("Event", "Event data successfully updated in Firestore.");
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Event", "Error updating event data in Firestore: " + e.getMessage());
+                });
+    }
+
     public void uploadEventPosterToFirebase(String picture) {
         if (eventId == null || eventId.isEmpty()) {
             throw new IllegalArgumentException("Event ID must be set before uploading an event poster.");

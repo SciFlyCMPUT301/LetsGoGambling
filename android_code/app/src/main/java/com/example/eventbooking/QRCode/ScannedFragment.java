@@ -14,15 +14,15 @@ import com.example.eventbooking.R;
 import org.w3c.dom.Text;
 
 public class ScannedFragment extends Fragment {
-    private static final String ARG_SCANNED_DATA = "scanned_data";
-    private String scannedData;
+    private static final String ARG_EVENT_ID = "eventId";
+    private String eventId;
     private TextView scanView;
     private Button scannerOpenButton;
 
     public static ScannedFragment newInstance(String scannedData) {
         ScannedFragment fragment = new ScannedFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_SCANNED_DATA, scannedData);
+        args.putString(ARG_EVENT_ID, scannedData);
         fragment.setArguments(args);
         return fragment;
     }
@@ -31,8 +31,7 @@ public class ScannedFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            String scannedData = getArguments().getString(ARG_SCANNED_DATA);
-            // Use the scanned data as needed
+            eventId = getArguments().getString(ARG_EVENT_ID);
         }
     }
 
@@ -42,9 +41,8 @@ public class ScannedFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_qrcode_scanned, container, false);
 
         scanView = view.findViewById(R.id.scanned_value);
-        scanView.setText(scannedData);
+        scanView.setText(eventId);
 
-        // Opens the scanned app with some functionality
         scannerOpenButton = view.findViewById(R.id.scanQrBtn);
         scannerOpenButton.setOnClickListener(v -> {
             getActivity().getSupportFragmentManager().beginTransaction()

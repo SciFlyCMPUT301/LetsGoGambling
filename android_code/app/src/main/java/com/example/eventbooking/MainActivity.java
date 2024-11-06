@@ -1,7 +1,6 @@
 package com.example.eventbooking;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -23,15 +22,11 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
-import com.example.eventbooking.Admin.AdminFragment;
 import com.example.eventbooking.Events.EventCreate.EventCreateFragment;
 import com.example.eventbooking.Events.EventPageFragment.EventFragment;
 import com.example.eventbooking.Home.HomeFragment;
 import com.example.eventbooking.Login.LoginFragment;
-import com.example.eventbooking.QRCode.CameraFragment;
-import com.example.eventbooking.QRCode.QRCodeEventGenerate;
 import com.example.eventbooking.QRCode.QRcodeGenerator;
-import com.example.eventbooking.QRCode.ScannedFragment;
 import com.example.eventbooking.Testing.TestFragment;
 import com.example.eventbooking.notification.NotificationFragment;
 import com.example.eventbooking.profile.ProfileFragment;
@@ -44,15 +39,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
-/**
- * MainActivity, this is the main portion to define navigation views and a controller to move
- * QR code intent to pass information to other models such as the LoginFragment and ScannedFragment
- *
- */
+
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, BottomNavigationView.OnNavigationItemSelectedListener{
-    /**
-     * Generating navigation controllers and instances to be utilized later
-     */
 //    BottomNavigationView bottomNavigationView;
     private static final int REQUEST_WRITE_STORAGE = 112;
     private QRcodeGenerator qrGenerator;
@@ -64,10 +52,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private ActionBarDrawerToggle drawerToggle;
 //    private ActivityMainBinding binding;
 
-    /**
-     * Setting fragments here any calls will be based off of this, easier to track what fragments
-     * are being called in the navigation bar and to see if they are being used at all
-     */
+    // Setting fragments here any calls will be based off of this, easier to track what
+    // Fragments can be called to generate new views
     private HomeFragment homeFragment = new HomeFragment();
     private ProfileFragment profileFragment = new ProfileFragment();
     private EventFragment eventFragment = new EventFragment();
@@ -80,19 +66,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private ViewCanceledListFragment viewCanceledListFragment = new ViewCanceledListFragment();
     private ViewAcceptedListFragment viewAcceptedListFragment = new ViewAcceptedListFragment();
     private OrganizerMenuFragment organizerMenuFragment = new OrganizerMenuFragment();
-    private ScannedFragment scannedFragment = new ScannedFragment();
-    private CameraFragment cameraFragment = new CameraFragment();
-    private QRCodeEventGenerate eventCodeGenerate = new QRCodeEventGenerate();
-    private AdminFragment adminFragment = new AdminFragment();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        /**
-         * Finding and setting the views for the navigation inside of activity_main
-         */
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNavigationView
                 = findViewById(R.id.bottom_navigation);
@@ -118,7 +97,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawerLayout.addDrawerListener(drawerToggle);
         drawerToggle.syncState();
 
-
 //        SharedPreferences preferences = getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);
 ////        boolean dataUploaded = preferences.getBoolean("dataUploaded", false);
 ////
@@ -133,12 +111,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 ////            editor.apply();
 ////        }
 
-//        if (savedInstanceState == null) {
-//            // Load HomeFragment by default
-//            getSupportFragmentManager().beginTransaction()
-//                    .replace(R.id.fragment_container, new LoginFragment())
-//                    .commit();
-//        }
+        if (savedInstanceState == null) {
+            // Load HomeFragment by default
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, new LoginFragment())
+                    .commit();
+        }
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -148,12 +126,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
-    /**
-     * The main navigation code here, first we check if its the bottom navigation view that was
-     * clicked on or the drawer side bar.
-     *
-     * This distinguising is used for future implimentation and ease of use with current switching
-     */
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int itemId = item.getItemId();
@@ -186,49 +158,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 return true;
             }
         }
-        /**
-         * Drawer side bar navigation
-         */
         else {
             if (itemId == R.id.nav_organizer_menu) {
-                //here is testing by iris added
-                Bundle bundle = new Bundle();
-                bundle.putString("eventId","event1");//hardcode the event id
-                //bundle.putInt("maxParticipants",100);
-                OrganizerMenuFragment organizerMenuFragment = new OrganizerMenuFragment();
-                organizerMenuFragment.setArguments(bundle);
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container, organizerMenuFragment)
                         .commit();
             } else if (itemId == R.id.nav_view_accepted) {
-                Bundle bundle = new Bundle();
-                bundle.putString("eventId","event1");
-                ViewAcceptedListFragment viewAcceptedListFragment = new ViewAcceptedListFragment();
-                viewAcceptedListFragment.setArguments(bundle);
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container, viewAcceptedListFragment)
                         .commit();
             } else if (itemId == R.id.nav_view_canceled) {
-                Bundle bundle = new Bundle();
-                bundle.putString("eventId","event1");
-                ViewCanceledListFragment viewCanceledListFragment = new ViewCanceledListFragment();
-                viewCanceledListFragment.setArguments(bundle);
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container, viewCanceledListFragment)
                         .commit();
             } else if (itemId == R.id.nav_view_signed) {
-                Bundle bundle = new Bundle();
-                bundle.putString("eventId","event1");
-                ViewSignedListFragment viewSignedListFragment = new ViewSignedListFragment();
-                viewSignedListFragment.setArguments(bundle);
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container, viewSignedListFragment)
                         .commit();
             } else if (itemId == R.id.nav_view_waiting) {
-                Bundle bundle = new Bundle();
-                bundle.putString("eventId","event1");
-                ViewWaitingListFragment viewWaitingListFragment = new ViewWaitingListFragment();
-                viewWaitingListFragment.setArguments(bundle);
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container, viewWaitingListFragment)
                         .commit();
@@ -256,22 +203,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container, eventCreateFragment)
                         .commit();
-            } else if (itemId == R.id.nav_camera) {
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, cameraFragment)
-                        .commit();
-            } else if (itemId == R.id.nav_scanned_event) {
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, scannedFragment)
-                        .commit();
-            } else if (itemId == R.id.nav_event_code_generate) {
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, eventCodeGenerate)
-                        .commit();
-            }else if (itemId == R.id.nav_admin) {
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, adminFragment)
-                        .commit();
             }
             // Close the drawer after an item is selected
             drawerLayout.closeDrawer(GravityCompat.START);
@@ -280,10 +211,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         return false;
     }
-    /**
-     * ability to press the back arrow on the phone to allow increased mobility for users to close
-     * the side bar.
-     */
+
     @Override
     public void onBackPressed() {
         // Close drawer if open
@@ -291,36 +219,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             drawerLayout.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
-        }
-    }
-
-
-    //QR code intent here, this is to get the links intercepted such that we can then pass
-    //Them into the program
-
-    /**
-     * The below two functions are intended on getting the QR code scanning outside of the app
-     * and then passing the data inside of the QR code into the app such that we can use it.
-     *
-     * handleQRCodeScan gets the data and opens scannedFragment with the data being passed into it.
-     * Future iterations should instead use bundles to enable more consistent loading across
-     * other navigation pathways
-     */
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        handleQRCodeScan(intent);
-    }
-
-    private void handleQRCodeScan(Intent intent) {
-        if (LoginFragment.isLoggedIn) { // Check if user is logged in
-            String scannedData = intent.getStringExtra("scanned_data");
-            if (scannedData != null) {
-                ScannedFragment scannedFragment = ScannedFragment.newInstance(scannedData);
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, scannedFragment)
-                        .commit();
-            }
         }
     }
 

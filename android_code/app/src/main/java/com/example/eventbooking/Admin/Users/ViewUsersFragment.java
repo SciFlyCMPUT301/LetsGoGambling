@@ -29,7 +29,7 @@ import java.util.List;
 
 public class ViewUsersFragment extends Fragment {
     private FirebaseFirestore db;
-//    private ArrayList<String> documentIds = new ArrayList<>();
+    private ArrayList<String> documentIds = new ArrayList<>();
     private ListView usersListView;
     private UserViewAdapter userAdapter;
     private ArrayList<User> userList;
@@ -53,12 +53,17 @@ public class ViewUsersFragment extends Fragment {
         adminGoBack = view.findViewById(R.id.admin_go_back);
         // Load images from Firebase
 //        loadImagesFromFirebase();
-
-
-        // Load Users
-        loadUsersFromFirestore();
-
-
+        db.collection("Users").get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    // Add document data to the list
+                    documentIds.add(document.getId());  // Store document IDs
+                }
+                userAdapter.notifyDataSetChanged();
+            } else {
+                Log.d("FirestoreError", "Error getting documents: ", task.getException());
+            }
+        });
         addUser.setOnClickListener(v -> {
             // Open EditUserFragment with empty fields for a new user
             openNewUserFragment();
@@ -70,10 +75,11 @@ public class ViewUsersFragment extends Fragment {
                     .commit();
         });
 
+
         // Set ListView item click listener
         usersListView.setOnItemClickListener((AdapterView<?> parent, View v, int position, long id) -> {
-            User selectedUser = userList.get(position);
-            openUserDetailsFragment(selectedUser);
+            String documentId = documentIds.get(position);
+            openUserDetailsFragment(documentId);
         });
 
 
@@ -95,50 +101,16 @@ public class ViewUsersFragment extends Fragment {
         transaction.commit();
     }
 
-    private void openUserDetailsFragment(User selectedUser) {
+    private void openUserDetailsFragment(String documentId) {
         FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
         EditUserFragment fragment = new EditUserFragment();
-
         Bundle bundle = new Bundle();
-        bundle.putString("deviceId", selectedUser.getDeviceID());
-        bundle.putString("username", selectedUser.getUsername());
-        bundle.putString("email", selectedUser.getEmail());
-        bundle.putString("phoneNumber", selectedUser.getPhoneNumber());
-        bundle.putString("location", selectedUser.getAddress());
-        bundle.putString("profilePictureUrl", selectedUser.getProfilePictureUrl());
+        bundle.putString("documentId", documentId);
         bundle.putBoolean("isNewUser", false);
-        if(selectedUser.hasRole("admin"))
-            bundle.putBoolean("admin", true);
-        else
-            bundle.putBoolean("admin", false);
-        if(selectedUser.hasRole("entrant"))
-            bundle.putBoolean("entrant", true);
-        else
-            bundle.putBoolean("entrant", false);
-        if(selectedUser.hasRole("organizer"))
-            bundle.putBoolean("organizer", true);
-        else
-            bundle.putBoolean("organizer", false);
         fragment.setArguments(bundle);
-
-        transaction.replace(R.id.fragment_container, fragment);
-        transaction.addToBackStack(null);
+        transaction.replace(R.id.fragment_container, fragment); // The container to replace
+        transaction.addToBackStack(null); // Optional: Adds the transaction to the back stack
         transaction.commit();
-    }
-
-    private void loadUsersFromFirestore() {
-        db.collection("Users").get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                for (QueryDocumentSnapshot document : task.getResult()) {
-                    User user = document.toObject(User.class);
-                    userList.add(user);
-                }
-                userAdapter.notifyDataSetChanged();
-                Log.d("ViewUsersFragment", "Users loaded: " + userList.size());
-            } else {
-                Log.e("FirestoreError", "Error getting documents: ", task.getException());
-            }
-        });
     }
 
 

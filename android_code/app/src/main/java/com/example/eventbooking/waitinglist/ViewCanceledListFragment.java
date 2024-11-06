@@ -25,7 +25,7 @@ public class ViewCanceledListFragment extends Fragment {
     public static ViewCanceledListFragment newInstance(String eventId) {
         ViewCanceledListFragment fragment = new ViewCanceledListFragment();
         Bundle args = new Bundle();
-        args.putString("eventId", eventId);
+        args.putString("event_id", eventId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -39,7 +39,7 @@ public class ViewCanceledListFragment extends Fragment {
         super.onCreate(savedInstanceState);
         // Retrieve the eventId from arguments
         if (getArguments() != null) {
-            eventId = getArguments().getString("eventId");
+            eventId = getArguments().getString("event_id");
         }
 
         // Initialize the WaitingList instance with only the event ID

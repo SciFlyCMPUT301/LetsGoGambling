@@ -3,10 +3,6 @@ package com.example.eventbooking.Events.EventData;
 import android.net.Uri;
 import android.os.UserManager;
 import android.provider.ContactsContract;
-import android.util.Log;
-import android.widget.Toast;
-
-import androidx.annotation.NonNull;
 
 import com.example.eventbooking.Location;
 
@@ -18,18 +14,9 @@ import com.example.eventbooking.Role;
 import com.example.eventbooking.User;
 
 import com.example.eventbooking.waitinglist.WaitingList;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -39,22 +26,19 @@ import java.util.List;
 import java.util.Map;
 
 public class Event {
+
     private String eventId;
     private String eventTitle;
     private String description;
     private String imageUrl; // URL of the event image in Firebase Storage
     private long timestamp; // Event time in milliseconds
-//    private Location location;
+    private Location location;
 
-    private String address;
-    private String location;
     private int maxParticipants; // limit number of entrants
     private List<String> waitingparticipantIds;
     private List<String> acceptedParticipantIds;
     private List<String> canceledParticipantIds;
     private List<String> signedUpParticipantIds;
-    private List<String> enrolledParticipantIds;
-    private List<String> declinedParticipantIds = new ArrayList<>();
     private WaitingList waitingList;
     private String organizerId;
     private FirebaseFirestore db;
@@ -66,11 +50,10 @@ public class Event {
         db = FirebaseFirestore.getInstance();
         this.waitingList= new WaitingList();
         //waiting list constructor will handle these 4 list
-        this.waitingparticipantIds = new ArrayList<>();
-        this.acceptedParticipantIds = new ArrayList<>();
-        this.canceledParticipantIds = new ArrayList<>();
-        this.signedUpParticipantIds = new ArrayList<>();
-        this.enrolledParticipantIds = new ArrayList<>();
+//        this.waitingparticipantIds = new ArrayList<>();
+//        this.acceptedParticipantIds = new ArrayList<>();
+//        this.canceledParticipantIds = new ArrayList<>();
+//        this.signedUpParticipantIds = new ArrayList<>();
     }
 
     public Event(int eventID) {
@@ -96,10 +79,10 @@ public class Event {
         //this.location = location;
         this.maxParticipants = maxParticipants;
         this.waitingList=new WaitingList(eventId);
-        this.waitingparticipantIds = new ArrayList<>();
-        this.acceptedParticipantIds = new ArrayList<>();
-        this.canceledParticipantIds = new ArrayList<>();
-        this.signedUpParticipantIds = new ArrayList<>();
+//        this.waitingparticipantIds = new ArrayList<>();
+//        this.acceptedParticipantIds = new ArrayList<>();
+//        this.canceledParticipantIds = new ArrayList<>();
+//        this.signedUpParticipantIds = new ArrayList<>();
 //        this.waitingList = new WaitingList(eventId);
         this.organizerId = organizerId;
         this.storage = FirebaseStorage.getInstance();
@@ -121,10 +104,8 @@ public class Event {
     public long getTimestamp() { return timestamp; }
     public void setTimestamp(long timestamp) { this.timestamp = timestamp; }
 
-//    public Location getLocation() { return location; }
-//    public void setLocation(Location new_location) { this.location = new_location; }
-    public String getAddress() { return address; }
-    public void setAddress(String new_location) { this.address = new_location; }
+    public Location getLocation() { return location; }
+    public void setLocation(Location new_location) { this.location = new_location; }
 
     public int getMaxParticipants() { return maxParticipants; }
     public void setMaxParticipants(int maxParticipants) { this.maxParticipants = maxParticipants; }
@@ -138,12 +119,7 @@ public class Event {
     public String getOrganizerId() { return organizerId; }
     public void setOrganizerId(String organizerId) { this.organizerId = organizerId; }
 
-    public String getLocation() {
-        return location;
-    }
-    public void setLocation(String location) {
-        this.location = location;
-    }
+
 
     /**
      * Adding new information here for the different lists that are in the event
@@ -152,19 +128,14 @@ public class Event {
     public List<String> getAcceptedParticipantIds() {
         return acceptedParticipantIds;
     }
-    public void addAcceptedParticipantId(String participantId){acceptedParticipantIds.add(participantId);}
+
     public List<String> getCanceledParticipantIds() {
         return canceledParticipantIds;
     }
-    public void addCanceledParticipantIds(String participantId){canceledParticipantIds.add(participantId);}
+
     public List<String> getSignedUpParticipantIds() {
         return signedUpParticipantIds;
     }
-    public void addSignedUpParticipantIds(String participantId){signedUpParticipantIds.add(participantId);}
-    public List<String> getWaitingParticipantIds() {
-        return waitingparticipantIds;
-    }
-    public void addWaitingParticipantIds(String participantId){waitingparticipantIds.add(participantId);}
 
     public void acceptParticipant(String entrantId) {
         if (!acceptedParticipantIds.contains(entrantId)) {
@@ -177,7 +148,7 @@ public class Event {
     public void cancelParticipant(String entrantId) {
         if (!canceledParticipantIds.contains(entrantId)) {
             canceledParticipantIds.add(entrantId);
-            acceptedParticipantIds.remove(entrantId);
+            waitingparticipantIds.remove(entrantId);
 //            waitingList.leave(entrantId);
         }
     }
@@ -185,10 +156,11 @@ public class Event {
     public void signUpParticipant(String entrantId) {
         if (!signedUpParticipantIds.contains(entrantId)) {
             signedUpParticipantIds.add(entrantId);
-            acceptedParticipantIds.remove(entrantId);
+            waitingparticipantIds.remove(entrantId);
 //            waitingList.leave(entrantId);
         }
     }
+
 
 
     //manage the participants
@@ -213,33 +185,20 @@ public class Event {
 
     public Task<Void> saveEventDataToFirestore() {
         Map<String, Object> eventData = new HashMap<>();
-        String new_eventID = eventId;
-        if(eventId == null){
-            new_eventID = getNewEventID();
-            eventData.put("eventId", new_eventID);
-        }
-        else{
-            eventData.put("eventId", eventId);
-        }
-
+        eventData.put("eventId", eventId);
         eventData.put("eventTitle", eventTitle);
         eventData.put("description", description);
         eventData.put("imageUrl", imageUrl);
         eventData.put("timestamp", timestamp);
-//        eventData.put("location", location != null ? location.toString() : null);
-        eventData.put("location", address);
+        eventData.put("location", location != null ? location.toString() : null);
         eventData.put("maxParticipants", maxParticipants);
-//        eventData.put("waitingparticipantIds",waitingList.getWaitingParticipantIds());
-//        eventData.put("acceptedParticipantIds", waitingList.getAcceptedParticipantIds());
-//        eventData.put("canceledParticipantIds", waitingList.getCanceledParticipantIds());
-//        eventData.put("signedUpParticipantIds", waitingList.getSignedUpParticipantIds());
-        // temporary fix to get test data working
-        eventData.put("waitingparticipantIds", waitingparticipantIds);
-        eventData.put("acceptedParticipantIds", acceptedParticipantIds);
-        eventData.put("canceledParticipantIds", canceledParticipantIds);
-        eventData.put("signedUpParticipantIds", signedUpParticipantIds);
+        eventData.put("waitingparticipantIds",waitingList.getWaitingParticipantIds());
+        eventData.put("acceptedParticipantIds", waitingList.getAcceptedParticipantIds());
+        eventData.put("canceledParticipantIds", waitingList.getCanceledParticipantIds());
+        eventData.put("signedUpParticipantIds", waitingList.getSignedUpParticipantIds());
 //        eventData.put("waitingList", waitingList.getEntrantIds());
         eventData.put("organizerId", organizerId);
+
         // Save or update the event data in Firestore
         return db.collection("Events").document(eventId)
                 .set(eventData)
@@ -297,54 +256,5 @@ public class Event {
     public void updateEventPosterToFirebase(String newPoster) {
         uploadEventPosterToFirebase(newPoster);
     }
-
-    private String getNewEventID(){
-        final String[] eventIDString = {""};
-        db.collection("Events").get().addOnCompleteListener(new
-        OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    eventIDString[0] = String.valueOf((task.getResult().size()) +1);
-                }
-//                    } else {
-//                        Toast.makeTesxt(getContext(),"Error : " +
-//                                e.toString(),Toast.LENGHT_LONG).show;
-//                    }
-            }
-        });
-        eventIDString[0] = "Event"+eventIDString[0];
-        return eventIDString[0];
-    }
-
-
-
-    public static void findEventById(String eventId, OnSuccessListener<Event> onSuccessListener, OnFailureListener onFailureListener) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("Events").document(eventId)
-                .get()
-                .addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()) {
-                        Event event = documentSnapshot.toObject(Event.class);
-                        onSuccessListener.onSuccess(event);
-                    } else {
-                        onSuccessListener.onSuccess(null); // Event not found
-                    }
-                })
-                .addOnFailureListener(onFailureListener);
-    }
-
-    // Method to add a user to the declined list
-    public void addDeclinedParticipantId(String userId) {
-        if (!declinedParticipantIds.contains(userId)) {
-            declinedParticipantIds.add(userId);
-        }
-    }
-
-    // Getter for declined participant IDs (optional, if needed elsewhere in code)
-    public List<String> getDeclinedParticipantIds() {
-        return declinedParticipantIds;
-    }
-
 
 }

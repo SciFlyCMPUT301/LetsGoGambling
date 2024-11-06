@@ -26,10 +26,19 @@ public class EventViewFragment extends Fragment {
     private TextView eventTitleText, eventDescriptionText;
     private LinearLayout buttonContainer;
 
+    public static EventViewFragment newInstance(String eventID, String deviceID) {
+        EventViewFragment fragment = new EventViewFragment();
+        Bundle args = new Bundle();
+        args.putString("eventId", eventID);
+        args.putString("deviceId", deviceID);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_event_view, container, false);
-
+        Log.d("In event", "Got into the event");
         // Initialize views
         eventPosterImage = view.findViewById(R.id.event_poster_image);
         eventTitleText = view.findViewById(R.id.event_title_text);
@@ -40,29 +49,31 @@ public class EventViewFragment extends Fragment {
         if (getArguments() != null) {
             eventId = getArguments().getString("eventId");
             deviceId = getArguments().getString("deviceId");
-            String listchoice = getArguments().getString("listAdd");
+            Log.d("In event", "eventid: "+ eventId);
+            Log.d("In event", "deviceId: "+ deviceId);
+//            String listchoice = getArguments().getString("listAdd");
 
 
 
             // Fetch event data based on eventId
 //            event = findEventById(eventId);
             Event.findEventById(eventId, event -> {
-                if (event != null) {
-                    if(listchoice == "Accepted")
-                        event.addAcceptedParticipantId("User1");
-                    if(listchoice == "Waiting")
-                        event.addWaitingParticipantIds("User1");
-                    if(listchoice == "Canceled")
-                        event.addCanceledParticipantIds("User1");
-                    if(listchoice == "SignedUp")
-                        event.addSignedUpParticipantIds("User1");
-                    Log.e("eventId", "Event found with ID: " + event.getEventId());
+//                if (event != null) {
+//                    if(listchoice == "Accepted")
+//                        event.addAcceptedParticipantId("User1");
+//                    if(listchoice == "Waiting")
+//                        event.addWaitingParticipantIds("User1");
+//                    if(listchoice == "Canceled")
+//                        event.addCanceledParticipantIds("User1");
+//                    if(listchoice == "SignedUp")
+//                        event.addSignedUpParticipantIds("User1");
+//                    Log.e("eventId", "Event found with ID: " + event.getEventId());
                     displayEventDetails(event);
                     configureButtons(event, userId);
-                } else {
-                    Toast.makeText(getContext(), "Event not found", Toast.LENGTH_SHORT).show();
-                    getActivity().getSupportFragmentManager().popBackStack();
-                }
+//                } else {
+//                    Toast.makeText(getContext(), "Event not found", Toast.LENGTH_SHORT).show();
+//                    getActivity().getSupportFragmentManager().popBackStack();
+//                }
             }, e -> {
                 Toast.makeText(getContext(), "Error fetching event: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 getActivity().getSupportFragmentManager().popBackStack();

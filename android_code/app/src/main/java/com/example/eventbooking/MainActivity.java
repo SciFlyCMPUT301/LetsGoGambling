@@ -28,6 +28,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.example.eventbooking.Admin.AdminFragment;
 import com.example.eventbooking.Events.EventCreate.EventCreateFragment;
 import com.example.eventbooking.Events.EventPageFragment.EventFragment;
+import com.example.eventbooking.Events.EventView.EventViewFragment;
 import com.example.eventbooking.Home.HomeFragment;
 import com.example.eventbooking.Login.LoginFragment;
 import com.example.eventbooking.QRCode.CameraFragment;
@@ -126,7 +127,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawerToggle.syncState();
 
         // Getting the login fragment given intent
-        handleIntent(getIntent());
+        Intent intent = getIntent();
+        handleIntent(intent);
 
 
 //        SharedPreferences preferences = getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);
@@ -347,7 +349,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 // If the user is already logged in, redirect immediately to ScannedFragment
                 if (LoginFragment.isLoggedIn) {
-                    navigateToScannedFragment(eventIdFromQR);
+                    openEventViewFragment(eventIdFromQR);
+//                    navigateToScannedFragment(eventIdFromQR);
                 } else {
                     // Show login screen first
                     showLoginFragment(eventIdFromQR);
@@ -362,7 +365,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private String extractEventIdFromUrl(String url) {
-        // Assuming the URL is in the format: app://eventDetail?eventID=12345
+        // Assuming the URL is in the format: eventbooking://eventDetail?eventID=12345
         String[] parts = url.split("eventID=");
         if (parts.length > 1) {
             return parts[1];
@@ -383,7 +386,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public void onLoginSuccess() {
         if (eventIdFromQR != null) {
-            navigateToScannedFragment(eventIdFromQR);
+            openEventViewFragment(eventIdFromQR);
+//            navigateToScannedFragment(eventIdFromQR);
         }
     }
 
@@ -392,9 +396,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         FragmentManager fragmentManager = getSupportFragmentManager();
         Bundle bundle = new Bundle();
         bundle.putString("eventId", eventId);
+//        bundle.putString("deviceId", putuseridhere);
+        bundle.putString("deviceId", "User37");
         scannedFragment.setArguments(bundle);
         fragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, scannedFragment)
+                .commit();
+    }
+
+    private void openEventViewFragment(String eventID) {
+        Log.d("Moving to Event", "HSHASHDASHD");
+        EventViewFragment eventViewFragment = new EventViewFragment();
+        Bundle args = new Bundle();
+        args.putString("eventId", eventID);
+
+        // Here get the userid and put it into it
+        args.putString("deviceId", "User1");
+        eventViewFragment.setArguments(args);
+
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, eventViewFragment)
+                .addToBackStack(null)
                 .commit();
     }
 

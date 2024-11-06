@@ -12,8 +12,10 @@ import androidx.appcompat.widget.Toolbar;
 
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import com.example.eventbooking.Events.EventCreate.EventCreateFragment;
+import com.example.eventbooking.Events.EventView.EventViewFragment;
 import com.example.eventbooking.Facility;
 import com.example.eventbooking.Home.HomeFragment;
 import com.example.eventbooking.Events.EventData.Event;
@@ -102,7 +104,7 @@ public class LoginFragment extends Fragment {
         String deviceId = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
 
         // Test code here to fake the device ID
-        final String tempval = "deviceID31";
+        final String tempval = "deviceID1";
 //        deviceId = tempval;
 
 //        deviceIdText.setText(deviceId);
@@ -133,12 +135,16 @@ public class LoginFragment extends Fragment {
                         if (eventIdFromQR != null) {
                             // If the user is new and QR code was scanned, go to ProfileCreation then ScannedFragment
                             getParentFragmentManager().beginTransaction()
-                                    .replace(R.id.fragment_container, ProfileEntrantFragment.newInstance(true, eventIdFromQR)) // replace with create new user fragment
+                                    .replace(R.id.fragment_container,
+                                            ProfileEntrantFragment.newInstance
+                                                    (true, eventIdFromQR, tempval)) // replace with create new user fragment
                                     .commit();
                         } else {
                             // If the user is new and no QR code scanned, just go to ProfileCreation
                             getParentFragmentManager().beginTransaction()
-                                    .replace(R.id.fragment_container, ProfileEntrantFragment.newInstance(true, null)) // replace with create new user fragment
+                                    .replace(R.id.fragment_container,
+                                            ProfileEntrantFragment.newInstance
+                                                    (true, null, tempval)) // replace with create new user fragment
                                     .commit();
                         }
                     }
@@ -157,10 +163,20 @@ public class LoginFragment extends Fragment {
                         nav.setVisibility(View.VISIBLE);
                         sidebar.setVisibility(View.VISIBLE);
                         toolbar.setVisibility(View.VISIBLE);
+
                         if (eventIdFromQR != null) {
+
+
                             getParentFragmentManager().beginTransaction()
-                                    .replace(R.id.fragment_container, ScannedFragment.newInstance(eventIdFromQR))
+                                    .replace(R.id.fragment_container, EventViewFragment.newInstance(eventIdFromQR, tempval))
+//                                    .replace(R.id.fragment_container, EventViewFragment.newInstance(eventIdFromQR, deviceId))
+                                    .addToBackStack(null)
                                     .commit();
+
+
+//                            getParentFragmentManager().beginTransaction()
+//                                    .replace(R.id.fragment_container, ScannedFragment.newInstance(eventIdFromQR))
+//                                    .commit();
                         } else {
 //                            getParentFragmentManager().beginTransaction()
 //                                    .replace(R.id.fragment_container, HomeFragment.newInstance(deviceId))

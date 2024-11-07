@@ -284,6 +284,8 @@ public class EventFragment extends Fragment {
 //            leaveWaitingListButton.setEnabled(true);
 //        }
 //    }
+
+   //test
     private User getUserData() {
         User Johhny = new User("deviceID1", "User1", "admin1@example.com", "555-001", null);
         Johhny.addRole("admin");
@@ -292,7 +294,12 @@ public class EventFragment extends Fragment {
         return Johhny;  // Example user, replace with actual Firebase logic
     }
 
-
+    /**
+     * Updates the event list based on the current user's role (user or organizer).
+     * Fetches events from Firestore and updates the ListView adapter.
+     *
+     * @param showUserEvents true if displaying user-related events, false for organizer events.
+     */
     private void updateEventList(boolean showUserEvents) {
         eventList.clear();
         /// TODO:
@@ -337,7 +344,9 @@ public class EventFragment extends Fragment {
 //        }
         eventAdapter.notifyDataSetChanged();
     }
-
+    /**
+     * Prompts the user to create a facility if they do not have one.
+     */
     private void promptCreateFacility() {
         new AlertDialog.Builder(getContext())
                 .setTitle("No Facility Associated")
@@ -346,7 +355,9 @@ public class EventFragment extends Fragment {
                 .setNegativeButton("Cancel", null)
                 .show();
     }
-
+    /**
+     * Navigates to EventCreateFragment to allow the user to create a new event.
+     */
     // Navigation method for event creation
     private void navigateToEventCreate() {
         if (getParentFragmentManager() != null && getContext() != null) {
@@ -356,7 +367,9 @@ public class EventFragment extends Fragment {
             transaction.commit();
         }
     }
-
+    /**
+     * Navigates to the facility creation fragment.
+     */
     // Navigation method for facility creation
     private void navigateToFacilityCreation() {
         if (getParentFragmentManager() != null && getContext() != null) {
@@ -369,7 +382,11 @@ public class EventFragment extends Fragment {
         }
     }
 
-
+    /**
+     * find event by participant device id
+     * @param deviceID
+     * @return
+     */
     public List<Event> findEventsByParticipantDeviceId(String deviceID) {
         List<Event> participantEvents = new ArrayList<>();
         for (Event event : eventList) {
@@ -384,7 +401,12 @@ public class EventFragment extends Fragment {
         return participantEvents;
     }
 
-    // Method to find events where the user with the specified deviceID is the organizer
+    /**
+     * Method to find events where the user with the specified deviceID is the organizer
+     * @param deviceID
+     * @return
+     */
+
     public List<Event> findEventsByOrganizerDeviceId(String deviceID) {
         List<Event> organizerEvents = new ArrayList<>();
         for (Event event : eventList) {
@@ -397,9 +419,10 @@ public class EventFragment extends Fragment {
 
 
     /**
-     * Getting five random values to display and use, doesnt matter what it is, will add random values to it
-     * to show that the code workds
-     * @return List<Event
+     * Fetches five random events from Firestore for testing purposes.
+     * Retrieves events from Firestore, shuffles them, and returns a list of five events.
+     *
+     * @return Task<List<Event>> task containing a list of five random events
      */
     public Task<List<Event>> getFiveRandomEvents() {
         TaskCompletionSource<List<Event>> taskCompletionSource = new TaskCompletionSource<>();

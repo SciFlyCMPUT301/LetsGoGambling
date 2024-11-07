@@ -121,6 +121,11 @@ public class Facility {
         }
     }
 
+    /**
+     * Function saves the local facility that is calling the task to save it to firebase
+     *
+     * @return Task completion
+     */
     public Task<Void> saveFacilityProfile() {
         String selected_facilityId = getFacilityID();
         if (selected_facilityId == null || selected_facilityId.isEmpty()) {
@@ -143,14 +148,18 @@ public class Facility {
     }
 
     // Method for administrators to remove the organizer from the facility
+
+    /**
+     * Method for removing the given facility that is loaded onto the device given the facility ID
+     */
     public void deleteFacility() {
-        if (name != null && !name.isEmpty()) {
+        if (facilityID != null && !facilityID.isEmpty()) {
             // Create a map to update the organizer field to null
             Map<String, Object> updates = new HashMap<>();
             updates.put("organizer", null); // Set the 'organizer' field to null
 
             // Update the facility document, setting the organizer to null
-            facilitiesRef.document(name)
+            facilitiesRef.document(facilityID)
                     .update(updates)
                     .addOnSuccessListener(aVoid -> {
                         System.out.println("Facility updated successfully: organizer set to null.");
@@ -164,6 +173,13 @@ public class Facility {
         }
     }
 
+    /**
+     * Here we are uploading the event to the facility and if the facility does not exist
+     * then make a new facility
+     *
+     * @param selectedfacilityID
+     * @param eventID
+     */
     public void associateEvent(String selectedfacilityID, String eventID) {
         // Check if the facility document exists
         db.collection("Facilities").document(selectedfacilityID)
@@ -182,7 +198,14 @@ public class Facility {
     }
 
     // Organizer method to associate an event with a facility
-    public boolean associateEvent(String eventName) {
+
+    /**
+     * Checker to see if an event is associated with a loaded facility
+     *
+     * @param eventName
+     * @return boolean
+     */
+    public boolean hasEvent(String eventName) {
         // Check if the event is already in the allEvents list
         if (allEvents.contains(eventName)) {
             System.out.println("Event already associated with this facility.");
@@ -191,6 +214,12 @@ public class Facility {
         return false;
     }
 
+    /**
+     * Function to update a given existing facility with a new event to be added
+     * Intended to be called at event creation
+     *
+     * @param eventName
+     */
     private void updateEventInFacility(String eventName) {
         if (allEvents == null) {
             allEvents = new ArrayList<>();
@@ -208,6 +237,12 @@ public class Facility {
         }
     }
 
+    /**
+     * This function saves a given facility with an event name to link the event to the facility
+     * Designed for automating the generation of data
+     *
+     * @param eventName
+     */
     private void createFacilityWithEvent(String eventName) {
         // Making new facility ID
 //        Query query = db.collection("Facilities");
@@ -247,6 +282,12 @@ public class Facility {
                 .addOnFailureListener(e -> System.out.println("Error creating facility: " + e.getMessage()));
     }
 
+    /**
+     * The function sees how many items are inside of the Facilities collection in firebase and
+     * then adds one to the number to a string "Facility" such that each facility has a unique ID
+     *
+     * @return String
+     */
     private String getNewFacilityID(){
         final String[] facilityIDString = {""};
         db.collection("Facilities").get().addOnCompleteListener(new

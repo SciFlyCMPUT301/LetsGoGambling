@@ -40,13 +40,13 @@ public class ProfileEntrantFragment extends Fragment {
     private TextView profileTitle;
     protected Button saveButton;
     private Button backButton;
+    private Button uploadButton;
     protected Button editButton;
     protected Switch notificationsSwitch;
 
     // Start of Testing values
     private Switch testingSwitch;
     private EditText deviceIDEntry;
-    private boolean testing;
     // End of Testing Values
 
     private EntrantProfileManager profileManager;
@@ -56,6 +56,7 @@ public class ProfileEntrantFragment extends Fragment {
     public boolean isNewUser = false;
     private String deviceId;
     private String eventIDFromQR = "";
+    private boolean testing = true;
     /**
      * Creates a new instance of the ProfileEntrantFragment with arguments for new user status, event ID, and device ID.
      *
@@ -102,6 +103,24 @@ public class ProfileEntrantFragment extends Fragment {
      * @return The view for this fragment
      */
 
+//    /**
+//     * Getting and setting the current deviceID to load the user information
+//     *
+//     * @param view The View returned by {@link #onCreateView(LayoutInflater, ViewGroup, Bundle)}.
+//     * @param savedInstanceState If non-null, this fragment is being re-constructed
+//     * from a previous saved state as given here.
+//     */
+//    @Override
+//    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+//        super.onViewCreated(view, savedInstanceState);
+//
+//        // Retrieve the current user's information
+//        User currentUser = UserManager.getInstance().getCurrentUser();
+//        if (currentUser != null) {
+//            displayUserInfo(currentUser);  // Use existing method or UI setup
+//        }
+//    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -118,6 +137,7 @@ public class ProfileEntrantFragment extends Fragment {
         backButton = view.findViewById(R.id.button_back_home);
         editButton = view.findViewById(R.id.button_edit_profile);
         deviceIDEntry = view.findViewById(R.id.device_id_entry);
+        uploadButton = view.findViewById(R.id.button_upload_photo);
         // Initialize EntrantProfileManager
         profileManager = new EntrantProfileManager();
 
@@ -133,16 +153,17 @@ public class ProfileEntrantFragment extends Fragment {
         //backButton.setOnClickListener(v -> requireActivity().onBackPressed()); // this crashes right now for some reason
         backButton.setOnClickListener(v -> goToHome());
         editButton.setOnClickListener(v -> toggleEditMode());
+        uploadButton.setOnClickListener(v-> uploadPhoto());
         // Handle testing switch
-        testingSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    testing = true;
-                } else {
-                    testing = false;
-                }
-            }
-        });
+//        testingSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//                if (isChecked) {
+//                    testing = true;
+//                } else {
+//                    testing = false;
+//                }
+//            }
+//        });
 
         // Initially, set save button and switch to be disabled
         // Set up the fragment for new users
@@ -150,6 +171,7 @@ public class ProfileEntrantFragment extends Fragment {
             setEditMode(true);
             editButton.setVisibility(View.GONE);
             backButton.setVisibility(View.GONE);
+            uploadButton.setVisibility(View.GONE);
             NavigationView sidebar = getActivity().findViewById(R.id.nav_view);
             sidebar.setVisibility(View.GONE);
             Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
@@ -259,6 +281,7 @@ public class ProfileEntrantFragment extends Fragment {
         if (isNewUser) {
             editButton.setVisibility(View.VISIBLE);
             backButton.setVisibility(View.VISIBLE);
+            uploadButton.setVisibility(View.VISIBLE);
             NavigationView sidebar = getActivity().findViewById(R.id.nav_view);
             sidebar.setVisibility(View.VISIBLE);
             Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
@@ -316,6 +339,18 @@ public class ProfileEntrantFragment extends Fragment {
      */
 
     private String getDeviceID() {
+        if(testing)
+            return "deviceID1";
         return Settings.Secure.getString(requireContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+    }
+
+
+
+    private void uploadPhoto(){
+
+
+
+
+
     }
 }

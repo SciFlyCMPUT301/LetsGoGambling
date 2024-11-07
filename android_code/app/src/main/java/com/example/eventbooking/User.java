@@ -50,6 +50,7 @@ public class User {
     private boolean facilityAssociated;
     private boolean notificationAsk;
     private boolean geolocationAsk;
+    private boolean testing = true;
 
     private List<String> roles;
     //Firebase
@@ -429,7 +430,7 @@ public class User {
         Map<String, Object> imageData = new HashMap<>();
         imageData.put("profilePictureUrl", imageURL);
 
-        db.collection("Users").document(username)
+        db.collection("Users").document(deviceId)
                 .update(imageData)
                 .addOnSuccessListener(aVoid -> {
                     Log.d("Firestore", "Image URL updated successfully.");
@@ -462,7 +463,7 @@ public class User {
                     updates.put("profilePictureUrl", defaultprofilepictureurl);
 
                     // Update the user's profile picture URL in Firestore
-                    db.collection("Users").document(username)
+                    db.collection("Users").document(deviceId)
                             .update(updates)
                             .addOnSuccessListener(updateVoid -> {
                                 // Successfully updated Firestore

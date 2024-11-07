@@ -1,5 +1,7 @@
 package com.example.eventbooking.Testing;
 
+import android.util.Log;
+
 import com.example.eventbooking.Events.EventData.Event;
 import com.example.eventbooking.Facility;
 import com.example.eventbooking.Role;
@@ -22,35 +24,39 @@ public class SampleTable {
         // Create 5 admin users
         for (int i = 1; i <= 5; i++) {
             User user = new User();
-            user.setUsername("adminUser" + i);
+            user.setUsername("User" + i);
             user.setDeviceID("deviceID" + i);
             user.setEmail("admin" + i + "@example.com");
             user.setPhoneNumber("555-000" + i);
             user.addRole(Role.ADMIN);
+            user.addRole(Role.ENTRANT);
             UserList.add(user);
         }
 
         // Create 10 organizer users
         for (int i = 1; i <= 10; i++) {
             User user = new User();
-            user.setUsername("organizerUser" + i);
+            user.setUsername("User" + i);
             user.setDeviceID("deviceID" + (i + 5));
             user.setEmail("organizer" + i + "@example.com");
             user.setPhoneNumber("555-010" + i);
             user.addRole(Role.ORGANIZER);
+            user.addRole(Role.ENTRANT);
             UserList.add(user);
         }
 
         // Create 15 normal users
         for (int i = 1; i <= 15; i++) {
             User user = new User();
-            user.setUsername("normalUser" + i);
+            user.setUsername("User" + i);
             user.setDeviceID("deviceID" + (i + 15));
             user.setEmail("user" + i + "@example.com");
             user.setPhoneNumber("555-020" + i);
             // ENTRANT role is added by default in User constructor
+            user.addRole(Role.ENTRANT);
             UserList.add(user);
         }
+        Log.d("User list", "Done List");
     }
 
     public void makeFacilityList() {
@@ -67,6 +73,7 @@ public class SampleTable {
             User organizer = organizers.get(i);
             Facility facility = new Facility();
             facility.setName("Facility" + (i + 1));
+            facility.setFacilityID("Facility" + (i + 1));
             facility.setAddress("Address of Facility" + (i + 1));
             facility.setOrganizer(organizer.getUsername());
             FacilityList.add(facility);
@@ -78,6 +85,7 @@ public class SampleTable {
         for (int i = 11; i <= 15; i++) {
             Facility facility = new Facility();
             facility.setName("Facility" + i);
+            facility.setFacilityID("Facility" + (i + 1));
             facility.setAddress("Address of Facility" + i);
             facility.setOrganizer(null); // No organizer
             FacilityList.add(facility);
@@ -98,44 +106,60 @@ public class SampleTable {
 
             // Assign to a facility (some facilities have events, some don't)
             if (!FacilityList.isEmpty()) {
-                // Randomly decide whether to assign to a facility
                 if (random.nextBoolean()) {
                     Facility facility = FacilityList.get(random.nextInt(FacilityList.size()));
+                    Log.d("Sample Table", "Event ID: " + "event" + i);
                     event.setLocation(facility.getAddress());
-                    facility.associateEvent(event.getEventId());
+                    facility.associateEvent(event.getEventId(), true);
                 }
             }
 
             // Assign participants with different statuses
             List<User> entrants = new ArrayList<>();
+            Log.d("Event list", "Making Entrant");
+
+            // Filter users with the ENTRANT role
             for (User user : UserList) {
                 if (user.hasRole(Role.ENTRANT)) {
                     entrants.add(user);
                 }
             }
+
+            // Log how many entrants we have
+            Log.d("Event list", "Making Entrant: " + entrants.size());
+
+            // Randomly shuffle entrants and select up to 10 participants
             Collections.shuffle(entrants);
             int numParticipants = Math.min(entrants.size(), 10);
+
+            // Assign participants to the event
             for (int j = 0; j < numParticipants; j++) {
                 User entrant = entrants.get(j);
+                Log.d("Event list", "deviceID: " + entrant.getDeviceID());
+
+                // Assign a random status to the participant
                 int status = random.nextInt(4); // 0: accepted, 1: signed-up, 2: canceled, 3: waitlist
                 switch (status) {
                     case 0:
-                        event.acceptParticipant(entrant.getUsername());
+                        event.addAcceptedParticipantId(entrant.getDeviceID());
                         break;
                     case 1:
-                        event.signUpParticipant(entrant.getUsername());
+                        event.addSignedUpParticipantIds(entrant.getDeviceID());
                         break;
                     case 2:
-                        event.cancelParticipant(entrant.getUsername());
+                        event.addCanceledParticipantIds(entrant.getDeviceID());
                         break;
                     case 3:
-                        event.addParticipant(entrant.getUsername());
+                        event.addWaitingParticipantIds(entrant.getDeviceID());
                         break;
                 }
             }
+
+            // Add the event to the EventList
             EventList.add(event);
         }
     }
+
 
     public void saveDataToFirebase(Runnable onSuccess, OnFailureListener onFailure) {
         AtomicInteger pendingWrites = new AtomicInteger(UserList.size() + FacilityList.size() + EventList.size());

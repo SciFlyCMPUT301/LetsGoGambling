@@ -32,6 +32,7 @@ public class Facility {
     private List<String> allEvents;
     private FirebaseFirestore db;
     private CollectionReference facilitiesRef;
+    private boolean testing = true;
 
     /**
      * The Facility class that has to have an organizer associated when we instantiate it, otherwise it
@@ -160,21 +161,27 @@ public class Facility {
      *
      * @param eventID
      */
-    public void associateEvent(String eventID) {
+    public void associateEvent(String eventID, boolean genEvent) {
         // Check if the facility document exists
-        db.collection("Facilities").document(facilityID)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && task.getResult() != null && task.getResult().exists()) {
-                        // Document exists, proceed with the update
-                        updateEventInFacility(eventID);
-                    } else {
-                        // Document doesn't exist, create it with the event
-                        System.out.println("Facility document not found. Creating document with event.");
-                        createFacilityWithEvent(eventID);
-                    }
-                })
-                .addOnFailureListener(e -> System.out.println("Error checking facility existence: " + e.getMessage()));
+        if(genEvent){
+            allEvents.add(eventID);
+        }else {
+
+
+            db.collection("Facilities").document(facilityID)
+                    .get()
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful() && task.getResult() != null && task.getResult().exists()) {
+                            // Document exists, proceed with the update
+                            updateEventInFacility(eventID);
+                        } else {
+                            // Document doesn't exist, create it with the event
+                            System.out.println("Facility document not found. Creating document with event.");
+                            createFacilityWithEvent(eventID);
+                        }
+                    })
+                    .addOnFailureListener(e -> System.out.println("Error checking facility existence: " + e.getMessage()));
+        }
     }
 
     // Organizer method to associate an event with a facility

@@ -209,6 +209,14 @@ public class User {
     }
 
     /**
+     * Interface for uploading images to firebase storage
+     */
+    public interface OnImageUploadComplete {
+        void onImageUploadComplete(String imageURL);
+        void onImageUploadFailed(Exception e);
+    }
+
+    /**
      * Generates a circular bitmap with a single letter in the center.
      * The letter is the first character of the provided name, or "A" if the name is empty.
      * The bitmap is randomly colored for visual uniqueness.
@@ -422,6 +430,39 @@ public class User {
                     Log.e("Firebase", "Image upload failed", e);
                 });
     }
+
+    /**
+     * Alternate version to the above upload image code to upload an image to firebase and
+     * get a link to it back
+     *
+     *
+     * @param imageUri
+     * @param callback
+     */
+    public void uploadImageAndGetUrl(Uri imageUri, OnImageUploadComplete callback) {
+        // Generate a unique key for the image
+        final String randomKey = UUID.randomUUID().toString();
+        StorageReference ref = storageReference.child("images/" + randomKey);
+
+        ref.putFile(imageUri)
+                .addOnSuccessListener(taskSnapshot -> {
+                    // Get the download URL
+                    ref.getDownloadUrl().addOnSuccessListener(downloadUrl -> {
+                        String imageURL = downloadUrl.toString();
+                        // Do not save the image URL to Firestore here
+                        // Return the imageURL via the callback
+                        callback.onImageUploadComplete(imageURL);
+                    }).addOnFailureListener(e -> {
+                        Log.e("Firebase", "Failed to get download URL", e);
+                        callback.onImageUploadFailed(e);
+                    });
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Firebase", "Image upload failed", e);
+                    callback.onImageUploadFailed(e);
+                });
+    }
+
 
     // Save image URL to Firestore
     void saveImageUrl(String imageURL) {

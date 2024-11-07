@@ -26,7 +26,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
+/**
+ * EditUserFragment provides an interface for administrators to add, update, or delete
+ * a user's information. It includes fields for the user’s personal details, role toggles,
+ * and notification preferences.
+ *
+ * <p>Administrators can edit user data, assign roles (entrant, organizer, admin),
+ * enable/disable notifications and geolocation tracking, and save changes to Firebase Firestore.</p>
+ */
 public class EditUserFragment extends Fragment {
     private EditText usernameEditText, deviceIdEditText, emailEditText, phoneNumberEditText, profilePictureUrlEditText, locationEditText, dateJoinedEditText;
     private Button saveButton, deleteButton, cancelButton;
@@ -36,9 +43,17 @@ public class EditUserFragment extends Fragment {
     private FirebaseFirestore db;
     private String documentId;
     private boolean isNewUser;
-
+    /**
+     * Inflates the layout for the fragment and initializes views, listeners, and Firestore instance.
+     *
+     * @param inflater LayoutInflater to inflate the fragment's view.
+     * @param container ViewGroup containing the fragment’s UI.
+     * @param savedInstanceState Saved instance state for re-creation.
+     * @return The root view of the fragment.
+     */
     @Nullable
     @Override
+
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_edit_user, container, false);
         db = FirebaseFirestore.getInstance();
@@ -57,7 +72,7 @@ public class EditUserFragment extends Fragment {
         organizerSwitch = view.findViewById(R.id.organizer_switch);
         adminSwitch = view.findViewById(R.id.admin_switch);
 
-
+        //retrive arguments to check if editing an existing user or creating a new one
         Bundle args = getArguments();
         if (args != null) {
             documentId = args.getString("deviceId");
@@ -101,6 +116,13 @@ public class EditUserFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Updates the user's information in Firebase Firestore.
+     * Retrieves user data from input fields, assembles it into a Map,
+     * and updates the Firestore document corresponding to the user ID.
+     *
+     * @param documentId The document ID of the user in Firestore.
+     */
     // make update user update the firebase
     private void updateUser(String documentId) {
         Map<String, Object> updatedData = new HashMap<>();
@@ -109,6 +131,7 @@ public class EditUserFragment extends Fragment {
         updatedData.put("email", emailEditText.getText().toString());
         updatedData.put("phoneNumber", phoneNumberEditText.getText().toString());
         updatedData.put("location", locationEditText.getText().toString());
+        //collect user roles based on selected switches
         List<String> roles = new ArrayList<>();
         if(entrantSwitch.isChecked())
             roles.add("entrant");
@@ -130,6 +153,12 @@ public class EditUserFragment extends Fragment {
         getActivity().onBackPressed();
     }
 
+    /**
+     * Deletes the user's document from Firebase Firestore.
+     * Displays a success message on successful deletion and navigates back.
+     *
+     * @param documentId The document ID of the user in Firestore.
+     */
 
     // change this so it deletes it from firebase
     private void deleteUser(String documentId) {
@@ -144,7 +173,12 @@ public class EditUserFragment extends Fragment {
 //        getActivity().onBackPressed();
     }
 
-
+    /**
+     * Loads user data from Firebase Firestore and populates the UI fields.
+     * This method is used to retrieve details of an existing user for editing.
+     *
+     * @param documentId The document ID of the user in Firestore.
+     */
     private void loadUserData(String documentId) {
         db.collection("Users").document(documentId).get().addOnSuccessListener(documentSnapshot -> {
             if (documentSnapshot.exists()) {
@@ -188,7 +222,10 @@ public class EditUserFragment extends Fragment {
         });
     }
 
-
+    /**
+     * Adds a new user to Firebase Firestore based on input field values.
+     * Creates a new document in the "Users" collection with user attributes.
+     */
     private void addUserToFirestore() {
         String username = usernameEditText.getText().toString();
         Map<String, Object> userData = new HashMap<>();

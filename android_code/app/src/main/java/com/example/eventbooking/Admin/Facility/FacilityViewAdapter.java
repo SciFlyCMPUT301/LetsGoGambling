@@ -16,12 +16,20 @@ import com.example.eventbooking.User;
 
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * FacilityViewAdapter is an ArrayAdapter for displaying facility data in a ListView.
+ * Each item in the list represents a facility with relevant details such as facility ID, name, and joining date.
+ */
 public class FacilityViewAdapter extends ArrayAdapter<Facility> {
 
     private Context context;
     private List<Facility> facilityList;
 
+    /**
+     * Constructor for FacilityViewAdapter.
+     * @param context
+     * @param facilityList
+     */
     //constructor, call on creation
     public FacilityViewAdapter(@NonNull Context context, ArrayList<Facility> facilityList) {
         super(context, R.layout.user_adapter_layout, facilityList);
@@ -30,6 +38,14 @@ public class FacilityViewAdapter extends ArrayAdapter<Facility> {
     }
 
     //called when rendering the list
+
+    /**
+     * Returns the view for a specific item in the list.
+     * @param position
+     * @param convertView
+     * @param parent
+     * @return
+     */
     public View getView(int position, View convertView, ViewGroup parent) {
 
         //get the property we are displaying

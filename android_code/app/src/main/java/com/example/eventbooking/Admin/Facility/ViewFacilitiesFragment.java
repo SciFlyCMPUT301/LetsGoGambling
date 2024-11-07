@@ -24,7 +24,10 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
-
+/**
+ * Fragment for displaying and managing a list of facilities.
+ * This fragment loads facility data from Firestore and allows the user to view or edit facility details.
+ */
 public class ViewFacilitiesFragment extends Fragment {
     private Button adminGoBack;
     private FirebaseFirestore db;
@@ -33,7 +36,18 @@ public class ViewFacilitiesFragment extends Fragment {
     private ArrayList<Facility> facilityList;
     private Button addUFacility;
 
-
+    /**
+     * Inflates the fragment's layout and initializes components.
+     * @param inflater The LayoutInflater object that can be used to inflate
+     * any views in the fragment,
+     * @param container If non-null, this is the parent view that the fragment's
+     * UI should be attached to.  The fragment should not add the view itself,
+     * but this can be used to generate the LayoutParams of the view.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     * from a previous saved state as given here.
+     *
+     * @return
+     */
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_view_facility, container, false);
 
@@ -65,6 +79,9 @@ public class ViewFacilitiesFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Loads the list of facilities from Firestore and updates the ListView.
+     */
     private void loadFacilitiesFromFirestore() {
         db.collection("Facilities").get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
@@ -80,6 +97,11 @@ public class ViewFacilitiesFragment extends Fragment {
         });
     }
 
+    /**
+     *  Opens the EditFacilityFragment for the selected facility to view or edit details.
+     *
+     * @param selectedFacility
+     */
     private void openFacilityDetailsFragment(Facility selectedFacility) {
         FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
         EditFacilityFragment fragment = new EditFacilityFragment();

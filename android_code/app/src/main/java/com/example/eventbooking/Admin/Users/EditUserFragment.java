@@ -20,12 +20,20 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
+/**
+ * EditUserFragment provides an interface for administrators to add, update, or delete
+ * a user's information. It includes fields for the user’s personal details, role toggles,
+ * and notification preferences.
+ *
+ * <p>Administrators can edit user data, assign roles (entrant, organizer, admin),
+ * enable/disable notifications and geolocation tracking, and save changes to Firebase Firestore.</p>
+ */
 public class EditUserFragment extends Fragment {
     private EditText usernameEditText, deviceIdEditText, emailEditText, phoneNumberEditText, profilePictureUrlEditText, locationEditText, dateJoinedEditText;
     private Button saveButton, deleteButton, cancelButton;
@@ -35,9 +43,17 @@ public class EditUserFragment extends Fragment {
     private FirebaseFirestore db;
     private String documentId;
     private boolean isNewUser;
-
+    /**
+     * Inflates the layout for the fragment and initializes views, listeners, and Firestore instance.
+     *
+     * @param inflater LayoutInflater to inflate the fragment's view.
+     * @param container ViewGroup containing the fragment’s UI.
+     * @param savedInstanceState Saved instance state for re-creation.
+     * @return The root view of the fragment.
+     */
     @Nullable
     @Override
+
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_edit_user, container, false);
         db = FirebaseFirestore.getInstance();
@@ -55,12 +71,26 @@ public class EditUserFragment extends Fragment {
         entrantSwitch = view.findViewById(R.id.entrant_switch);
         organizerSwitch = view.findViewById(R.id.organizer_switch);
         adminSwitch = view.findViewById(R.id.admin_switch);
+
+        //retrive arguments to check if editing an existing user or creating a new one
         Bundle args = getArguments();
         if (args != null) {
+            documentId = args.getString("deviceId");
             isNewUser = args.getBoolean("isNewUser", false);
+            Log.d("Edit User Fragment", "Document ID: "+ documentId);
             if (!isNewUser) {
-                documentId = args.getString("documentId");
-                loadUserData(documentId); // Load existing user data
+                // Load existing user data
+//                String documentId = args.getString("documentId");
+                usernameEditText.setText(args.getString("username"));
+                deviceIdEditText.setText(args.getString("deviceID"));
+                emailEditText.setText(args.getString("email"));
+                phoneNumberEditText.setText(args.getString("phoneNumber"));
+                profilePictureUrlEditText.setText(args.getString("profilePictureUrl"));
+                locationEditText.setText(args.getString("location"));
+                entrantSwitch.setChecked(args.getBoolean("entrant"));
+                adminSwitch.setChecked(args.getBoolean("admin"));
+                organizerSwitch.setChecked(args.getBoolean("organizer"));
+                deleteButton.setVisibility(View.VISIBLE); // Show delete button for existing users
             } else {
                 deleteButton.setVisibility(View.GONE); // Hide delete button for new user
             }
@@ -74,8 +104,10 @@ public class EditUserFragment extends Fragment {
             }
         });
         deleteButton.setOnClickListener(v -> {
+            Log.d("Edit User", "Document ID: "+ documentId);
             if (documentId != null) {
                 deleteUser(documentId);
+
             }
         });
 
@@ -84,6 +116,13 @@ public class EditUserFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Updates the user's information in Firebase Firestore.
+     * Retrieves user data from input fields, assembles it into a Map,
+     * and updates the Firestore document corresponding to the user ID.
+     *
+     * @param documentId The document ID of the user in Firestore.
+     */
     // make update user update the firebase
     private void updateUser(String documentId) {
         Map<String, Object> updatedData = new HashMap<>();
@@ -92,14 +131,15 @@ public class EditUserFragment extends Fragment {
         updatedData.put("email", emailEditText.getText().toString());
         updatedData.put("phoneNumber", phoneNumberEditText.getText().toString());
         updatedData.put("location", locationEditText.getText().toString());
-        String roleArray[] = new String[3];
+        //collect user roles based on selected switches
+        List<String> roles = new ArrayList<>();
         if(entrantSwitch.isChecked())
-            roleArray[0] = "entrant";
+            roles.add("entrant");
         if(organizerSwitch.isChecked())
-            roleArray[1] = "organizer";
+            roles.add("organizer");
         if(adminSwitch.isChecked())
-            roleArray[2] = "admin";
-        updatedData.put("role", roleArray);
+            roles.add("admin");
+        updatedData.put("role", roles);
         updatedData.put("notificationAsk", notificiation.isChecked());
         updatedData.put("geolocationAsk", geolocation.isChecked());
         db.collection("Users").document(documentId)
@@ -110,22 +150,35 @@ public class EditUserFragment extends Fragment {
                 .addOnFailureListener(e -> {
                     Log.d("FirestoreError", "Error updating user", e);
                 });
+        getActivity().onBackPressed();
     }
 
+    /**
+     * Deletes the user's document from Firebase Firestore.
+     * Displays a success message on successful deletion and navigates back.
+     *
+     * @param documentId The document ID of the user in Firestore.
+     */
 
     // change this so it deletes it from firebase
     private void deleteUser(String documentId) {
-        userRef.removeValue().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                Toast.makeText(getContext(), "User deleted successfully.", Toast.LENGTH_SHORT).show();
-                getActivity().onBackPressed();
-            } else {
-                Toast.makeText(getContext(), "Failed to delete user.", Toast.LENGTH_SHORT).show();
-            }
-        });
+        db.collection("Users").document(documentId).delete()
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(getContext(), "User deleted successfully.", Toast.LENGTH_SHORT).show();
+                    getActivity().onBackPressed(); // Navigate back after deletion
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "Failed to delete user: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+//        getActivity().onBackPressed();
     }
 
-
+    /**
+     * Loads user data from Firebase Firestore and populates the UI fields.
+     * This method is used to retrieve details of an existing user for editing.
+     *
+     * @param documentId The document ID of the user in Firestore.
+     */
     private void loadUserData(String documentId) {
         db.collection("Users").document(documentId).get().addOnSuccessListener(documentSnapshot -> {
             if (documentSnapshot.exists()) {
@@ -169,7 +222,10 @@ public class EditUserFragment extends Fragment {
         });
     }
 
-
+    /**
+     * Adds a new user to Firebase Firestore based on input field values.
+     * Creates a new document in the "Users" collection with user attributes.
+     */
     private void addUserToFirestore() {
         String username = usernameEditText.getText().toString();
         Map<String, Object> userData = new HashMap<>();

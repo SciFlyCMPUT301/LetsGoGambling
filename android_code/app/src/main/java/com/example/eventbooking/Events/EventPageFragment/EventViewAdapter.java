@@ -22,21 +22,44 @@ import java.util.List;
 /// TODO:
 //Change this to event_adapter_layout
 
-
+/**
+ * EventViewAdapter is a custom ArrayAdapter used for displaying events in a ListView.
+ * Each item in the list represents an event with details such as event ID, title, date joined,
+ * and the user's list status in relation to the event (e.g., Accepted, Waiting).
+ */
 public class EventViewAdapter extends ArrayAdapter<Event> {
 
     private Context context;
     private List<Event> eventList;
     private String userId = "User1";
+    private boolean test;
 
     //constructor, call on creation
-    public EventViewAdapter(@NonNull Context context, ArrayList<Event> eventList) {
+    /**
+     * Constructor for EventViewAdapter.
+     *
+     * @param context   the context in which the adapter is used
+     * @param eventList the list of Event objects to be displayed
+     * @param test      boolean indicating if the adapter is in test mode
+     */
+    public EventViewAdapter(@NonNull Context context, ArrayList<Event> eventList, boolean test) {
         super(context, R.layout.event_adapter_view, eventList);
         this.context = context;
         this.eventList = eventList;
+        this.test = test;
     }
 
     //called when rendering the list
+
+
+    /**
+     * Returns the view for a specific item in the list.
+     *
+     * @param position    the position of the item within the adapter's data set
+     * @param convertView the old view to reuse, if possible
+     * @param parent      the parent view that this view will be attached to
+     * @return the View for the specified position in the list
+     */
     public View getView(int position, View convertView, ViewGroup parent) {
 
         Event event = eventList.get(position);
@@ -57,7 +80,9 @@ public class EventViewAdapter extends ArrayAdapter<Event> {
         dateJoined.setText("Today");
 
         String status;
-        if (event.getAcceptedParticipantIds().contains(userId)) {
+        if(test == false){
+            status = "";
+        } else if (event.getAcceptedParticipantIds().contains(userId)) {
             status = "Accepted List";
         } else if (event.getCanceledParticipantIds().contains(userId)) {
             status = "Canceled List";

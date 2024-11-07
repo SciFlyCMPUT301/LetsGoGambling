@@ -14,8 +14,12 @@ import android.widget.Toast;
 import androidx.fragment.app.Fragment;
 
 import com.example.eventbooking.Events.EventData.Event;
+import com.example.eventbooking.Events.EventPageFragment.EventFragment;
 import com.example.eventbooking.R;
 
+/**
+ * EventViewFragment is a fragment that displays details of an event.
+ */
 public class EventViewFragment extends Fragment {
 
     private String eventId;
@@ -25,6 +29,22 @@ public class EventViewFragment extends Fragment {
     private ImageView eventPosterImage;
     private TextView eventTitleText, eventDescriptionText;
     private LinearLayout buttonContainer;
+
+    /**
+     * Creates a new instance of EventViewFragment.
+     * @param eventID
+     * @param deviceID
+     * @return
+     */
+
+    public static EventViewFragment newInstance(String eventID, String deviceID) {
+        EventViewFragment fragment = new EventViewFragment();
+        Bundle args = new Bundle();
+        args.putString("eventId", eventID);
+        args.putString("deviceId", deviceID);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -45,15 +65,17 @@ public class EventViewFragment extends Fragment {
             // Fetch event data based on eventId
             Event.findEventById(eventId, event -> {
                 if (event != null) {
-                    // Update participant list based on listchoice
-                    if(listchoice.equals("Accepted"))
-                        event.addAcceptedParticipantId("User1");
-                    if(listchoice.equals("Waiting"))
-                        event.addWaitingParticipantIds("User1");
-                    if(listchoice.equals("Canceled"))
-                        event.addCanceledParticipantIds("User1");
-                    if(listchoice.equals("SignedUp"))
-                        event.addSignedUpParticipantIds("User1");
+//                     Update participant list based on listchoice
+                    if(listchoice != null) {
+                        if (listchoice.equals("Accepted"))
+                            event.addAcceptedParticipantId("User1");
+                        if (listchoice.equals("Waiting"))
+                            event.addWaitingParticipantIds("User1");
+                        if (listchoice.equals("Canceled"))
+                            event.addCanceledParticipantIds("User1");
+                        if (listchoice.equals("SignedUp"))
+                            event.addSignedUpParticipantIds("User1");
+                    }
                     Log.e("eventId", "Event found with ID: " + event.getEventId());
                     displayEventDetails(event);
                     configureButtons(event, userId);
@@ -70,6 +92,10 @@ public class EventViewFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Displays details of an event in the UI.
+     * @param event
+     */
     private void displayEventDetails(Event event) {
         if (event == null) {
             Log.e("EventViewFragment", "Event is null, cannot display details.");
@@ -85,6 +111,11 @@ public class EventViewFragment extends Fragment {
         // loadImageIntoView(event.getImageUrl(), eventPosterImage);
     }
 
+    /**
+     * Configures buttons based on the user's list status in the event.
+     * @param selectedEvent
+     * @param selectedUserId
+     */
     private void configureButtons(Event selectedEvent, String selectedUserId) {
         // Clear existing buttons
         buttonContainer.removeAllViews();
@@ -97,26 +128,37 @@ public class EventViewFragment extends Fragment {
             addButton("Sign Up", v -> {
                 selectedEvent.signUpParticipant(selectedUserId);
                 updateEventInFirestore(selectedEvent);
+                goBackToEventFragment();
             });
 
             // Add "Reject" button to move user to canceled list
             addButton("Reject", v -> {
                 selectedEvent.cancelParticipant(selectedUserId);
                 updateEventInFirestore(selectedEvent);
+                goBackToEventFragment();
             });
 
             // Add "Decline" button to move user to declined list
-            addButton("Decline", v -> {
-                selectedEvent.addDeclinedParticipantId(selectedUserId); // Adds user to declined list
+//            addButton("Decline", v -> {
+//                selectedEvent.addDeclinedParticipantId(selectedUserId); // Adds user to declined list
+//                updateEventInFirestore(selectedEvent);
+//            });
+        } else if(selectedEvent.getWaitingParticipantIds().contains(selectedUserId)){
+            addButton("Leave Waitlist", v -> {
+                selectedEvent.removeWaitingParticipantId(selectedUserId);
                 updateEventInFirestore(selectedEvent);
+                goBackToEventFragment();
             });
-        } else if (!selectedEvent.getWaitingParticipantIds().contains(selectedUserId) &&
+        }
+
+        else if (!selectedEvent.getWaitingParticipantIds().contains(selectedUserId) &&
                 !selectedEvent.getSignedUpParticipantIds().contains(selectedUserId) &&
                 !selectedEvent.getCanceledParticipantIds().contains(selectedUserId)) {
             // If user is not in any list, add "Waitlist" button to add user to waiting list
             addButton("Waitlist", v -> {
                 selectedEvent.addWaitingParticipantIds(selectedUserId);
                 updateEventInFirestore(selectedEvent);
+                goBackToEventFragment();
             });
         }
 
@@ -124,6 +166,11 @@ public class EventViewFragment extends Fragment {
         addButton("Cancel", v -> getActivity().getSupportFragmentManager().popBackStack());
     }
 
+    /**
+     * Adds a button to the button container.
+     * @param text
+     * @param listener
+     */
     private void addButton(String text, View.OnClickListener listener) {
         Button button = new Button(getContext());
         button.setText(text);
@@ -131,6 +178,10 @@ public class EventViewFragment extends Fragment {
         buttonContainer.addView(button);
     }
 
+    /**
+     * Updates the event in Firestore.
+     * @param event
+     */
     private void updateEventInFirestore(Event event) {
         event.saveEventDataToFirestore().addOnSuccessListener(aVoid -> {
             Toast.makeText(getContext(), "Event updated successfully", Toast.LENGTH_SHORT).show();
@@ -139,5 +190,13 @@ public class EventViewFragment extends Fragment {
         });
     }
 
-
+    /**
+     * Goes back to the EventFragment.
+     */
+    private void goBackToEventFragment(){
+        getActivity().getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, new EventFragment())
+                .addToBackStack(null)
+                .commit();
+    }
 }

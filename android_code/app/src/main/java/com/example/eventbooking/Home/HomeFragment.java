@@ -18,7 +18,9 @@ import com.example.eventbooking.Events.EventCreate.EventCreateFragment;
 import com.example.eventbooking.Events.EventPageFragment.EventFragment;
 import com.example.eventbooking.R;
 import com.example.eventbooking.User;
+import com.example.eventbooking.UserManager;
 import com.example.eventbooking.notification.NotificationFragment;
+import com.example.eventbooking.profile.ProfileEntrantFragment;
 import com.example.eventbooking.profile.ProfileFragment;
 
 // For now let the home page be where all users end up after sign up or device recognized
@@ -26,6 +28,7 @@ import com.example.eventbooking.profile.ProfileFragment;
 
 public class HomeFragment extends Fragment {
     private int someInteger = 42; // Example integer to pass
+    private String userId;
 
     public static HomeFragment newInstance(String userId) {
         HomeFragment fragment = new HomeFragment();
@@ -74,7 +77,7 @@ public class HomeFragment extends Fragment {
         Button profileButton = rootView.findViewById(R.id.button_profile);
         profileButton.setOnClickListener(v -> {
             getParentFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, ProfileFragment.newInstance())
+                    .replace(R.id.fragment_container, ProfileEntrantFragment.newInstance(false, null, UserManager.getInstance().getUserId()))
                     .commit();
         });
 

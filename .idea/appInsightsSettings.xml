@@ -1,26 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="AppInsightsSettings">
-    <option name="tabSettings">
-      <map>
-        <entry key="Firebase Crashlytics">
-          <value>
-            <InsightsFilterSettings>
-              <option name="connection">
-                <ConnectionSetting>
-                  <option name="appId" value="com.example.eventbooking" />
-                  <option name="mobileSdkAppId" value="1:1033525912292:android:087b6b19aedee5919902f1" />
-                  <option name="projectId" value="letsgogambling-9ebb8" />
-                  <option name="projectNumber" value="1033525912292" />
-                </ConnectionSetting>
-              </option>
-              <option name="signal" value="SIGNAL_UNSPECIFIED" />
-              <option name="timeIntervalDays" value="THIRTY_DAYS" />
-              <option name="visibilityType" value="ALL" />
-            </InsightsFilterSettings>
-          </value>
-        </entry>
-      </map>
-    </option>
+    <option name="selectedTabId" value="Firebase Crashlytics" />
   </component>
 </project>

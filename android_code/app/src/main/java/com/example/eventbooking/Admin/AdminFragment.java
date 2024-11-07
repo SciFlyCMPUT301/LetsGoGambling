@@ -24,10 +24,21 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentTransaction;
-
+/**
+ * AdminFragment serves as the main interface for the admin to navigate between different sections,
+ * such as viewing users, events, facilities, and images.
+ */
 public class AdminFragment extends Fragment {
     private Button viewUsersButton, viewEventsButton, viewFacilitiesButton, viewImagesButton;
 
+    /**
+     * Inflates the fragment's layout and initializes components.
+     *
+     * @param inflater           LayoutInflater used to inflate the layout
+     * @param container          ViewGroup container in which the fragment is placed
+     * @param savedInstanceState Bundle containing saved state data (if any)
+     * @return the root View for the fragment's layout
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -37,28 +48,37 @@ public class AdminFragment extends Fragment {
         viewUsersButton = view.findViewById(R.id.viewUsersButton);
         viewEventsButton = view.findViewById(R.id.viewEventsButton);
         viewFacilitiesButton = view.findViewById(R.id.viewFacilitiesButton);
+        viewImagesButton = view.findViewById(R.id.viewImagesButton);
 
         //for now hiding it because not dealing with images
 //        viewImagesButton = view.findViewById(R.id.viewImagesButton);
 
         // Set button listeners
+        //initialize fragment
         ViewUsersFragment usersFragment = new ViewUsersFragment();
         ViewEventsFragment eventsFragment = new ViewEventsFragment();
         ViewFacilitiesFragment facilitiesFragment = new ViewFacilitiesFragment();
-
+        //set up on clicklistener
         viewUsersButton.setOnClickListener(v -> replaceFragment(usersFragment));
         viewEventsButton.setOnClickListener(v -> replaceFragment(eventsFragment));
         viewFacilitiesButton.setOnClickListener(v -> replaceFragment(facilitiesFragment));
         //for now hiding it because not dealing with images, it doesnt work
-//        viewImagesButton.setOnClickListener(v -> replaceFragment(new ViewImagesFragment()));
+        viewImagesButton.setOnClickListener(v -> replaceFragment(new ViewImagesFragment()));
 
         return view;
     }
 
 
 
-
+    /**
+     * Replaces the current fragment with the specified fragment and adds it to the back stack.
+     * Displays a success message on successful replacement, otherwise shows an error message.
+     *
+     * @param fragment the Fragment to display in the fragment container
+     */
     private void replaceFragment(Fragment fragment) {
+        Toast.makeText(getContext(), "Fragment launched successfully!", Toast.LENGTH_SHORT).show();
+        // Replace the current fragment with the specified fragment if manager and context are valid
         if (getParentFragmentManager() != null && getContext() != null) {
             FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
             transaction.replace(R.id.fragment_container, fragment);

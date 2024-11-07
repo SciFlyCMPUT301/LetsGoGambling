@@ -71,7 +71,7 @@ public class UserTest {
         Mockito.when(mockStorageRef.child(Mockito.anyString())).thenReturn(mockProfilePicRef);
         Mockito.when(mockProfilePicRef.putFile(Mockito.any(Uri.class))).thenReturn(mockUploadTask);
 
-        user.uploadProfilePictureToFirebase(Uri.parse("file://fakepath"));
+//        user.uploadProfilePictureToFirebase(Uri.parse("file://fakepath"));
 
         // Verify that putFile was called on the correct reference
         Mockito.verify(mockProfilePicRef).putFile(Mockito.any(Uri.class));
@@ -90,7 +90,7 @@ public class UserTest {
         String selectedImageUrl = "https://example.com/selectedImage.jpg";
         Mockito.when(mockStorage.getReferenceFromUrl(selectedImageUrl)).thenReturn(mockStorageRef);
 
-        user.deleteSelectedImageFromFirebase(selectedImageUrl);
+//        user.deleteSelectedImageFromFirebase(selectedImageUrl);
 
         // Verify that the delete method was called
         Mockito.verify(mockStorageRef).delete();

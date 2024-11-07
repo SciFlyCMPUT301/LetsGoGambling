@@ -34,10 +34,14 @@ import com.google.android.material.navigation.NavigationView;
 
 public class ProfileEntrantFragment extends Fragment {
 
-    private EditText editName, editEmail, editPhone;
+    protected EditText editName;
+    protected EditText editEmail;
+    protected EditText editPhone;
     private TextView profileTitle;
-    private Button saveButton, backButton, editButton;
-    private Switch notificationsSwitch;
+    protected Button saveButton;
+    private Button backButton;
+    protected Button editButton;
+    protected Switch notificationsSwitch;
 
     // Start of Testing values
     private Switch testingSwitch;
@@ -47,9 +51,9 @@ public class ProfileEntrantFragment extends Fragment {
 
     private EntrantProfileManager profileManager;
     private EntrantProfile currentProfile;
-    private User currentUser;
-    private boolean isEditing = false;
-    private boolean isNewUser = false;
+    public User currentUser;
+    public boolean isEditing = false;
+    public boolean isNewUser = false;
     private String deviceId;
     private String eventIDFromQR = "";
     /**
@@ -213,7 +217,7 @@ public class ProfileEntrantFragment extends Fragment {
      * Also, handles saving user data for new users.
      */
 
-    private void saveUserProfile() {
+    public void saveUserProfile() {
         if (currentProfile == null) {
             currentProfile = new EntrantProfile();
         }
@@ -286,7 +290,7 @@ public class ProfileEntrantFragment extends Fragment {
      * Toggles the edit mode on and off. When enabled, the fields become editable, and the user can save changes.
      */
 
-    private void toggleEditMode() {
+    public void toggleEditMode() {
         isEditing = !isEditing;
         setEditMode(isEditing);
         Toast.makeText(getContext(), isEditing ? "Edit mode enabled" : "Edit mode disabled", Toast.LENGTH_SHORT).show();
@@ -297,7 +301,7 @@ public class ProfileEntrantFragment extends Fragment {
      * @param enable Flag indicating whether edit mode should be enabled or not
      */
 
-    private void setEditMode(boolean enable) {
+    public void setEditMode(boolean enable) {
         editName.setEnabled(enable);
         editEmail.setEnabled(enable);
         editPhone.setEnabled(enable);

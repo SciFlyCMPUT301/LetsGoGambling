@@ -5,14 +5,17 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.example.eventbooking.Admin.AdminFragment;
+import com.example.eventbooking.Admin.Users.EditUserFragment;
 import com.example.eventbooking.Admin.Users.UserViewAdapter;
 import com.example.eventbooking.Facility;
 import com.example.eventbooking.R;
@@ -53,6 +56,12 @@ public class ViewFacilitiesFragment extends Fragment {
                     .replace(R.id.fragment_container, new AdminFragment())
                     .commit();
         });
+
+
+        facilitiesListView.setOnItemClickListener((AdapterView<?> parent, View v, int position, long id) -> {
+            Facility selectedFacility = facilityList.get(position);
+            openFacilityDetailsFragment(selectedFacility);
+        });
         return view;
     }
 
@@ -69,6 +78,21 @@ public class ViewFacilitiesFragment extends Fragment {
                 Log.e("FirestoreError", "Error getting documents: ", task.getException());
             }
         });
+    }
+
+    private void openFacilityDetailsFragment(Facility selectedFacility) {
+        FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+        EditFacilityFragment fragment = new EditFacilityFragment();
+
+        Bundle bundle = new Bundle();
+        bundle.putString("facilityId", selectedFacility.getFacilityID());
+        Log.d("Loading Facility", "Document ID: "+ selectedFacility.getFacilityID());
+
+        fragment.setArguments(bundle);
+
+        transaction.replace(R.id.fragment_container, fragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
     }
 
 

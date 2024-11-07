@@ -19,6 +19,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.eventbooking.Events.EventData.Event;
 import com.example.eventbooking.R;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,11 +28,12 @@ public class EditEventFragment extends Fragment {
     private Spinner listSelectorSpinner;
     private EditText eventTitleEditText, eventDescriptionEditText, maxParticipantsEditText, eventLocationEditText, organiserIDEditText
             , participantEditText;
-    private Button saveButton, cancelButton, addParticipantButton, removeParticipantButton;
+    private Button saveButton, cancelButton, addParticipantButton, removeParticipantButton, removeEventButton;
     private ListView participantsListView;
     private Event selectedEvent;
     private ArrayAdapter<String> participantsAdapter;
 
+    private FirebaseFirestore db;
     private List<String> selectedList = null;
     private List<String> updatedWaitingList;
     private List<String> updatedAcceptedList;
@@ -47,7 +49,7 @@ public class EditEventFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_edit_event, container, false);
-
+        db = FirebaseFirestore.getInstance();
         // Initialize views
         listSelectorSpinner = view.findViewById(R.id.spinner_list_selector);
         eventTitleEditText = view.findViewById(R.id.edit_text_event_title);
@@ -57,6 +59,7 @@ public class EditEventFragment extends Fragment {
         organiserIDEditText = view.findViewById(R.id.edit_organizer_text);
         participantEditText = view.findViewById(R.id.edit_participant);
 
+        removeEventButton = view.findViewById(R.id.button_remove_event);
         saveButton = view.findViewById(R.id.button_save);
         cancelButton = view.findViewById(R.id.button_cancel);
         participantsListView = view.findViewById(R.id.participants_list_view);
@@ -92,6 +95,7 @@ public class EditEventFragment extends Fragment {
 
         removeParticipantButton.setOnClickListener(v -> removeParticipant());
 
+        removeEventButton.setOnClickListener(v->removeEvent());
         return view;
     }
 
@@ -230,5 +234,19 @@ public class EditEventFragment extends Fragment {
         } else {
             Toast.makeText(getContext(), "Participant not found.", Toast.LENGTH_SHORT).show();
         }
+    }
+
+
+    private void removeEvent(){
+        db.collection("Events").document(selectedEvent.getEventId()).delete()
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(getContext(), "User deleted successfully.", Toast.LENGTH_SHORT).show();
+                    getActivity().onBackPressed(); // Navigate back after deletion
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "Failed to delete user: ", Toast.LENGTH_SHORT).show();
+                });
+
+
     }
 }

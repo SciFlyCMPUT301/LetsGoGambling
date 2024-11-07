@@ -51,9 +51,6 @@ public class LoginFragment extends Fragment {
     public static boolean isLoggedIn = false;
     private String eventIdFromQR;
 
-    public LoginFragment() {
-
-    }
 
     public void setEventId(String eventId) {
         this.eventIdFromQR = eventId;
@@ -72,6 +69,7 @@ public class LoginFragment extends Fragment {
     /**
      * Sets up the view for the login. Gets user from firestore and changes text accordingly.
      * If the user is new, takes them to create fragment, otherwise takes them to the home page.
+     * If the app was launched via QR Code, take the user to the corresponding event.
      *
      * @param inflater The LayoutInflater object that can be used to inflate
      * any views in the fragment,

@@ -24,6 +24,7 @@ import com.example.eventbooking.QRCode.ScannedFragment;
 import com.example.eventbooking.R;
 import com.example.eventbooking.User;
 
+import com.example.eventbooking.UserManager;
 import com.google.android.material.navigation.NavigationView;
 /**
  * ProfileEntrantFragment is a Fragment that handles the display and editing of an entrant's profile.
@@ -117,11 +118,16 @@ public class ProfileEntrantFragment extends Fragment {
         profileManager = new EntrantProfileManager();
 
         // Load existing profile data
-        loadUserProfile();
+        //loadUserProfile(); user data is already loaded
+        if (!isNewUser) {
+            onProfileLoaded(UserManager.getInstance().getCurrentUser());
+        }
+
 
         // Set up button listeners
         saveButton.setOnClickListener(v -> saveUserProfile());
-        backButton.setOnClickListener(v -> requireActivity().onBackPressed()); // Updated line
+        //backButton.setOnClickListener(v -> requireActivity().onBackPressed()); // this crashes right now for some reason
+        backButton.setOnClickListener(v -> goToHome());
         editButton.setOnClickListener(v -> toggleEditMode());
         // Handle testing switch
         testingSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -151,9 +157,19 @@ public class ProfileEntrantFragment extends Fragment {
         }
         return view;
     }
+<<<<<<< HEAD
     /**
      * Loads the profile data from Firestore using the device ID.
      */
+=======
+
+    private void goToHome() {
+        getParentFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, new HomeFragment())
+                .commit();
+    }
+
+>>>>>>> 15233f275d41372ddb3a6c344377e5584869aa85
     private void loadUserProfile() {
         String deviceID = getDeviceID();
         profileManager.getProfile(deviceID, this::onProfileLoaded);
@@ -216,6 +232,8 @@ public class ProfileEntrantFragment extends Fragment {
         if(testing == true){
             savingUser.setDeviceID(deviceIDEntry.getText().toString().trim());
         }
+
+        UserManager.getInstance().setCurrentUser(savingUser);
 
         savingUser.saveUserDataToFirestore(new User.OnUserIDGenerated() {
             @Override

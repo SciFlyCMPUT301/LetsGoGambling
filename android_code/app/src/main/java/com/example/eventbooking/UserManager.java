@@ -51,8 +51,8 @@ public class UserManager {
         this.currentUser = user;
         Log.d("UserManager", user.getDeviceID() + user.getUsername());
 
-        findUserFacility();
-        findUserEvents();
+        //findUserFacility(); unclear if we need these
+        //findUserEvents();
     }
 
     /**
@@ -134,4 +134,6 @@ public class UserManager {
     public List<Event> getUserEvents() {
         return userEvents;
     }
+
+    public String getUserId() { return currentUser.getDeviceID(); }
 }

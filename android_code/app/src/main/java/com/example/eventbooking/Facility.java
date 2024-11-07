@@ -59,7 +59,15 @@ public class Facility {
         // Initialize list to avoid NullPointerException
         allEvents = new ArrayList<>();
     }
-    // This constructor is for when we dont have a facility ID
+
+    /**
+     * Constructor for Facility without facilityID.
+     *
+     * @param name       the name of the facility
+     * @param address    the address of the facility
+     * @param description the description of the facility
+     * @param organizer  the organizer of the facility
+     */
     public Facility(String name, String address, String description, String organizer) {
         this.name = name;
         this.address = address;
@@ -68,7 +76,10 @@ public class Facility {
         this.facilitiesRef = db.collection("facilities");
         this.allEvents = new ArrayList<>();
     }
-    // Getters and Setters for fields
+
+    /**
+     * Getters and Setters for the given fields that can be easily set or we want to get
+     */
     public String getName(){
         return name;
     }
@@ -81,11 +92,14 @@ public class Facility {
         return address;
     }
 
+
     public void setAddress(String address){
         this.address = address;
     }
 
+
     public String getOrganizer() { return organizer; }
+
     public void setOrganizer(String organizer) { this.organizer = organizer; }
 
 //    public Location getLocation() { return location; }
@@ -121,6 +135,12 @@ public class Facility {
         }
     }
 
+    /**
+     * Saves the facility profile to Firestore.
+     *
+     * @return a Task representing the save operation
+     * @throws IllegalArgumentException if facility ID is null or empty
+     */
     public Task<Void> saveFacilityProfile() {
         String selected_facilityId = getFacilityID();
         if (selected_facilityId == null || selected_facilityId.isEmpty()) {
@@ -143,6 +163,11 @@ public class Facility {
     }
 
     // Method for administrators to remove the organizer from the facility
+    /**
+     * Deletes the facility by setting its organizer to null, allowing administrators to disassociate the organizer.
+     *
+     * @throws IllegalArgumentException if facility name is invalid
+     */
     public void deleteFacility() {
         if (name != null && !name.isEmpty()) {
             // Create a map to update the organizer field to null
@@ -164,6 +189,12 @@ public class Facility {
         }
     }
 
+    /**
+     * Associates an event with a facility, creating the facility document if it doesn't exist.
+     *
+     * @param selectedfacilityID the facility ID to associate with
+     * @param eventID            the event ID to associate
+     */
     public void associateEvent(String selectedfacilityID, String eventID) {
         // Check if the facility document exists
         db.collection("Facilities").document(selectedfacilityID)
@@ -182,6 +213,12 @@ public class Facility {
     }
 
     // Organizer method to associate an event with a facility
+    /**
+     * Checks if an event is already associated with the facility.
+     *
+     * @param eventName the event name to check
+     * @return true if the event is already associated, otherwise false
+     */
     public boolean associateEvent(String eventName) {
         // Check if the event is already in the allEvents list
         if (allEvents.contains(eventName)) {
@@ -191,6 +228,11 @@ public class Facility {
         return false;
     }
 
+    /**
+     * Updates the facility by adding a new event if it is not already associated.
+     *
+     * @param eventName the event name to add
+     */
     private void updateEventInFacility(String eventName) {
         if (allEvents == null) {
             allEvents = new ArrayList<>();
@@ -208,6 +250,11 @@ public class Facility {
         }
     }
 
+    /**
+     * Creates a new facility with an initial event if it does not already exist.
+     *
+     * @param eventName the event name to associate initially
+     */
     private void createFacilityWithEvent(String eventName) {
         // Making new facility ID
 //        Query query = db.collection("Facilities");
@@ -247,6 +294,11 @@ public class Facility {
                 .addOnFailureListener(e -> System.out.println("Error creating facility: " + e.getMessage()));
     }
 
+    /**
+     * Generates a new unique facility ID.
+     *
+     * @return the new facility ID
+     */
     private String getNewFacilityID(){
         final String[] facilityIDString = {""};
         db.collection("Facilities").get().addOnCompleteListener(new

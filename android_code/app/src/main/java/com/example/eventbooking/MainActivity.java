@@ -127,8 +127,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawerToggle.syncState();
 
         // Getting the login fragment given intent
-        Intent intent = getIntent();
-        handleIntent(intent);
+        handleIntent(getIntent());
 
 
 //        SharedPreferences preferences = getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);

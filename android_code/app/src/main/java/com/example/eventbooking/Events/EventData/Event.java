@@ -188,6 +188,11 @@ public class Event {
         return waitingparticipantIds;
     }
     public void addWaitingParticipantIds(String participantId){waitingparticipantIds.add(participantId);}
+    public void removeWaitingParticipantId(String participantId){
+        if(waitingparticipantIds.contains(participantId)){
+            waitingparticipantIds.remove(participantId);
+        }
+    }
     /**
      * Accepts a participant, moving their ID to the accepted list and removing them from the waiting list.
      *
@@ -209,7 +214,6 @@ public class Event {
         if (!canceledParticipantIds.contains(entrantId)) {
             canceledParticipantIds.add(entrantId);
             acceptedParticipantIds.remove(entrantId);
-
         }
     }
     /**

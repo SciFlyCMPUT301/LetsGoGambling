@@ -124,7 +124,15 @@ public class EventViewFragment extends Fragment {
 //                selectedEvent.addDeclinedParticipantId(selectedUserId); // Adds user to declined list
 //                updateEventInFirestore(selectedEvent);
 //            });
-        } else if (!selectedEvent.getWaitingParticipantIds().contains(selectedUserId) &&
+        } else if(selectedEvent.getWaitingParticipantIds().contains(selectedUserId)){
+            addButton("Leave Waitlist", v -> {
+                selectedEvent.removeWaitingParticipantId(selectedUserId);
+                updateEventInFirestore(selectedEvent);
+                goBackToEventFragment();
+            });
+        }
+
+        else if (!selectedEvent.getWaitingParticipantIds().contains(selectedUserId) &&
                 !selectedEvent.getSignedUpParticipantIds().contains(selectedUserId) &&
                 !selectedEvent.getCanceledParticipantIds().contains(selectedUserId)) {
             // If user is not in any list, add "Waitlist" button to add user to waiting list

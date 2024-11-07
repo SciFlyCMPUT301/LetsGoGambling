@@ -158,12 +158,11 @@ public class Facility {
      * Here we are uploading the event to the facility and if the facility does not exist
      * then make a new facility
      *
-     * @param selectedfacilityID
      * @param eventID
      */
-    public void associateEvent(String selectedfacilityID, String eventID) {
+    public void associateEvent(String eventID) {
         // Check if the facility document exists
-        db.collection("Facilities").document(selectedfacilityID)
+        db.collection("Facilities").document(facilityID)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful() && task.getResult() != null && task.getResult().exists()) {

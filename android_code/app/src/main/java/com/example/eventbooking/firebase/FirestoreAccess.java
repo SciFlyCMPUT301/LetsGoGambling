@@ -6,6 +6,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,14 +15,38 @@ import java.util.Map;
 public class FirestoreAccess {
     private FirebaseFirestore db;
     private CollectionReference usersRef;
+    private CollectionReference eventsRef;
+    private static FirestoreAccess instance;
+    private CollectionReference facilitiesRef;
 
     public FirestoreAccess() {
         db = FirebaseFirestore.getInstance();
         usersRef = db.collection("Users");
+        eventsRef = db.collection("Events");
+        facilitiesRef = db.collection("Facilities");
+    }
+
+    public static FirestoreAccess getInstance() {
+        if (instance == null) {
+            instance = new FirestoreAccess();
+        }
+        return instance;
     }
 
     public Task<DocumentSnapshot> getUser(String userId) {
         return usersRef.document(userId).get();
+    }
+
+    public Task<QuerySnapshot> getUserEvents(String userId) {
+        return eventsRef.whereEqualTo("userId", userId).get();
+    }
+
+    public Task<QuerySnapshot> getUserFacility(String userId) {
+        return facilitiesRef.whereEqualTo("userId", userId).get();  // Query facility data based on userId
+    }
+
+    public Task<QuerySnapshot> getOrganizerEvents(String userId) {
+        return eventsRef.whereEqualTo("organizerId", userId).get();  // Assuming "organizerId" is the field linking events to the organizer
     }
 
     public Task<Void> addUser(User user) {

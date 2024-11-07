@@ -80,7 +80,7 @@ public class DataGenerator {
             // Assign location from facilities
             if (!facilityList.isEmpty()) {
                 Facility facility = facilityList.get(random.nextInt(facilityList.size()));
-                event.setLocation(facility.getLocation());
+                event.setLocation(facility.getAddress());
                 facility.associateEvent(event.getEventId());
             }
 

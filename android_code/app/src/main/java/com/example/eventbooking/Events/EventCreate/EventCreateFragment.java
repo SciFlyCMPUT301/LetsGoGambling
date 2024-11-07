@@ -101,7 +101,11 @@ public class EventCreateFragment extends Fragment {
 
         return rootView;
     }
-
+    /**
+     * Creates a new event using the information entered in the form fields. The event is saved to Firestore,
+     * and if the user does not already have the organizer role, it is assigned to them and updated in Firestore.
+     * The method also validates input fields and provides feedback to the user in case of errors.
+     */
     private void createEvent(){
 
 
@@ -180,7 +184,9 @@ public class EventCreateFragment extends Fragment {
 
 
     }
-
+    /**
+     * Clears the input fields in the event creation form, resetting them to their default empty state.
+     */
 
     private void clearEventForm(){
         editTextTitle.setText("");

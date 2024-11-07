@@ -12,16 +12,21 @@ import androidx.appcompat.widget.Toolbar;
 
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import com.example.eventbooking.Events.EventCreate.EventCreateFragment;
+import com.example.eventbooking.Events.EventView.EventViewFragment;
 import com.example.eventbooking.Facility;
 import com.example.eventbooking.Home.HomeFragment;
 import com.example.eventbooking.Events.EventData.Event;
+import com.example.eventbooking.MainActivity;
+import com.example.eventbooking.QRCode.ScannedFragment;
 import com.example.eventbooking.R;
 import com.example.eventbooking.Role;
 import com.example.eventbooking.User;
 import com.example.eventbooking.UserManager;
 import com.example.eventbooking.firebase.FirestoreAccess;
+import com.example.eventbooking.profile.ProfileEntrantFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -44,11 +49,24 @@ public class LoginFragment extends Fragment {
     TextView welcomeText;
     BottomNavigationView nav;
     public static boolean isLoggedIn = false;
+    private String eventIdFromQR;
 
+    public LoginFragment() {
+
+    }
+
+    public void setEventId(String eventId) {
+        this.eventIdFromQR = eventId;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d("LoginOnCreate", "Before Argument");
+        if (getArguments() != null) {
+            eventIdFromQR = getArguments().getString("eventIdFromQR");
+            Log.d("LoginOnCreate", "After Argument " + eventIdFromQR);
+        }
     }
 
     /**
@@ -76,7 +94,7 @@ public class LoginFragment extends Fragment {
 
         NavigationView sidebar = getActivity().findViewById(R.id.nav_view);
 //        if (sidebar != null) {
-            sidebar.setVisibility(View.GONE);
+        sidebar.setVisibility(View.GONE);
 //        }
 
         // tool bar hiding possible???
@@ -86,11 +104,20 @@ public class LoginFragment extends Fragment {
         deviceIdText = rootView.findViewById(R.id.text_login_deviceid);
         welcomeText = rootView.findViewById(R.id.text_login_welcome);
         String deviceId = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
-        deviceIdText.setText(deviceId);
 
-        Log.d("Login", deviceId);
+        // Test code here to fake the device ID
+        final String tempval = "deviceID1";
+//        deviceId = tempval;
+
+//        deviceIdText.setText(deviceId);
+//
+//        Log.d("Login", deviceId);
+        deviceIdText.setText(tempval);
+        Log.d("Login", tempval);
         FirestoreAccess fs = FirestoreAccess.getInstance();
-        fs.getUser(deviceId).addOnSuccessListener(snapshot -> {
+//        fs.getUser(deviceId).addOnSuccessListener(snapshot -> {
+        fs.getUser(tempval).addOnSuccessListener(snapshot -> {
+            Log.d("Login New User", "New User found");
             //nav.setVisibility(View.VISIBLE);
             if (!snapshot.exists()) { // if new user
                 welcomeText.setText("Welcome new user");
@@ -108,9 +135,23 @@ public class LoginFragment extends Fragment {
                         nav.setVisibility(View.VISIBLE);
                         sidebar.setVisibility(View.VISIBLE);
                         toolbar.setVisibility(View.VISIBLE);
-                        getParentFragmentManager().beginTransaction()
-                            .replace(R.id.fragment_container, HomeFragment.newInstance(deviceId)) // replace with create new user fragment
-                            .commit();
+                        if (eventIdFromQR != null) {
+                            // If the user is new and QR code was scanned, go to ProfileCreation then ScannedFragment
+                            Log.d("Login Fragment", "New User going to Profile Entrant QR code");
+                            getParentFragmentManager().beginTransaction()
+                                    .replace(R.id.fragment_container,
+                                            ProfileEntrantFragment.newInstance
+                                                    (true, eventIdFromQR, tempval)) // replace with create new user fragment
+                                    .commit();
+                        } else {
+                            // If the user is new and no QR code scanned, just go to ProfileCreation
+                            Log.d("Login Fragment", "New User going to Profile Entrant no QR code");
+                            getParentFragmentManager().beginTransaction()
+                                    .replace(R.id.fragment_container,
+                                            ProfileEntrantFragment.newInstance
+                                                    (true, null, tempval)) // replace with create new user fragment
+                                    .commit();
+                        }
                     }
                 }, 3000);
             } else { // returning user
@@ -127,9 +168,30 @@ public class LoginFragment extends Fragment {
                         nav.setVisibility(View.VISIBLE);
                         sidebar.setVisibility(View.VISIBLE);
                         toolbar.setVisibility(View.VISIBLE);
-                        getParentFragmentManager().beginTransaction()
-                                .replace(R.id.fragment_container, HomeFragment.newInstance(deviceId))
-                                .commit();
+                        Log.d("Login", "EventID from QR code " + eventIdFromQR);
+                        if (eventIdFromQR != null) {
+
+
+                            getParentFragmentManager().beginTransaction()
+                                    .replace(R.id.fragment_container, EventViewFragment.newInstance(eventIdFromQR, tempval))
+//                                    .replace(R.id.fragment_container, EventViewFragment.newInstance(eventIdFromQR, deviceId))
+                                    .addToBackStack(null)
+                                    .commit();
+
+
+//                            getParentFragmentManager().beginTransaction()
+//                                    .replace(R.id.fragment_container, ScannedFragment.newInstance(eventIdFromQR))
+//                                    .commit();
+                        } else {
+//                            getParentFragmentManager().beginTransaction()
+//                                    .replace(R.id.fragment_container, HomeFragment.newInstance(deviceId))
+//                                    .commit();
+                            getParentFragmentManager().beginTransaction()
+                                    .replace(R.id.fragment_container, HomeFragment.newInstance(tempval))
+                                    .commit();
+
+                        }
+
                     }
                 }, 3000);
             }

@@ -1,4 +1,4 @@
-package com.example.eventbooking;
+package com.example.eventbooking.profile;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 

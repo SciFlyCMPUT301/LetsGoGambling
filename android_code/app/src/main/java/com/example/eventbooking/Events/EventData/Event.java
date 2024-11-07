@@ -38,6 +38,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * The Event class represents an event in the system, encapsulating details such as title,
+ * description, location, maximum participants, and lists for participant statuses (e.g., accepted,
+ * canceled). This class provides methods for managing event data and interacting with Firebase
+ * services for storage, retrieval, and updates.
+ */
 public class Event {
     private String eventId;
     private String eventTitle;
@@ -54,11 +60,15 @@ public class Event {
     private List<String> canceledParticipantIds;
     private List<String> signedUpParticipantIds;
     private List<String> enrolledParticipantIds;
+    private List<String> declinedParticipantIds = new ArrayList<>();
     private WaitingList waitingList;
     private String organizerId;
     private FirebaseFirestore db;
     private FirebaseStorage storage;
-
+    /**
+     * Default constructor that initializes Firebase Firestore and Storage instances, as well as
+     * participant lists.
+     */
 
     public Event() {
         storage = FirebaseStorage.getInstance();
@@ -82,6 +92,18 @@ public class Event {
 //        this.signedUpParticipantIds = new ArrayList<>();
 //        this.waitingList = new WaitingList(eventId);
     }
+    /**
+     * Constructs an Event with specific parameters.
+     *
+     * @param eventId          The unique identifier of the event.
+     * @param eventTitle       The title of the event.
+     * @param description      The description of the event.
+     * @param imageUrl         The URL of the event image.
+     * @param timestamp        The timestamp of the event.
+     * @param locationstr      The location of the event.
+     * @param maxParticipants  The maximum number of participants allowed.
+     * @param organizerId      The ID of the organizer for this event.
+     */
 
     public Event(String eventId, String eventTitle, String description, String imageUrl, long timestamp, String locationstr, int maxParticipants, String organizerId) {
         storage = FirebaseStorage.getInstance();
@@ -104,6 +126,8 @@ public class Event {
         this.storage = FirebaseStorage.getInstance();
         this.db = FirebaseFirestore.getInstance();
     }
+
+
 
     public String getEventId() { return eventId; }
     public void setEventId(String eventId) { this.eventId = eventId; }
@@ -164,38 +188,64 @@ public class Event {
         return waitingparticipantIds;
     }
     public void addWaitingParticipantIds(String participantId){waitingparticipantIds.add(participantId);}
-
+    public void removeWaitingParticipantId(String participantId){
+        if(waitingparticipantIds.contains(participantId)){
+            waitingparticipantIds.remove(participantId);
+        }
+    }
+    /**
+     * Accepts a participant, moving their ID to the accepted list and removing them from the waiting list.
+     *
+     * @param entrantId The ID of the participant to accept.
+     */
     public void acceptParticipant(String entrantId) {
         if (!acceptedParticipantIds.contains(entrantId)) {
             acceptedParticipantIds.add(entrantId);
             waitingparticipantIds.remove(entrantId);
-//            waitingList.leave(entrantId);
         }
     }
+    /**
+     * Cancels a participant's entry, moving their ID to the canceled list and removing them from the accepted list.
+     *
+     * @param entrantId The ID of the participant to cancel.
+     */
 
     public void cancelParticipant(String entrantId) {
         if (!canceledParticipantIds.contains(entrantId)) {
             canceledParticipantIds.add(entrantId);
             acceptedParticipantIds.remove(entrantId);
-//            waitingList.leave(entrantId);
         }
     }
+    /**
+     * Signs up a participant by adding their ID to the signed-up list and removing them from the accepted list.
+     *
+     * @param entrantId The ID of the participant to sign up.
+     */
 
     public void signUpParticipant(String entrantId) {
         if (!signedUpParticipantIds.contains(entrantId)) {
             signedUpParticipantIds.add(entrantId);
             acceptedParticipantIds.remove(entrantId);
-//            waitingList.leave(entrantId);
+
         }
     }
 
 
-    //manage the participants
+    /**
+     * Adds a participant to the waiting list if the maximum participant count is not reached.
+     *
+     * @param entrantId The ID of the participant to add.
+     */
     public void addParticipant(String entrantId){
         if(!waitingparticipantIds.contains(entrantId)&&waitingparticipantIds.size()<maxParticipants){
             waitingparticipantIds.add(entrantId);
         }
     }
+    /**
+     * Removes a participant from the waiting list.
+     *
+     * @param entrantId The ID of the participant to remove.
+     */
     public void removeParticipant(String entrantId){
         if(waitingparticipantIds.contains(entrantId)){
             waitingparticipantIds.remove(entrantId);}
@@ -209,6 +259,11 @@ public class Event {
             throw new IllegalArgumentException("Event ID is invalid");
         }
     }
+    /**
+     * Saves event data to Firestore with event details and participant lists.
+     *
+     * @return A task representing the asynchronous save operation.
+     */
 
     public Task<Void> saveEventDataToFirestore() {
         Map<String, Object> eventData = new HashMap<>();
@@ -216,10 +271,13 @@ public class Event {
         if(eventId == null){
             new_eventID = getNewEventID();
             eventData.put("eventId", new_eventID);
+            this.eventId = new_eventID;
         }
         else{
             eventData.put("eventId", eventId);
         }
+        if(canceledParticipantIds.contains("User1"))
+            Log.d("Saving Event", "User1 rejected");
 
         eventData.put("eventTitle", eventTitle);
         eventData.put("description", description);
@@ -247,6 +305,43 @@ public class Event {
                 })
                 .addOnFailureListener(e -> {
                     System.out.println("Error saving event data to Firestore: " + e.getMessage());
+                });
+    }
+
+    public Task<Void> updateEventData(String newTitle, String newDescription, String newLocation, int newMaxParticipants, String newOrganizerId,
+                                      List<String> newWaitingparticipantIds, List<String> newAcceptedParticipantIds,
+                                      List<String> newCanceledParticipantIds, List<String> newSignedUpParticipantIds) {
+        // Update the event properties with the new values
+        this.eventTitle = newTitle;
+        this.description = newDescription;
+        this.location = newLocation;
+        this.maxParticipants = newMaxParticipants;
+        this.organizerId = newOrganizerId;
+        this.waitingparticipantIds = newWaitingparticipantIds;
+        this.acceptedParticipantIds = newAcceptedParticipantIds;
+        this.canceledParticipantIds = newCanceledParticipantIds;
+        this.signedUpParticipantIds = newSignedUpParticipantIds;
+        // Prepare the updated event data map
+        Map<String, Object> eventData = new HashMap<>();
+        eventData.put("eventId", eventId);
+        eventData.put("eventTitle", eventTitle);
+        eventData.put("description", description);
+        eventData.put("location", location);
+        eventData.put("maxParticipants", maxParticipants);
+        eventData.put("waitingparticipantIds", waitingparticipantIds);
+        eventData.put("acceptedParticipantIds", acceptedParticipantIds);
+        eventData.put("canceledParticipantIds", canceledParticipantIds);
+        eventData.put("signedUpParticipantIds", signedUpParticipantIds);
+        eventData.put("organizerId", organizerId);
+
+        // Save or update the event data in Firestore
+        return db.collection("Events").document(eventId)
+                .set(eventData)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("Event", "Event data successfully updated in Firestore.");
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Event", "Error updating event data in Firestore: " + e.getMessage());
                 });
     }
 
@@ -331,6 +426,18 @@ public class Event {
                     }
                 })
                 .addOnFailureListener(onFailureListener);
+    }
+
+    // Method to add a user to the declined list
+    public void addDeclinedParticipantId(String userId) {
+        if (!declinedParticipantIds.contains(userId)) {
+            declinedParticipantIds.add(userId);
+        }
+    }
+
+    // Getter for declined participant IDs (optional, if needed elsewhere in code)
+    public List<String> getDeclinedParticipantIds() {
+        return declinedParticipantIds;
     }
 
 

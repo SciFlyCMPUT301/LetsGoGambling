@@ -1,6 +1,8 @@
 package com.example.eventbooking.Admin.Facility;
 
-public class EditFacilityFragment {
+import androidx.fragment.app.Fragment;
+
+public class EditFacilityFragment extends Fragment {
 
 
 

@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.example.eventbooking.Login.LoginFragment;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.example.eventbooking.R;
@@ -41,20 +42,34 @@ public class CameraFragment extends Fragment {
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
         if (result != null) {
             if (result.getContents() != null) {
+
                 String scannedData = result.getContents();
+                String eventId = extractEventIdFromQR(scannedData);
+                navigateToScannedFragment(eventId);
 
-
-                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-                ScannedFragment scannedFragment = ScannedFragment.newInstance(scannedData);
-                fragmentManager.beginTransaction()
-                        .replace(R.id.fragment_container, scannedFragment)
-                        .commit();
             } else {
                 Toast.makeText(getActivity(), "Scan failed or canceled", Toast.LENGTH_SHORT).show();
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
+    }
+
+    private String extractEventIdFromQR(String scannedData) {
+        // Assuming the QR code contains a URL like app://eventDetail?eventID=12345
+        String[] parts = scannedData.split("eventID=");
+        if (parts.length > 1) {
+            return parts[1];
+        }
+        return null;
+    }
+
+    public void navigateToScannedFragment(String eventId) {
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        ScannedFragment scannedFragment = ScannedFragment.newInstance(eventId);
+        fragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, scannedFragment)
+                .commit();
     }
 }
 

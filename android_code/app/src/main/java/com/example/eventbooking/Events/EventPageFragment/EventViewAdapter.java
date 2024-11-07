@@ -28,12 +28,14 @@ public class EventViewAdapter extends ArrayAdapter<Event> {
     private Context context;
     private List<Event> eventList;
     private String userId = "User1";
+    private boolean test;
 
     //constructor, call on creation
-    public EventViewAdapter(@NonNull Context context, ArrayList<Event> eventList) {
+    public EventViewAdapter(@NonNull Context context, ArrayList<Event> eventList, boolean test) {
         super(context, R.layout.event_adapter_view, eventList);
         this.context = context;
         this.eventList = eventList;
+        this.test = test;
     }
 
     //called when rendering the list
@@ -57,7 +59,9 @@ public class EventViewAdapter extends ArrayAdapter<Event> {
         dateJoined.setText("Today");
 
         String status;
-        if (event.getAcceptedParticipantIds().contains(userId)) {
+        if(test == false){
+            status = "";
+        } else if (event.getAcceptedParticipantIds().contains(userId)) {
             status = "Accepted List";
         } else if (event.getCanceledParticipantIds().contains(userId)) {
             status = "Canceled List";

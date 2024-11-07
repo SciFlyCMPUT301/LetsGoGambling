@@ -21,16 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-/**
- * The Facility class that has to have an organizer associated when we instantiate it, otherwise it
- * is a floating facility. This description means that nobody else can create a similar facility
- * (use case when we ban a facility).
- *
- * Facilities must also have the ability to have an event associated with them when one is created.
- * This is handled by the controller.
- *
- * @since   2024-11-04
- */
+
 public class Facility {
     private String facilityID;
     private String name;
@@ -69,21 +60,11 @@ public class Facility {
         this.allEvents = new ArrayList<>();
     }
     // Getters and Setters for fields
-    public String getName(){
-        return name;
-    }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-    public void setName(String name){
-        this.name = name;
-    }
-
-    public String getAddress(){
-        return address;
-    }
-
-    public void setAddress(String address){
-        this.address = address;
-    }
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
 
     public String getOrganizer() { return organizer; }
     public void setOrganizer(String organizer) { this.organizer = organizer; }

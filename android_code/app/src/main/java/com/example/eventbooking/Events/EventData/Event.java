@@ -86,11 +86,6 @@ public class Event {
         storage = FirebaseStorage.getInstance();
         db = FirebaseFirestore.getInstance();
         this.waitingList=new WaitingList();
-//        this.waitingparticipantIds = new ArrayList<>();
-//        this.acceptedParticipantIds = new ArrayList<>();
-//        this.canceledParticipantIds = new ArrayList<>();
-//        this.signedUpParticipantIds = new ArrayList<>();
-//        this.waitingList = new WaitingList(eventId);
     }
     /**
      * Constructs an Event with specific parameters.
@@ -128,42 +123,87 @@ public class Event {
     }
 
 
-
+    /** get event id
+     * @return eventId*/
     public String getEventId() { return eventId; }
+    /**
+     * set event id
+     * @param eventId*/
     public void setEventId(String eventId) { this.eventId = eventId; }
-
+    /**
+     * get event id
+     * @return eventTitle*/
     public String getEventTitle() { return eventTitle; }
+    /**
+     * set eventTitle
+     * @param eventTitle*/
     public void setEventTitle(String eventTitle) { this.eventTitle = eventTitle; }
-
+    /**
+     * get event description
+     * @return description*/
     public String getDescription() { return description; }
+    /**
+     * set description
+     * @param description*/
     public void setDescription(String description) { this.description = description; }
-
+    /**
+     * get image URL
+     * @return imageUrl*/
     public String getImageUrl() { return imageUrl; }
+    /**
+     * set Image url
+     * @param imageUrl */
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
-
+    /**
+     * get time stamp
+     *@return timestamp */
     public long getTimestamp() { return timestamp; }
+    /**
+     * set Time stamp
+     * @param timestamp*/
     public void setTimestamp(long timestamp) { this.timestamp = timestamp; }
 
 //    public Location getLocation() { return location; }
 //    public void setLocation(Location new_location) { this.location = new_location; }
+
+    /**
+     * get address
+     * @return address */
     public String getAddress() { return address; }
+    /**
+     * set address
+     * @param new_location
+     * @return address, new location */
     public void setAddress(String new_location) { this.address = new_location; }
-
+    /**
+     * get Max participant
+     * @return maxParticipants*/
     public int getMaxParticipants() { return maxParticipants; }
+    /**
+     * set Max participant
+     * @param maxParticipants */
     public void setMaxParticipants(int maxParticipants) { this.maxParticipants = maxParticipants; }
-
-    public List<String> getParticipantIds() { return waitingparticipantIds; }
-    public void setParticipantIds(List<String> participantIds) { this.waitingparticipantIds = participantIds; }
-
+    /**
+     * get current waiting list of the event
+     * @return waitingList*/
     public WaitingList getWaitingList() { return waitingList; }
-    public void setWaitingList(WaitingList waitingList) { this.waitingList = waitingList; }
-
+    /**
+     * get organizer Id
+     * @return organizer Id*/
     public String getOrganizerId() { return organizerId; }
+    /**
+     * set organizer id
+     * @param organizerId */
     public void setOrganizerId(String organizerId) { this.organizerId = organizerId; }
-
+    /**
+     * get location
+     * @return location */
     public String getLocation() {
         return location;
     }
+    /**
+     * set location
+     * @param location */
     public void setLocation(String location) {
         this.location = location;
     }
@@ -308,6 +348,19 @@ public class Event {
                 });
     }
 
+    /**
+     * update event data to the firebase
+     * @param newTitle
+     * @param newDescription
+     * @param newLocation
+     * @param newMaxParticipants
+     * @param newOrganizerId
+     * @param newWaitingparticipantIds
+     * @param newAcceptedParticipantIds
+     * @param newCanceledParticipantIds
+     * @param newSignedUpParticipantIds
+     * @return
+     */
     public Task<Void> updateEventData(String newTitle, String newDescription, String newLocation, int newMaxParticipants, String newOrganizerId,
                                       List<String> newWaitingparticipantIds, List<String> newAcceptedParticipantIds,
                                       List<String> newCanceledParticipantIds, List<String> newSignedUpParticipantIds) {
@@ -345,6 +398,10 @@ public class Event {
                 });
     }
 
+    /***
+     * upload the evnet poster to the firebase
+     * @param picture
+     */
     public void uploadEventPosterToFirebase(String picture) {
         if (eventId == null || eventId.isEmpty()) {
             throw new IllegalArgumentException("Event ID must be set before uploading an event poster.");
@@ -388,10 +445,18 @@ public class Event {
         });
     }
 
+    /**
+     * update the event poster to firebase
+     * @param newPoster
+     */
     public void updateEventPosterToFirebase(String newPoster) {
         uploadEventPosterToFirebase(newPoster);
     }
 
+    /**
+     * geenrate new event id
+     * @return
+     */
     private String getNewEventID(){
         final String[] eventIDString = {""};
         db.collection("Events").get().addOnCompleteListener(new
@@ -412,7 +477,12 @@ public class Event {
     }
 
 
-
+    /**
+     * retrive the event id from firebase
+     * @param eventId
+     * @param onSuccessListener
+     * @param onFailureListener
+     */
     public static void findEventById(String eventId, OnSuccessListener<Event> onSuccessListener, OnFailureListener onFailureListener) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("Events").document(eventId)
@@ -428,6 +498,10 @@ public class Event {
                 .addOnFailureListener(onFailureListener);
     }
 
+    /**
+     * add user to the declined list
+     * @param userId
+     */
     // Method to add a user to the declined list
     public void addDeclinedParticipantId(String userId) {
         if (!declinedParticipantIds.contains(userId)) {
@@ -435,6 +509,10 @@ public class Event {
         }
     }
 
+    /**
+     * get user ids from the decline participant
+     * @return declinedparticipantIds
+     */
     // Getter for declined participant IDs (optional, if needed elsewhere in code)
     public List<String> getDeclinedParticipantIds() {
         return declinedParticipantIds;

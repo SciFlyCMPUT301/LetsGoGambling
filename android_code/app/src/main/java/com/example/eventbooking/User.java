@@ -50,6 +50,7 @@ public class User {
     private boolean facilityAssociated;
     private boolean notificationAsk;
     private boolean geolocationAsk;
+    private boolean testing = true;
 
     private List<String> roles;
     //Firebase
@@ -205,6 +206,14 @@ public class User {
         if (hasRole(role)) {
             roles.remove(role);
         }
+    }
+
+    /**
+     * Interface for uploading images to firebase storage
+     */
+    public interface OnImageUploadComplete {
+        void onImageUploadComplete(String imageURL);
+        void onImageUploadFailed(Exception e);
     }
 
     /**
@@ -422,6 +431,39 @@ public class User {
                 });
     }
 
+    /**
+     * Alternate version to the above upload image code to upload an image to firebase and
+     * get a link to it back
+     *
+     *
+     * @param imageUri
+     * @param callback
+     */
+    public void uploadImageAndGetUrl(Uri imageUri, OnImageUploadComplete callback) {
+        // Generate a unique key for the image
+        final String randomKey = UUID.randomUUID().toString();
+        StorageReference ref = storageReference.child("images/" + randomKey);
+
+        ref.putFile(imageUri)
+                .addOnSuccessListener(taskSnapshot -> {
+                    // Get the download URL
+                    ref.getDownloadUrl().addOnSuccessListener(downloadUrl -> {
+                        String imageURL = downloadUrl.toString();
+                        // Do not save the image URL to Firestore here
+                        // Return the imageURL via the callback
+                        callback.onImageUploadComplete(imageURL);
+                    }).addOnFailureListener(e -> {
+                        Log.e("Firebase", "Failed to get download URL", e);
+                        callback.onImageUploadFailed(e);
+                    });
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Firebase", "Image upload failed", e);
+                    callback.onImageUploadFailed(e);
+                });
+    }
+
+
     // Save image URL to Firestore
     void saveImageUrl(String imageURL) {
 
@@ -429,7 +471,7 @@ public class User {
         Map<String, Object> imageData = new HashMap<>();
         imageData.put("profilePictureUrl", imageURL);
 
-        db.collection("Users").document(username)
+        db.collection("Users").document(deviceId)
                 .update(imageData)
                 .addOnSuccessListener(aVoid -> {
                     Log.d("Firestore", "Image URL updated successfully.");
@@ -462,7 +504,7 @@ public class User {
                     updates.put("profilePictureUrl", defaultprofilepictureurl);
 
                     // Update the user's profile picture URL in Firestore
-                    db.collection("Users").document(username)
+                    db.collection("Users").document(deviceId)
                             .update(updates)
                             .addOnSuccessListener(updateVoid -> {
                                 // Successfully updated Firestore

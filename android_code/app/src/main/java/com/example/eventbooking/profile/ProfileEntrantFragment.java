@@ -1,6 +1,10 @@
 package com.example.eventbooking.profile;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,10 +13,13 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
@@ -26,6 +33,8 @@ import com.example.eventbooking.User;
 
 import com.example.eventbooking.UserManager;
 import com.google.android.material.navigation.NavigationView;
+import com.squareup.picasso.Picasso;
+
 /**
  * ProfileEntrantFragment is a Fragment that handles the display and editing of an entrant's profile.
  * It allows users to view and update their personal details such as name, email, phone number, and notification preferences.
@@ -40,13 +49,17 @@ public class ProfileEntrantFragment extends Fragment {
     private TextView profileTitle;
     protected Button saveButton;
     private Button backButton;
+    private Button uploadButton;
     protected Button editButton;
     protected Switch notificationsSwitch;
+    private ImageView userImage;
+    private ActivityResultLauncher<Intent> pickImageLauncher;
+    private Uri selectedImageUri;
+    private String tempProfilePictureUrl;
 
     // Start of Testing values
     private Switch testingSwitch;
     private EditText deviceIDEntry;
-    private boolean testing;
     // End of Testing Values
 
     private EntrantProfileManager profileManager;
@@ -56,6 +69,7 @@ public class ProfileEntrantFragment extends Fragment {
     public boolean isNewUser = false;
     private String deviceId;
     private String eventIDFromQR = "";
+    private boolean testing = true;
     /**
      * Creates a new instance of the ProfileEntrantFragment with arguments for new user status, event ID, and device ID.
      *
@@ -102,6 +116,24 @@ public class ProfileEntrantFragment extends Fragment {
      * @return The view for this fragment
      */
 
+//    /**
+//     * Getting and setting the current deviceID to load the user information
+//     *
+//     * @param view The View returned by {@link #onCreateView(LayoutInflater, ViewGroup, Bundle)}.
+//     * @param savedInstanceState If non-null, this fragment is being re-constructed
+//     * from a previous saved state as given here.
+//     */
+//    @Override
+//    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+//        super.onViewCreated(view, savedInstanceState);
+//
+//        // Retrieve the current user's information
+//        User currentUser = UserManager.getInstance().getCurrentUser();
+//        if (currentUser != null) {
+//            displayUserInfo(currentUser);  // Use existing method or UI setup
+//        }
+//    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -118,6 +150,8 @@ public class ProfileEntrantFragment extends Fragment {
         backButton = view.findViewById(R.id.button_back_home);
         editButton = view.findViewById(R.id.button_edit_profile);
         deviceIDEntry = view.findViewById(R.id.device_id_entry);
+        uploadButton = view.findViewById(R.id.button_upload_photo);
+        userImage = view.findViewById(R.id.user_image);
         // Initialize EntrantProfileManager
         profileManager = new EntrantProfileManager();
 
@@ -126,6 +160,9 @@ public class ProfileEntrantFragment extends Fragment {
         if (!isNewUser) {
             onProfileLoaded(UserManager.getInstance().getCurrentUser());
         }
+        uploadButton.setVisibility(View.GONE);
+
+
 
 
         // Set up button listeners
@@ -133,16 +170,41 @@ public class ProfileEntrantFragment extends Fragment {
         //backButton.setOnClickListener(v -> requireActivity().onBackPressed()); // this crashes right now for some reason
         backButton.setOnClickListener(v -> goToHome());
         editButton.setOnClickListener(v -> toggleEditMode());
+        uploadButton.setOnClickListener(v-> uploadPhoto());
         // Handle testing switch
-        testingSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    testing = true;
-                } else {
-                    testing = false;
+//        testingSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//                if (isChecked) {
+//                    testing = true;
+//                } else {
+//                    testing = false;
+//                }
+//            }
+//        });
+        // Image launcher to get images and store them temporarially
+        pickImageLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        Intent data = result.getData();
+                        if (data != null && data.getData() != null) {
+                            selectedImageUri = data.getData();
+                            currentUser.uploadImageAndGetUrl(selectedImageUri, new User.OnImageUploadComplete() {
+                                @Override
+                                public void onImageUploadComplete(String imageURL) {
+                                    tempProfilePictureUrl = imageURL; // Store the URL temporarily
+                                    userImage.setImageURI(selectedImageUri);
+                                }
+
+                                @Override
+                                public void onImageUploadFailed(Exception e) {
+                                    Toast.makeText(getContext(), "Image upload failed", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    }
                 }
-            }
-        });
+        );
 
         // Initially, set save button and switch to be disabled
         // Set up the fragment for new users
@@ -150,6 +212,7 @@ public class ProfileEntrantFragment extends Fragment {
             setEditMode(true);
             editButton.setVisibility(View.GONE);
             backButton.setVisibility(View.GONE);
+            uploadButton.setVisibility(View.GONE);
             NavigationView sidebar = getActivity().findViewById(R.id.nav_view);
             sidebar.setVisibility(View.GONE);
             Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
@@ -162,18 +225,19 @@ public class ProfileEntrantFragment extends Fragment {
         return view;
     }
 
+
     /**
-     * Loads the profile data from Firestore using the device ID.
+     * Will move to fragment home
      */
-
-
     private void goToHome() {
         getParentFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, new HomeFragment())
                 .commit();
     }
 
-
+    /**
+     * Loads the profile data from Firestore using the device ID.
+     */
     private void loadUserProfile() {
         String deviceID = getDeviceID();
         profileManager.getProfile(deviceID, this::onProfileLoaded);
@@ -200,7 +264,6 @@ public class ProfileEntrantFragment extends Fragment {
      *
      * @param loadingUser The loaded User object
      */
-
     private void onProfileLoaded(User loadingUser) {
         if (loadingUser != null) {
             currentUser = loadingUser;
@@ -208,6 +271,15 @@ public class ProfileEntrantFragment extends Fragment {
             editEmail.setText(loadingUser.getEmail());
             editPhone.setText(loadingUser.getPhoneNumber());
             notificationsSwitch.setChecked(loadingUser.isNotificationAsk());
+
+            String profilePictureUrl = loadingUser.getProfilePictureUrl();
+            if (profilePictureUrl != null && !profilePictureUrl.isEmpty()) {
+                Picasso.get()
+                        .load(profilePictureUrl) // URL of the image
+                        .placeholder(R.drawable.placeholder_image_foreground) // Placeholder image while loading
+                        .error(R.drawable.placeholder_image_foreground) // Error image if loading fails
+                        .into(userImage); // ImageView to load the image into
+            }
         } else {
             Toast.makeText(getContext(), "No profile data found.", Toast.LENGTH_SHORT).show();
         }
@@ -239,16 +311,15 @@ public class ProfileEntrantFragment extends Fragment {
 
         UserManager.getInstance().setCurrentUser(savingUser);
 
-        savingUser.saveUserDataToFirestore(new User.OnUserIDGenerated() {
-            @Override
-            public void onUserIDGenerated(String userID) {
-                if (userID != null) {
-                    // Handle successful save operation here
-                } else {
-                    // Handle failure (e.g., show an error message to the user)
-                }
-            }
-        });
+        savingUser.saveUserDataToFirestore()
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(getContext(), "Profile saved successfully.", Toast.LENGTH_SHORT).show();
+                    setEditMode(false);
+                    // Handle navigation or other logic after saving
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "Failed to save profile.", Toast.LENGTH_SHORT).show();
+                });
 
         String deviceID = getDeviceID();
 // profileManager.createOrUpdateProfile(deviceID, currentProfile);
@@ -259,6 +330,7 @@ public class ProfileEntrantFragment extends Fragment {
         if (isNewUser) {
             editButton.setVisibility(View.VISIBLE);
             backButton.setVisibility(View.VISIBLE);
+//            uploadButton.setVisibility(View.VISIBLE);
             NavigationView sidebar = getActivity().findViewById(R.id.nav_view);
             sidebar.setVisibility(View.VISIBLE);
             Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
@@ -286,6 +358,20 @@ public class ProfileEntrantFragment extends Fragment {
 
         }
     }
+
+    /**
+     * Firebase call to save the given user data
+     *
+     * @param user
+     */
+    private void saveUserData(User user) {
+        user.saveUserDataToFirestore().addOnSuccessListener(aVoid -> {
+            Toast.makeText(getContext(), "Profile saved successfully", Toast.LENGTH_SHORT).show();
+        }).addOnFailureListener(e -> {
+            Toast.makeText(getContext(), "Failed to save profile", Toast.LENGTH_SHORT).show();
+        });
+    }
+
     /**
      * Toggles the edit mode on and off. When enabled, the fields become editable, and the user can save changes.
      */
@@ -308,6 +394,7 @@ public class ProfileEntrantFragment extends Fragment {
         notificationsSwitch.setEnabled(enable);
         saveButton.setEnabled(enable);
         editButton.setText(enable ? "Cancel" : "Edit");
+        uploadButton.setVisibility(View.VISIBLE);
     }
     /**
      * Retrieves the device ID of the current device.
@@ -316,6 +403,17 @@ public class ProfileEntrantFragment extends Fragment {
      */
 
     private String getDeviceID() {
+        if(testing)
+            return "deviceID1";
         return Settings.Secure.getString(requireContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+    }
+
+
+    /**
+     * Uploading a photo to firebase
+     */
+    public void uploadPhoto() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        pickImageLauncher.launch(intent);
     }
 }

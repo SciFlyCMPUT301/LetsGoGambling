@@ -17,6 +17,9 @@ import com.example.eventbooking.Events.EventData.Event;
 import com.example.eventbooking.Events.EventPageFragment.EventFragment;
 import com.example.eventbooking.R;
 
+/**
+ * EventViewFragment is a fragment that displays details of an event.
+ */
 public class EventViewFragment extends Fragment {
 
     private String eventId;
@@ -26,6 +29,13 @@ public class EventViewFragment extends Fragment {
     private ImageView eventPosterImage;
     private TextView eventTitleText, eventDescriptionText;
     private LinearLayout buttonContainer;
+
+    /**
+     * Creates a new instance of EventViewFragment.
+     * @param eventID
+     * @param deviceID
+     * @return
+     */
 
     public static EventViewFragment newInstance(String eventID, String deviceID) {
         EventViewFragment fragment = new EventViewFragment();
@@ -82,6 +92,10 @@ public class EventViewFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Displays details of an event in the UI.
+     * @param event
+     */
     private void displayEventDetails(Event event) {
         if (event == null) {
             Log.e("EventViewFragment", "Event is null, cannot display details.");
@@ -97,6 +111,11 @@ public class EventViewFragment extends Fragment {
         // loadImageIntoView(event.getImageUrl(), eventPosterImage);
     }
 
+    /**
+     * Configures buttons based on the user's list status in the event.
+     * @param selectedEvent
+     * @param selectedUserId
+     */
     private void configureButtons(Event selectedEvent, String selectedUserId) {
         // Clear existing buttons
         buttonContainer.removeAllViews();
@@ -147,6 +166,11 @@ public class EventViewFragment extends Fragment {
         addButton("Cancel", v -> getActivity().getSupportFragmentManager().popBackStack());
     }
 
+    /**
+     * Adds a button to the button container.
+     * @param text
+     * @param listener
+     */
     private void addButton(String text, View.OnClickListener listener) {
         Button button = new Button(getContext());
         button.setText(text);
@@ -154,6 +178,10 @@ public class EventViewFragment extends Fragment {
         buttonContainer.addView(button);
     }
 
+    /**
+     * Updates the event in Firestore.
+     * @param event
+     */
     private void updateEventInFirestore(Event event) {
         event.saveEventDataToFirestore().addOnSuccessListener(aVoid -> {
             Toast.makeText(getContext(), "Event updated successfully", Toast.LENGTH_SHORT).show();
@@ -162,6 +190,9 @@ public class EventViewFragment extends Fragment {
         });
     }
 
+    /**
+     * Goes back to the EventFragment.
+     */
     private void goBackToEventFragment(){
         getActivity().getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, new EventFragment())

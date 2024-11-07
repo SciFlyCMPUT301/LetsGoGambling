@@ -24,13 +24,23 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * ViewImagesFragment is a Fragment that displays a list of images fetched from Firebase.
+ * Each image can be clicked to view more details in a separate fragment.
+ */
 public class ViewImagesFragment extends Fragment {
     private ListView imagesListView;
     private ImageAdapter imageAdapter;
     private List<ImageClass> imageList;
     private Button adminGoBack;
-
+    /**
+     * Inflates the fragment's layout and initializes the components.
+     *
+     * @param inflater           LayoutInflater used to inflate the layout
+     * @param container          ViewGroup container in which the fragment is placed
+     * @param savedInstanceState Bundle containing saved state data (if any)
+     * @return the root View for the fragment's layout
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -61,7 +71,11 @@ public class ViewImagesFragment extends Fragment {
 
         return view;
     }
-
+    /**
+     * Loads images from Firebase database and updates the ListView adapter.
+     * On successful data retrieval, images are added to the list and displayed.
+     * Displays a Toast message if data retrieval fails.
+     */
     private void loadImagesFromFirebase() {
         FirebaseDatabase.getInstance().getReference("images")
                 .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -81,7 +95,11 @@ public class ViewImagesFragment extends Fragment {
                     }
                 });
     }
-
+    /**
+     * Opens a fragment to display details for a selected image.
+     *
+     * @param image the ImageClass object representing the selected image
+     */
     private void openImageDetailsFragment(ImageClass image) {
 //        EditImageFragment fragment = EditImageFragment.newInstance(image);
         FragmentTransaction transaction = getParentFragmentManager().beginTransaction();

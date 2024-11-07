@@ -23,7 +23,15 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
-
+/**
+ * The ViewEventsFragment class displays a list of events for administrators to manage.
+ * It fetches event data from Firebase Firestore and allows navigation to detailed event
+ * views for further modifications.
+ *
+ * <p>This fragment includes buttons for adding new facilities and navigating back to
+ * the admin home. Events are displayed in a ListView and loaded asynchronously from the
+ * Firestore database.</p>
+ */
 public class ViewEventsFragment extends Fragment {
     private Button adminGoBack;
     private EventViewAdapter eventAdapter;
@@ -35,12 +43,24 @@ public class ViewEventsFragment extends Fragment {
     private FirebaseFirestore db;
 
 
-
+    /**
+     *Inflates the layout for this fragment and initializes views, adapters,
+     *and event listeners.
+     * @param inflater The LayoutInflater object that can be used to inflate
+     * any views in the fragment,
+     * @param container If non-null, this is the parent view that the fragment's
+     * UI should be attached to.  The fragment should not add the view itself,
+     * but this can be used to generate the LayoutParams of the view.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     * from a previous saved state as given here.
+     *
+     * @return
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_view_events, container, false);
-
+        // Initialize view components
         // Starting from here views
 //        backButton = view.findViewById(R.id.button_back_home);
         eventList = new ArrayList<>();
@@ -54,13 +74,13 @@ public class ViewEventsFragment extends Fragment {
         eventAdapter = new EventViewAdapter(getContext(), eventList, false);
         eventListView.setAdapter(eventAdapter);
         loadEventsFromFirebase();
-
+        // Set click listener for list items to open event details
         eventListView.setOnItemClickListener((parent, view1, position, id) -> {
             Event selectedEvent = eventList.get(position);
             openEventDetailPage(selectedEvent);
             });
 
-
+        // Set click listener for admin go back button
         adminGoBack.setOnClickListener(v -> {
             // Navigate back to HomeFragment
             getParentFragmentManager().beginTransaction()
@@ -71,6 +91,11 @@ public class ViewEventsFragment extends Fragment {
 
     }
 
+    /**
+     * Loads the list of events from Firebase Firestore. On successful retrieval,
+     * it populates the event list and notifies the adapter to update the ListView.
+     * Displays a toast message if the loading fails.
+     */
     private void loadEventsFromFirebase() {
         db.collection("Events").get()
                 .addOnCompleteListener(task -> {
@@ -89,6 +114,12 @@ public class ViewEventsFragment extends Fragment {
                 });
     }
 
+
+    /**
+     * Opens the detail view for the selected event, allowing further edits.
+     *
+     * @param selectedEvent The event selected by the user, represented as an {@link Event} object.
+     */
     private void openEventDetailPage(Event selectedEvent) {
         // Create and navigate to the Event Detail Fragment
         EditEventFragment detailFragment = new EditEventFragment(selectedEvent);

@@ -15,17 +15,32 @@ import com.example.eventbooking.R;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
-
+/**
+ * ImageAdapter is a custom ArrayAdapter for displaying images in a ListView or GridView.
+ * Each item in the view contains an image and its associated link.
+ */
 public class ImageAdapter extends ArrayAdapter<Image> {
     private Context context;
     private List<ImageClass> imageList;
-
+    /**
+     * Constructor for ImageAdapter.
+     *
+     * @param context   the context in which the adapter is used
+     * @param imageList the list of ImageClass objects to be displayed
+     */
     public ImageAdapter(@NonNull Context context, List<ImageClass> imageList) {
         super(context, R.layout.item_image);
         this.context = context;
         this.imageList = imageList;
     }
 
+    /**
+     * Returns the view for a specific item in the list.
+     * @param position
+     * @param convertView
+     * @param parent
+     * @return
+     */
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {

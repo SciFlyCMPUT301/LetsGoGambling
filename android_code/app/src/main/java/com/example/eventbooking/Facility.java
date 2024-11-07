@@ -21,16 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-/**
- * The Facility class that has to have an organizer associated when we instantiate it, otherwise it
- * is a floating facility. This description means that nobody else can create a similar facility
- * (use case when we ban a facility).
- *
- * Facilities must also have the ability to have an event associated with them when one is created.
- * This is handled by the controller.
- *
- * @since   2024-11-04
- */
+
 public class Facility {
     private String facilityID;
     private String name;
@@ -77,6 +68,7 @@ public class Facility {
         this.allEvents = new ArrayList<>();
     }
 
+
     /**
      * Getters and Setters for the given fields that can be easily set or we want to get
      */
@@ -92,11 +84,9 @@ public class Facility {
         return address;
     }
 
-
     public void setAddress(String address){
         this.address = address;
     }
-
 
     public String getOrganizer() { return organizer; }
 
@@ -163,19 +153,20 @@ public class Facility {
     }
 
     // Method for administrators to remove the organizer from the facility
+
     /**
      * Deletes the facility by setting its organizer to null, allowing administrators to disassociate the organizer.
      *
      * @throws IllegalArgumentException if facility name is invalid
      */
     public void deleteFacility() {
-        if (name != null && !name.isEmpty()) {
+        if (facilityID != null && !facilityID.isEmpty()) {
             // Create a map to update the organizer field to null
             Map<String, Object> updates = new HashMap<>();
             updates.put("organizer", null); // Set the 'organizer' field to null
 
             // Update the facility document, setting the organizer to null
-            facilitiesRef.document(name)
+            facilitiesRef.document(facilityID)
                     .update(updates)
                     .addOnSuccessListener(aVoid -> {
                         System.out.println("Facility updated successfully: organizer set to null.");
@@ -196,8 +187,9 @@ public class Facility {
      * @param eventID            the event ID to associate
      */
     public void associateEvent(String selectedfacilityID, String eventID) {
+
         // Check if the facility document exists
-        db.collection("Facilities").document(selectedfacilityID)
+        db.collection("Facilities").document(facilityID)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful() && task.getResult() != null && task.getResult().exists()) {
@@ -213,6 +205,7 @@ public class Facility {
     }
 
     // Organizer method to associate an event with a facility
+
     /**
      * Checks if an event is already associated with the facility.
      *
@@ -220,6 +213,7 @@ public class Facility {
      * @return true if the event is already associated, otherwise false
      */
     public boolean associateEvent(String eventName) {
+
         // Check if the event is already in the allEvents list
         if (allEvents.contains(eventName)) {
             System.out.println("Event already associated with this facility.");

@@ -1,7 +1,5 @@
 package com.example.eventbooking.Testing;
 
-import android.util.Log;
-
 import com.example.eventbooking.Events.EventData.Event;
 import com.example.eventbooking.Facility;
 import com.example.eventbooking.Role;
@@ -13,52 +11,83 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class SampleTable {
-    public static List<User> UserList = new ArrayList<>();
-    public static List<Facility> FacilityList = new ArrayList<>();
-    public static List<Event> EventList = new ArrayList<>();
+    public List<User> UserList = new ArrayList<>();
+    public List<Facility> FacilityList = new ArrayList<>();
+    public List<Event> EventList = new ArrayList<>();
+
+    private int userUpdateCount;
+    private int facilityUpdateCount;
 
     public void makeUserList() {
-        // Create 30 users with various roles (including entrants)
-        for (int i = 1; i <= 30; i++) {
+        // Create 5 admin users
+        for (int i = 1; i <= 5; i++) {
             User user = new User();
-            user.setUsername("User" + i);
+            user.setUsername("adminUser" + i);
             user.setDeviceID("deviceID" + i);
-            user.setEmail("user" + i + "@example.com");
+            user.setEmail("admin" + i + "@example.com");
             user.setPhoneNumber("555-000" + i);
-            user.addRole(Role.ENTRANT);
+            user.addRole(Role.ADMIN);
+            UserList.add(user);
+        }
 
-            // Assign additional roles to the first few users
-            if (i <= 5) {
-                user.addRole(Role.ADMIN);
-            }
-            if (i <= 15) {
-                user.addRole(Role.ORGANIZER);
-            }
+        // Create 10 organizer users
+        for (int i = 1; i <= 10; i++) {
+            User user = new User();
+            user.setUsername("organizerUser" + i);
+            user.setDeviceID("deviceID" + (i + 5));
+            user.setEmail("organizer" + i + "@example.com");
+            user.setPhoneNumber("555-010" + i);
+            user.addRole(Role.ORGANIZER);
+            UserList.add(user);
+        }
 
+        // Create 15 normal users
+        for (int i = 1; i <= 15; i++) {
+            User user = new User();
+            user.setUsername("normalUser" + i);
+            user.setDeviceID("deviceID" + (i + 15));
+            user.setEmail("user" + i + "@example.com");
+            user.setPhoneNumber("555-020" + i);
+            // ENTRANT role is added by default in User constructor
             UserList.add(user);
         }
     }
 
     public void makeFacilityList() {
-        // Create facilities and associate with organizer users
-        for (int i = 0; i < 10; i++) {
-            User organizer = UserList.get(i); // Assume the first 10 users are organizers
+        // Get organizers from UserList
+        List<User> organizers = new ArrayList<>();
+        for (User user : UserList) {
+            if (user.hasRole(Role.ORGANIZER)) {
+                organizers.add(user);
+            }
+        }
+
+        // Create facilities and associate with organizers
+        for (int i = 0; i < organizers.size(); i++) {
+            User organizer = organizers.get(i);
             Facility facility = new Facility();
             facility.setName("Facility" + (i + 1));
             facility.setAddress("Address of Facility" + (i + 1));
             facility.setOrganizer(organizer.getUsername());
-            facility.setFacilityID("Facility" + (i + 1));
             FacilityList.add(facility);
-
-            // Mark user as associated with a facility
+            // Optionally, set facility in organizer if needed
             organizer.setFacilityAssociated(true);
+        }
+
+        // Create facilities without events or organizers
+        for (int i = 11; i <= 15; i++) {
+            Facility facility = new Facility();
+            facility.setName("Facility" + i);
+            facility.setAddress("Address of Facility" + i);
+            facility.setOrganizer(null); // No organizer
+            FacilityList.add(facility);
         }
     }
 
     public void makeEventList() {
         Random random = new Random();
 
-        // Create 30 events and assign each to a facility
+        // Create 30 events
         for (int i = 1; i <= 30; i++) {
             Event event = new Event();
             event.setEventId("event" + i);
@@ -67,35 +96,46 @@ public class SampleTable {
             event.setTimestamp(System.currentTimeMillis() + i * 100000);
             event.setMaxParticipants(20);
 
-            // Assign a random facility to the event
-            Facility facility = FacilityList.get(random.nextInt(FacilityList.size()));
-            if (facility != null) {
-                event.setAddress(facility.getAddress());
-                event.setOrganizerId(facility.getOrganizer());
+            // Assign to a facility (some facilities have events, some don't)
+            if (!FacilityList.isEmpty()) {
+                // Randomly decide whether to assign to a facility
+                if (random.nextBoolean()) {
+                    Facility facility = FacilityList.get(random.nextInt(FacilityList.size()));
+                    event.setLocation(facility.getAddress());
+                    facility.associateEvent(event.getEventId());
+                }
             }
 
-            // Add at least five users to the waiting list for each event
-            List<User> shuffledUsers = new ArrayList<>(UserList);
-            Collections.shuffle(shuffledUsers);
-            for (int j = 0; j < 5; j++) {
-                String userId = shuffledUsers.get(j).getUsername();
-                event.addParticipant(userId);  // Adds to waiting list
+            // Assign participants with different statuses
+            List<User> entrants = new ArrayList<>();
+            for (User user : UserList) {
+                if (user.hasRole(Role.ENTRANT)) {
+                    entrants.add(user);
+                }
             }
-
+            Collections.shuffle(entrants);
+            int numParticipants = Math.min(entrants.size(), 10);
+            for (int j = 0; j < numParticipants; j++) {
+                User entrant = entrants.get(j);
+                int status = random.nextInt(4); // 0: accepted, 1: signed-up, 2: canceled, 3: waitlist
+                switch (status) {
+                    case 0:
+                        event.acceptParticipant(entrant.getUsername());
+                        break;
+                    case 1:
+                        event.signUpParticipant(entrant.getUsername());
+                        break;
+                    case 2:
+                        event.cancelParticipant(entrant.getUsername());
+                        break;
+                    case 3:
+                        event.addParticipant(entrant.getUsername());
+                        break;
+                }
+            }
             EventList.add(event);
-
-            // Save event data with waiting list to Firestore
-            event.saveEventDataToFirestore().addOnSuccessListener(aVoid -> {
-                System.out.println("Event " + event.getEventId() + " with waiting list saved to Firestore.");
-            }).addOnFailureListener(e -> {
-                System.out.println("Failed to save event " + event.getEventId() + " to Firestore: " + e.getMessage());
-            });
         }
     }
-
-
-
-
 
     public void saveDataToFirebase(Runnable onSuccess, OnFailureListener onFailure) {
         AtomicInteger pendingWrites = new AtomicInteger(UserList.size() + FacilityList.size() + EventList.size());
@@ -114,16 +154,13 @@ public class SampleTable {
 
         // Save facilities
         for (Facility facility : FacilityList) {
-            Log.d("FacilityDebug", "Facility name: " + facility.getFacilityID() + ", " +facility.getOrganizer());
-            if(facility.getFacilityID() != null) {
-                facility.saveFacilityProfile()
-                        .addOnSuccessListener(aVoid -> checkCompletion(pendingWrites, failures, onSuccess, onFailure))
-                        .addOnFailureListener(e -> {
-                            failures.incrementAndGet();
-                            onFailure.onFailure(e);
-                            checkCompletion(pendingWrites, failures, onSuccess, onFailure);
-                        });
-            }
+            facility.saveFacilityProfile()
+                    .addOnSuccessListener(aVoid -> checkCompletion(pendingWrites, failures, onSuccess, onFailure))
+                    .addOnFailureListener(e -> {
+                        failures.incrementAndGet();
+                        onFailure.onFailure(e);
+                        checkCompletion(pendingWrites, failures, onSuccess, onFailure);
+                    });
         }
 
         // Save events

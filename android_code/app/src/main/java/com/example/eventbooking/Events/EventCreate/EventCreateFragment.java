@@ -36,7 +36,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
+/**
+ * Fragment for creating new events. This fragment allows users to input event details, such as title, description,
+ * image URL, location, and participant limits. The event is saved to Firestore, and if the user does not have
+ * the organizer role, it is assigned to them and updated in Firestore.
+ */
 public class EventCreateFragment extends Fragment {
     private EditText editTextTitle;
     private EditText editTextDescription;
@@ -51,7 +55,11 @@ public class EventCreateFragment extends Fragment {
     private boolean roleAssigned = false, testingFlag;
     public EventCreateFragment(){}
 
-
+    /**
+     * Creates a new instance of EventCreateFragment, primarily for testing.
+     * @param testing
+     * @return
+     */
     public static EventCreateFragment newInstance(boolean testing) {
         EventCreateFragment fragment = new EventCreateFragment();
         Bundle args = new Bundle();
@@ -60,6 +68,11 @@ public class EventCreateFragment extends Fragment {
         return fragment;
     }
 
+    /**
+     * Called when the fragment is created. Retrieves the testing flag from arguments if provided.
+     * @param savedInstanceState If the fragment is being re-created from
+     * a previous saved state, this is the state.
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,6 +82,14 @@ public class EventCreateFragment extends Fragment {
         }
     }
 
+    /**
+     * Inflates the fragment's layout and initializes UI elements.
+     *
+     * @param inflater           LayoutInflater used to inflate the layout
+     * @param container          ViewGroup container in which the fragment is placed
+     * @param savedInstanceState Bundle containing saved state data (if any)
+     * @return the root View for the fragment's layout
+     */
     // Inflate the layout and display the integer
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

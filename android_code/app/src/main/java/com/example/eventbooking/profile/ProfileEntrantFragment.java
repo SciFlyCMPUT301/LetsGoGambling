@@ -24,6 +24,7 @@ import com.example.eventbooking.QRCode.ScannedFragment;
 import com.example.eventbooking.R;
 import com.example.eventbooking.User;
 
+import com.example.eventbooking.UserManager;
 import com.google.android.material.navigation.NavigationView;
 
 public class ProfileEntrantFragment extends Fragment {
@@ -90,11 +91,16 @@ public class ProfileEntrantFragment extends Fragment {
         profileManager = new EntrantProfileManager();
 
         // Load existing profile data
-        loadUserProfile();
+        //loadUserProfile(); user data is already loaded
+        if (!isNewUser) {
+            onProfileLoaded(UserManager.getInstance().getCurrentUser());
+        }
+
 
         // Set up button listeners
         saveButton.setOnClickListener(v -> saveUserProfile());
-        backButton.setOnClickListener(v -> requireActivity().onBackPressed()); // Updated line
+        //backButton.setOnClickListener(v -> requireActivity().onBackPressed()); // this crashes right now for some reason
+        backButton.setOnClickListener(v -> goToHome());
         editButton.setOnClickListener(v -> toggleEditMode());
 
         testingSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -122,6 +128,12 @@ public class ProfileEntrantFragment extends Fragment {
             setEditMode(false);
         }
         return view;
+    }
+
+    private void goToHome() {
+        getParentFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, new HomeFragment())
+                .commit();
     }
 
     private void loadUserProfile() {
@@ -172,6 +184,8 @@ public class ProfileEntrantFragment extends Fragment {
         if(testing == true){
             savingUser.setDeviceID(deviceIDEntry.getText().toString().trim());
         }
+
+        UserManager.getInstance().setCurrentUser(savingUser);
 
         savingUser.saveUserDataToFirestore(new User.OnUserIDGenerated() {
             @Override

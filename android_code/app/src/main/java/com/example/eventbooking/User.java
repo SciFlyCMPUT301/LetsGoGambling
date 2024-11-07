@@ -1,6 +1,11 @@
 package com.example.eventbooking;
 
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.net.Uri;
+import android.util.Base64;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -12,6 +17,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -47,8 +53,8 @@ public class User {
 
     private List<String> roles;
     //Firebase
-    private StorageReference storageReference;
-    private FirebaseFirestore db;
+    StorageReference storageReference;
+    FirebaseFirestore db;
 
     /**
      * This constructor is used to instantiate lists inside of the class so when calling them
@@ -70,8 +76,8 @@ public class User {
         this.username = username;
         this.email = email;
         this.phoneNumber = phoneNumber;
-        this.profilePictureUrl = defaultProfilePictureUrl();
-        this.defaultprofilepictureurl = defaultProfilePictureUrl();
+        this.profilePictureUrl = null;
+        this.defaultprofilepictureurl = null;
         this.roles = new ArrayList<>();
         this.roles.add(Role.ENTRANT); //set default role to be entrant
         this.storageReference = FirebaseStorage.getInstance().getReference();
@@ -130,6 +136,7 @@ public class User {
     public void setProfilePictureUrl(String profilePictureUrl) {
         this.profilePictureUrl = profilePictureUrl;
     }
+
 
     public List<String> getRoles() {
         return roles;
@@ -201,16 +208,80 @@ public class User {
     }
 
     /**
-     * This setter sets the defualt profile picture for the user when they first create the account.
-     * This makes sure we dont have null values when looking for images to load when reaching the
-     * given page
+     * Generates a circular bitmap with a single letter in the center.
+     * The letter is the first character of the provided name, or "A" if the name is empty.
+     * The bitmap is randomly colored for visual uniqueness.
+     *
+     * @param name The name from which to extract the first letter for the profile picture.
+     * @return A 100x100 pixel circular bitmap with the initial letter in the center.
      */
-    public String defaultProfilePictureUrl() {
-        if (username != null && !username.isEmpty()) {
-            return "https://firebasestorage.googleapis.com/v0/b/letsgogambling-9ebb8.appspot.com/o/default%2F" + username + ".png?alt=media";
-        } else {
-            throw new IllegalArgumentException("Username is invalid.");
-        }
+    public Bitmap generateProfileBitmap(String name) {
+        String letter = (name == null || name.isEmpty()) ? "A" : String.valueOf(name.charAt(0)).toUpperCase();
+        int size = 100;
+        Bitmap bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        Paint paint = new Paint();
+        paint.setAntiAlias(true);
+        paint.setColor(Color.rgb((int) (Math.random() * 256), (int) (Math.random() * 256), (int) (Math.random() * 256)));
+        canvas.drawCircle(size / 2, size / 2, size / 2, paint);
+        paint.setColor(Color.rgb((int) (Math.random() * 256), (int) (Math.random() * 256), (int) (Math.random() * 256)));
+        paint.setTextSize(50);
+        paint.setTextAlign(Paint.Align.CENTER);
+        float yPos = (canvas.getHeight() / 2) - ((paint.descent() + paint.ascent()) / 2);
+        canvas.drawText(letter, size / 2, yPos, paint);
+
+        return bitmap;
+    }
+
+    /**
+     * Generates a profile picture, compresses it to a PNG format, and initiates its upload to Firebase Storage.
+     * After successful upload, the Firebase Storage URL will be saved in Firestore as the profile picture URL.
+     *
+     * @param name The name from which to generate the profile picture with the first letter.
+     * @return A string message indicating that profile picture generation and upload have been initiated.
+     */
+    public String defaultProfilePictureUrl(String name) {
+        Bitmap bitmap = generateProfileBitmap(name);
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+        byte[] byteArray = byteArrayOutputStream.toByteArray();
+
+        // Upload image to Firebase Storage and save the URL
+        uploadDefaultImageToFirebaseStorage(byteArray);
+
+        return "Profile picture generation initiated.";
+    }
+
+    /**
+     * Uploads an image byte array to Firebase Storage and retrieves the download URL upon successful upload.
+     * The URL is then saved as the profile picture URL in Firestore.
+     *
+     * @param imageBytes The byte array of the image to upload.
+     */
+    public void uploadDefaultImageToFirebaseStorage(byte[] imageBytes) {
+        // Generate a unique identifier for the image
+        String imageFileName = "defaultProfilePictures/" + UUID.randomUUID().toString() + ".png";
+        StorageReference imageRef = storageReference.child(imageFileName);
+
+        // Upload the image to Firebase Storage
+        imageRef.putBytes(imageBytes)
+                .addOnSuccessListener(taskSnapshot -> {
+                    // Get the download URL of the uploaded image
+                    imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                        String downloadUrl = uri.toString();
+                        // Save the download URL to Firestore
+                        profilePictureUrl = downloadUrl; // Set the profile URL here
+                        defaultprofilepictureurl = downloadUrl; // Set as the default profile URL
+
+                        saveImageUrl(downloadUrl);
+                    }).addOnFailureListener(e -> {
+                        Log.e("Firebase", "Failed to retrieve download URL", e);
+                    });
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Firebase", "Image upload failed", e);
+                });
     }
 
     /**
@@ -248,6 +319,7 @@ public class User {
         userData.put("email", email);
         userData.put("phoneNumber", phoneNumber);
         userData.put("profilePictureUrl", profilePictureUrl);
+        userData.put("defaultProfilePictureUrl", defaultprofilepictureurl);
         userData.put("location", location != null ? location.toString() : null);
         userData.put("adminLevel", adminLevel);
         userData.put("facilityAssociated", facilityAssociated);
@@ -265,9 +337,6 @@ public class User {
                     System.out.println("Error writing user data to Firestore: " + e.getMessage());
                 });
     }
-
-
-
 
 
     public Task<Void> saveUserDataToFirestore(final OnUserIDGenerated callback) {
@@ -354,7 +423,7 @@ public class User {
     }
 
     // Save image URL to Firestore
-    private void saveImageUrl(String imageURL) {
+    void saveImageUrl(String imageURL) {
 
         // Create a map to hold the image URL
         Map<String, Object> imageData = new HashMap<>();

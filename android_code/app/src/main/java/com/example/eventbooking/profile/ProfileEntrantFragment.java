@@ -157,11 +157,11 @@ public class ProfileEntrantFragment extends Fragment {
         }
         return view;
     }
-<<<<<<< HEAD
+
     /**
      * Loads the profile data from Firestore using the device ID.
      */
-=======
+
 
     private void goToHome() {
         getParentFragmentManager().beginTransaction()
@@ -169,7 +169,6 @@ public class ProfileEntrantFragment extends Fragment {
                 .commit();
     }
 
->>>>>>> 15233f275d41372ddb3a6c344377e5584869aa85
     private void loadUserProfile() {
         String deviceID = getDeviceID();
         profileManager.getProfile(deviceID, this::onProfileLoaded);

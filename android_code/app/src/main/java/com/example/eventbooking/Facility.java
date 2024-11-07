@@ -3,8 +3,6 @@ package com.example.eventbooking;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.storage.FirebaseStorage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -115,7 +113,7 @@ public class Facility {
         }
     }
 
-    public int getFacilityID() {
+    public String getFacilityID() {
         return 0;
     }
 }

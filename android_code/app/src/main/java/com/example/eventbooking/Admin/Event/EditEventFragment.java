@@ -236,7 +236,6 @@ public class EditEventFragment extends Fragment {
         }
     }
 
-
     private void removeEvent(){
         db.collection("Events").document(selectedEvent.getEventId()).delete()
                 .addOnSuccessListener(aVoid -> {

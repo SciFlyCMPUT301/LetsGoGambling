@@ -27,6 +27,10 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * ViewUsersFragment is a Fragment that displays a list of users from Firestore.
+ * This fragment allows the admin to add new users, view user details, or navigate back to the AdminFragment.
+ */
 public class ViewUsersFragment extends Fragment {
     private FirebaseFirestore db;
 //    private ArrayList<String> documentIds = new ArrayList<>();
@@ -36,7 +40,14 @@ public class ViewUsersFragment extends Fragment {
     private Button addUser;
     private Button adminGoBack;
 
-
+    /**
+     * Inflates the fragment's layout and initializes components.
+     *
+     * @param inflater           LayoutInflater used to inflate the layout
+     * @param container          ViewGroup container in which the fragment is placed
+     * @param savedInstanceState Bundle containing saved state data (if any)
+     * @return the root View for the fragment's layout
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -46,9 +57,11 @@ public class ViewUsersFragment extends Fragment {
 //        imagesListView = view.findViewById(R.id.imagesListView);
         db = FirebaseFirestore.getInstance();
         userList = new ArrayList<>();
+        // Set up ListView and adapter to display users
         usersListView = view.findViewById(R.id.user_list);
         userAdapter = new UserViewAdapter(getContext(), userList);
         usersListView.setAdapter(userAdapter);
+        // Initialize buttons for adding users and navigating back
         addUser = view.findViewById(R.id.add_user_button);
         adminGoBack = view.findViewById(R.id.admin_go_back);
         // Load images from Firebase
@@ -77,12 +90,11 @@ public class ViewUsersFragment extends Fragment {
         });
 
 
-
-
-
         return view;
     }
-
+    /**
+     * Opens a new EditUserFragment with empty fields to add a new user.
+     */
     private void openNewUserFragment() {
         EditUserFragment fragment = new EditUserFragment();
         Bundle bundle = new Bundle();
@@ -95,6 +107,11 @@ public class ViewUsersFragment extends Fragment {
         transaction.commit();
     }
 
+    /**
+     * Opens the EditUserFragment with details of the selected user for viewing or editing.
+     *
+     * @param selectedUser the User object representing the selected user
+     */
     private void openUserDetailsFragment(User selectedUser) {
         FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
         EditUserFragment fragment = new EditUserFragment();
@@ -121,20 +138,25 @@ public class ViewUsersFragment extends Fragment {
         else
             bundle.putBoolean("organizer", false);
         fragment.setArguments(bundle);
-
+        // Replace current fragment with EditUserFragment and add to back stack
         transaction.replace(R.id.fragment_container, fragment);
         transaction.addToBackStack(null);
         transaction.commit();
     }
-
+    /**
+     * Loads users from Firestore and updates the ListView adapter.
+     * Logs the device ID of each loaded user and shows an error message on failure.
+     */
     private void loadUsersFromFirestore() {
         db.collection("Users").get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
+                // Iterate through the documents and add each user to the list
                 for (QueryDocumentSnapshot document : task.getResult()) {
                     User user = document.toObject(User.class);
                     userList.add(user);
                     Log.d("ViewUsersFragment", "User deviceId: " + user.getDeviceID());
                 }
+                // Notify adapter to refresh ListView
                 userAdapter.notifyDataSetChanged();
                 Log.d("ViewUsersFragment", "Users loaded: " + userList.size());
             } else {

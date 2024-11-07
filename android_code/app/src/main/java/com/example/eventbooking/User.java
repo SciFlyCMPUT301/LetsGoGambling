@@ -483,6 +483,12 @@ public class User {
         void onUserIDGenerated(String userID);
     }
 
+    /**
+     * Generating a new user deviceID for testing, in practice this is replaced with get device ID
+     * and subsequent calls to that to a singleton
+     *
+     * @param callback
+     */
     public void getNewUserID(final OnUserIDGenerated callback) {
         db.collection("Users").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override

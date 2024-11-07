@@ -101,7 +101,7 @@ public class SampleTable {
                 // Randomly decide whether to assign to a facility
                 if (random.nextBoolean()) {
                     Facility facility = FacilityList.get(random.nextInt(FacilityList.size()));
-                    event.setLocation(facility.getLocation());
+                    event.setLocation(facility.getAddress());
                     facility.associateEvent(event.getEventId());
                 }
             }

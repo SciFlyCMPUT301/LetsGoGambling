@@ -336,6 +336,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //        }
 //    }
 
+    /**
+     * Handling of external links and QR code scanning from outside of the app
+     *
+     * @param intent
+     */
     private void handleIntent(Intent intent) {
         boolean loggingin = false;
         if (intent != null && intent.getData() != null) {
@@ -367,6 +372,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    /**
+     * Getting the eventID from the QR code URL string
+     *
+     * @param url
+     * @return string
+     */
     private String extractEventIdFromUrl(String url) {
         // Assuming the URL is in the format: eventbooking://eventDetail?eventID=12345
         String[] parts = url.split("eventID=");
@@ -375,6 +386,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         return null;
     }
+
+    /**
+     * Navigating to the login fragment
+     *
+     * @param eventIdFromQR
+     */
     private void showLoginFragment(String eventIdFromQR) {
         // Show LoginFragment first
         Log.d("MainActivity Login Move", "Event ID: " + eventIdFromQR);
@@ -387,7 +404,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .commit();
     }
 
-
+    /**
+     * If login is successful and a QR code is scanned then go to the Event View with the
+     * Event ID as a parameter
+     */
     public void onLoginSuccess() {
         if (eventIdFromQR != null) {
             openEventViewFragment(eventIdFromQR);
@@ -395,21 +415,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    private void navigateToScannedFragment(String eventId) {
-
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        Bundle bundle = new Bundle();
-        bundle.putString("eventId", eventId);
-//        bundle.putString("deviceId", putuseridhere);
-        bundle.putString("deviceId", "User37");
-        scannedFragment.setArguments(bundle);
-        fragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, scannedFragment)
-                .commit();
-    }
-
+    /**
+     * Directly going to the event view fragment given an eventID as a parameter to pass through
+     *
+     * @param eventID
+     */
     private void openEventViewFragment(String eventID) {
-        Log.d("Moving to Event", "HSHASHDASHD " + eventID);
+        Log.d("Moving to Event", "Event: " + eventID);
         EventViewFragment eventViewFragment = new EventViewFragment();
         Bundle args = new Bundle();
         args.putString("eventId", eventID);

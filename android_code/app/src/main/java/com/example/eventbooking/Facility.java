@@ -115,4 +115,7 @@ public class Facility {
         }
     }
 
+    public int getFacilityID() {
+        return 0;
+    }
 }

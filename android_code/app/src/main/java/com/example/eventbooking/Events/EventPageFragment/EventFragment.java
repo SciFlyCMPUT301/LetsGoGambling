@@ -8,22 +8,15 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import com.example.eventbooking.Events.EventCreate.EventCreateFragment;
 import com.example.eventbooking.Home.HomeFragment;
 import com.example.eventbooking.R;
 import com.example.eventbooking.User;
 import com.example.eventbooking.UserManager;
 import com.example.eventbooking.waitinglist.OrganizerMenuFragment;
 import com.example.eventbooking.waitinglist.WaitingList;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.example.eventbooking.waitinglist.OrganizerMenuFragment;
+
 public class EventFragment extends Fragment {
     private TextView additionalInfoTextView;
     private static final String ARG_INTEGER = "arg_integer";
@@ -38,9 +31,10 @@ public class EventFragment extends Fragment {
     //setting up a button that to organizer
     private Button organizerMenuButton;
 
-    public static EventFragment newInstance(int integer) {
+    public static EventFragment newInstance() {
         EventFragment fragment = new EventFragment();
         Bundle args = new Bundle();
+        int integer;
         args.putInt(ARG_INTEGER, integer);
         fragment.setArguments(args);
         return fragment;

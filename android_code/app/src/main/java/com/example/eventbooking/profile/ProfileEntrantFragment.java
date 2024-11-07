@@ -25,6 +25,11 @@ import com.example.eventbooking.R;
 import com.example.eventbooking.User;
 
 import com.google.android.material.navigation.NavigationView;
+/**
+ * ProfileEntrantFragment is a Fragment that handles the display and editing of an entrant's profile.
+ * It allows users to view and update their personal details such as name, email, phone number, and notification preferences.
+ * It also handles logic for new user creation, editing modes, and saving data to Firestore.
+ */
 
 public class ProfileEntrantFragment extends Fragment {
 
@@ -46,6 +51,14 @@ public class ProfileEntrantFragment extends Fragment {
     private boolean isNewUser = false;
     private String deviceId;
     private String eventIDFromQR = "";
+    /**
+     * Creates a new instance of the ProfileEntrantFragment with arguments for new user status, event ID, and device ID.
+     *
+     * @param isNewUser   Flag indicating if the user is new
+     * @param eventIdFromQR Event ID obtained from QR scan (if any)
+     * @param deviceId     Device ID of the user
+     * @return A new instance of ProfileEntrantFragment
+     */
 
     public static ProfileEntrantFragment newInstance(boolean isNewUser, String eventIdFromQR, String deviceId) {
         ProfileEntrantFragment fragment = new ProfileEntrantFragment();
@@ -57,6 +70,12 @@ public class ProfileEntrantFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
+    /**
+     * Initializes the fragment with arguments passed during creation.
+     * Retrieves the new user status, event ID, and device ID from the arguments.
+     *
+     * @param savedInstanceState Saved state bundle for the fragment
+     */
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,6 +88,14 @@ public class ProfileEntrantFragment extends Fragment {
 
         }
     }
+    /**
+     * Inflates the layout for this fragment and sets up the views, buttons, and listeners.
+     *
+     * @param inflater           The LayoutInflater used to inflate the layout
+     * @param container          The parent view group
+     * @param savedInstanceState Saved state bundle for the fragment
+     * @return The view for this fragment
+     */
 
     @Nullable
     @Override
@@ -96,7 +123,7 @@ public class ProfileEntrantFragment extends Fragment {
         saveButton.setOnClickListener(v -> saveUserProfile());
         backButton.setOnClickListener(v -> requireActivity().onBackPressed()); // Updated line
         editButton.setOnClickListener(v -> toggleEditMode());
-
+        // Handle testing switch
         testingSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
@@ -108,6 +135,7 @@ public class ProfileEntrantFragment extends Fragment {
         });
 
         // Initially, set save button and switch to be disabled
+        // Set up the fragment for new users
         if (isNewUser) {
             setEditMode(true);
             editButton.setVisibility(View.GONE);
@@ -123,11 +151,18 @@ public class ProfileEntrantFragment extends Fragment {
         }
         return view;
     }
-
+    /**
+     * Loads the profile data from Firestore using the device ID.
+     */
     private void loadUserProfile() {
         String deviceID = getDeviceID();
         profileManager.getProfile(deviceID, this::onProfileLoaded);
     }
+    /**
+     * Callback for when the profile is loaded from Firestore. Updates the UI with profile data.
+     *
+     * @param profile The loaded EntrantProfile object
+     */
 
     private void onProfileLoaded(EntrantProfile profile) {
         if (profile != null) {
@@ -140,6 +175,11 @@ public class ProfileEntrantFragment extends Fragment {
             Toast.makeText(getContext(), "No profile data found.", Toast.LENGTH_SHORT).show();
         }
     }
+    /**
+     * Callback for when the user profile is loaded.
+     *
+     * @param loadingUser The loaded User object
+     */
 
     private void onProfileLoaded(User loadingUser) {
         if (loadingUser != null) {
@@ -152,6 +192,10 @@ public class ProfileEntrantFragment extends Fragment {
             Toast.makeText(getContext(), "No profile data found.", Toast.LENGTH_SHORT).show();
         }
     }
+    /**
+     * Saves the user profile data to Firestore, either creating or updating the profile.
+     * Also, handles saving user data for new users.
+     */
 
     private void saveUserProfile() {
         if (currentProfile == null) {
@@ -185,11 +229,11 @@ public class ProfileEntrantFragment extends Fragment {
         });
 
         String deviceID = getDeviceID();
-//        profileManager.createOrUpdateProfile(deviceID, currentProfile);
+// profileManager.createOrUpdateProfile(deviceID, currentProfile);
 
         Toast.makeText(getContext(), "Profile saved successfully.", Toast.LENGTH_SHORT).show();
         setEditMode(false);
-
+        // Handle navigation after saving profile
         if (isNewUser) {
             editButton.setVisibility(View.VISIBLE);
             backButton.setVisibility(View.VISIBLE);
@@ -220,12 +264,20 @@ public class ProfileEntrantFragment extends Fragment {
 
         }
     }
+    /**
+     * Toggles the edit mode on and off. When enabled, the fields become editable, and the user can save changes.
+     */
 
     private void toggleEditMode() {
         isEditing = !isEditing;
         setEditMode(isEditing);
         Toast.makeText(getContext(), isEditing ? "Edit mode enabled" : "Edit mode disabled", Toast.LENGTH_SHORT).show();
     }
+    /**
+     * Sets the edit mode for the profile. When enabled, the user can edit the profile details.
+     *
+     * @param enable Flag indicating whether edit mode should be enabled or not
+     */
 
     private void setEditMode(boolean enable) {
         editName.setEnabled(enable);
@@ -235,6 +287,11 @@ public class ProfileEntrantFragment extends Fragment {
         saveButton.setEnabled(enable);
         editButton.setText(enable ? "Cancel" : "Edit");
     }
+    /**
+     * Retrieves the device ID of the current device.
+     *
+     * @return The device ID
+     */
 
     private String getDeviceID() {
         return Settings.Secure.getString(requireContext().getContentResolver(), Settings.Secure.ANDROID_ID);

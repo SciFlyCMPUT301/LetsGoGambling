@@ -51,7 +51,15 @@ public class Facility {
         // Initialize list to avoid NullPointerException
         allEvents = new ArrayList<>();
     }
-    // This constructor is for when we dont have a facility ID
+
+    /**
+     * Constructor for Facility without facilityID.
+     *
+     * @param name       the name of the facility
+     * @param address    the address of the facility
+     * @param description the description of the facility
+     * @param organizer  the organizer of the facility
+     */
     public Facility(String name, String address, String description, String organizer) {
         this.name = name;
         this.address = address;
@@ -60,9 +68,18 @@ public class Facility {
         this.facilitiesRef = db.collection("facilities");
         this.allEvents = new ArrayList<>();
     }
-    // Getters and Setters for fields
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+
+
+    /**
+     * Getters and Setters for the given fields that can be easily set or we want to get
+     */
+    public String getName(){
+        return name;
+    }
+
+    public void setName(String name){
+        this.name = name;
+    }
 
     public String getAddress() { return address; }
     public void setAddress(String address) { this.address = address; }
@@ -104,9 +121,10 @@ public class Facility {
     }
 
     /**
-     * Function saves the local facility that is calling the task to save it to firebase
+     * Saves the facility profile to Firestore.
      *
-     * @return Task completion
+     * @return a Task representing the save operation
+     * @throws IllegalArgumentException if facility ID is null or empty
      */
     public Task<Void> saveFacilityProfile() {
         String selected_facilityId = getFacilityID();
@@ -132,7 +150,9 @@ public class Facility {
     // Method for administrators to remove the organizer from the facility
 
     /**
-     * Method for removing the given facility that is loaded onto the device given the facility ID
+     * Deletes the facility by setting its organizer to null, allowing administrators to disassociate the organizer.
+     *
+     * @throws IllegalArgumentException if facility name is invalid
      */
     public void deleteFacility() {
         if (facilityID != null && !facilityID.isEmpty()) {
@@ -156,11 +176,11 @@ public class Facility {
     }
 
     /**
-     * Here we are uploading the event to the facility and if the facility does not exist
-     * then make a new facility
+     * Associates an event with a facility, creating the facility document if it doesn't exist.
      *
-     * @param eventID
+     * @param eventID            the event ID to associate
      */
+
     public void associateEvent(String eventID, boolean genEvent) {
         // Check if the facility document exists
         if(genEvent){
@@ -187,10 +207,10 @@ public class Facility {
     // Organizer method to associate an event with a facility
 
     /**
-     * Checker to see if an event is associated with a loaded facility
+     * Checks if an event is already associated with the facility.
      *
-     * @param eventName
-     * @return boolean
+     * @param eventName the event name to check
+     * @return true if the event is already associated, otherwise false
      */
     public boolean hasEvent(String eventName) {
         // Check if the event is already in the allEvents list
@@ -202,10 +222,9 @@ public class Facility {
     }
 
     /**
-     * Function to update a given existing facility with a new event to be added
-     * Intended to be called at event creation
+     * Updates the facility by adding a new event if it is not already associated.
      *
-     * @param eventName
+     * @param eventName the event name to add
      */
     private void updateEventInFacility(String eventName) {
         if (allEvents == null) {
@@ -228,7 +247,7 @@ public class Facility {
      * This function saves a given facility with an event name to link the event to the facility
      * Designed for automating the generation of data
      *
-     * @param eventName
+     * @param eventName the event name to associate initially
      */
     private void createFacilityWithEvent(String eventName) {
         // Making new facility ID
@@ -273,7 +292,7 @@ public class Facility {
      * The function sees how many items are inside of the Facilities collection in firebase and
      * then adds one to the number to a string "Facility" such that each facility has a unique ID
      *
-     * @return String
+     * @return the new facility ID
      */
     private String getNewFacilityID(){
         final String[] facilityIDString = {""};

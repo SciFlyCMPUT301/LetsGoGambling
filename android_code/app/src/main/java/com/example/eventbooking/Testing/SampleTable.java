@@ -167,7 +167,9 @@ public class SampleTable {
 
         // Save users
         for (User user : UserList) {
-            user.setProfilePictureUrl("https://firebasestorage.googleapis.com/v0/b/letsgogambling-9ebb8.appspot.com/o/images%2F0fe6da45-0e90-46e4-ba6a-ec805ffbf380.jpg?alt=media&token=4ad91ceb-d991-44b5-81f2-edc136751202");
+            String image_link = "https://firebasestorage.googleapis.com/v0/b/letsgogambling-9ebb8.appspot.com/o/images%2Fb8d07a65-6ab2-4ba3-8b92-724e4803e468.jpg?alt=media&token=b24f29a0-98eb-4597-a218-40f494bd3ad3";
+            user.setdefaultProfilePictureUrl(image_link);
+            user.setProfilePictureUrl(image_link);
             user.saveUserDataToFirestore()
                     .addOnSuccessListener(aVoid -> checkCompletion(pendingWrites, failures, onSuccess, onFailure))
                     .addOnFailureListener(e -> {

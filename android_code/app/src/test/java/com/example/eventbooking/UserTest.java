@@ -1,16 +1,29 @@
 package com.example.eventbooking;
 
 import android.net.Uri;
+
+import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
+
+import androidx.test.core.app.ApplicationProvider;
+
 import org.mockito.Mockito;
 
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-public class UserTest {
 
+public class UserTest {
+    private FirebaseStorage firebaseStorage;
+
+    @Before
+    public void setUp() {
+        firebaseStorage = Mockito.mock(FirebaseStorage.class);
+        FirebaseApp.initializeApp(ApplicationProvider.getApplicationContext());
+    }
 
     @Test
     public void testSetAndGetUsername() {

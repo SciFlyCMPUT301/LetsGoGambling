@@ -23,6 +23,7 @@ public class Facility {
     private List<String> allEvents;
     private FirebaseFirestore db;
     private CollectionReference facilitiesRef;
+    private boolean testing = true;
 
     /**
      * The Facility class that has to have an organizer associated when we instantiate it, otherwise it
@@ -77,16 +78,10 @@ public class Facility {
         this.name = name;
     }
 
-    public String getAddress(){
-        return address;
-    }
-
-    public void setAddress(String address){
-        this.address = address;
-    }
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
 
     public String getOrganizer() { return organizer; }
-
     public void setOrganizer(String organizer) { this.organizer = organizer; }
 
 //    public Location getLocation() { return location; }
@@ -180,25 +175,30 @@ public class Facility {
     /**
      * Associates an event with a facility, creating the facility document if it doesn't exist.
      *
-     * @param selectedfacilityID the facility ID to associate with
      * @param eventID            the event ID to associate
      */
-    public void associateEvent(String selectedfacilityID, String eventID) {
 
+    public void associateEvent(String eventID, boolean genEvent) {
         // Check if the facility document exists
-        db.collection("Facilities").document(facilityID)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && task.getResult() != null && task.getResult().exists()) {
-                        // Document exists, proceed with the update
-                        updateEventInFacility(eventID);
-                    } else {
-                        // Document doesn't exist, create it with the event
-                        System.out.println("Facility document not found. Creating document with event.");
-                        createFacilityWithEvent(eventID);
-                    }
-                })
-                .addOnFailureListener(e -> System.out.println("Error checking facility existence: " + e.getMessage()));
+        if(genEvent){
+            allEvents.add(eventID);
+        }else {
+
+
+            db.collection("Facilities").document(facilityID)
+                    .get()
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful() && task.getResult() != null && task.getResult().exists()) {
+                            // Document exists, proceed with the update
+                            updateEventInFacility(eventID);
+                        } else {
+                            // Document doesn't exist, create it with the event
+                            System.out.println("Facility document not found. Creating document with event.");
+                            createFacilityWithEvent(eventID);
+                        }
+                    })
+                    .addOnFailureListener(e -> System.out.println("Error checking facility existence: " + e.getMessage()));
+        }
     }
 
     // Organizer method to associate an event with a facility
@@ -209,8 +209,7 @@ public class Facility {
      * @param eventName the event name to check
      * @return true if the event is already associated, otherwise false
      */
-    public boolean associateEvent(String eventName) {
-
+    public boolean hasEvent(String eventName) {
         // Check if the event is already in the allEvents list
         if (allEvents.contains(eventName)) {
             System.out.println("Event already associated with this facility.");
@@ -242,7 +241,8 @@ public class Facility {
     }
 
     /**
-     * Creates a new facility with an initial event if it does not already exist.
+     * This function saves a given facility with an event name to link the event to the facility
+     * Designed for automating the generation of data
      *
      * @param eventName the event name to associate initially
      */
@@ -286,7 +286,8 @@ public class Facility {
     }
 
     /**
-     * Generates a new unique facility ID.
+     * The function sees how many items are inside of the Facilities collection in firebase and
+     * then adds one to the number to a string "Facility" such that each facility has a unique ID
      *
      * @return the new facility ID
      */

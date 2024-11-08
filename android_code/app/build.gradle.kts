@@ -51,6 +51,7 @@ dependencies {
     implementation(libs.firebase.database)
     implementation(libs.firebase.firestore)
     testImplementation(libs.junit)
+    testImplementation("org.mockito:mockito-core:2.28.2")
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     androidTestImplementation("org.mockito:mockito-core:2.28.2")

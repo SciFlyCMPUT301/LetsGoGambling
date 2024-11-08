@@ -1,96 +1,157 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:layout_marginTop="65dp"
+    android:layout_marginBottom="50dp">>
 
-    <!-- Edit Button for toggling edit mode -->
-    <Button
-        android:id="@+id/button_edit_profile"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Edit"
-        android:layout_gravity="end"
-        android:padding="16dp" />
-
-    <TextView
-        android:id="@+id/profile_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Profile Page"
-        android:textSize="24sp"
-        android:layout_gravity="center_horizontal"
-        android:paddingBottom="16dp" />
-
-    <EditText
-        android:id="@+id/edit_name"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Name"
-        android:inputType="textPersonName"
-        android:enabled="false"
-        android:padding="20dp"/>
+        android:orientation="vertical">
 
-    <EditText
-        android:id="@+id/edit_email"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Email"
-        android:inputType="textEmailAddress"
-        android:enabled="false"
-        android:padding="20dp"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="16dp">
 
-    <EditText
-        android:id="@+id/edit_phone"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Phone (Optional)"
-        android:inputType="phone"
-        android:enabled="false"
-        android:padding="20dp"/>
+            <Button
+                android:id="@+id/button_edit_profile"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Edit"
+                android:padding="16dp"
+                android:layout_gravity="center"/>
+        </LinearLayout>
 
-    <!-- Notification preference switch -->
-    <Switch
-        android:id="@+id/notifications_switch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Enable Notifications"
-        android:checked="true"
-        android:enabled="false"
-        android:padding="20dp"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="16dp">
 
-    <Switch
-        android:id="@+id/testing_switch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Enable Testing"
-        android:checked="true"
-        android:enabled="false"
-        android:padding="20dp"/>
+            <Button
+                android:id="@+id/button_upload_photo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Upload Photo"
+                android:padding="16dp"
+                android:layout_gravity="left"/>
 
-    <EditText
-        android:id="@+id/device_id_entry"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="DeviceID"
-        android:text="deviceID1"
-        android:padding="20dp"/>
+            <Button
+                android:id="@+id/button_remove_photo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Remove Photo"
+                android:padding="16dp"
+                android:layout_gravity="right"/>
+        </LinearLayout>
 
-    <Button
-        android:id="@+id/button_save_profile"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Save"
-        android:enabled="false" />
+        <!-- Section for user profile image -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="16dp">
 
-    <Button
-        android:id="@+id/button_back_home"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Back to Home" />
+            <ImageView
+                android:id="@+id/user_image"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_gravity="center"
+                android:contentDescription="Profile Image" />
+        </LinearLayout>
 
-</LinearLayout>
+        <!-- Section for user profile details -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
 
-    <!-- new user:use hint for back to home button and  the edit button on top instead of android text because
-     they don't have an option of not saving info or retrieving past info as they are a new user-->
+            <TextView
+                android:id="@+id/profile_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Profile Page"
+                android:textSize="24sp"
+                android:layout_gravity="center_horizontal"
+                android:paddingBottom="16dp" />
 
+            <EditText
+                android:id="@+id/edit_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Name"
+                android:inputType="textPersonName"
+                android:enabled="false"
+                android:padding="20dp"/>
+
+            <EditText
+                android:id="@+id/edit_email"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Email"
+                android:inputType="textEmailAddress"
+                android:enabled="false"
+                android:padding="20dp"/>
+
+            <EditText
+                android:id="@+id/edit_phone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Phone (Optional)"
+                android:inputType="phone"
+                android:enabled="false"
+                android:padding="20dp"/>
+
+            <!-- Notification preference switch -->
+            <Switch
+                android:id="@+id/notifications_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Enable Notifications"
+                android:checked="true"
+                android:enabled="false"
+                android:padding="20dp"/>
+
+            <Switch
+                android:id="@+id/testing_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Enable Testing"
+                android:checked="true"
+                android:enabled="false"
+                android:padding="20dp"/>
+
+            <EditText
+                android:id="@+id/device_id_entry"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="DeviceID"
+                android:text="deviceID1"
+                android:padding="20dp"/>
+
+            <Button
+                android:id="@+id/button_save_profile"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Save"
+                android:enabled="false" />
+
+            <Button
+                android:id="@+id/button_back_home"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Back to Home"
+                android:layout_gravity="center" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+</ScrollView>

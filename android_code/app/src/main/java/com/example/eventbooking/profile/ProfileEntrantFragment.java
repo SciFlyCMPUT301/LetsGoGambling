@@ -2,6 +2,7 @@ package com.example.eventbooking.profile;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -34,7 +35,11 @@ import com.example.eventbooking.User;
 import com.example.eventbooking.UserManager;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
+
+import java.io.ByteArrayOutputStream;
+import java.util.UUID;
 
 /**
  * ProfileEntrantFragment is a Fragment that handles the display and editing of an entrant's profile.
@@ -354,15 +359,7 @@ public class ProfileEntrantFragment extends Fragment {
 
         UserManager.getInstance().setCurrentUser(currentUser);
 
-        currentUser.saveUserDataToFirestore()
-                .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(getContext(), "Profile saved successfully.", Toast.LENGTH_SHORT).show();
-                    setEditMode(false);
-                    // Handle navigation or other logic after saving
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "Failed to save profile.", Toast.LENGTH_SHORT).show();
-                });
+
 
         String deviceID = getDeviceID();
 // profileManager.createOrUpdateProfile(deviceID, currentProfile);
@@ -371,35 +368,86 @@ public class ProfileEntrantFragment extends Fragment {
         setEditMode(false);
         // Handle navigation after saving profile
         if (isNewUser) {
-            editButton.setVisibility(View.VISIBLE);
-            backButton.setVisibility(View.VISIBLE);
-//            uploadButton.setVisibility(View.VISIBLE);
-            NavigationView sidebar = getActivity().findViewById(R.id.nav_view);
-            sidebar.setVisibility(View.VISIBLE);
-            Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
-            toolbar.setVisibility(View.VISIBLE);
-            View nav = getActivity().findViewById(R.id.bottom_navigation);
-            nav.setVisibility(View.VISIBLE);
+            Bitmap bitmap = currentUser.generateProfileBitmap(currentUser.getUsername());
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+            byte[] imageBytes = baos.toByteArray();
 
-            if(eventIDFromQR == null){
-                Log.d("ProfileEntrant", "Nothing found");
-                getParentFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, HomeFragment.newInstance(getDeviceID()))
-                        .commit();
-            } else {
-                Log.d("ProfileEntrant", "Found QR link: " + eventIDFromQR);
-                getParentFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, EventViewFragment.newInstance(eventIDFromQR, deviceId))
+            String imageFileName = "defaultProfilePictures/" + UUID.randomUUID() + ".png";
+            StorageReference imageRef = currentUser.storageReference.child(imageFileName);
+
+            imageRef.putBytes(imageBytes).addOnSuccessListener(taskSnapshot ->
+                    imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                        String downloadUrl = uri.toString();
+                        currentUser.setProfilePictureUrl(downloadUrl);
+                        currentUser.setdefaultProfilePictureUrl(downloadUrl);
+
+                        // Save user data to Firestore
+                        currentUser.saveUserDataToFirestore().addOnSuccessListener(aVoid -> {
+                            Toast.makeText(getContext(), "Profile saved successfully.", Toast.LENGTH_SHORT).show();
+                            setEditMode(false);
+
+                            // Update profile image in UI
+                            if (downloadUrl != null && !downloadUrl.isEmpty()) {
+                                Picasso.get().load(downloadUrl)
+                                        .placeholder(R.drawable.placeholder_image_foreground)
+                                        .error(R.drawable.error_image_foreground)
+                                        .into(userImage);
+                            }
+
+                            // Update UI elements visibility
+                            editButton.setVisibility(View.VISIBLE);
+                            backButton.setVisibility(View.VISIBLE);
+                            NavigationView sidebar = getActivity().findViewById(R.id.nav_view);
+                            sidebar.setVisibility(View.VISIBLE);
+                            Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
+                            toolbar.setVisibility(View.VISIBLE);
+                            View nav = getActivity().findViewById(R.id.bottom_navigation);
+                            nav.setVisibility(View.VISIBLE);
+
+                            if(eventIDFromQR == null){
+                                Log.d("ProfileEntrant", "Nothing found");
+                                getParentFragmentManager().beginTransaction()
+                                        .replace(R.id.fragment_container, HomeFragment.newInstance(getDeviceID()))
+                                        .commit();
+                            } else {
+                                Log.d("ProfileEntrant", "Found QR link: " + eventIDFromQR);
+                                getParentFragmentManager().beginTransaction()
+                                        .replace(R.id.fragment_container, EventViewFragment.newInstance(eventIDFromQR, deviceId))
 //                      .replace(R.id.fragment_container, EventViewFragment.newInstance(eventIdFromQR, deviceId))
-                        .addToBackStack(null)
-                        .commit();
+                                        .addToBackStack(null)
+                                        .commit();
 //                getParentFragmentManager().beginTransaction()
 //                        .replace(R.id.fragment_container, ScannedFragment.newInstance(eventIDFromQR))
 //                        .commit();
-            }
+                            }
+                        }).addOnFailureListener(e -> {
+                            Toast.makeText(getContext(), "Failed to save profile.", Toast.LENGTH_SHORT).show();
+                            Log.e("ProfileEntrantFragment", "Error saving profile", e);
+                        });
+                    }).addOnFailureListener(e -> {
+                        Log.e("Firebase", "Failed to retrieve download URL", e);
+                        Toast.makeText(getContext(), "Failed to upload profile picture.", Toast.LENGTH_SHORT).show();
+                    })
+            ).addOnFailureListener(e -> {
+                Log.e("Firebase", "Image upload failed", e);
+                Toast.makeText(getContext(), "Failed to upload profile picture.", Toast.LENGTH_SHORT).show();
+            });
 
-
+        } else{
+            currentUser.saveUserDataToFirestore()
+                    .addOnSuccessListener(aVoid -> {
+                        Toast.makeText(getContext(), "Profile saved successfully.", Toast.LENGTH_SHORT).show();
+                        setEditMode(false);
+                        // Handle navigation or other logic after saving
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(getContext(), "Failed to save profile.", Toast.LENGTH_SHORT).show();
+                    });
         }
+
+
+
     }
 
 

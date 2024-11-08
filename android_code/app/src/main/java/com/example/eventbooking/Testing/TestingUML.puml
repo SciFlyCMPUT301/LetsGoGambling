@@ -1,0 +1,158 @@
+@startuml
+class TestFragment {
+    -- Attributes --
+    - TAG : String
+    - PICK_IMAGE_REQUEST : int
+    - btnGenerateData : Button
+    - btnLoadData : Button
+    - btnSelectImage : Button
+    - btnUploadImage : Button
+    - btnDelete : Button
+    - imageView : ImageView
+    - txtStatus : TextView
+    - imageUri : Uri
+    - db : FirebaseFirestore
+    - storage : FirebaseStorage
+    - sampleTable : SampleTable
+    - francisTest : boolean
+
+    -- Methods --
+    + TestFragment()
+    + onCreate(savedInstanceState: Bundle) : void
+    + onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle) : View
+    - generateAndSaveData() : void
+    - loadDataFromFirebase() : void
+    - openFileChooser() : void
+    + onActivityResult(requestCode: int, resultCode: int, data: Intent) : void
+    - uploadImage() : void
+    - saveImageLinkToFirestore(imageUrl: String, usage: String, description: String) : void
+    - deleteAllData() : void
+
+'    -- Inner Class --
+'    class ImageData {
+'        -- Attributes --
+'        - imageUrl : String
+'        - usage : String
+'        - description : String
+'
+'        -- Methods --
+'        + ImageData()
+'        + ImageData(imageUrl: String, usage: String, description: String)
+'        + getImageUrl() : String
+'        + getUsage() : String
+'        + getDescription() : String
+'    }
+}
+
+class SampleTable {
+    -- Attributes --
+    + UserList : List<User>
+    + FacilityList : List<Facility>
+    + EventList : List<Event>
+    - userUpdateCount : int
+    - facilityUpdateCount : int
+
+    -- Methods --
+    + makeUserList() : void
+    + makeFacilityList() : void
+    + makeEventList() : void
+    + saveDataToFirebase(onSuccess: Runnable, onFailure: OnFailureListener) : void
+    - checkCompletion(pendingWrites: AtomicInteger, failures: AtomicInteger, onSuccess: Runnable, onFailure: OnFailureListener) : void
+    + getUserList() : List<User>
+    + getFacilityList() : List<Facility>
+    + getEventList() : List<Event>
+    + updateUser(updatedUser: User) : void
+    + updateFacility(updatedFacility: Facility) : void
+    + updateEvent(updatedEvent: Event) : void
+    + getUserByUsername(username: String) : User
+    + getFacilityByName(name: String) : Facility
+    + getEventById(eventId: String) : Event
+}
+
+class FirebaseTestingActivity {
+    -- Attributes --
+    - TAG : String
+    - PICK_IMAGE_REQUEST : int
+    - btnGenerateData : Button
+    - btnLoadData : Button
+    - btnSelectImage : Button
+    - btnUploadImage : Button
+    - imageView : ImageView
+    - txtStatus : TextView
+    - imageUri : Uri
+    - db : FirebaseFirestore
+    - storage : FirebaseStorage
+    - sampleTable : SampleTable
+
+    -- Methods --
+    + onCreate(savedInstanceState: Bundle) : void
+    - generateAndSaveData() : void
+    - loadDataFromFirebase() : void
+    - openFileChooser() : void
+    + onActivityResult(requestCode: int, resultCode: int, data: Intent) : void
+    - uploadImage() : void
+    - saveImageLinkToFirestore(imageUrl: String, usage: String, description: String) : void
+
+'    -- Inner Class --
+'    class ImageData {
+'        -- Attributes --
+'        - imageUrl : String
+'        - usage : String
+'        - description : String
+'
+'        -- Methods --
+'        + ImageData()
+'        + ImageData(imageUrl: String, usage: String, description: String)
+'        + getImageUrl() : String
+'        + getUsage() : String
+'        + getDescription() : String
+'    }
+}
+
+
+class ImageData {
+    -- Attributes --
+    - imageUrl : String
+    - usage : String
+    - description : String
+
+    -- Methods --
+    + ImageData()
+    + ImageData(imageUrl: String, usage: String, description: String)
+    + getImageUrl() : String
+    + getUsage() : String
+    + getDescription() : String
+}
+
+class FirebaseTesting {
+    -- Attributes --
+    - TAG : String
+    - db : FirebaseFirestore
+    - storage : FirebaseStorage
+
+    -- Methods --
+    + FirebaseTesting()
+    + uploadImage(localImagePath: String, usageLocation: String, description: String) : void
+    + loadImages() : void
+    + testFirebaseOperations() : void
+    + loadUsersFromFirebase() : void
+    + loadFacilitiesFromFirebase() : void
+    + loadEventsFromFirebase() : void
+}
+
+' Relationships with correct multiplicity and UML notations
+FirebaseTestingActivity *-- "1" SampleTable : contains
+SampleTable o-- "*" User : contains
+SampleTable o-- "*" Facility : contains
+SampleTable o-- "*" Event : contains
+FirebaseTestingActivity --> "1" FirebaseFirestore : uses
+FirebaseTestingActivity --> "1" FirebaseStorage : uses
+TestFragment --> "1" FirebaseFirestore : uses
+TestFragment --> "1" FirebaseStorage : uses
+TestFragment *-- "1" SampleTable : contains
+FirebaseTesting --> "1" FirebaseFirestore : uses
+FirebaseTesting --> "1" FirebaseStorage : uses
+FirebaseTesting --> "1" SampleTable : uses
+FirebaseTestingActivity +-- ImageData
+TestFragment +-- ImageData
+@enduml

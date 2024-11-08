@@ -11,6 +11,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +29,7 @@ public class UserTest {
 
     @Before
     public void setUp() {
-        MockitoAnnotations.openMocks(this);
+        MockitoAnnotations.initMocks(this);
         user = new User(mockStorageReference, mockDb); // Inject mocks
     }
 

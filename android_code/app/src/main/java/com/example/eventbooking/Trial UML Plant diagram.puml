@@ -1,0 +1,230 @@
+@startuml
+
+class Facility {
+    -- Attributes --
+    - facilityID : String
+    - name : String
+    - address : String
+    - organizer : String
+    - eventName : String
+    - allEvents : List<String>
+    - db : FirebaseFirestore
+    - facilitiesRef : CollectionReference
+    - testing : boolean
+
+    -- Methods --
+    + Facility()
+    + Facility(name: String, address: String, description: String, organizer: String)
+    + getName() : String
+    + setName(name: String) : void
+    + getAddress() : String
+    + setAddress(address: String) : void
+    + getOrganizer() : String
+    + setOrganizer(organizer: String) : void
+    + getFacilityID() : String
+    + setFacilityID(facilityID: String) : void
+    + getEvent() : String
+    + setEvent(eventName: String) : void
+    + setAllEvents(allEvents: List<String>) : void
+    + getAllEvents() : List<String>
+    + addAllEventsItem(eventID: String) : void
+    + removeAllEventsItem(eventID: String) : void
+    + saveFacilityProfile() : Task<Void>
+    + deleteFacility() : void
+    + associateEvent(eventID: String, genEvent: boolean) : void
+    + hasEvent(eventName: String) : boolean
+    + updateEventInFacility(eventName: String) : void
+    + createFacilityWithEvent(eventName: String) : void
+    + getNewFacilityID() : String
+}
+
+
+
+class Location {
+    -- Attributes --
+    - address : String
+    - latitude : int
+    - longitude : int
+}
+
+class MainActivity {
+    -- Attributes --
+    - REQUEST_WRITE_STORAGE : int
+    - qrGenerator : QRcodeGenerator
+    - qrCodeImageView : ImageView
+    - navController : NavController
+    - bottomNavigationView : BottomNavigationView
+    - drawerLayout : DrawerLayout
+    - navigationView : NavigationView
+    - drawerToggle : ActionBarDrawerToggle
+    - TAG : String
+    - eventIdFromQR : String
+    - isLoggedIn : boolean
+
+    -- Methods --
+    + onCreate(savedInstanceState: Bundle) : void
+    + onNavigationItemSelected(item: MenuItem) : boolean
+    + onBackPressed() : void
+    + onNewIntent(intent: Intent) : void
+    - handleIntent(intent: Intent) : void
+    - extractEventIdFromUrl(url: String) : String
+    - showLoginFragment(eventIdFromQR: String) : void
+    + onLoginSuccess() : void
+    - openEventViewFragment(eventID: String) : void
+}
+
+
+class DataGenerator {
+    -- Attributes --
+    - userList : List<User>
+    - facilityList : List<Facility>
+    - eventList : List<Event>
+    - db : FirebaseFirestore
+
+    -- Methods --
+    + DataGenerator()
+    + generateAndUploadData() : void
+    - generateUsers() : void
+    - generateFacilities() : void
+    - generateEvents() : void
+    - uploadData() : void
+}
+
+
+
+class Date {
+    -- Attributes --
+    - day : int
+    - month : int
+    - year : int
+}
+
+class User {
+    -- Attributes --
+    - deviceId : String
+    - username : String
+    - email : String
+    - phoneNumber : String
+    - profilePictureUrl : String
+    - defaultprofilepictureurl : String
+    - location : String
+    - address : String
+    - adminLevel : boolean
+    - facilityAssociated : boolean
+    - notificationAsk : boolean
+    - geolocationAsk : boolean
+    - roles : List<String>
+
+    -- Methods --
+    + getDeviceID() : String
+    + setDeviceID(deviceId: String) : void
+    + getUsername() : String
+    + setUsername(username: String) : void
+    + getEmail() : String
+    + setEmail(email: String) : void
+    + getPhoneNumber() : String
+    + setPhoneNumber(phoneNumber: String) : void
+    + getProfilePictureUrl() : String
+    + setProfilePictureUrl(profilePictureUrl: String) : void
+    + getdefaultProfilePictureUrl() : String
+    + setdefaultProfilePictureUrl(defaultprofilepictureurl: String) : void
+    + getRoles() : List<String>
+    + setRoles(roles: List<String>) : void
+    + isFacilityAssociated() : boolean
+    + setFacilityAssociated(facilityAssociated: boolean) : void
+    + getAddress() : String
+    + setAddress(address: String) : void
+    + getLocation() : String
+    + setLocation(location: String) : void
+    + isGeolocationAsk() : boolean
+    + setGeolocationAsk(geolocationAsk: boolean) : void
+    + isNotificationAsk() : boolean
+    + setNotificationAsk(notificationAsk: boolean) : void
+    + hasRole(role: String) : boolean
+    + addRole(role: String) : void
+    + removeRole(role: String) : void
+    + generateProfileBitmap(name: String) : Bitmap
+    + defaultProfilePictureUrl(name: String) : Task<Void>
+    + uploadDefaultImageToFirebaseStorage(imageBytes: byte[]) : Task<Void>
+    + saveUserDataToFirestore() : Task<Void>
+    + saveGeneratedImageUrl(imageURL: String) : Task<Void>
+    + updateProfilePicture(newPictureUri: Uri) : void
+    + deleteSelectedImageFromFirebase(imageUrl: String) : void
+    + isDefaultURLMain() : boolean
+    + setMainToDefault() : void
+
+'    -- Inner Interfaces --
+'    interface OnImageUploadComplete {
+'        + onImageUploadComplete(imageURL: String) : void
+'        + onImageUploadFailed(e: Exception) : void
+'    }
+'
+'    interface OnImageRemovalComplete {
+'        + onImageRemovalSuccess() : void
+'        + onImageRemovalFailed(e: Exception) : void
+'    }
+'
+'    interface OnProfilePictureGeneratedListener {
+'        + onProfilePictureGenerated() : void
+'        + onProfilePictureGenerationFailed(e: Exception) : void
+'    }
+'
+'    interface OnUserIDGenerated {
+'        + onUserIDGenerated(userID: String) : void
+'    }
+}
+
+class UserManager {
+    -- Attributes --
+    - instance : UserManager
+    - currentUser : User
+    - userFacility : Facility
+    - organizerEvents : List<Event>
+    - userEvents : List<Event>
+    - eventDatabase : List<Event>
+
+    -- Methods --
+    + getInstance() : UserManager
+    + setCurrentUser(user: User) : void
+    + findUserEvents() : void
+    + findUserFacility() : void
+    + findOrganizerEvents() : void
+    + userHasFacility() : boolean
+    + getCurrentUser() : User
+    + getUserFacility() : Facility
+    + getOrganizerEvents() : List<Event>
+    + getUserEvents() : List<Event>
+    + getUserId() : String
+}
+
+UserManager *-- "1" User : manages
+UserManager --> "1" FirestoreAccess : uses
+UserManager *-- "1" Facility : manages
+UserManager *-- "1..*" Event : manages
+DataGenerator *-- "1..*" User : generates
+DataGenerator *-- "1..*" Facility : generates
+DataGenerator *-- "1..*" Event : generates
+DataGenerator --> "1" FirebaseFirestore : uses
+Facility --> FirebaseFirestore : uses
+Facility --> CollectionReference : manages
+Facility *-- "1..*" Event : associates
+MainActivity --> "1" HomeFragment : manages
+MainActivity --> "1" ProfileFragment : manages
+MainActivity --> "1" EventFragment : manages
+MainActivity --> "1" TestFragment : manages
+MainActivity --> "1" EventCreateFragment : manages
+MainActivity --> "1" LoginFragment : manages
+MainActivity --> "1" NotificationFragment : manages
+MainActivity --> "1" ViewWaitingListFragment : manages
+MainActivity --> "1" ViewSignedListFragment : manages
+MainActivity --> "1" ViewCanceledListFragment : manages
+MainActivity --> "1" ViewAcceptedListFragment : manages
+MainActivity --> "1" OrganizerMenuFragment : manages
+MainActivity --> "1" ScannedFragment : manages
+MainActivity --> "1" CameraFragment : manages
+MainActivity --> "1" QRCodeEventGenerate : manages
+MainActivity --> "1" AdminFragment : manages
+MainActivity --> "1" ProfileEntrantFragment : manages
+MainActivity --> QRcodeGenerator : uses
+
+@enduml

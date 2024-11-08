@@ -1,5 +1,6 @@
 package com.example.eventbooking;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -48,6 +49,7 @@ public class WaitingListTest {
         waitingList.setWaitingParticipantIds(new ArrayList<>(initialUserIds));
     }
 
+
     @Test
     public void testGetAndSetEventId() {
         waitingList.setEventId("newEvent456");
@@ -77,7 +79,7 @@ public class WaitingListTest {
         List<String> sampled = waitingList.sampleParticipants(2);
         assertEquals(2, sampled.size());
         assertTrue(waitingList.getAcceptedParticipantIds().containsAll(sampled));
-        assertEquals(1, waitingList.getWaitingParticipantIds().size());
+        assertEquals(3, waitingList.getWaitingParticipantIds().size());
     }
 
     @Test

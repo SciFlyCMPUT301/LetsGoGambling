@@ -140,7 +140,7 @@ public class WaitingList {
         //checks if any list contains the user id
         //we allow someone declined the invitation to rejoin the waiting list
         //thus, if condition exclude the canceledParticipantIds
-        if (waitingParticipantIds.contains(participantId) ||
+        if (!waitingParticipantIds.contains(participantId) ||
                 acceptedParticipantIds.contains(participantId) ||
                 signedUpParticipantIds.contains(participantId)
         ) {

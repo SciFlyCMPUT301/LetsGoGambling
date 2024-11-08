@@ -1,5 +1,7 @@
 package com.example.eventbooking;
 
+public class UserTest {
+
 import android.net.Uri;
 import org.junit.Test;
 import static org.junit.Assert.*;

@@ -5,7 +5,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
-import android.util.Base64;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -67,6 +66,12 @@ public class User {
         this.roles = new ArrayList<>();
         this.storageReference = FirebaseStorage.getInstance().getReference();
         this.db = FirebaseFirestore.getInstance();
+    }
+
+    // Constructor for testing that allows injecting mock dependencies
+    public User(StorageReference storageReference, FirebaseFirestore db) {
+        this.storageReference = storageReference;
+        this.db = db;
     }
 
     /**

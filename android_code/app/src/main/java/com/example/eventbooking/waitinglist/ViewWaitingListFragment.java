@@ -34,7 +34,7 @@ public class ViewWaitingListFragment extends Fragment {
     public static ViewWaitingListFragment newInstance(String eventId) {
         ViewWaitingListFragment fragment = new ViewWaitingListFragment();
         Bundle args = new Bundle();
-        args.putString("event_id", eventId);
+        args.putString("eventId", eventId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -50,7 +50,7 @@ public class ViewWaitingListFragment extends Fragment {
 
         // Retrieve the eventId from arguments
         if (getArguments() != null) {
-            eventId = getArguments().getString("event_id");
+            eventId = getArguments().getString("eventId");
         }
         Log.d("Waiting List View", "EventID: " + eventId);
         // Initialize WaitingList instance with only the event ID

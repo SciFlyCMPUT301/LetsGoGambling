@@ -30,7 +30,7 @@ public class FacilityTest {
     @Before
     public void setUp() {
         // Mock FirebaseFirestore and CollectionReference to prevent real Firebase initialization
-        MockitoAnnotations.openMocks(this);
+        MockitoAnnotations.initMocks(this);
         facility = new Facility(mockDb, mockFacilitiesRef);
     }
 

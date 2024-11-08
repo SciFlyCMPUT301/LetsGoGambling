@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 
 import com.example.eventbooking.R;
 import com.example.eventbooking.User;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,6 +59,7 @@ public class UserViewAdapter extends ArrayAdapter<User> {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
         View view = inflater.inflate(R.layout.user_adapter_layout, null);
 
+        ImageView userImage = (ImageView) view.findViewById(R.id.user_image);
         TextView deviceID = (TextView) view.findViewById(R.id.device_id);
         TextView username = (TextView) view.findViewById(R.id.username);
         TextView dateJoined = (TextView) view.findViewById(R.id.date_joined);
@@ -66,8 +68,14 @@ public class UserViewAdapter extends ArrayAdapter<User> {
         dateJoined.setText("Today");
 
 //        //get the image associated with this property
-//        int imageID = context.getResources().getIdentifier(property.getImage(), "drawable", context.getPackageName());
-//        image.setImageResource(imageID);
+        String profilePictureUrl = user.getProfilePictureUrl();
+        if (profilePictureUrl != null && !profilePictureUrl.isEmpty()) {
+            Picasso.get()
+                    .load(profilePictureUrl) // URL of the image
+                    .placeholder(R.drawable.placeholder_image_foreground) // Placeholder image while loading
+                    .error(R.drawable.placeholder_image_foreground) // Error image if loading fails
+                    .into(userImage); // ImageView to load the image into
+        }
 
         return view;
     }

@@ -37,6 +37,7 @@ import com.example.eventbooking.QRCode.QRcodeGenerator;
 import com.example.eventbooking.QRCode.ScannedFragment;
 import com.example.eventbooking.Testing.TestFragment;
 import com.example.eventbooking.notification.NotificationFragment;
+import com.example.eventbooking.profile.ProfileEntrantFragment;
 import com.example.eventbooking.profile.ProfileFragment;
 import com.example.eventbooking.waitinglist.OrganizerMenuFragment;
 import com.example.eventbooking.waitinglist.ViewAcceptedListFragment;
@@ -92,6 +93,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private CameraFragment cameraFragment = new CameraFragment();
     private QRCodeEventGenerate eventCodeGenerate = new QRCodeEventGenerate();
     private AdminFragment adminFragment = new AdminFragment();
+    private ProfileEntrantFragment profileEntrantFragment = new ProfileEntrantFragment();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -180,7 +182,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             } else if (itemId == R.id.nav_profile) {
                 getSupportFragmentManager()
                         .beginTransaction()
-                        .replace(R.id.fragment_container, profileFragment)
+                        .replace(R.id.fragment_container, profileEntrantFragment)
                         .commit();
                 return true;
             } else if (itemId == R.id.nav_events) {
@@ -245,7 +247,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         .commit();
             } else if (itemId == R.id.nav_profile) {
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, profileFragment)
+                        .replace(R.id.fragment_container, profileEntrantFragment)
                         .commit();
             } else if (itemId == R.id.nav_notifications) {
                 getSupportFragmentManager().beginTransaction()

@@ -81,7 +81,7 @@ public class DataGenerator {
             if (!facilityList.isEmpty()) {
                 Facility facility = facilityList.get(random.nextInt(facilityList.size()));
                 event.setLocation(facility.getAddress());
-                facility.associateEvent(event.getEventId());
+                facility.associateEvent(event.getEventId(), true);
             }
 
             // Assign organizer

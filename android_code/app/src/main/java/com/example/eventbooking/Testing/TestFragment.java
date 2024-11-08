@@ -26,6 +26,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.WriteBatch;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -44,7 +45,7 @@ public class TestFragment extends Fragment {
     private static final String TAG = "FirebaseTestingFragment";
     private static final int PICK_IMAGE_REQUEST = 1;
 
-    private Button btnGenerateData, btnLoadData, btnSelectImage, btnUploadImage;
+    private Button btnGenerateData, btnLoadData, btnSelectImage, btnUploadImage, btnDelete;
     private ImageView imageView;
     private TextView txtStatus;
 
@@ -54,6 +55,8 @@ public class TestFragment extends Fragment {
     private FirebaseStorage storage;
 
     private SampleTable sampleTable;
+
+    private boolean francisTest = true;
 
     public TestFragment() {
         // Required empty public constructor
@@ -82,15 +85,20 @@ public class TestFragment extends Fragment {
         btnLoadData = view.findViewById(R.id.btnLoadData);
         btnSelectImage = view.findViewById(R.id.btnSelectImage);
         btnUploadImage = view.findViewById(R.id.btnUploadImage);
+        btnDelete = view.findViewById(R.id.btnDeleteAllGenData);
         imageView = view.findViewById(R.id.imageView);
         txtStatus = view.findViewById(R.id.txtStatus);
+
+        if(francisTest == false){
+            btnDelete.setVisibility(View.GONE);
+        }
 
         // Set click listeners
         btnGenerateData.setOnClickListener(v -> generateAndSaveData());
         btnLoadData.setOnClickListener(v -> loadDataFromFirebase());
         btnSelectImage.setOnClickListener(v -> openFileChooser());
         btnUploadImage.setOnClickListener(v -> uploadImage());
-
+        btnDelete.setOnClickListener(v-> deleteAllData());
         return view;
     }
 
@@ -253,5 +261,57 @@ public class TestFragment extends Fragment {
         public String getDescription() {
             return description;
         }
+    }
+
+
+
+    private void deleteAllData() {
+        ProgressDialog progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setTitle("Deleting All Data...");
+        progressDialog.setMessage("Please wait...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
+        // Create a batch to perform deletions
+        WriteBatch batch = db.batch();
+
+        // Delete all users
+        db.collection("Users").get().addOnSuccessListener(queryDocumentSnapshots -> {
+            for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
+                batch.delete(document.getReference());
+            }
+
+            // Delete all facilities
+            db.collection("Facilities").get().addOnSuccessListener(queryDocumentSnapshots1 -> {
+                for (DocumentSnapshot document : queryDocumentSnapshots1.getDocuments()) {
+                    batch.delete(document.getReference());
+                }
+
+                // Delete all events
+                db.collection("Events").get().addOnSuccessListener(queryDocumentSnapshots2 -> {
+                    for (DocumentSnapshot document : queryDocumentSnapshots2.getDocuments()) {
+                        batch.delete(document.getReference());
+                    }
+
+                    // Commit the batch after all deletions
+                    batch.commit().addOnSuccessListener(aVoid -> {
+                        progressDialog.dismiss();
+                        Toast.makeText(getActivity(), "All data deleted successfully.", Toast.LENGTH_SHORT).show();
+                    }).addOnFailureListener(e -> {
+                        progressDialog.dismiss();
+                        Toast.makeText(getActivity(), "Failed to delete data: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    });
+                }).addOnFailureListener(e -> {
+                    progressDialog.dismiss();
+                    Toast.makeText(getActivity(), "Error deleting events: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+            }).addOnFailureListener(e -> {
+                progressDialog.dismiss();
+                Toast.makeText(getActivity(), "Error deleting facilities: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            });
+        }).addOnFailureListener(e -> {
+            progressDialog.dismiss();
+            Toast.makeText(getActivity(), "Error deleting users: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        });
     }
 }

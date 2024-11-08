@@ -1,0 +1,114 @@
+@startuml
+class ProfileFragment {
+    - receivedInteger : int
+    + newInstance() : ProfileFragment
+    + onCreate(savedInstanceState: Bundle) : void
+    + onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle) : View
+}
+
+class ProfileEntrantFragment {
+    - profileManager : EntrantProfileManager
+    - currentProfile : EntrantProfile
+    - currentUser : User
+    - isNewUser : boolean
+    - eventIDFromQR : String
+    - deviceId : String
+    - selectedImageUri : Uri
+    - profileTitle : TextView
+    - editName : EditText
+    - editEmail : EditText
+    - editPhone : EditText
+    - notificationsSwitch : Switch
+    - saveButton : Button
+    - backButton : Button
+    - editButton : Button
+    - uploadButton : Button
+    - userImage : ImageView
+    + newInstance(isNewUser: boolean, eventId: String, deviceId: String) : ProfileEntrantFragment
+    + onCreate(savedInstanceState: Bundle) : void
+    + onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle) : View
+    - loadUserProfile() : void
+    - onProfileLoaded(profile: EntrantProfile) : void
+    - saveUserProfile() : void
+    - toggleEditMode() : void
+    - setEditMode(enable: boolean) : void
+    - getDeviceID() : String
+    - uploadPhoto() : void
+    - removeImage() : void
+    - goToHome() : void
+}
+
+class EntrantProfileManager {
+    - db : FirebaseFirestore
+    + createOrUpdateProfile(deviceID: String, profile: EntrantProfile) : void
+    + getProfile(deviceID: String, callback: ProfileLoadCallback) : void
+
+
+}
+
+class EntrantProfile {
+    - name : String
+    - email : String
+    - phoneNumber : String
+    - notificationsEnabled : boolean
+    + EntrantProfile()
+    + EntrantProfile(name: String, email: String, phoneNumber: String)
+    + getName() : String
+    + setName(name: String) : void
+    + getEmail() : String
+    + setEmail(email: String) : void
+    + getPhoneNumber() : String
+    + setPhoneNumber(phoneNumber: String) : void
+    + isNotificationsEnabled() : boolean
+    + setNotificationsEnabled(enabled: boolean) : void
+    + toString() : String
+}
+
+class LoginFragment {
+    - deviceIdText : TextView
+    - welcomeText : TextView
+    - nav : BottomNavigationView
+    - isLoggedIn : boolean
+    - eventIdFromQR : String
+    + setEventId(eventId: String) : void
+    + onCreate(savedInstanceState: Bundle) : void
+    + onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle) : View
+}
+
+class HomeFragment {
+    - someInteger : int
+    - userId : String
+    + newInstance(userId: String) : HomeFragment
+    + onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle) : View
+}
+
+class HomeViewModel {
+    - mText : MutableLiveData<String>
+    + HomeViewModel()
+    + getText() : LiveData<String>
+}
+
+HomeFragment --> "1" EventCreateFragment : navigates
+HomeFragment --> "1" EventFragment : navigates
+HomeFragment --> "1" NotificationFragment : navigates
+HomeFragment --> "1" ProfileEntrantFragment : navigates
+HomeViewModel --> LiveData : provides
+
+ProfileEntrantFragment *-- "1" EntrantProfileManager : manages
+ProfileEntrantFragment *-- "1" EntrantProfile : contains
+ProfileEntrantFragment --> "1" User : uses
+ProfileEntrantFragment --> "1" HomeFragment : navigates
+ProfileEntrantFragment --> "1" EventViewFragment : navigates
+
+EntrantProfileManager --> EntrantProfile : manages
+EntrantProfileManager --> FirebaseFirestore : uses
+EntrantProfileManager o-- ProfileLoadCallback : callback
+
+ProfileFragment --> "1" HomeFragment : navigates
+ProfileFragment --> "1" NotificationFragment : navigates
+
+LoginFragment --> "1" ProfileEntrantFragment : navigates
+LoginFragment --> "1" HomeFragment : navigates
+LoginFragment --> "1" EventViewFragment : navigates
+LoginFragment --> "1" FirestoreAccess : uses
+@enduml

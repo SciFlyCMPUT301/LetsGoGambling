@@ -7,7 +7,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebView.FindListener;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -20,7 +19,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.eventbooking.Events.EventData.Event;
 import com.example.eventbooking.Facility;
-import com.example.eventbooking.R; // Ensure you have the correct R import
+import com.example.eventbooking.R;
 import com.example.eventbooking.User;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -30,16 +29,19 @@ import com.google.firebase.firestore.WriteBatch;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-// Picasso library
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
 import java.util.UUID;
 
 import android.app.Activity;
-import android.content.pm.PackageManager;
-import android.Manifest;
 
+/**
+ * The TestFragment class is a Fragment used for testing and managing data related to users,
+ * facilities, events, and image uploads within the app. This fragment provides functionality
+ * for generating and saving sample data to Firebase, loading data from Firebase, selecting and
+ * uploading images, and deleting all generated data from Firebase.
+ */
 public class TestFragment extends Fragment {
 
     private static final String TAG = "FirebaseTestingFragment";
@@ -58,6 +60,9 @@ public class TestFragment extends Fragment {
 
     private boolean francisTest = true;
 
+    /**
+     * Default constructor for the TestFragment.
+     */
     public TestFragment() {
         // Required empty public constructor
     }
@@ -74,9 +79,17 @@ public class TestFragment extends Fragment {
         sampleTable = new SampleTable();
     }
 
+    /**
+     * Inflates the layout for this fragment and initializes UI components and event listeners.
+     *
+     * @param inflater LayoutInflater to inflate the view
+     * @param container Parent view to contain the fragment's view
+     * @param savedInstanceState The saved state of the fragment (if any)
+     * @return The View for this fragment
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState){
+                             Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_test, container, false);
 
@@ -89,19 +102,23 @@ public class TestFragment extends Fragment {
         imageView = view.findViewById(R.id.imageView);
         txtStatus = view.findViewById(R.id.txtStatus);
 
-        if(francisTest == false){
+        if (francisTest == false) {
             btnDelete.setVisibility(View.GONE);
         }
 
-        // Set click listeners
+        // Set click listeners for buttons
         btnGenerateData.setOnClickListener(v -> generateAndSaveData());
         btnLoadData.setOnClickListener(v -> loadDataFromFirebase());
         btnSelectImage.setOnClickListener(v -> openFileChooser());
         btnUploadImage.setOnClickListener(v -> uploadImage());
-        btnDelete.setOnClickListener(v-> deleteAllData());
+        btnDelete.setOnClickListener(v -> deleteAllData());
+
         return view;
     }
 
+    /**
+     * Generates sample data (users, facilities, and events) and saves it to Firebase.
+     */
     private void generateAndSaveData() {
         txtStatus.setText("Generating and saving data...");
         sampleTable.makeUserList();
@@ -124,20 +141,17 @@ public class TestFragment extends Fragment {
         });
     }
 
-
-
-
-
-
-
+    /**
+     * Loads data (users, facilities, and events) from Firebase Firestore and displays status.
+     */
     private void loadDataFromFirebase() {
         txtStatus.setText("Loading data from Firebase...");
+
         // Load Users
         db.collection("Users").get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     List<User> users = queryDocumentSnapshots.toObjects(User.class);
                     Log.d(TAG, "Users loaded: " + users.size());
-                    // Display or process users as needed
                     txtStatus.setText("Users loaded: " + users.size());
                 })
                 .addOnFailureListener(e -> Log.e(TAG, "Error loading users", e));
@@ -147,7 +161,6 @@ public class TestFragment extends Fragment {
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     List<Facility> facilities = queryDocumentSnapshots.toObjects(Facility.class);
                     Log.d(TAG, "Facilities loaded: " + facilities.size());
-                    // Display or process facilities as needed
                     txtStatus.append("\nFacilities loaded: " + facilities.size());
                 })
                 .addOnFailureListener(e -> Log.e(TAG, "Error loading facilities", e));
@@ -157,12 +170,14 @@ public class TestFragment extends Fragment {
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     List<Event> events = queryDocumentSnapshots.toObjects(Event.class);
                     Log.d(TAG, "Events loaded: " + events.size());
-                    // Display or process events as needed
                     txtStatus.append("\nEvents loaded: " + events.size());
                 })
                 .addOnFailureListener(e -> Log.e(TAG, "Error loading events", e));
     }
 
+    /**
+     * Opens the file chooser to select an image from the device.
+     */
     private void openFileChooser() {
         Intent intent = new Intent();
         intent.setType("image/*");
@@ -171,43 +186,41 @@ public class TestFragment extends Fragment {
         startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
     }
 
-    // Handle result of image chooser
+    /**
+     * Handles the result of the image selection from the file chooser.
+     *
+     * @param requestCode The request code for the activity
+     * @param resultCode The result code of the activity
+     * @param data The intent containing the selected image URI
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        // Check if image was selected
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK
                 && data != null && data.getData() != null) {
-
             imageUri = data.getData();
-
-            // Display selected image in ImageView
             Picasso.get().load(imageUri).into(imageView);
         }
     }
 
+    /**
+     * Uploads the selected image to Firebase Storage and saves the image URL to Firestore.
+     */
     private void uploadImage() {
         if (imageUri != null) {
-            // Show progress dialog
             ProgressDialog progressDialog = new ProgressDialog(getActivity());
             progressDialog.setTitle("Uploading Image...");
             progressDialog.show();
 
-            // Get a reference to the storage
             StorageReference storageRef = storage.getReference();
-
-            // Create a unique name for the image
             String fileName = UUID.randomUUID().toString() + ".jpg";
             StorageReference imageRef = storageRef.child("images/" + fileName);
 
-            // Upload the image
             imageRef.putFile(imageUri)
                     .addOnSuccessListener(taskSnapshot -> {
-                        // Get the download URL
                         imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
                             String downloadUrl = uri.toString();
-                            // Save the link in Firestore
                             saveImageLinkToFirestore(downloadUrl, "Profile Picture", "User profile image");
                             progressDialog.dismiss();
                             Toast.makeText(getActivity(), "Image uploaded", Toast.LENGTH_SHORT).show();
@@ -222,49 +235,26 @@ public class TestFragment extends Fragment {
         }
     }
 
+    /**
+     * Saves the image URL to Firestore under the "Images" collection.
+     *
+     * @param imageUrl The URL of the uploaded image
+     * @param usage The intended usage of the image
+     * @param description A description of the image
+     */
     private void saveImageLinkToFirestore(String imageUrl, String usage, String description) {
-        // Create a map to store in Firestore
         String documentId = UUID.randomUUID().toString();
         ImageData imageData = new ImageData(imageUrl, usage, description);
 
-        // Save to Firestore in "Images" collection
         db.collection("Images").document(documentId)
                 .set(imageData)
                 .addOnSuccessListener(aVoid -> Log.d(TAG, "Image link saved to Firestore"))
                 .addOnFailureListener(e -> Log.e(TAG, "Error saving image link", e));
     }
 
-    // ImageData class to represent image documents in Firestore
-    public static class ImageData {
-        private String imageUrl;
-        private String usage;
-        private String description;
-
-        public ImageData() {
-            // Firestore requires a no-arg constructor
-        }
-
-        public ImageData(String imageUrl, String usage, String description) {
-            this.imageUrl = imageUrl;
-            this.usage = usage;
-            this.description = description;
-        }
-
-        public String getImageUrl() {
-            return imageUrl;
-        }
-
-        public String getUsage() {
-            return usage;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-    }
-
-
-
+    /**
+     * Deletes all generated data (users, facilities, events) from Firebase Firestore.
+     */
     private void deleteAllData() {
         ProgressDialog progressDialog = new ProgressDialog(getActivity());
         progressDialog.setTitle("Deleting All Data...");
@@ -272,28 +262,23 @@ public class TestFragment extends Fragment {
         progressDialog.setCancelable(false);
         progressDialog.show();
 
-        // Create a batch to perform deletions
         WriteBatch batch = db.batch();
 
-        // Delete all users
         db.collection("Users").get().addOnSuccessListener(queryDocumentSnapshots -> {
             for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
                 batch.delete(document.getReference());
             }
 
-            // Delete all facilities
             db.collection("Facilities").get().addOnSuccessListener(queryDocumentSnapshots1 -> {
                 for (DocumentSnapshot document : queryDocumentSnapshots1.getDocuments()) {
                     batch.delete(document.getReference());
                 }
 
-                // Delete all events
                 db.collection("Events").get().addOnSuccessListener(queryDocumentSnapshots2 -> {
                     for (DocumentSnapshot document : queryDocumentSnapshots2.getDocuments()) {
                         batch.delete(document.getReference());
                     }
 
-                    // Commit the batch after all deletions
                     batch.commit().addOnSuccessListener(aVoid -> {
                         progressDialog.dismiss();
                         Toast.makeText(getActivity(), "All data deleted successfully.", Toast.LENGTH_SHORT).show();
@@ -313,5 +298,46 @@ public class TestFragment extends Fragment {
             progressDialog.dismiss();
             Toast.makeText(getActivity(), "Error deleting users: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         });
+    }
+
+    /**
+     * Represents image data that will be saved in Firestore.
+     */
+    public static class ImageData {
+        private String imageUrl;
+        private String usage;
+        private String description;
+
+        /**
+         * Default constructor required for Firestore.
+         */
+        public ImageData() {
+            // Firestore requires a no-arg constructor
+        }
+
+        /**
+         * Constructs an ImageData object.
+         *
+         * @param imageUrl The URL of the image
+         * @param usage The usage of the image
+         * @param description A description of the image
+         */
+        public ImageData(String imageUrl, String usage, String description) {
+            this.imageUrl = imageUrl;
+            this.usage = usage;
+            this.description = description;
+        }
+
+        public String getImageUrl() {
+            return imageUrl;
+        }
+
+        public String getUsage() {
+            return usage;
+        }
+
+        public String getDescription() {
+            return description;
+        }
     }
 }

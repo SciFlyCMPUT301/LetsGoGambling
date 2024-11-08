@@ -5,11 +5,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
-import android.util.Base64;
 import android.util.Log;
-
 import androidx.annotation.NonNull;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -17,7 +14,6 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.firestore.SetOptions;
-
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -67,6 +63,12 @@ public class User {
         this.roles = new ArrayList<>();
         this.storageReference = FirebaseStorage.getInstance().getReference();
         this.db = FirebaseFirestore.getInstance();
+    }
+
+    // Constructor for testing that allows injecting mock dependencies
+    public User(StorageReference storageReference, FirebaseFirestore db) {
+        this.storageReference = storageReference;
+        this.db = db;
     }
 
     /**

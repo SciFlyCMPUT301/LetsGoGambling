@@ -12,7 +12,13 @@ import com.google.android.gms.tasks.OnFailureListener;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * The SampleTable class is designed to generate sample data for users, facilities, and events.
+ * This data is intended to be sent to Firebase, and the class also supports saving, updating,
+ * and deleting data for quick testing and loading.
+ */
 public class SampleTable {
+
     public List<User> UserList = new ArrayList<>();
     public List<Facility> FacilityList = new ArrayList<>();
     public List<Event> EventList = new ArrayList<>();
@@ -20,6 +26,9 @@ public class SampleTable {
     private int userUpdateCount;
     private int facilityUpdateCount;
 
+    /**
+     * Generates a list of sample users with different roles (admin, organizer, and normal users).
+     */
     public void makeUserList() {
         // Create 5 admin users
         for (int i = 1; i <= 5; i++) {
@@ -52,23 +61,25 @@ public class SampleTable {
             user.setDeviceID("deviceID" + (i + 15));
             user.setEmail("user" + i + "@example.com");
             user.setPhoneNumber("555-020" + i);
-            // ENTRANT role is added by default in User constructor
-            user.addRole(Role.ENTRANT);
+            user.addRole(Role.ENTRANT);  // ENTRANT role is added by default
             UserList.add(user);
         }
         Log.d("User list", "Done List");
     }
 
+    /**
+     * Generates a list of sample facilities and associates them with organizer users.
+     */
     public void makeFacilityList() {
-        // Get organizers from UserList
         List<User> organizers = new ArrayList<>();
+        // Collect organizers from the UserList
         for (User user : UserList) {
             if (user.hasRole(Role.ORGANIZER)) {
                 organizers.add(user);
             }
         }
 
-        // Create facilities and associate with organizers
+        // Create facilities and associate them with organizers
         for (int i = 0; i < organizers.size(); i++) {
             User organizer = organizers.get(i);
             Facility facility = new Facility();
@@ -77,11 +88,10 @@ public class SampleTable {
             facility.setAddress("Address of Facility" + (i + 1));
             facility.setOrganizer(organizer.getUsername());
             FacilityList.add(facility);
-            // Optionally, set facility in organizer if needed
             organizer.setFacilityAssociated(true);
         }
 
-        // Create facilities without events or organizers
+        // Create additional facilities without events or organizers
         for (int i = 11; i <= 15; i++) {
             Facility facility = new Facility();
             facility.setName("Facility" + i);
@@ -92,6 +102,9 @@ public class SampleTable {
         }
     }
 
+    /**
+     * Generates a list of sample events, randomly assigning facilities, participants, and statuses.
+     */
     public void makeEventList() {
         Random random = new Random();
 
@@ -104,54 +117,33 @@ public class SampleTable {
             event.setTimestamp(System.currentTimeMillis() + i * 100000);
             event.setMaxParticipants(20);
 
-            // Assign to a facility (some facilities have events, some don't)
-            if (!FacilityList.isEmpty()) {
-                if (random.nextBoolean()) {
-                    Facility facility = FacilityList.get(random.nextInt(FacilityList.size()));
-                    Log.d("Sample Table", "Event ID: " + "event" + i);
-                    event.setLocation(facility.getAddress());
-                    facility.associateEvent(event.getEventId(), true);
-                }
+            // Assign a facility to the event (if applicable)
+            if (!FacilityList.isEmpty() && random.nextBoolean()) {
+                Facility facility = FacilityList.get(random.nextInt(FacilityList.size()));
+                event.setLocation(facility.getAddress());
+                facility.associateEvent(event.getEventId(), true);
             }
 
-            // Assign participants with different statuses
+            // Assign participants with random statuses
             List<User> entrants = new ArrayList<>();
-            Log.d("Event list", "Making Entrant");
-
-            // Filter users with the ENTRANT role
             for (User user : UserList) {
                 if (user.hasRole(Role.ENTRANT)) {
                     entrants.add(user);
                 }
             }
 
-            // Log how many entrants we have
-            Log.d("Event list", "Making Entrant: " + entrants.size());
-
             // Randomly shuffle entrants and select up to 10 participants
             Collections.shuffle(entrants);
             int numParticipants = Math.min(entrants.size(), 10);
 
-            // Assign participants to the event
             for (int j = 0; j < numParticipants; j++) {
                 User entrant = entrants.get(j);
-                Log.d("Event list", "deviceID: " + entrant.getDeviceID());
-
-                // Assign a random status to the participant
-                int status = random.nextInt(4); // 0: accepted, 1: signed-up, 2: canceled, 3: waitlist
+                int status = random.nextInt(4);  // 0: accepted, 1: signed-up, 2: canceled, 3: waitlist
                 switch (status) {
-                    case 0:
-                        event.addAcceptedParticipantId(entrant.getDeviceID());
-                        break;
-                    case 1:
-                        event.addSignedUpParticipantIds(entrant.getDeviceID());
-                        break;
-                    case 2:
-                        event.addCanceledParticipantIds(entrant.getDeviceID());
-                        break;
-                    case 3:
-                        event.addWaitingParticipantIds(entrant.getDeviceID());
-                        break;
+                    case 0: event.addAcceptedParticipantId(entrant.getDeviceID()); break;
+                    case 1: event.addSignedUpParticipantIds(entrant.getDeviceID()); break;
+                    case 2: event.addCanceledParticipantIds(entrant.getDeviceID()); break;
+                    case 3: event.addWaitingParticipantIds(entrant.getDeviceID()); break;
                 }
             }
 
@@ -160,16 +152,20 @@ public class SampleTable {
         }
     }
 
-
+    /**
+     * Saves the generated data (users, facilities, and events) to Firebase Firestore.
+     *
+     * @param onSuccess The callback to execute if the data is successfully saved.
+     * @param onFailure The callback to execute if an error occurs during saving.
+     */
     public void saveDataToFirebase(Runnable onSuccess, OnFailureListener onFailure) {
         AtomicInteger pendingWrites = new AtomicInteger(UserList.size() + FacilityList.size() + EventList.size());
         AtomicInteger failures = new AtomicInteger(0);
 
-        // Save users
+        // Save users to Firestore
         for (User user : UserList) {
-            String image_link = "https://firebasestorage.googleapis.com/v0/b/letsgogambling-9ebb8.appspot.com/o/images%2Fb8d07a65-6ab2-4ba3-8b92-724e4803e468.jpg?alt=media&token=b24f29a0-98eb-4597-a218-40f494bd3ad3";
-            user.setdefaultProfilePictureUrl(image_link);
-            user.setProfilePictureUrl(image_link);
+            String imageLink = "https://example.com/default-profile-picture.jpg";
+            user.setProfilePictureUrl(imageLink);
             user.saveUserDataToFirestore()
                     .addOnSuccessListener(aVoid -> checkCompletion(pendingWrites, failures, onSuccess, onFailure))
                     .addOnFailureListener(e -> {
@@ -179,7 +175,7 @@ public class SampleTable {
                     });
         }
 
-        // Save facilities
+        // Save facilities to Firestore
         for (Facility facility : FacilityList) {
             facility.saveFacilityProfile()
                     .addOnSuccessListener(aVoid -> checkCompletion(pendingWrites, failures, onSuccess, onFailure))
@@ -190,7 +186,7 @@ public class SampleTable {
                     });
         }
 
-        // Save events
+        // Save events to Firestore
         for (Event event : EventList) {
             event.saveEventDataToFirestore()
                     .addOnSuccessListener(aVoid -> checkCompletion(pendingWrites, failures, onSuccess, onFailure))
@@ -202,6 +198,14 @@ public class SampleTable {
         }
     }
 
+    /**
+     * Helper method to check if all Firebase writes are completed.
+     *
+     * @param pendingWrites The number of pending writes.
+     * @param failures The number of failures.
+     * @param onSuccess The callback to execute on success.
+     * @param onFailure The callback to execute on failure.
+     */
     private void checkCompletion(AtomicInteger pendingWrites, AtomicInteger failures, Runnable onSuccess, OnFailureListener onFailure) {
         if (pendingWrites.decrementAndGet() == 0) {
             if (failures.get() == 0) {
@@ -212,20 +216,42 @@ public class SampleTable {
         }
     }
 
-    // Methods to retrieve lists
+    // Methods to retrieve the lists of users, facilities, and events
+
+    /**
+     * Returns the list of sample users.
+     *
+     * @return The list of users.
+     */
     public List<User> getUserList() {
         return UserList;
     }
 
+    /**
+     * Returns the list of sample facilities.
+     *
+     * @return The list of facilities.
+     */
     public List<Facility> getFacilityList() {
         return FacilityList;
     }
 
+    /**
+     * Returns the list of sample events.
+     *
+     * @return The list of events.
+     */
     public List<Event> getEventList() {
         return EventList;
     }
 
-    // Methods to update specific users, facilities, events
+    // Methods to update specific users, facilities, or events
+
+    /**
+     * Updates a specific user's information.
+     *
+     * @param updatedUser The updated user object.
+     */
     public void updateUser(User updatedUser) {
         for (int i = 0; i < UserList.size(); i++) {
             if (UserList.get(i).getUsername().equals(updatedUser.getUsername())) {
@@ -236,6 +262,11 @@ public class SampleTable {
         }
     }
 
+    /**
+     * Updates a specific facility's information.
+     *
+     * @param updatedFacility The updated facility object.
+     */
     public void updateFacility(Facility updatedFacility) {
         for (int i = 0; i < FacilityList.size(); i++) {
             if (FacilityList.get(i).getName().equals(updatedFacility.getName())) {
@@ -246,6 +277,11 @@ public class SampleTable {
         }
     }
 
+    /**
+     * Updates a specific event's information.
+     *
+     * @param updatedEvent The updated event object.
+     */
     public void updateEvent(Event updatedEvent) {
         for (int i = 0; i < EventList.size(); i++) {
             if (EventList.get(i).getEventId().equals(updatedEvent.getEventId())) {
@@ -256,7 +292,14 @@ public class SampleTable {
         }
     }
 
-    // Additional methods for demonstration
+    // Additional methods for retrieving objects by specific identifiers
+
+    /**
+     * Retrieves a user by their username.
+     *
+     * @param username The username of the user to retrieve.
+     * @return The user with the given username, or null if not found.
+     */
     public User getUserByUsername(String username) {
         for (User user : UserList) {
             if (user.getUsername().equals(username)) {
@@ -266,6 +309,12 @@ public class SampleTable {
         return null;
     }
 
+    /**
+     * Retrieves a facility by its name.
+     *
+     * @param name The name of the facility to retrieve.
+     * @return The facility with the given name, or null if not found.
+     */
     public Facility getFacilityByName(String name) {
         for (Facility facility : FacilityList) {
             if (facility.getName().equals(name)) {
@@ -275,6 +324,12 @@ public class SampleTable {
         return null;
     }
 
+    /**
+     * Retrieves an event by its ID.
+     *
+     * @param eventId The ID of the event to retrieve.
+     * @return The event with the given ID, or null if not found.
+     */
     public Event getEventById(String eventId) {
         for (Event event : EventList) {
             if (event.getEventId().equals(eventId)) {

@@ -1,5 +1,6 @@
 package com.example.eventbooking;
 
+<<<<<<< HEAD
 import android.net.Uri;
 
 import org.junit.Before;
@@ -12,9 +13,27 @@ import org.mockito.Mockito;
 
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
+=======
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
+import com.google.firebase.firestore.FirebaseFirestore;
+>>>>>>> origin
+import com.google.firebase.storage.StorageReference;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+
+
+import java.util.ArrayList;
+import java.util.List;
+
+<<<<<<< HEAD
 
 public class UserTest {
     private FirebaseStorage firebaseStorage;
@@ -24,87 +43,122 @@ public class UserTest {
         firebaseStorage = Mockito.mock(FirebaseStorage.class);
         FirebaseApp.initializeApp(ApplicationProvider.getApplicationContext());
     }
+=======
+public class UserTest {
+    @Mock
+    private StorageReference mockStorageReference;
 
-    @Test
-    public void testSetAndGetUsername() {
-        User user = new User();
-        user.setUsername("TestUser");
-        assertEquals("TestUser", user.getUsername());
+    @Mock
+    private FirebaseFirestore mockDb;
+>>>>>>> origin
+
+    private User user;
+
+    @Before
+    public void setUp() {
+        MockitoAnnotations.initMocks(this);
+        user = new User(mockStorageReference, mockDb); // Inject mocks
     }
 
     @Test
-    public void testSetAndGetEmail() {
-        User user = new User();
+    public void testGetAndSetUsername() {
+        user.setUsername("testUser");
+        assertEquals("testUser", user.getUsername());
+    }
+
+    @Test
+    public void testGetAndSetDeviceID() {
+        user.setDeviceID("device123");
+        assertEquals("device123", user.getDeviceID());
+    }
+
+    @Test
+    public void testGetAndSetEmail() {
         user.setEmail("test@example.com");
         assertEquals("test@example.com", user.getEmail());
     }
 
     @Test
-    public void testSetAndGetPhoneNumber() {
-        User user = new User();
-        user.setPhoneNumber("1234567890");
-        assertEquals("1234567890", user.getPhoneNumber());
+    public void testGetAndSetPhoneNumber() {
+        user.setPhoneNumber("123-456-7890");
+        assertEquals("123-456-7890", user.getPhoneNumber());
     }
 
     @Test
-    public void testSetAndGetProfilePictureUrl() {
-        User user = new User();
-        user.setProfilePictureUrl("https://example.com/pic.jpg");
-        assertEquals("https://example.com/pic.jpg", user.getProfilePictureUrl());
+    public void testGetAndSetProfilePictureUrl() {
+        user.setProfilePictureUrl("http://example.com/pic.png");
+        assertEquals("http://example.com/pic.png", user.getProfilePictureUrl());
     }
 
     @Test
-    public void testAddRoleAndHasRole() {
-        User user = new User();
-        user.addRole("ADMIN");
-        assertTrue(user.hasRole("ADMIN"));
+    public void testGetAndSetAddress() {
+        user.setAddress("456 Banana Blvd.");
+        assertEquals("456 Banana Blvd.", user.getAddress());
     }
 
     @Test
-    public void testDefaultProfilePictureUrl() {
-        User user = new User();
-        user.setUsername("DefaultUser");
-        String expectedUrl = "https://firebasestorage.googleapis.com/v0/b/YOUR_FIREBASE_PROJECT_ID/o/default%2FDefaultUser.png?alt=media";
-        assertEquals(expectedUrl, user.defaultProfilePictureUrl(user.getUsername()));
+    public void testGetAndSetLocation() {
+        user.setLocation("New Facility");
+        assertEquals("New Facility", user.getLocation());
     }
 
     @Test
-    public void testUploadProfilePictureToFirebase() {
-        User user = new User();
-        user.setUsername("TestUser");
-
-        // Mock Firebase Storage
-        FirebaseStorage mockStorage = Mockito.mock(FirebaseStorage.class);
-        StorageReference mockStorageRef = Mockito.mock(StorageReference.class);
-        StorageReference mockProfilePicRef = Mockito.mock(StorageReference.class);
-        UploadTask mockUploadTask = Mockito.mock(UploadTask.class);
-
-        Mockito.when(mockStorage.getReference()).thenReturn(mockStorageRef);
-        Mockito.when(mockStorageRef.child(Mockito.anyString())).thenReturn(mockProfilePicRef);
-        Mockito.when(mockProfilePicRef.putFile(Mockito.any(Uri.class))).thenReturn(mockUploadTask);
-
-//        user.uploadProfilePictureToFirebase(Uri.parse("file://fakepath"));
-
-        // Verify that putFile was called on the correct reference
-        Mockito.verify(mockProfilePicRef).putFile(Mockito.any(Uri.class));
+    public void testGetAndSetAdminLevel() {
+        user.setAdminLevel(true);
+        assertTrue(user.isAdminLevel());
+        user.setAdminLevel(false);
+        assertFalse(user.isAdminLevel());
     }
 
     @Test
-    public void testDeleteSelectedImageFromFirebase() {
-        User user = new User();
-        user.setUsername("TestUser");
+    public void testGetAndSetFacilityAssociated() {
+        user.setFacilityAssociated(true);
+        assertTrue(user.isFacilityAssociated());
+        user.setFacilityAssociated(false);
+        assertFalse(user.isFacilityAssociated());
+    }
 
-        // Mock Firebase Storage
-        FirebaseStorage mockStorage = Mockito.mock(FirebaseStorage.class);
-        StorageReference mockStorageRef = Mockito.mock(StorageReference.class);
+    @Test
+    public void testGetAndSetNotificationAsk() {
+        user.setNotificationAsk(true);
+        assertTrue(user.isNotificationAsk());
+        user.setNotificationAsk(false);
+        assertFalse(user.isNotificationAsk());
+    }
 
-        // Mock the URL and behavior
-        String selectedImageUrl = "https://example.com/selectedImage.jpg";
-        Mockito.when(mockStorage.getReferenceFromUrl(selectedImageUrl)).thenReturn(mockStorageRef);
+    @Test
+    public void testGetAndSetGeolocationAsk() {
+        user.setGeolocationAsk(true);
+        assertTrue(user.isGeolocationAsk());
+        user.setGeolocationAsk(false);
+        assertFalse(user.isGeolocationAsk());
+    }
 
-//        user.deleteSelectedImageFromFirebase(selectedImageUrl);
+    @Test
+    public void testGetAndSetRoles() {
+        List<String> roles = new ArrayList<>();
+        roles.add("ADMIN");
+        roles.add("USER");
 
-        // Verify that the delete method was called
-        Mockito.verify(mockStorageRef).delete();
+        user.setRoles(roles);
+        assertEquals(roles, user.getRoles());
+        assertTrue(user.getRoles().contains("ADMIN"));
+        assertTrue(user.getRoles().contains("USER"));
+    }
+
+    @Test
+    public void testAddAndRemoveRole() {
+        user.addRole("USER");
+        assertTrue(user.getRoles().contains("USER"));
+
+        user.removeRole("USER");
+        assertFalse(user.getRoles().contains("USER"));
+    }
+
+    @Test
+    public void testHasRole() {
+        user.addRole("USER");
+        assertTrue(user.hasRole("USER"));
+        assertFalse(user.hasRole("ADMIN"));
     }
 }

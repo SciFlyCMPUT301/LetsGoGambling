@@ -46,7 +46,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-
+/**
+ * Event fragment here to display all events given parameters
+ */
 public class EventFragment extends Fragment {
     private Button addFacilityButton, backButton;
     private String currentUserId = "User1";

@@ -1,21 +1,12 @@
 package com.example.eventbooking;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 
-import com.example.eventbooking.Events.EventData.Event;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.AggregateQuery;
-import com.google.firebase.firestore.AggregateQuerySnapshot;
-import com.google.firebase.firestore.AggregateSource;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.storage.FirebaseStorage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,10 +37,17 @@ public class Facility {
      */
     public Facility() {
         // Initialize Firebase instances
-        db = FirebaseFirestore.getInstance();
-        facilitiesRef = db.collection("facilities");
+        this.db = FirebaseFirestore.getInstance();
+        this.facilitiesRef = db.collection("facilities");
         // Initialize list to avoid NullPointerException
-        allEvents = new ArrayList<>();
+        this.allEvents = new ArrayList<>();
+    }
+
+    // Constructor for dependency injection (useful for testing)
+    public Facility(FirebaseFirestore db, CollectionReference facilitiesRef) {
+        this.db = db;
+        this.facilitiesRef = facilitiesRef;
+        this.allEvents = new ArrayList<>();
     }
 
     /**
@@ -69,7 +67,6 @@ public class Facility {
         this.allEvents = new ArrayList<>();
     }
 
-
     /**
      * Getters and Setters for the given fields that can be easily set or we want to get
      */
@@ -82,6 +79,11 @@ public class Facility {
     }
 
     public String getAddress() { return address; }
+
+    /**
+     * Set the address to the input string
+     * @param address
+     */
     public void setAddress(String address) { this.address = address; }
 
     public String getOrganizer() { return organizer; }
@@ -89,7 +91,9 @@ public class Facility {
 
 //    public Location getLocation() { return location; }
 //    public void setLocation(Location location) { this.location = location; }
-
+    /**
+     *
+     */
     public String getFacilityID() {
         return facilityID;
     }
@@ -105,6 +109,10 @@ public class Facility {
         this.eventName = eventName;
     }
 
+    /**
+     * Setting all the events for the facility to a given list
+     * @param allEvents
+     */
     public void setAllEvents(List<String> allEvents) {
         this.allEvents = allEvents;
     }

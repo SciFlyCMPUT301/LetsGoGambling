@@ -1,0 +1,247 @@
+@startuml
+class AdminFragment {
+    -- Attributes --
+    - viewUsersButton : Button
+    - viewEventsButton : Button
+    - viewFacilitiesButton : Button
+    - viewImagesButton : Button
+
+    -- Methods --
+    + onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle) : View
+    - replaceFragment(fragment: Fragment) : void
+}
+
+class ViewUsersFragment {
+    -- Attributes --
+    - db : FirebaseFirestore
+    - usersListView : ListView
+    - userAdapter : UserViewAdapter
+    - userList : ArrayList<User>
+    - addUser : Button
+    - adminGoBack : Button
+
+    -- Methods --
+    + onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle) : View
+    - openNewUserFragment() : void
+    - openUserDetailsFragment(selectedUser: User) : void
+    - loadUsersFromFirestore() : void
+}
+
+class UserViewAdapter {
+    -- Attributes --
+    - context : Context
+    - userList : List<User>
+
+    -- Methods --
+    + UserViewAdapter(context: Context, userList: ArrayList<User>)
+    + getView(position: int, convertView: View, parent: ViewGroup) : View
+}
+
+class EditUserFragment {
+    -- Attributes --
+    - usernameEditText : EditText
+    - deviceIdEditText : EditText
+    - emailEditText : EditText
+    - phoneNumberEditText : EditText
+    - profilePictureUrlEditText : EditText
+    - locationEditText : EditText
+    - dateJoinedEditText : EditText
+    - saveButton : Button
+    - deleteButton : Button
+    - cancelButton : Button
+    - notificationSwitch : Switch
+    - geolocationSwitch : Switch
+    - entrantSwitch : Switch
+    - organizerSwitch : Switch
+    - adminSwitch : Switch
+    - db : FirebaseFirestore
+    - documentId : String
+    - isNewUser : boolean
+
+    -- Methods --
+    + onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle) : View
+    - updateUser(documentId: String) : void
+    - deleteUser(documentId: String) : void
+    - loadUserData(documentId: String) : void
+    - addUserToFirestore() : void
+}
+
+class ViewImagesFragment {
+    -- Attributes --
+    - imagesListView : ListView
+    - imageAdapter : ImageAdapter
+    - imageList : List<ImageClass>
+    - adminGoBack : Button
+
+    -- Methods --
+    + onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle) : View
+    - loadImagesFromFirebase() : void
+    - openImageDetailsFragment(image: ImageClass) : void
+}
+
+class ImageClass {
+    -- Attributes --
+    - URL : String
+    - image : Image
+
+    -- Methods --
+    // No public methods defined in the file
+}
+
+class ImageAdapter {
+    -- Attributes --
+    - context : Context
+    - imageList : List<ImageClass>
+
+    -- Methods --
+    + ImageAdapter(context: Context, imageList: List<ImageClass>)
+    + getView(position: int, convertView: View, parent: ViewGroup) : View
+}
+
+class EditImageFragment {
+    -- Attributes --
+    // No attributes defined in the file
+
+    -- Methods --
+    // No public methods defined in the file
+}
+
+class ViewFacilitiesFragment {
+    -- Attributes --
+    - adminGoBack : Button
+    - db : FirebaseFirestore
+    - facilitiesListView : ListView
+    - facilityAdapter : FacilityViewAdapter
+    - facilityList : ArrayList<Facility>
+    - addUFacility : Button
+
+    -- Methods --
+    + onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle) : View
+    - loadFacilitiesFromFirestore() : void
+    - openFacilityDetailsFragment(selectedFacility: Facility) : void
+}
+
+class FacilityViewAdapter {
+    -- Attributes --
+    - context : Context
+    - facilityList : List<Facility>
+
+    -- Methods --
+    + FacilityViewAdapter(context: Context, facilityList: ArrayList<Facility>)
+    + getView(position: int, convertView: View, parent: ViewGroup) : View
+}
+
+class EditEventFragment {
+    -- Attributes --
+    - listSelectorSpinner : Spinner
+    - eventTitleEditText : EditText
+    - eventDescriptionEditText : EditText
+    - maxParticipantsEditText : EditText
+    - eventLocationEditText : EditText
+    - organiserIDEditText : EditText
+    - participantEditText : EditText
+    - saveButton : Button
+    - cancelButton : Button
+    - addParticipantButton : Button
+    - removeParticipantButton : Button
+    - removeEventButton : Button
+    - participantsListView : ListView
+    - selectedEvent : Event
+    - participantsAdapter : ArrayAdapter<String>
+    - db : FirebaseFirestore
+    - selectedList : List<String>
+    - updatedWaitingList : List<String>
+    - updatedAcceptedList : List<String>
+    - updatedCanceledList : List<String>
+    - updatedSignedUpList : List<String>
+
+    -- Methods --
+    + EditEventFragment(selectedEvent: Event)
+    + onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle) : View
+    - populateEventDetails() : void
+    - saveEvent() : void
+    - goBackToViewEvents() : void
+    - updateParticipantsList(position: int) : void
+    - addParticipant() : void
+    - removeParticipant() : void
+    - removeEvent() : void
+}
+
+class EditEventFragment {
+    -- Attributes --
+    - listSelectorSpinner : Spinner
+    - eventTitleEditText : EditText
+    - eventDescriptionEditText : EditText
+    - maxParticipantsEditText : EditText
+    - eventLocationEditText : EditText
+    - organiserIDEditText : EditText
+    - participantEditText : EditText
+    - saveButton : Button
+    - cancelButton : Button
+    - addParticipantButton : Button
+    - removeParticipantButton : Button
+    - removeEventButton : Button
+    - participantsListView : ListView
+    - selectedEvent : Event
+    - participantsAdapter : ArrayAdapter<String>
+    - db : FirebaseFirestore
+    - selectedList : List<String>
+    - updatedWaitingList : List<String>
+    - updatedAcceptedList : List<String>
+    - updatedCanceledList : List<String>
+    - updatedSignedUpList : List<String>
+
+    -- Methods --
+    + EditEventFragment(selectedEvent: Event)
+    + onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle) : View
+    - populateEventDetails() : void
+    - saveEvent() : void
+    - goBackToViewEvents() : void
+    - updateParticipantsList(position: int) : void
+    - addParticipant() : void
+    - removeParticipant() : void
+    - removeEvent() : void
+}
+
+class ViewEventsFragment {
+    -- Attributes --
+    - adminGoBack : Button
+    - eventAdapter : EventViewAdapter
+    - userManager : UserManager
+    - eventList : ArrayList<Event>
+    - testing : boolean
+    - eventListView : ListView
+    - addFacilityButton : Button
+    - backButton : Button
+    - db : FirebaseFirestore
+
+    -- Methods --
+    + onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle) : View
+    - loadEventsFromFirebase() : void
+    - openEventDetailPage(selectedEvent: Event) : void
+}
+
+ViewEventsFragment --> "1" AdminFragment : navigates
+ViewEventsFragment --> "1" EventViewAdapter : uses
+ViewEventsFragment --> "1" EditEventFragment : navigates
+ViewEventsFragment *-- "1..*" Event : contains
+EditEventFragment *-- "1" Event : contains
+EditEventFragment --> "1" ViewEventsFragment : navigates
+ViewFacilitiesFragment --> "1" FacilityViewAdapter : uses
+FacilityViewAdapter o-- "0..*" Facility : contains
+ViewFacilitiesFragment --> "1" AdminFragment : navigates
+ViewFacilitiesFragment --> "1" FacilityViewAdapter : uses
+ViewFacilitiesFragment --> "1" EditFacilityFragment : uses
+ViewFacilitiesFragment *-- "1..*" Facility : contains
+ViewImagesFragment --> "1" EditImageFragment : navigates
+ImageAdapter *-- "0..*" ImageClass : contains
+ViewImagesFragment --> "1" ImageAdapter : uses
+ViewImagesFragment *-- "1..*" ImageClass : contains
+AdminFragment --> "1" ViewUsersFragment : navigates
+ViewUsersFragment --> "1" AdminFragment : navigates
+ViewUsersFragment --> "1" UserViewAdapter : uses
+ViewUsersFragment --> "1" EditUserFragment : uses
+ViewUsersFragment --> "1..*" User : uses
+UserViewAdapter *-- "1..*" User : contains
+EditUserFragment --> "1" User : uses
+@enduml

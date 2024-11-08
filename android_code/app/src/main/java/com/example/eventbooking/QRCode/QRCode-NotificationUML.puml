@@ -1,0 +1,52 @@
+@startuml
+class NotificationFragment {
+    - ARG_INTEGER : String
+    - receivedInteger : int
+    + newInstance() : NotificationFragment
+    + onCreate(savedInstanceState: Bundle) : void
+    + onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle) : View
+}
+
+class NotificationViewModel {
+}
+
+class CameraFragment {
+    - REQUEST_CODE_SCAN : int
+    + onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle) : View
+    + onActivityResult(requestCode: int, resultCode: int, data: Intent) : void
+    - extractEventIdFromQR(scannedData: String) : String
+    + navigateToScannedFragment(eventId: String) : void
+}
+
+class QRCodeEventGenerate {
+    - qrCodeGenerator : QRcodeGenerator
+    + onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle) : View
+    - generateHash(input: String) : String
+}
+
+class QRcodeGenerator {
+    - context : Context
+    + QRcodeGenerator(context: Context)
+    + generateQRCode(content: String) : Bitmap
+    + saveQRCode(bitmap: Bitmap, eventID: String) : void
+}
+
+class ScannedFragment {
+    - ARG_EVENT_ID : String
+    - eventId : String
+    - scanView : TextView
+    - scannerOpenButton : Button
+    + newInstance(scannedData: String) : ScannedFragment
+    + onCreate(savedInstanceState: Bundle) : void
+    + onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle) : View
+}
+
+NotificationFragment --> "1" ProfileFragment : navigates
+NotificationFragment --> "1" HomeFragment : navigates
+CameraFragment --> "1" ScannedFragment : navigates
+CameraFragment --> "1" IntentIntegrator : uses
+QRCodeEventGenerate --> "1" QRcodeGenerator : uses
+QRcodeGenerator --> Bitmap : generates
+QRcodeGenerator --> Context : uses
+ScannedFragment --> "1" CameraFragment : navigates
+@enduml

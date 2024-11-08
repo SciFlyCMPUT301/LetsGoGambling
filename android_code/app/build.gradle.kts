@@ -52,6 +52,7 @@ dependencies {
     implementation(libs.firebase.database)
     implementation(libs.firebase.firestore)
     implementation(libs.qr.scanner)
+    testImplementation(libs.junit.jupiter)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     testImplementation(libs.junit)

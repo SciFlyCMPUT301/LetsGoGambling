@@ -53,10 +53,14 @@ public class TestProfile {
         onView(withId(R.id.button_profile)).perform(click());
         onView(withId(R.id.button_edit_profile)).perform(click());
         onView(withId(R.id.edit_name)).perform(clearText(), typeText("test1"), closeSoftKeyboard());
+        onView(withId(R.id.edit_email)).perform(clearText(), typeText("test2"), closeSoftKeyboard());
+        onView(withId(R.id.edit_phone)).perform(clearText(), typeText("test3"), closeSoftKeyboard());
         onView(withClassName(containsString(ScrollView.class.getSimpleName()))).perform(swipeUp());
         //onView(withId(R.id.button_save_profile)).perform(scrollTo());
         onView(withId(R.id.button_save_profile)).perform(click());
         onView(withId(R.id.edit_name)).check(matches(withText("test1")));
+        onView(withId(R.id.edit_email)).check(matches(withText("test2")));
+        onView(withId(R.id.edit_phone)).check(matches(withText("3")));
     }
 
 }

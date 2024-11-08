@@ -55,7 +55,7 @@ public class User {
 
     private List<String> roles;
     //Firebase
-    StorageReference storageReference;
+    public StorageReference storageReference;
     FirebaseFirestore db;
 
     /**
@@ -228,6 +228,14 @@ public class User {
         void onImageRemovalSuccess();
         void onImageRemovalFailed(Exception e);
     }
+
+    /**
+     * Interface for saving generated images to firebase storage
+     */
+    public interface OnProfilePictureGeneratedListener {
+        void onProfilePictureGenerated();
+        void onProfilePictureGenerationFailed(Exception e);
+    }
     /**
      * Generates a circular bitmap with a single letter in the center.
      * The letter is the first character of the provided name, or "A" if the name is empty.
@@ -261,7 +269,7 @@ public class User {
      * @param name The name from which to generate the profile picture with the first letter.
      * @return A string message indicating that profile picture generation and upload have been initiated.
      */
-    public String defaultProfilePictureUrl(String name) {
+    public Task<Void> defaultProfilePictureUrl(String name) {
         Bitmap bitmap = generateProfileBitmap(name);
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -269,9 +277,9 @@ public class User {
         byte[] byteArray = byteArrayOutputStream.toByteArray();
 
         // Upload image to Firebase Storage and save the URL
-        uploadDefaultImageToFirebaseStorage(byteArray);
 
-        return "Profile picture generation initiated.";
+
+        return uploadDefaultImageToFirebaseStorage(byteArray);
     }
 
     /**
@@ -280,28 +288,30 @@ public class User {
      *
      * @param imageBytes The byte array of the image to upload.
      */
-    public void uploadDefaultImageToFirebaseStorage(byte[] imageBytes) {
+    public Task<Void> uploadDefaultImageToFirebaseStorage(byte[] imageBytes) {
         // Generate a unique identifier for the image
         String imageFileName = "defaultProfilePictures/" + UUID.randomUUID().toString() + ".png";
         StorageReference imageRef = storageReference.child(imageFileName);
 
         // Upload the image to Firebase Storage
-        imageRef.putBytes(imageBytes)
-                .addOnSuccessListener(taskSnapshot -> {
+        return imageRef.putBytes(imageBytes)
+                .continueWithTask(task -> {
+                    if (!task.isSuccessful()) {
+                        throw task.getException();
+                    }
                     // Get the download URL of the uploaded image
-                    imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
-                        String downloadUrl = uri.toString();
-                        // Save the download URL to Firestore
-                        profilePictureUrl = downloadUrl; // Set the profile URL here
-                        defaultprofilepictureurl = downloadUrl; // Set as the default profile URL
-
-                        saveImageUrl(downloadUrl);
-                    }).addOnFailureListener(e -> {
-                        Log.e("Firebase", "Failed to retrieve download URL", e);
-                    });
+                    return imageRef.getDownloadUrl();
                 })
-                .addOnFailureListener(e -> {
-                    Log.e("Firebase", "Image upload failed", e);
+                .continueWithTask(task -> {
+                    if (!task.isSuccessful()) {
+                        throw task.getException();
+                    }
+                    Uri downloadUri = task.getResult();
+                    String downloadUrl = downloadUri.toString();
+                    profilePictureUrl = downloadUrl;
+                    defaultprofilepictureurl = downloadUrl;
+
+                    return saveGeneratedImageUrl(downloadUrl);
                 });
     }
 
@@ -498,22 +508,19 @@ public class User {
 
 
     // Save image URL to Firestore
-    void saveImageUrl(String imageURL) {
 
-        // Create a map to hold the image URL
+    /**
+     * Saving the generated image url to the user and updating the firebase
+     * @param imageURL
+     */
+    public Task<Void> saveGeneratedImageUrl(String imageURL) {
+
         Map<String, Object> imageData = new HashMap<>();
         imageData.put("profilePictureUrl", imageURL);
+        imageData.put("defaultProfilePictureUrl", imageURL);
 
-        db.collection("Users").document(deviceId)
-                .update(imageData)
-                .addOnSuccessListener(aVoid -> {
-                    Log.d("Firestore", "Image URL updated successfully.");
-
-                })
-                .addOnFailureListener(e -> {
-                    Log.e("Firebase", "Failed to save image URL", e);
-
-                });
+        return db.collection("Users").document(deviceId)
+                .set(imageData, SetOptions.merge());
     }
 
     // Update profile picture

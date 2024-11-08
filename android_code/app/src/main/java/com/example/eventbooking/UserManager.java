@@ -47,12 +47,35 @@ public class UserManager {
      * out all the user's data
      * @param user the current user
      */
-    public void setCurrentUser(User user){
-        this.currentUser = user;
-        Log.d("UserManager", user.getDeviceID() + user.getUsername());
+    public void setCurrentUser(User user) {
+        if (user == null) {
+            this.currentUser = null;
+            return;
+        }
 
-        //findUserFacility(); unclear if we need these
-        //findUserEvents();
+        // Initialize a new User instance and copy fields from the input user
+        this.currentUser = new User();
+        this.currentUser.setDeviceID(user.getDeviceID());
+        this.currentUser.setUsername(user.getUsername());
+        this.currentUser.setEmail(user.getEmail());
+        this.currentUser.setPhoneNumber(user.getPhoneNumber());
+        this.currentUser.setProfilePictureUrl(user.getProfilePictureUrl());
+        this.currentUser.setdefaultProfilePictureUrl(user.getProfilePictureUrl());
+        this.currentUser.setLocation(user.getLocation());
+        this.currentUser.setAddress(user.getAddress());
+        this.currentUser.setAdminLevel(user.isAdminLevel());
+        this.currentUser.setFacilityAssociated(user.isFacilityAssociated());
+        this.currentUser.setNotificationAsk(user.isNotificationAsk());
+        this.currentUser.setGeolocationAsk(user.isGeolocationAsk());
+
+        // Make a deep copy of the roles list to avoid sharing references
+        this.currentUser.setRoles(new ArrayList<>(user.getRoles()));
+
+        Log.d("UserManager", "User set with ID: " + currentUser.getDeviceID() + " and Name: " + currentUser.getUsername());
+
+        // Optionally load related data if needed
+        // findUserFacility();
+        // findUserEvents();
     }
 
     /**

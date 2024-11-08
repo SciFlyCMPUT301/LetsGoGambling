@@ -1,6 +1,11 @@
 package com.example.eventbooking.profile;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,10 +14,13 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
@@ -26,6 +34,13 @@ import com.example.eventbooking.User;
 
 import com.example.eventbooking.UserManager;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Picasso;
+
+import java.io.ByteArrayOutputStream;
+import java.util.UUID;
+
 /**
  * ProfileEntrantFragment is a Fragment that handles the display and editing of an entrant's profile.
  * It allows users to view and update their personal details such as name, email, phone number, and notification preferences.
@@ -39,10 +54,14 @@ public class ProfileEntrantFragment extends Fragment {
     protected EditText editPhone;
     private TextView profileTitle;
     protected Button saveButton;
+    private Button removeImageButton;
     private Button backButton;
     private Button uploadButton;
     protected Button editButton;
     protected Switch notificationsSwitch;
+    private ImageView userImage;
+    private ActivityResultLauncher<Intent> pickImageLauncher;
+    private Uri selectedImageUri;
 
     // Start of Testing values
     private Switch testingSwitch;
@@ -138,14 +157,25 @@ public class ProfileEntrantFragment extends Fragment {
         editButton = view.findViewById(R.id.button_edit_profile);
         deviceIDEntry = view.findViewById(R.id.device_id_entry);
         uploadButton = view.findViewById(R.id.button_upload_photo);
+        userImage = view.findViewById(R.id.user_image);
+        removeImageButton = view.findViewById(R.id.button_remove_photo);
         // Initialize EntrantProfileManager
         profileManager = new EntrantProfileManager();
 
         // Load existing profile data
         //loadUserProfile(); user data is already loaded
         if (!isNewUser) {
+            Log.d("Profile", "Loading the profile");
+//            String testDeviceID = "deviceID1";
+//            loadUserByDeviceID(testDeviceID);
             onProfileLoaded(UserManager.getInstance().getCurrentUser());
+        }else{
+            Log.d("Profile", "New profile");
+            currentUser = new User();
         }
+        uploadButton.setVisibility(View.GONE);
+
+
 
 
         // Set up button listeners
@@ -154,6 +184,7 @@ public class ProfileEntrantFragment extends Fragment {
         backButton.setOnClickListener(v -> goToHome());
         editButton.setOnClickListener(v -> toggleEditMode());
         uploadButton.setOnClickListener(v-> uploadPhoto());
+        removeImageButton.setOnClickListener(v-> removeImage());
         // Handle testing switch
 //        testingSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 //            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -164,6 +195,22 @@ public class ProfileEntrantFragment extends Fragment {
 //                }
 //            }
 //        });
+        // Image launcher to get images and store them temporarially
+        pickImageLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        Intent data = result.getData();
+                        if (data != null && data.getData() != null) {
+                            selectedImageUri = data.getData();
+                            // Upload the image and update the profile picture URL
+                            currentUser.uploadImage(selectedImageUri);
+                            // Update the ImageView with the selected image
+                            userImage.setImageURI(selectedImageUri);
+                        }
+                    }
+                }
+        );
 
         // Initially, set save button and switch to be disabled
         // Set up the fragment for new users
@@ -184,18 +231,19 @@ public class ProfileEntrantFragment extends Fragment {
         return view;
     }
 
+
     /**
-     * Loads the profile data from Firestore using the device ID.
+     * Will move to fragment home
      */
-
-
     private void goToHome() {
         getParentFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, new HomeFragment())
                 .commit();
     }
 
-
+    /**
+     * Loads the profile data from Firestore using the device ID.
+     */
     private void loadUserProfile() {
         String deviceID = getDeviceID();
         profileManager.getProfile(deviceID, this::onProfileLoaded);
@@ -222,18 +270,65 @@ public class ProfileEntrantFragment extends Fragment {
      *
      * @param loadingUser The loaded User object
      */
-
     private void onProfileLoaded(User loadingUser) {
         if (loadingUser != null) {
+//            currentUser.deepCopy(loadingUser);
             currentUser = loadingUser;
+            Log.d("Profile load", "Loading profile " + currentUser.getdefaultProfilePictureUrl());
+            Log.d("Profile load", "Loading profile " + loadingUser.getdefaultProfilePictureUrl());
             editName.setText(loadingUser.getUsername());
             editEmail.setText(loadingUser.getEmail());
             editPhone.setText(loadingUser.getPhoneNumber());
             notificationsSwitch.setChecked(loadingUser.isNotificationAsk());
+            currentUser.setdefaultProfilePictureUrl(loadingUser.getdefaultProfilePictureUrl());
+            String profilePictureUrl = loadingUser.getProfilePictureUrl();
+            Log.d("Profile", "URL "+ profilePictureUrl);
+            if (profilePictureUrl != null && !profilePictureUrl.isEmpty()) {
+                Picasso.get()
+                        .load(profilePictureUrl) // URL of the image
+                        .placeholder(R.drawable.placeholder_image_foreground) // Placeholder image while loading
+                        .error(R.drawable.error_image_foreground) // Error image if loading fails
+                        .into(userImage); // ImageView to load the image into
+            }
         } else {
             Toast.makeText(getContext(), "No profile data found.", Toast.LENGTH_SHORT).show();
         }
     }
+
+//    /**
+//     * Fix in place because the singleton does not work in this code at all
+//     * This just loads a user from firebase into the program
+//     *
+//     *
+//     * @param deviceID
+//     */
+//    private void loadUserByDeviceID(String deviceID) {
+//        FirebaseFirestore db = FirebaseFirestore.getInstance();
+//
+//        // Query Firestore for the user with the specified deviceID
+//        db.collection("Users")
+//                .document(deviceID)
+//                .get()
+//                .addOnSuccessListener(documentSnapshot -> {
+//                    if (documentSnapshot.exists()) {
+//                        // Convert document snapshot to a User object
+//                        User loadedUser = documentSnapshot.toObject(User.class);
+//                        if (loadedUser != null) {
+//                            onProfileLoaded(loadedUser);
+//                        } else {
+//                            Log.e("Profile", "Failed to convert document to User.");
+//                            Toast.makeText(getContext(), "Failed to load user data.", Toast.LENGTH_SHORT).show();
+//                        }
+//                    } else {
+//                        Toast.makeText(getContext(), "No user found with this device ID.", Toast.LENGTH_SHORT).show();
+//                    }
+//                })
+//                .addOnFailureListener(e -> {
+//                    Log.e("Profile", "Error loading user: ", e);
+//                    Toast.makeText(getContext(), "Error loading user data.", Toast.LENGTH_SHORT).show();
+//                });
+//    }
+
     /**
      * Saves the user profile data to Firestore, either creating or updating the profile.
      * Also, handles saving user data for new users.
@@ -249,28 +344,22 @@ public class ProfileEntrantFragment extends Fragment {
         currentProfile.setPhoneNumber(editPhone.getText().toString().trim());
         currentProfile.setNotificationsEnabled(notificationsSwitch.isChecked());
 
-        User savingUser = new User();
-        savingUser.setUsername(editName.getText().toString().trim());
-        savingUser.setEmail(editEmail.getText().toString().trim());
-        savingUser.setPhoneNumber(editPhone.getText().toString().trim());
-        savingUser.setNotificationAsk(notificationsSwitch.isChecked());
-        savingUser.addRole("entrant");
-        if(testing == true){
-            savingUser.setDeviceID(deviceIDEntry.getText().toString().trim());
+        currentUser.setUsername(editName.getText().toString().trim());
+        currentUser.setEmail(editEmail.getText().toString().trim());
+        currentUser.setPhoneNumber(editPhone.getText().toString().trim());
+        currentUser.setNotificationAsk(notificationsSwitch.isChecked());
+        Log.d("Profile save", "Profile " + currentUser.getdefaultProfilePictureUrl());
+//        if(selectedImageUri != null){
+//            currentUser.setProfilePictureUrl(selectedImageUri.toString());
+//        }
+
+        if(testing){
+            currentUser.setDeviceID(deviceIDEntry.getText().toString().trim());
         }
 
-        UserManager.getInstance().setCurrentUser(savingUser);
+        UserManager.getInstance().setCurrentUser(currentUser);
 
-        savingUser.saveUserDataToFirestore(new User.OnUserIDGenerated() {
-            @Override
-            public void onUserIDGenerated(String userID) {
-                if (userID != null) {
-                    // Handle successful save operation here
-                } else {
-                    // Handle failure (e.g., show an error message to the user)
-                }
-            }
-        });
+
 
         String deviceID = getDeviceID();
 // profileManager.createOrUpdateProfile(deviceID, currentProfile);
@@ -279,36 +368,89 @@ public class ProfileEntrantFragment extends Fragment {
         setEditMode(false);
         // Handle navigation after saving profile
         if (isNewUser) {
-            editButton.setVisibility(View.VISIBLE);
-            backButton.setVisibility(View.VISIBLE);
-            uploadButton.setVisibility(View.VISIBLE);
-            NavigationView sidebar = getActivity().findViewById(R.id.nav_view);
-            sidebar.setVisibility(View.VISIBLE);
-            Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
-            toolbar.setVisibility(View.VISIBLE);
-            View nav = getActivity().findViewById(R.id.bottom_navigation);
-            nav.setVisibility(View.VISIBLE);
+            Bitmap bitmap = currentUser.generateProfileBitmap(currentUser.getUsername());
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+            byte[] imageBytes = baos.toByteArray();
 
-            if(eventIDFromQR == null){
-                Log.d("ProfileEntrant", "Nothing found");
-                getParentFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, HomeFragment.newInstance(getDeviceID()))
-                        .commit();
-            } else {
-                Log.d("ProfileEntrant", "Found QR link: " + eventIDFromQR);
-                getParentFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, EventViewFragment.newInstance(eventIDFromQR, deviceId))
+            String imageFileName = "defaultProfilePictures/" + UUID.randomUUID() + ".png";
+            StorageReference imageRef = currentUser.storageReference.child(imageFileName);
+
+            imageRef.putBytes(imageBytes).addOnSuccessListener(taskSnapshot ->
+                    imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                        String downloadUrl = uri.toString();
+                        currentUser.setProfilePictureUrl(downloadUrl);
+                        currentUser.setdefaultProfilePictureUrl(downloadUrl);
+
+                        // Save user data to Firestore
+                        currentUser.saveUserDataToFirestore().addOnSuccessListener(aVoid -> {
+                            Toast.makeText(getContext(), "Profile saved successfully.", Toast.LENGTH_SHORT).show();
+                            setEditMode(false);
+
+                            // Update profile image in UI
+                            if (downloadUrl != null && !downloadUrl.isEmpty()) {
+                                Picasso.get().load(downloadUrl)
+                                        .placeholder(R.drawable.placeholder_image_foreground)
+                                        .error(R.drawable.error_image_foreground)
+                                        .into(userImage);
+                            }
+
+                            // Update UI elements visibility
+                            editButton.setVisibility(View.VISIBLE);
+                            backButton.setVisibility(View.VISIBLE);
+                            NavigationView sidebar = getActivity().findViewById(R.id.nav_view);
+                            sidebar.setVisibility(View.VISIBLE);
+                            Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
+                            toolbar.setVisibility(View.VISIBLE);
+                            View nav = getActivity().findViewById(R.id.bottom_navigation);
+                            nav.setVisibility(View.VISIBLE);
+
+                            if(eventIDFromQR == null){
+                                Log.d("ProfileEntrant", "Nothing found");
+                                getParentFragmentManager().beginTransaction()
+                                        .replace(R.id.fragment_container, HomeFragment.newInstance(getDeviceID()))
+                                        .commit();
+                            } else {
+                                Log.d("ProfileEntrant", "Found QR link: " + eventIDFromQR);
+                                getParentFragmentManager().beginTransaction()
+                                        .replace(R.id.fragment_container, EventViewFragment.newInstance(eventIDFromQR, deviceId))
 //                      .replace(R.id.fragment_container, EventViewFragment.newInstance(eventIdFromQR, deviceId))
-                        .addToBackStack(null)
-                        .commit();
+                                        .addToBackStack(null)
+                                        .commit();
 //                getParentFragmentManager().beginTransaction()
 //                        .replace(R.id.fragment_container, ScannedFragment.newInstance(eventIDFromQR))
 //                        .commit();
-            }
+                            }
+                        }).addOnFailureListener(e -> {
+                            Toast.makeText(getContext(), "Failed to save profile.", Toast.LENGTH_SHORT).show();
+                            Log.e("ProfileEntrantFragment", "Error saving profile", e);
+                        });
+                    }).addOnFailureListener(e -> {
+                        Log.e("Firebase", "Failed to retrieve download URL", e);
+                        Toast.makeText(getContext(), "Failed to upload profile picture.", Toast.LENGTH_SHORT).show();
+                    })
+            ).addOnFailureListener(e -> {
+                Log.e("Firebase", "Image upload failed", e);
+                Toast.makeText(getContext(), "Failed to upload profile picture.", Toast.LENGTH_SHORT).show();
+            });
 
-
+        } else{
+            currentUser.saveUserDataToFirestore()
+                    .addOnSuccessListener(aVoid -> {
+                        Toast.makeText(getContext(), "Profile saved successfully.", Toast.LENGTH_SHORT).show();
+                        setEditMode(false);
+                        // Handle navigation or other logic after saving
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(getContext(), "Failed to save profile.", Toast.LENGTH_SHORT).show();
+                    });
         }
+
+
+
     }
+
+
     /**
      * Toggles the edit mode on and off. When enabled, the fields become editable, and the user can save changes.
      */
@@ -331,6 +473,7 @@ public class ProfileEntrantFragment extends Fragment {
         notificationsSwitch.setEnabled(enable);
         saveButton.setEnabled(enable);
         editButton.setText(enable ? "Cancel" : "Edit");
+        uploadButton.setVisibility(View.VISIBLE);
     }
     /**
      * Retrieves the device ID of the current device.
@@ -345,12 +488,34 @@ public class ProfileEntrantFragment extends Fragment {
     }
 
 
-
-    private void uploadPhoto(){
-
-
-
-
-
+    /**
+     * Uploading a photo to firebase
+     */
+    public void uploadPhoto() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        pickImageLauncher.launch(intent);
     }
+
+    public void removeImage() {
+        if (!currentUser.isDefaultURLMain()) {
+            currentUser.deleteSelectedImageFromFirebase(currentUser.getProfilePictureUrl());
+
+            // Update the UI to display the default image
+            String defaultImageUrl = currentUser.getdefaultProfilePictureUrl();
+            if (defaultImageUrl != null && !defaultImageUrl.isEmpty()) {
+                Picasso.get()
+                        .load(defaultImageUrl)
+                        .placeholder(R.drawable.placeholder_image_foreground)
+                        .error(R.drawable.error_image_foreground)
+                        .into(userImage);
+            } else {
+                // If default image URL is not available, set a placeholder image
+                userImage.setImageResource(R.drawable.placeholder_image_foreground);
+            }
+            Toast.makeText(getContext(), "Profile image removed.", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getContext(), "Default image is already set.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
 }

@@ -154,6 +154,7 @@ public class LoginFragment extends Fragment {
                 }, 3000);
             } else { // returning user
                 User user = snapshot.toObject(User.class);
+                Log.d("Login", "User profile " + user.getProfilePictureUrl());
                 Log.d("Login", "Retrieved user "+user.getUsername());
                 UserManager.getInstance().setCurrentUser(user);
 

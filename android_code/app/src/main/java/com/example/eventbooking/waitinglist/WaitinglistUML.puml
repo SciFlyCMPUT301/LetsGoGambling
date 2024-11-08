@@ -1,0 +1,147 @@
+@startuml
+class OrganizerMenuFragment {
+    -- Attributes --
+    - eventId : String
+    - viewWaitingListButton : Button
+    - sampleAttendeesButton : Button
+    - viewCanceledListButton : Button
+    - viewAcceptedListButton : Button
+    - viewSignedListButton : Button
+    - drawReplacementButton : Button
+    - backToEventPageButton : Button
+    - generateQRCode : Button
+    - QRImage : ImageView
+    - qrCodeGenerator : QRcodeGenerator
+    - replacementSize : int
+    - waitingList : WaitingList
+    - maxParticipant : int
+
+    -- Methods --
+    + OrganizerMenuFragment()
+    + newInstance(eventId: String) : OrganizerMenuFragment
+    + onCreate(savedInstanceState: Bundle) : void
+    + onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle) : View
+    - navigateToViewWaitingList() : void
+    - navigateToViewSignedList() : void
+    - navigateToCanceledList() : void
+    - navigateToViewAcceptedList() : void
+    - sampleAttendees() : void
+    - promptReplacementSize() : void
+    - drawReplacement(replacementSize: int) : void
+    - generateAndDisplayQRCode(eventID: String) : void
+    - navigateBackToEventPage() : void
+}
+
+class ViewAcceptedListFragment {
+    -- Attributes --
+    - acceptedListView : ListView
+    - backButton : Button
+    - eventId : String
+    - waitingList : WaitingList
+
+    -- Methods --
+    + newInstance(eventId: String) : ViewAcceptedListFragment
+    + onCreate(savedInstanceState: Bundle) : void
+    + onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle) : View
+    - displayAcceptedList() : void
+    - navigateBackToOrganizerMenu() : void
+}
+
+class ViewCanceledListFragment {
+    -- Attributes --
+    - canceledListView : ListView
+    - backButton : Button
+    - eventId : String
+    - waitingList : WaitingList
+
+    -- Methods --
+    + newInstance(eventId: String) : ViewCanceledListFragment
+    + onCreate(savedInstanceState: Bundle) : void
+    + onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle) : View
+    - displayCanceledList() : void
+    - navigateBackToOrganizerMenu() : void
+}
+
+class ViewSignedListFragment {
+    -- Attributes --
+    - signedUpListView : ListView
+    - backButton : Button
+    - eventId : String
+    - waitingList : WaitingList
+
+    -- Methods --
+    + newInstance(eventId: String) : ViewSignedListFragment
+    + onCreate(savedInstanceState: Bundle) : void
+    + onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle) : View
+    - displaySignedUpList() : void
+    - navigateBackToOrganizerMenu() : void
+}
+
+class ViewWaitingListFragment {
+    -- Attributes --
+    - waitingListView : ListView
+    - backButton : Button
+    - eventId : String
+    - waitingList : WaitingList
+
+    -- Methods --
+    + newInstance(eventId: String) : ViewWaitingListFragment
+    + onCreate(savedInstanceState: Bundle) : void
+    + onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle) : View
+    - displayWaitingList() : void
+    - navigateBackToOrganizerMenu() : void
+}
+
+class WaitingList {
+    -- Attributes --
+    - eventId : String
+    - maxParticipants : int
+    - waitingParticipantIds : List<String>
+    - acceptedParticipantIds : List<String>
+    - signedUpParticipantIds : List<String>
+    - canceledParticipantIds : List<String>
+
+    -- Methods --
+    + WaitingList()
+    + WaitingList(eventId: String)
+    + getEventId() : String
+    + setEventId(eventId: String) : void
+    + getMaxParticipants() : int
+    + setMaxParticipants(maxParticipants: int) : void
+    + getWaitingParticipantIds() : List<String>
+    + setWaitingParticipantIds(waitingParticipantIds: List<String>) : void
+    + getAcceptedParticipantIds() : List<String>
+    + setAcceptedParticipantIds(acceptedParticipantIds: List<String>) : void
+    + getSignedUpParticipantIds() : List<String>
+    + setSignedUpParticipantIds(signedUpParticipantIds: List<String>) : void
+    + getCanceledParticipantIds() : List<String>
+    + setCanceledParticipantIds(canceledParticipantIds: List<String>) : void
+    + addParticipantToWaitingList(participantId: String) : boolean
+    + sampleParticipants(sampleSize: int) : List<String>
+    + participantSignsUp(participantId: String) : String
+    + cancelParticipation(participantId: String) : boolean
+    + drawReplacement(replacementSize: int) : List<String>
+    + loadFromFirebase() : Task<DocumentSnapshot>
+    + updateToFirebase() : Task<Void>
+}
+
+WaitingList <-- ViewAcceptedListFragment : uses
+WaitingList <-- ViewCanceledListFragment : uses
+WaitingList <-- ViewSignedListFragment : uses
+WaitingList <-- ViewWaitingListFragment : uses
+ViewWaitingListFragment --> OrganizerMenuFragment : navigates
+ViewWaitingListFragment --> WaitingList : uses
+ViewSignedListFragment --> OrganizerMenuFragment : navigates
+ViewSignedListFragment --> WaitingList : uses
+ViewCanceledListFragment --> OrganizerMenuFragment : navigates
+ViewCanceledListFragment --> WaitingList : uses
+ViewAcceptedListFragment --> OrganizerMenuFragment : navigates
+ViewAcceptedListFragment --> WaitingList : uses
+OrganizerMenuFragment --> EventFragment : navigates
+OrganizerMenuFragment --> ViewWaitingListFragment : navigates
+OrganizerMenuFragment --> ViewSignedListFragment : navigates
+OrganizerMenuFragment --> ViewCanceledListFragment : navigates
+OrganizerMenuFragment --> ViewAcceptedListFragment : navigates
+OrganizerMenuFragment --> WaitingList : contains
+OrganizerMenuFragment --> QRcodeGenerator : uses
+@enduml

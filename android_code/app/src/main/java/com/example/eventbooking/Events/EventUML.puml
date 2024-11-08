@@ -1,0 +1,153 @@
+@startuml
+class EventViewFragment {
+    - eventId : String
+    - deviceId : String
+    - userId : String
+    - event : Event
+    - eventPosterImage : ImageView
+    - eventTitleText : TextView
+    - eventDescriptionText : TextView
+    - buttonContainer : LinearLayout
+    + newInstance(eventID: String, deviceID: String) : EventViewFragment
+    + onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle) : View
+    - displayEventDetails(event: Event) : void
+    - configureButtons(selectedEvent: Event, selectedUserId: String) : void
+    - addButton(text: String, listener: View.OnClickListener) : void
+    - updateEventInFirestore(event: Event) : void
+    - goBackToEventFragment() : void
+}
+
+class EventViewAdapter {
+    - context : Context
+    - eventList : List<Event>
+    - userId : String
+    - test : boolean
+    + EventViewAdapter(context: Context, eventList: ArrayList<Event>, test: boolean)
+    + getView(position: int, convertView: View, parent: ViewGroup) : View
+}
+
+class EventFragment {
+    - addFacilityButton : Button
+    - backButton : Button
+    - currentUserId : String
+    - eventList : ArrayList<Event>
+    - testing : boolean
+    - eventSwitch : Switch
+    - eventListView : ListView
+    - db : FirebaseFirestore
+    - currentUser : User
+    - eventAdapter : EventViewAdapter
+    - userManager : UserManager
+    + newInstance() : EventFragment
+    + onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle) : View
+    - getUserData() : User
+    - updateEventList(showUserEvents: boolean) : void
+    - promptCreateFacility() : void
+    - navigateToEventCreate() : void
+    - navigateToFacilityCreation() : void
+    - findEventsByParticipantDeviceId(deviceID: String) : List<Event>
+    - findEventsByOrganizerDeviceId(deviceID: String) : List<Event>
+    - getFiveRandomEvents() : Task<List<Event>>
+}
+
+class Event {
+    - eventId : String
+    - eventTitle : String
+    - description : String
+    - imageUrl : String
+    - timestamp : long
+    - address : String
+    - location : String
+    - maxParticipants : int
+    - waitingParticipantIds : List<String>
+    - acceptedParticipantIds : List<String>
+    - canceledParticipantIds : List<String>
+    - signedUpParticipantIds : List<String>
+    - enrolledParticipantIds : List<String>
+    - declinedParticipantIds : List<String>
+    - waitingList : WaitingList
+    - organizerId : String
+    - db : FirebaseFirestore
+    - storage : FirebaseStorage
+    + Event()
+    + Event(eventId: String, eventTitle: String, description: String, imageUrl: String, timestamp: long, locationstr: String, maxParticipants: int, organizerId: String)
+    + getEventId() : String
+    + setEventId(eventId: String) : void
+    + getEventTitle() : String
+    + setEventTitle(eventTitle: String) : void
+    + getDescription() : String
+    + setDescription(description: String) : void
+    + getImageUrl() : String
+    + setImageUrl(imageUrl: String) : void
+    + getTimestamp() : long
+    + setTimestamp(timestamp: long) : void
+    + getAddress() : String
+    + setAddress(address: String) : void
+    + getMaxParticipants() : int
+    + setMaxParticipants(maxParticipants: int) : void
+    + getWaitingList() : WaitingList
+    + getOrganizerId() : String
+    + setOrganizerId(organizerId: String) : void
+    + getLocation() : String
+    + setLocation(location: String) : void
+    + getAcceptedParticipantIds() : List<String>
+    + addAcceptedParticipantId(participantId: String) : void
+    + getCanceledParticipantIds() : List<String>
+    + addCanceledParticipantIds(participantId: String) : void
+    + getSignedUpParticipantIds() : List<String>
+    + addSignedUpParticipantIds(participantId: String) : void
+    + getWaitingParticipantIds() : List<String>
+    + addWaitingParticipantIds(participantId: String) : void
+    + removeWaitingParticipantId(participantId: String) : void
+    + acceptParticipant(entrantId: String) : void
+    + cancelParticipant(entrantId: String) : void
+    + signUpParticipant(entrantId: String) : void
+    + addParticipant(entrantId: String) : void
+    + removeParticipant(entrantId: String) : void
+    + createEventPosterUrl() : String
+    + saveEventDataToFirestore() : Task<Void>
+    + updateEventData(...) : Task<Void>
+    + uploadEventPosterToFirebase(picture: String) : void
+    + updateEventPosterToFirebase(newPoster: String) : void
+    + getNewEventID() : String
+    + findEventById(eventId: String, onSuccessListener: OnSuccessListener<Event>, onFailureListener: OnFailureListener) : void
+    + addDeclinedParticipantId(userId: String) : void
+    + getDeclinedParticipantIds() : List<String>
+}
+
+class EventCreateFragment {
+    - editTextTitle : EditText
+    - editTextDescription : EditText
+    - editTextImageUrl : EditText
+    - editTextLocation : EditText
+    - editMaxParticipants : EditText
+    - editWaitingListLimit : EditText
+    - createEventButton : Button
+    - backButton : Button
+    - db : FirebaseFirestore
+    - roleAssigned : boolean
+    - testingFlag : boolean
+    + EventCreateFragment()
+    + newInstance(testing: boolean) : EventCreateFragment
+    + onCreate(savedInstanceState: Bundle) : void
+    + onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle) : View
+    - createEvent() : void
+    - clearEventForm() : void
+}
+
+EventCreateFragment *-- "1" Event : creates
+EventCreateFragment --> "1" FirebaseFirestore : uses
+EventCreateFragment --> "1" HomeFragment : navigates
+Event *-- "0..*" WaitingList : contains
+EventFragment --> "1" EventCreateFragment : navigates
+EventFragment --> "1" EventViewFragment : navigates
+EventFragment --> "1" OrganizerMenuFragment : navigates
+EventFragment --> "1" HomeFragment : navigates
+EventFragment *-- "1..*" Event : contains
+EventFragment --> "1" User : uses
+EventFragment --> "1" EventViewAdapter : uses
+ViewEventsFragment --> "1" EventViewAdapter : uses
+EventViewAdapter *-- "1..*" Event : contains
+EventViewFragment --> "1" Event : uses
+EventViewFragment --> "1" EventFragment : navigates
+@enduml

@@ -5,7 +5,6 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 import org.mockito.Mockito;
 
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -53,7 +52,7 @@ public class UserTest {
         User user = new User();
         user.setUsername("DefaultUser");
         String expectedUrl = "https://firebasestorage.googleapis.com/v0/b/YOUR_FIREBASE_PROJECT_ID/o/default%2FDefaultUser.png?alt=media";
-        assertEquals(expectedUrl, user.defaultProfilePictureUrl());
+        assertEquals(expectedUrl, user.defaultProfilePictureUrl(user.getUsername()));
     }
 
     @Test

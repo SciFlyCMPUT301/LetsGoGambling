@@ -79,6 +79,11 @@ public class Facility {
     }
 
     public String getAddress() { return address; }
+
+    /**
+     * Set the address to the input string
+     * @param address
+     */
     public void setAddress(String address) { this.address = address; }
 
     public String getOrganizer() { return organizer; }
@@ -86,7 +91,9 @@ public class Facility {
 
 //    public Location getLocation() { return location; }
 //    public void setLocation(Location location) { this.location = location; }
-
+    /**
+     *
+     */
     public String getFacilityID() {
         return facilityID;
     }
@@ -102,6 +109,10 @@ public class Facility {
         this.eventName = eventName;
     }
 
+    /**
+     * Setting all the events for the facility to a given list
+     * @param allEvents
+     */
     public void setAllEvents(List<String> allEvents) {
         this.allEvents = allEvents;
     }

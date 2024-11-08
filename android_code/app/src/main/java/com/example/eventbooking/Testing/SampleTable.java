@@ -12,6 +12,10 @@ import com.google.android.gms.tasks.OnFailureListener;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * This class is designed to generate sample data to be sent to firebase, meant for quick loading and
+ * deleting of the data
+ */
 public class SampleTable {
     public List<User> UserList = new ArrayList<>();
     public List<Facility> FacilityList = new ArrayList<>();

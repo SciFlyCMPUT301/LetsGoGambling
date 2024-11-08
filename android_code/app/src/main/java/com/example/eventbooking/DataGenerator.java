@@ -10,6 +10,15 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.*;
 
+
+/**
+ * This class is responsible for generating sample data for users, facilities, and events,
+ * and uploading them to a Firebase Firestore database.
+ * <p>
+ * It creates a set of users with different roles (Admin, Organizer, Entrant), a set of facilities
+ * with assigned organizers,and events that are linked to users and facilities.
+ * The generated data is then uploaded asynchronously to Firestore.
+ */
 public class DataGenerator {
 
     private List<User> userList;
@@ -18,13 +27,18 @@ public class DataGenerator {
 
     private FirebaseFirestore db;
 
+    /**
+     * Constructor for the Data Generator class to instantiate the lists so they are not null
+     */
     public DataGenerator() {
         db = FirebaseFirestore.getInstance();
         userList = new ArrayList<>();
         facilityList = new ArrayList<>();
         eventList = new ArrayList<>();
     }
-
+    /**
+     *
+     */
     public void generateAndUploadData() {
         generateUsers();
         generateFacilities();

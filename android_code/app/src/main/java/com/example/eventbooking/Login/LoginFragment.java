@@ -113,11 +113,13 @@ public class LoginFragment extends Fragment {
         deviceIdText.setText(tempval);
         Log.d("Login", tempval);
         FirestoreAccess fs = FirestoreAccess.getInstance();
+        Log.d("Login Firebase", "Firebase Access Found");
 //        fs.getUser(deviceId).addOnSuccessListener(snapshot -> {
         fs.getUser(tempval).addOnSuccessListener(snapshot -> {
             Log.d("Login New User", "New User found");
             //nav.setVisibility(View.VISIBLE);
             if (!snapshot.exists()) { // if new user
+                Log.d("Login", "New user, no snapshot found.");
                 welcomeText.setText("Welcome new user");
                 //testing
 //                User user = new User(deviceId, "Alex", "a@b.com", "9312-303", new HashSet<>());
@@ -153,6 +155,7 @@ public class LoginFragment extends Fragment {
                     }
                 }, 3000);
             } else { // returning user
+                Log.d("Login", "Returning User");
                 User user = snapshot.toObject(User.class);
                 Log.d("Login", "User profile " + user.getProfilePictureUrl());
                 Log.d("Login", "Retrieved user "+user.getUsername());
@@ -194,7 +197,10 @@ public class LoginFragment extends Fragment {
                     }
                 }, 3000);
             }
+        }).addOnFailureListener(e -> {
+            Log.d("Login", "Firestore access failed: " + e.getMessage());
         });
+        Log.d("Login", "Firebase Failed");
 
         return rootView;
     }

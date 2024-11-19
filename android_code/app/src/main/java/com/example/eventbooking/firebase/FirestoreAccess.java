@@ -1,5 +1,7 @@
 package com.example.eventbooking.firebase;
 
+import android.util.Log;
+
 import com.example.eventbooking.User;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
@@ -24,6 +26,7 @@ public class FirestoreAccess {
         usersRef = db.collection("Users");
         eventsRef = db.collection("Events");
         facilitiesRef = db.collection("Facilities");
+        Log.d("Firestore Access", "Instantiating Firestore");
     }
 
     public static FirestoreAccess getInstance() {
@@ -34,7 +37,10 @@ public class FirestoreAccess {
     }
 
     public Task<DocumentSnapshot> getUser(String userId) {
-        return usersRef.document(userId).get();
+        Log.d("Firestore Access", "Getting User " + userId);
+//        return usersRef.document(userId).get();
+        DocumentReference userDoc = usersRef.document(userId);
+        return userDoc.get();
     }
 
     public Task<QuerySnapshot> getUserEvents(String userId) {

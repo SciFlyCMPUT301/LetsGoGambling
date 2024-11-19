@@ -25,6 +25,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
+import com.example.eventbooking.Admin.AdminActivity;
 import com.example.eventbooking.Admin.AdminFragment;
 import com.example.eventbooking.Events.EventCreate.EventCreateFragment;
 import com.example.eventbooking.Events.EventPageFragment.EventFragment;
@@ -282,9 +283,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         .replace(R.id.fragment_container, eventCodeGenerate)
                         .commit();
             }else if (itemId == R.id.nav_admin) {
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, adminFragment)
-                        .commit();
+                // Activity Movement
+                startActivity(new Intent(this, AdminActivity.class));
+                // Fragment movement
+//                getSupportFragmentManager().beginTransaction()
+//                        .replace(R.id.fragment_container, adminFragment)
+//                        .commit();
             }
             // Close the drawer after an item is selected
             drawerLayout.closeDrawer(GravityCompat.START);

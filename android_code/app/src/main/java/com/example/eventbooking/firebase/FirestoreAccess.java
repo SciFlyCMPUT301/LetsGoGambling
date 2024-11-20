@@ -55,6 +55,17 @@ public class FirestoreAccess {
         return eventsRef.whereEqualTo("organizerId", userId).get();  // Assuming "organizerId" is the field linking events to the organizer
     }
 
+    /**
+     * Retrieves all users with the given username.
+     *
+     * @param username The username to search for in the Users collection.
+     * @return A Task<QuerySnapshot> containing the query results.
+     */
+    public Task<QuerySnapshot> getUsersByUsername(String username) {
+        Log.d("Firestore Access", "Querying Users by username: " + username);
+        return usersRef.whereEqualTo("username", username).get();
+    }
+
     public Task<Void> addUser(User user) {
 //        Map<String, Object> userdata = new HashMap<>();
 //        userdata.put("username", user.getUsername());

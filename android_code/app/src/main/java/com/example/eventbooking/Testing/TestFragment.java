@@ -1,6 +1,7 @@
 package com.example.eventbooking.Testing;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -8,23 +9,23 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.app.ProgressDialog;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.eventbooking.Events.EventData.Event;
-import com.example.eventbooking.Facility;
+import com.example.eventbooking.Facility.Facility;
+import com.example.eventbooking.Home.HomeActivity;
+import com.example.eventbooking.QRCode.QRcodeGenerator;
 import com.example.eventbooking.R;
 import com.example.eventbooking.User;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.WriteBatch;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -47,9 +48,12 @@ public class TestFragment extends Fragment {
     private static final String TAG = "FirebaseTestingFragment";
     private static final int PICK_IMAGE_REQUEST = 1;
 
-    private Button btnGenerateData, btnLoadData, btnSelectImage, btnUploadImage, btnDelete;
-    private ImageView imageView;
+    private Button btnGenerateData, btnLoadData, btnSelectImage;
+    private Button generateQRCode,  btnUploadImage, btnDelete, btnBackHome;
+    private ImageView imageView, QRCode;
     private TextView txtStatus;
+    private EditText eventIDForQR;
+    private QRcodeGenerator qrCodeGenerator;
 
     private Uri imageUri;
 
@@ -75,6 +79,8 @@ public class TestFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
         storage = FirebaseStorage.getInstance();
 
+        qrCodeGenerator = new QRcodeGenerator(getContext());
+
         // Initialize SampleTable
         sampleTable = new SampleTable();
     }
@@ -98,9 +104,13 @@ public class TestFragment extends Fragment {
         btnLoadData = view.findViewById(R.id.btnLoadData);
         btnSelectImage = view.findViewById(R.id.btnSelectImage);
         btnUploadImage = view.findViewById(R.id.btnUploadImage);
+        generateQRCode = view.findViewById(R.id.button_generate_qr_code);
         btnDelete = view.findViewById(R.id.btnDeleteAllGenData);
+        btnBackHome = view.findViewById(R.id.button_back_home);
         imageView = view.findViewById(R.id.imageView);
+        QRCode = view.findViewById(R.id.potentialQRCode);
         txtStatus = view.findViewById(R.id.txtStatus);
+        eventIDForQR = view.findViewById(R.id.event_id_for_qr);
 
         if (francisTest == false) {
             btnDelete.setVisibility(View.GONE);
@@ -112,7 +122,8 @@ public class TestFragment extends Fragment {
         btnSelectImage.setOnClickListener(v -> openFileChooser());
         btnUploadImage.setOnClickListener(v -> uploadImage());
         btnDelete.setOnClickListener(v -> deleteAllData());
-
+        btnBackHome.setOnClickListener(v -> backToHome());
+        generateQRCode.setOnClickListener(v -> generateAndDisplayQRCode());
         return view;
     }
 
@@ -266,6 +277,21 @@ public class TestFragment extends Fragment {
 
         db.collection("Users").get().addOnSuccessListener(queryDocumentSnapshots -> {
             for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
+                String userId = document.getId();
+                String profilePictureUrl = document.getString("profilePictureUrl");
+                String defaultProfilePictureUrl = document.getString("defaultProfilePictureUrl");
+
+                // Delete the profile picture(s) from Firebase Storage
+                if (profilePictureUrl != null) {
+                    if (profilePictureUrl.equals(defaultProfilePictureUrl)) {
+                        // Delete only the default profile picture if the profile matches default
+                        deleteProfilePictureFromStorage(defaultProfilePictureUrl);
+                    } else {
+                        // Delete both profile and default pictures if they are different
+                        deleteProfilePictureFromStorage(profilePictureUrl);
+                        deleteProfilePictureFromStorage(defaultProfilePictureUrl);
+                    }
+                }
                 batch.delete(document.getReference());
             }
 
@@ -340,4 +366,56 @@ public class TestFragment extends Fragment {
             return description;
         }
     }
+
+    /**
+     * Deletes a profile picture from Firebase Storage.
+     *
+     * @param imageUrl The URL of the profile picture to delete.
+     */
+    private void deleteProfilePictureFromStorage(String imageUrl) {
+        if (imageUrl == null || imageUrl.isEmpty()) {
+            return;
+        }
+
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference storageReference = storage.getReferenceFromUrl(imageUrl);
+
+        storageReference.delete().addOnSuccessListener(aVoid -> {
+            Log.d("DeleteProfilePicture", "Profile picture deleted successfully.");
+        }).addOnFailureListener(e -> {
+            Log.e("DeleteProfilePicture", "Failed to delete profile picture: " + e.getMessage());
+        });
+    }
+
+
+
+    /**
+     * This function will get the QR code associated with the event to be scanned and displayed when scanned
+     * Once the QR code is generated then we display the QR code
+     */
+    private void generateAndDisplayQRCode() {
+        // URL to be encoded into the QR code (example URL with eventId)
+        String event = eventIDForQR.getText().toString();
+        String eventUrl = "eventbooking://eventDetail?eventID=" + event;
+
+        // Generate QR code using the QRcodeGenerator class
+        Bitmap qrCodeBitmap = qrCodeGenerator.generateQRCode(eventUrl);
+
+        if (qrCodeBitmap != null) {
+            QRCode.setImageBitmap(qrCodeBitmap);
+
+            qrCodeGenerator.saveQRCode(qrCodeBitmap, event);
+
+            Toast.makeText(getContext(), "QR code generated and saved.", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getContext(), "Failed to generate QR code.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void backToHome(){
+        Intent intent = new Intent(getActivity(), HomeActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+    }
+
 }

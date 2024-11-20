@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_marginTop="70dp"
+    android:padding="16dp">
+
+<!--    <Button-->
+<!--        android:id="@+id/viewUsersButton"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="View All Users" />-->
+
+<!--    <Button-->
+<!--        android:id="@+id/viewEventsButton"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="View All Events"-->
+<!--        android:layout_marginTop="8dp" />-->
+
+<!--    <Button-->
+<!--        android:id="@+id/viewFacilitiesButton"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="View All Facilities"-->
+<!--        android:layout_marginTop="8dp" />-->
+
+<!--    <Button-->
+<!--        android:id="@+id/viewImagesButton"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="View All Images"-->
+<!--        android:layout_marginTop="8dp" />-->
+
+    <FrameLayout
+        android:id="@+id/flFragmentAdmin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!--    <FrameLayout-->
+    <!--        android:id="@+id/flFragmentAdmin"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="match_parent" />-->
+
+</LinearLayout>

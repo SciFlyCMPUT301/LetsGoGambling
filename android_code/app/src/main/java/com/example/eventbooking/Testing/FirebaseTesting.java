@@ -2,12 +2,7 @@ package com.example.eventbooking.Testing;
 
 import android.net.Uri;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.example.eventbooking.Events.EventData.Event;
-import com.example.eventbooking.Facility;
-import com.example.eventbooking.User;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.*;
 import com.google.firebase.storage.*;
 

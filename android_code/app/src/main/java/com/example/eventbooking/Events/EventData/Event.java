@@ -335,6 +335,7 @@ public class Event {
      */
 
     public Task<Void> saveEventDataToFirestore() {
+        Log.d("Event", "Saving Event to Firestore");
         Map<String, Object> eventData = new HashMap<>();
         String new_eventID = eventId;
         if(eventId == null){

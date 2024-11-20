@@ -27,12 +27,12 @@
 
 
         <activity
-            android:name=".MainActivity"
+            android:name=".Login.LoginActivity"
             android:exported="true">
-
+            <!--            Old activity, changing to Login-->
+            <!--            android:name=".MainActivity"-->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <intent-filter>
@@ -45,6 +45,14 @@
                     tools:ignore="AppLinkUrlError" />
             </intent-filter>
         </activity>
+
+<!--        <activity android:name=".Login.LoginActivity" />-->
+        <activity android:name=".MainActivity" />
+        <activity android:name=".profile.ProfileActivity" />
+        <activity android:name=".Home.HomeActivity" />
+        <activity android:name=".Admin.AdminActivity" />
+        <activity android:name=".Events.EventView.EventViewActivity" />
+        <activity android:name=".Events.EventPageFragment.EventActivity" />
     </application>
 
 </manifest>

@@ -10,9 +10,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
-import com.example.eventbooking.Facility;
+import com.example.eventbooking.Facility.Facility;
 import com.example.eventbooking.R;
-import com.example.eventbooking.User;
 
 import java.util.ArrayList;
 import java.util.List;

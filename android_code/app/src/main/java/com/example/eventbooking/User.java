@@ -532,6 +532,7 @@ public class User {
 
 
     public void deleteSelectedImageFromFirebase(String imageUrl) {
+        Log.d("User", "Remove Image Firebase");
         // Get a reference to the image in Firebase Storage
         StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl(imageUrl);
 

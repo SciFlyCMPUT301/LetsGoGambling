@@ -1,9 +1,7 @@
 package com.example.eventbooking;
 
 import com.example.eventbooking.Events.EventData.Event;
-import com.example.eventbooking.Facility;
-import com.example.eventbooking.User;
-import com.example.eventbooking.Role;
+import com.example.eventbooking.Facility.Facility;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.FirebaseFirestore;

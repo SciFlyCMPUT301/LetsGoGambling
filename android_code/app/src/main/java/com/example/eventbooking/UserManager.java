@@ -3,11 +3,10 @@ package com.example.eventbooking;
 import android.util.Log;
 
 import com.example.eventbooking.Events.EventData.Event;
+import com.example.eventbooking.Facility.Facility;
 import com.example.eventbooking.firebase.FirestoreAccess;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +59,7 @@ public class UserManager {
         this.currentUser.setEmail(user.getEmail());
         this.currentUser.setPhoneNumber(user.getPhoneNumber());
         this.currentUser.setProfilePictureUrl(user.getProfilePictureUrl());
-        this.currentUser.setdefaultProfilePictureUrl(user.getProfilePictureUrl());
+        this.currentUser.setdefaultProfilePictureUrl(user.getdefaultProfilePictureUrl());
         this.currentUser.setLocation(user.getLocation());
         this.currentUser.setAddress(user.getAddress());
         this.currentUser.setAdminLevel(user.isAdminLevel());

@@ -178,7 +178,7 @@ public class EditEventFragment extends Fragment {
      */
     private void goBackToViewEvents() {
         getParentFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, new ViewEventsFragment())
+                .replace(R.id.flFragmentAdmin, new ViewEventsFragment())
                 .commit();
     }
 

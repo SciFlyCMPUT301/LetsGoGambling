@@ -1,5 +1,6 @@
 package com.example.eventbooking.Admin.Users;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,10 +15,14 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.example.eventbooking.Admin.AdminActivity;
 import com.example.eventbooking.Admin.AdminFragment;
+import com.example.eventbooking.Admin.Event.EditEventFragment;
 import com.example.eventbooking.Admin.Images.EditImageFragment;
 import com.example.eventbooking.Admin.Images.ImageAdapter;
 import com.example.eventbooking.Admin.Images.ImageClass;
+import com.example.eventbooking.Events.EventData.Event;
+import com.example.eventbooking.Home.HomeActivity;
 import com.example.eventbooking.Home.HomeFragment;
 import com.example.eventbooking.R;
 import com.example.eventbooking.User;
@@ -52,7 +57,7 @@ public class ViewUsersFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_view_users, container, false);
-
+        Log.d("View Users Fragment", "Fragment Launched");
         // Initialize ListView
 //        imagesListView = view.findViewById(R.id.imagesListView);
         db = FirebaseFirestore.getInstance();
@@ -64,105 +69,74 @@ public class ViewUsersFragment extends Fragment {
         // Initialize buttons for adding users and navigating back
         addUser = view.findViewById(R.id.add_user_button);
         adminGoBack = view.findViewById(R.id.admin_go_back);
-        // Load images from Firebase
-//        loadImagesFromFirebase();
-
 
         // Load Users
         loadUsersFromFirestore();
+        Log.d("View Users Fragment", "After Firestore Call");
 
 
         addUser.setOnClickListener(v -> {
             // Open EditUserFragment with empty fields for a new user
-            openNewUserFragment();
+            openUserDetailPage(null);
         });
         adminGoBack.setOnClickListener(v -> {
-            // Navigate back to HomeFragment
-            getParentFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new AdminFragment())
-                    .commit();
+            backToAdmin();
         });
 
         // Set ListView item click listener
         usersListView.setOnItemClickListener((AdapterView<?> parent, View v, int position, long id) -> {
             User selectedUser = userList.get(position);
-            openUserDetailsFragment(selectedUser);
+            openUserDetailPage(selectedUser);
         });
 
 
         return view;
     }
-    /**
-     * Opens a new EditUserFragment with empty fields to add a new user.
-     */
-    private void openNewUserFragment() {
-        EditUserFragment fragment = new EditUserFragment();
-        Bundle bundle = new Bundle();
-        bundle.putBoolean("isNewUser", true); // Pass flag for new user
-        fragment.setArguments(bundle);
 
-        FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragment_container, fragment);
-        transaction.addToBackStack(null);
-        transaction.commit();
-    }
 
     /**
-     * Opens the EditUserFragment with details of the selected user for viewing or editing.
+     * Opens the detail view for the selected user, allowing further edits.
      *
-     * @param selectedUser the User object representing the selected user
+     * @param selectedUser The event selected by the user, represented as an {@link Event} object.
      */
-    private void openUserDetailsFragment(User selectedUser) {
-        FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
-        EditUserFragment fragment = new EditUserFragment();
-
-        Bundle bundle = new Bundle();
-        bundle.putString("deviceId", selectedUser.getDeviceID());
-        Log.d("Loading User", "Document ID: "+ selectedUser.getDeviceID());
-        bundle.putString("username", selectedUser.getUsername());
-        bundle.putString("email", selectedUser.getEmail());
-        bundle.putString("phoneNumber", selectedUser.getPhoneNumber());
-        bundle.putString("location", selectedUser.getAddress());
-        bundle.putString("profilePictureUrl", selectedUser.getProfilePictureUrl());
-        bundle.putBoolean("isNewUser", false);
-        if(selectedUser.hasRole("admin"))
-            bundle.putBoolean("admin", true);
-        else
-            bundle.putBoolean("admin", false);
-        if(selectedUser.hasRole("entrant"))
-            bundle.putBoolean("entrant", true);
-        else
-            bundle.putBoolean("entrant", false);
-        if(selectedUser.hasRole("organizer"))
-            bundle.putBoolean("organizer", true);
-        else
-            bundle.putBoolean("organizer", false);
-        fragment.setArguments(bundle);
-        // Replace current fragment with EditUserFragment and add to back stack
-        transaction.replace(R.id.fragment_container, fragment);
-        transaction.addToBackStack(null);
-        transaction.commit();
+    private void openUserDetailPage(User selectedUser) {
+        // Create and navigate to the Event Detail Fragment
+        Log.d("View Users Fragment", "Open User Edit Page");
+        EditUserFragment fragment = new EditUserFragment(selectedUser);
+        getParentFragmentManager().beginTransaction()
+                .replace(R.id.flFragmentAdmin, fragment)
+                .addToBackStack(null)
+                .commit();
     }
+
     /**
      * Loads users from Firestore and updates the ListView adapter.
      * Logs the device ID of each loaded user and shows an error message on failure.
      */
     private void loadUsersFromFirestore() {
+        Log.d("View Users Fragment", "Loading Users From Firestore");
         db.collection("Users").get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 // Iterate through the documents and add each user to the list
                 for (QueryDocumentSnapshot document : task.getResult()) {
                     User user = document.toObject(User.class);
                     userList.add(user);
-                    Log.d("ViewUsersFragment", "User deviceId: " + user.getDeviceID());
+                    Log.d("View Users Fragment", "User deviceId: " + user.getDeviceID());
                 }
                 // Notify adapter to refresh ListView
                 userAdapter.notifyDataSetChanged();
-                Log.d("ViewUsersFragment", "Users loaded: " + userList.size());
+                Log.d("View Users Fragment", "Users loaded: " + userList.size());
             } else {
                 Log.e("FirestoreError", "Error getting documents: ", task.getException());
             }
         });
+        Log.d("ViewUsersFragment", "Users loaded: " + userList.size());
+    }
+
+    private void backToAdmin(){
+        Intent intent = new Intent(getActivity(), AdminActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
     }
 
 

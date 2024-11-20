@@ -1,5 +1,6 @@
 package com.example.eventbooking.Admin.Event;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.eventbooking.Admin.AdminActivity;
 import com.example.eventbooking.Admin.AdminFragment;
 import com.example.eventbooking.Events.EventData.Event;
 import com.example.eventbooking.Events.EventPageFragment.EventViewAdapter;
@@ -83,9 +85,7 @@ public class ViewEventsFragment extends Fragment {
         // Set click listener for admin go back button
         adminGoBack.setOnClickListener(v -> {
             // Navigate back to HomeFragment
-            getParentFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new AdminFragment())
-                    .commit();
+            backToAdmin();
         });
         return view;
 
@@ -124,11 +124,16 @@ public class ViewEventsFragment extends Fragment {
         // Create and navigate to the Event Detail Fragment
         EditEventFragment detailFragment = new EditEventFragment(selectedEvent);
         getParentFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, detailFragment)
+                .replace(R.id.flFragmentAdmin, detailFragment)
                 .addToBackStack(null)
                 .commit();
     }
 
+    private void backToAdmin(){
+        Intent intent = new Intent(getActivity(), AdminActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+    }
 
 
 }

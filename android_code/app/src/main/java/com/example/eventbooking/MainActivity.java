@@ -25,11 +25,15 @@ import androidx.fragment.app.FragmentManager;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
+import com.example.eventbooking.Admin.AdminActivity;
 import com.example.eventbooking.Admin.AdminFragment;
 import com.example.eventbooking.Events.EventCreate.EventCreateFragment;
+import com.example.eventbooking.Events.EventPageFragment.EventActivity;
 import com.example.eventbooking.Events.EventPageFragment.EventFragment;
 import com.example.eventbooking.Events.EventView.EventViewFragment;
+import com.example.eventbooking.Home.HomeActivity;
 import com.example.eventbooking.Home.HomeFragment;
+import com.example.eventbooking.Login.LoginActivity;
 import com.example.eventbooking.Login.LoginFragment;
 import com.example.eventbooking.QRCode.CameraFragment;
 import com.example.eventbooking.QRCode.QRCodeEventGenerate;
@@ -37,6 +41,7 @@ import com.example.eventbooking.QRCode.QRcodeGenerator;
 import com.example.eventbooking.QRCode.ScannedFragment;
 import com.example.eventbooking.Testing.TestFragment;
 import com.example.eventbooking.notification.NotificationFragment;
+import com.example.eventbooking.profile.ProfileActivity;
 import com.example.eventbooking.profile.ProfileEntrantFragment;
 import com.example.eventbooking.profile.ProfileFragment;
 import com.example.eventbooking.waitinglist.OrganizerMenuFragment;
@@ -108,7 +113,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 = findViewById(R.id.bottom_navigation);
         bottomNavigationView
                 .setOnNavigationItemSelectedListener(this);
-        bottomNavigationView.setSelectedItemId(R.id.nav_home);
+//        bottomNavigationView.setSelectedItemId(R.id.nav_home);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -127,7 +132,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.addDrawerListener(drawerToggle);
         drawerToggle.syncState();
-
         // Getting the login fragment given intent
         handleIntent(getIntent());
 
@@ -172,32 +176,50 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int itemId = item.getItemId();
         if (itemId == R.id.nav_home || itemId == R.id.nav_profile ||
         itemId == R.id.nav_events || itemId == R.id.nav_test){
-
             if (itemId == R.id.nav_home) {
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.fragment_container, homeFragment)
-                        .commit();
+                Intent intent = new Intent(this, HomeActivity.class);
+                intent.putExtra("source_activity", "Main Activity");
+                startActivity(intent);
                 return true;
             } else if (itemId == R.id.nav_profile) {
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.fragment_container, profileEntrantFragment)
-                        .commit();
+                Intent intent = new Intent(this, ProfileActivity.class);
+                startActivity(intent);
                 return true;
             } else if (itemId == R.id.nav_events) {
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.fragment_container, eventFragment)
-                        .commit();
+                Intent intent = new Intent(this, EventActivity.class);
+                startActivity(intent);
                 return true;
-            }else if (itemId == R.id.nav_test) {
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.fragment_container, testFragment)
-                        .commit();
+            } else if (itemId == R.id.nav_admin) {
+                Intent intent = new Intent(this, AdminActivity.class);
+                startActivity(intent);
                 return true;
             }
+//            return super.onNavigationItemSelected(item);
+//            if (itemId == R.id.nav_home) {
+//                getSupportFragmentManager()
+//                        .beginTransaction()
+//                        .replace(R.id.fragment_container, homeFragment)
+//                        .commit();
+//                return true;
+//            } else if (itemId == R.id.nav_profile) {
+//                getSupportFragmentManager()
+//                        .beginTransaction()
+//                        .replace(R.id.fragment_container, profileEntrantFragment)
+//                        .commit();
+//                return true;
+//            } else if (itemId == R.id.nav_events) {
+//                getSupportFragmentManager()
+//                        .beginTransaction()
+//                        .replace(R.id.fragment_container, eventFragment)
+//                        .commit();
+//                return true;
+//            }else if (itemId == R.id.nav_test) {
+//                getSupportFragmentManager()
+//                        .beginTransaction()
+//                        .replace(R.id.fragment_container, testFragment)
+//                        .commit();
+//                return true;
+//            }
         }
         /**
          * Drawer side bar navigation
@@ -258,6 +280,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         .replace(R.id.fragment_container, loginFragment)
                         .commit();
             } else if (itemId == R.id.nav_home) {
+                Log.d("Main Activity", "Home Fragment Called Navigation");
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container, homeFragment)
                         .commit();
@@ -401,9 +424,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Bundle bundle = new Bundle();
         bundle.putString("eventIdFromQR", eventIdFromQR);
         loginFragment.setArguments(bundle);
-        fragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, loginFragment)
-                .commit();
+
+        // Old Fragment code that doesnt work with HomeActivity, breaks
+//        fragmentManager.beginTransaction()
+//                .replace(R.id.fragment_container, loginFragment)
+//                .commit();
+
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
     }
 
     /**

@@ -65,7 +65,8 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.fragment_home, container, false);
-
+        Log.d("Home Fragment", "Called from: " + getActivity());
+        Log.d("Home Fragment", "Called from: " + getContext());
 
         // Display the integer
         TextView integerTextView = rootView.findViewById(R.id.home_integer_text);

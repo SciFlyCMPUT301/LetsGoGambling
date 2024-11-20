@@ -3,10 +3,9 @@ package com.example.eventbooking.Testing;
 import android.util.Log;
 
 import com.example.eventbooking.Events.EventData.Event;
-import com.example.eventbooking.Facility;
+import com.example.eventbooking.Facility.Facility;
 import com.example.eventbooking.Role;
 import com.example.eventbooking.User;
-import com.example.eventbooking.waitinglist.WaitingList;
 import com.google.android.gms.tasks.OnFailureListener;
 
 import java.util.*;
@@ -26,10 +25,19 @@ public class SampleTable {
     private int userUpdateCount;
     private int facilityUpdateCount;
 
+    private String getRandomLocation() {
+        String[] locations = {"New York", "Los Angeles", "Chicago", "Houston", "Phoenix", "Philadelphia", "San Antonio", "San Diego", "Dallas", "San Jose"};
+        Random rand = new Random();
+        return locations[rand.nextInt(locations.length)];
+    }
+
+
     /**
      * Generates a list of sample users with different roles (admin, organizer, and normal users).
      */
     public void makeUserList() {
+
+
         // Create 5 admin users
         for (int i = 1; i <= 5; i++) {
             User user = new User();
@@ -39,6 +47,10 @@ public class SampleTable {
             user.setPhoneNumber("555-000" + i);
             user.addRole(Role.ADMIN);
             user.addRole(Role.ENTRANT);
+            user.setLocation(getRandomLocation());
+            String profileURL = user.defaultProfilePictureUrl(user.getUsername()).toString();
+            user.setdefaultProfilePictureUrl(profileURL);
+            user.setProfilePictureUrl(profileURL);
             UserList.add(user);
         }
 
@@ -51,6 +63,11 @@ public class SampleTable {
             user.setPhoneNumber("555-010" + i);
             user.addRole(Role.ORGANIZER);
             user.addRole(Role.ENTRANT);
+            user.setLocation(getRandomLocation());
+
+            String profileURL = user.defaultProfilePictureUrl(user.getUsername()).toString();
+            user.setdefaultProfilePictureUrl(profileURL);
+            user.setProfilePictureUrl(profileURL);
             UserList.add(user);
         }
 
@@ -61,7 +78,11 @@ public class SampleTable {
             user.setDeviceID("deviceID" + (i + 15));
             user.setEmail("user" + i + "@example.com");
             user.setPhoneNumber("555-020" + i);
-            user.addRole(Role.ENTRANT);  // ENTRANT role is added by default
+            user.addRole(Role.ENTRANT);
+            user.setLocation(getRandomLocation());
+            String profileURL = user.defaultProfilePictureUrl(user.getUsername()).toString();
+            user.setdefaultProfilePictureUrl(profileURL);
+            user.setProfilePictureUrl(profileURL);
             UserList.add(user);
         }
         Log.d("User list", "Done List");

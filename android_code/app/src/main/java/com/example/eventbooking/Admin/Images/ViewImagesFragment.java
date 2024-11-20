@@ -1,6 +1,7 @@
 package com.example.eventbooking.Admin.Images;
 
 
+import android.content.Intent;
 import android.media.Image;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -15,6 +16,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.example.eventbooking.Admin.AdminActivity;
 import com.example.eventbooking.Admin.AdminFragment;
 import com.example.eventbooking.R;
 import com.google.firebase.database.DataSnapshot;
@@ -64,9 +66,7 @@ public class ViewImagesFragment extends Fragment {
 
         adminGoBack.setOnClickListener(v -> {
             // Navigate back to HomeFragment
-            getParentFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new AdminFragment())
-                    .commit();
+            backToAdmin();
         });
 
         return view;
@@ -106,5 +106,12 @@ public class ViewImagesFragment extends Fragment {
 //        transaction.replace(R.id.flFragment, fragment);
         transaction.addToBackStack(null);
         transaction.commit();
+    }
+
+
+    private void backToAdmin(){
+        Intent intent = new Intent(getActivity(), AdminActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
     }
 }

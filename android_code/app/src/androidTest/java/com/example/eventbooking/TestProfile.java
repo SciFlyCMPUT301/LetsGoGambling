@@ -35,12 +35,16 @@ public class TestProfile {
 
     @Test
     public void testNavToProfile() {
+        // Because this is not the first test for the login and therefore
+        // Login already occurs
         onView(withId(R.id.text_login_welcome)).check(matches(isDisplayed()));
+//        onView(withText("Welcome")).check(matches(isDisplayed()));
         SystemClock.sleep(5000);
         onView(withId(R.id.home_title)).check(matches(isDisplayed()));
         onView(withId(R.id.button_profile)).perform(click());
         onView(withId(R.id.button_edit_profile)).check(matches(isDisplayed()));
         onView(withClassName(containsString(ScrollView.class.getSimpleName()))).perform(swipeUp());
+        SystemClock.sleep(1000);
         onView(withId(R.id.button_back_home)).perform(click());
         onView(withId(R.id.home_title)).check(matches(isDisplayed()));
     }

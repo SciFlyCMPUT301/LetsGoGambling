@@ -60,7 +60,7 @@ public class Event {
     private List<String> canceledParticipantIds;
     private List<String> signedUpParticipantIds;
     private List<String> enrolledParticipantIds;
-    private List<String> declinedParticipantIds = new ArrayList<>();
+    private List<String> declinedParticipantIds;
     private WaitingList waitingList;
     private String organizerId;
     private FirebaseFirestore db;
@@ -80,12 +80,41 @@ public class Event {
         this.canceledParticipantIds = new ArrayList<>();
         this.signedUpParticipantIds = new ArrayList<>();
         this.enrolledParticipantIds = new ArrayList<>();
+        this.declinedParticipantIds = new ArrayList<>();
+
     }
 
     public Event(int eventID) {
         storage = FirebaseStorage.getInstance();
         db = FirebaseFirestore.getInstance();
         this.waitingList=new WaitingList();
+    }
+
+    /**
+     * Secondary constructor
+     *
+     * @param db
+     */
+    public Event(FirebaseFirestore db) {
+        this.db = db;
+        this.waitingList= new WaitingList();
+        //waiting list constructor will handle these 4 list
+        this.waitingparticipantIds = new ArrayList<>();
+        this.acceptedParticipantIds = new ArrayList<>();
+        this.canceledParticipantIds = new ArrayList<>();
+        this.signedUpParticipantIds = new ArrayList<>();
+        this.enrolledParticipantIds = new ArrayList<>();
+        this.declinedParticipantIds = new ArrayList<>();
+    }
+    public Event(FirebaseFirestore db, FirebaseStorage storage) {
+        this.db = db;
+        this.storage = storage;
+        this.waitingparticipantIds = new ArrayList<>();
+        this.acceptedParticipantIds = new ArrayList<>();
+        this.canceledParticipantIds = new ArrayList<>();
+        this.signedUpParticipantIds = new ArrayList<>();
+        this.enrolledParticipantIds = new ArrayList<>();
+        this.declinedParticipantIds = new ArrayList<>();
     }
     /**
      * Constructs an Event with specific parameters.
@@ -316,9 +345,9 @@ public class Event {
         else{
             eventData.put("eventId", eventId);
         }
-        if(canceledParticipantIds.contains("User1"))
-            Log.d("Saving Event", "User1 rejected");
-        Log.d("Event", "EventID: " + eventId);
+//        if(canceledParticipantIds.contains("User1"))
+//            Log.d("Saving Event", "User1 rejected");
+//        Log.d("Event", "EventID: " + eventId);
         eventData.put("eventTitle", eventTitle);
         eventData.put("description", description);
         eventData.put("imageUrl", imageUrl);
@@ -335,6 +364,7 @@ public class Event {
         eventData.put("acceptedParticipantIds", acceptedParticipantIds);
         eventData.put("canceledParticipantIds", canceledParticipantIds);
         eventData.put("signedUpParticipantIds", signedUpParticipantIds);
+        eventData.put("declinedParticipantIds", declinedParticipantIds);
 //        eventData.put("waitingList", waitingList.getEntrantIds());
         eventData.put("organizerId", organizerId);
         // Save or update the event data in Firestore
@@ -391,10 +421,10 @@ public class Event {
         return db.collection("Events").document(eventId)
                 .set(eventData)
                 .addOnSuccessListener(aVoid -> {
-                    Log.d("Event", "Event data successfully updated in Firestore.");
+//                    Log.d("Event", "Event data successfully updated in Firestore.");
                 })
                 .addOnFailureListener(e -> {
-                    Log.e("Event", "Error updating event data in Firestore: " + e.getMessage());
+//                    Log.e("Event", "Error updating event data in Firestore: " + e.getMessage());
                 });
     }
 
@@ -518,5 +548,12 @@ public class Event {
         return declinedParticipantIds;
     }
 
-
+    /**
+     * Manually setting the firestore
+     *
+     * @param mockFirestore
+     */
+    public void setFirestore(FirebaseFirestore mockFirestore) {
+        db = mockFirestore;
+    }
 }

@@ -41,6 +41,7 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.4.0"))
     implementation("com.google.firebase:firebase-storage:21.0.1")
     implementation("com.squareup.picasso:picasso:2.8")
+    implementation("com.google.firebase:firebase-messaging")
     //implementation(files("C:\\Users\\pilck\\AppData\\Local\\Android\\Sdk\\platforms\\android-35\\android.jar"))
     implementation(libs.appcompat)
     implementation(libs.material)

@@ -48,7 +48,7 @@ public class FirestoreAccess {
     }
 
     public Task<QuerySnapshot> getUserFacility(String userId) {
-        return facilitiesRef.whereEqualTo("userId", userId).get();  // Query facility data based on userId
+        return facilitiesRef.whereEqualTo("organizer", userId).get();  // Query facility data based on userId
     }
 
     public Task<QuerySnapshot> getOrganizerEvents(String userId) {

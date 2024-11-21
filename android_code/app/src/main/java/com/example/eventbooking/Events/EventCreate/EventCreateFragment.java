@@ -1,20 +1,25 @@
 package com.example.eventbooking.Events.EventCreate;
 
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import com.example.eventbooking.Events.EventPageFragment.EventViewFragmentActivity;
 import com.example.eventbooking.Home.HomeFragment;
+import com.example.eventbooking.QRCode.QRcodeGenerator;
 import com.example.eventbooking.waitinglist.WaitingList;
 import com.example.eventbooking.Location;
 import com.example.eventbooking.R;
@@ -51,6 +56,8 @@ public class EventCreateFragment extends Fragment {
     private Button createEventButton;
     private Button backButton;
     private FirebaseFirestore db;
+    private ImageView QRCode;
+    private QRcodeGenerator qrCodeGenerator;
     //empty constructor
     private boolean roleAssigned = false, testingFlag;
     public EventCreateFragment(){}
@@ -75,11 +82,13 @@ public class EventCreateFragment extends Fragment {
      */
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Log.d("Event Create Fragment", "Fragment Started");
         super.onCreate(savedInstanceState);
         // Retrieve the integer from arguments
         if (getArguments() != null) {
             testingFlag = getArguments().getBoolean("testing flag");
         }
+        qrCodeGenerator = new QRcodeGenerator(getContext());
     }
 
     /**
@@ -95,6 +104,7 @@ public class EventCreateFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_event_create, container, false);
+        Log.d("Event Create Fragment", "Fragment Started");
         //init UI elements
         editTextTitle = rootView.findViewById(R.id.event_create_title);
         editWaitingListLimit = rootView.findViewById(R.id.waiting_list_limit);
@@ -104,14 +114,12 @@ public class EventCreateFragment extends Fragment {
         //remainder here , add the limit number to set up maximum entrant in witinglist
         editTextImageUrl = rootView.findViewById(R.id.event_image_url);
         createEventButton= rootView.findViewById(R.id.button_create_event);
+        QRCode = rootView.findViewById(R.id.qr_image_view);
 
         // Set up button to go back to HomeFragment
         Button backButton = rootView.findViewById(R.id.button_back_home);
         backButton.setOnClickListener(v -> {
-            // Navigate back to HomeFragment
-            getParentFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new HomeFragment())
-                    .commit();
+            navBackToEvents();
         });
         //set up the create event button
         createEventButton.setOnClickListener(v->{
@@ -129,7 +137,7 @@ public class EventCreateFragment extends Fragment {
      */
     private void createEvent(){
 
-
+        Log.d("Create Event Fragment", "Create Event Start");
         String title = editTextTitle.getText().toString().trim();
         String description = editTextDescription.getText().toString().trim();
         String imageUrl = editTextImageUrl.getText().toString().trim();
@@ -169,11 +177,14 @@ public class EventCreateFragment extends Fragment {
             Toast.makeText(getContext(),"User not found",Toast.LENGTH_SHORT).show();
             return;
         }
+        Log.d("Create Event Fragment", "Create Event After List Check");
+
         //generate event id
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        CollectionReference eventRef = db.collection("Events");
-        DocumentReference newEventRef = eventRef.document();
-        String eventId = newEventRef.getId();
+//        FirebaseFirestore db = FirebaseFirestore.getInstance();
+//        CollectionReference eventRef = db.collection("Events");
+//        DocumentReference newEventRef = eventRef.document();
+//        String eventId = newEventRef.getId();
+        String eventId = null;
         Event event = new Event(eventId, title, description,imageUrl,System.currentTimeMillis(),locationStr,maxParticipants,currentUser.getDeviceID());
 
 
@@ -182,12 +193,11 @@ public class EventCreateFragment extends Fragment {
         if(!currentUser.hasRole(Role.ORGANIZER)){
             currentUser.addRole(Role.ORGANIZER);
             roleAssigned= true;
-
-
         }
 
         //update role in firebase
         if (roleAssigned) {
+            Log.d("Create Event Fragment", "New Organizer for facility");
             db = FirebaseFirestore.getInstance();
             CollectionReference usersRef = db.collection("Users");
             usersRef.document(currentUser.getDeviceID())
@@ -199,8 +209,14 @@ public class EventCreateFragment extends Fragment {
                         Toast.makeText(getContext(), "Failed to update user role", Toast.LENGTH_SHORT).show();
                     });
         }
+        Log.d("Create Event Fragment", "Save Event");
+        event.saveEventDataToFirestore()
+                .addOnSuccessListener(aVoid -> {
+                    generateAndDisplayQRCode(event.getEventId());
+                    Log.d("Event", "Event successfully saved!");
+                })
+                .addOnFailureListener(e -> Log.e("Event", "Error saving event", e));
 
-        event.saveEventDataToFirestore();
 
 
 
@@ -215,6 +231,32 @@ public class EventCreateFragment extends Fragment {
         editTextLocation.setText("");
         editTextImageUrl.setText("");
         editTextLocation.setText("");
+    }
+
+    private void generateAndDisplayQRCode(String eventID) {
+        // URL to be encoded into the QR code (example URL with eventId)
+        String event = eventID;
+        String eventUrl = "eventbooking://eventDetail?eventID=" + event;
+
+        // Generate QR code using the QRcodeGenerator class
+        Bitmap qrCodeBitmap = qrCodeGenerator.generateQRCode(eventUrl);
+
+        if (qrCodeBitmap != null) {
+            QRCode.setImageBitmap(qrCodeBitmap);
+
+            qrCodeGenerator.saveQRCode(qrCodeBitmap, event);
+
+            Toast.makeText(getContext(), "QR code generated and saved.", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getContext(), "Failed to generate QR code.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void navBackToEvents(){
+        getParentFragmentManager().beginTransaction()
+                .replace(R.id.event_container, new EventViewFragmentActivity())
+                .addToBackStack(null)
+                .commit();
     }
 
 

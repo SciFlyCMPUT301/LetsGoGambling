@@ -73,7 +73,7 @@ public class UserManager {
         Log.d("UserManager", "User set with ID: " + currentUser.getDeviceID() + " and Name: " + currentUser.getUsername());
 
         // Optionally load related data if needed
-        // findUserFacility();
+         findUserFacility();
         // findUserEvents();
     }
 
@@ -96,10 +96,12 @@ public class UserManager {
      * Queries and gets the user's facility if it exists
      */
     private void findUserFacility() {
+        Log.d("User Manager", "Find User Facility Start");
         FirestoreAccess.getInstance().getUserFacility(currentUser.getDeviceID()).addOnSuccessListener(queryDocumentSnapshots -> {
             if (!queryDocumentSnapshots.isEmpty()) {
                 DocumentSnapshot doc = queryDocumentSnapshots.getDocuments().get(0);
                 this.userFacility = doc.toObject(Facility.class);
+                Log.d("User Manager", "User facility found");
                 Log.d("UserManager", this.userFacility.toString());
                 findOrganizerEvents();
             }

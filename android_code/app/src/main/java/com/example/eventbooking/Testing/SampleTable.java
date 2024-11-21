@@ -46,6 +46,7 @@ public class SampleTable {
             user.setEmail("admin" + i + "@example.com");
             user.setPhoneNumber("555-000" + i);
             user.addRole(Role.ADMIN);
+            user.addRole(Role.ORGANIZER);
             user.addRole(Role.ENTRANT);
             user.setLocation(getRandomLocation());
             String profileURL = user.defaultProfilePictureUrl(user.getUsername()).toString();
@@ -57,14 +58,13 @@ public class SampleTable {
         // Create 10 organizer users
         for (int i = 1; i <= 10; i++) {
             User user = new User();
-            user.setUsername("User" + i);
+            user.setUsername("User" + (i + 5));
             user.setDeviceID("deviceID" + (i + 5));
-            user.setEmail("organizer" + i + "@example.com");
-            user.setPhoneNumber("555-010" + i);
+            user.setEmail("organizer" + (i + 5) + "@example.com");
+            user.setPhoneNumber("555-010" + (i + 5));
             user.addRole(Role.ORGANIZER);
             user.addRole(Role.ENTRANT);
             user.setLocation(getRandomLocation());
-
             String profileURL = user.defaultProfilePictureUrl(user.getUsername()).toString();
             user.setdefaultProfilePictureUrl(profileURL);
             user.setProfilePictureUrl(profileURL);
@@ -74,10 +74,10 @@ public class SampleTable {
         // Create 15 normal users
         for (int i = 1; i <= 15; i++) {
             User user = new User();
-            user.setUsername("User" + i);
+            user.setUsername("User" + (i + 15));
             user.setDeviceID("deviceID" + (i + 15));
-            user.setEmail("user" + i + "@example.com");
-            user.setPhoneNumber("555-020" + i);
+            user.setEmail("user" + (i + 15) + "@example.com");
+            user.setPhoneNumber("555-020" + (i + 15));
             user.addRole(Role.ENTRANT);
             user.setLocation(getRandomLocation());
             String profileURL = user.defaultProfilePictureUrl(user.getUsername()).toString();
@@ -107,20 +107,20 @@ public class SampleTable {
             facility.setName("Facility" + (i + 1));
             facility.setFacilityID("Facility" + (i + 1));
             facility.setAddress("Address of Facility" + (i + 1));
-            facility.setOrganizer(organizer.getUsername());
+            facility.setOrganizer(organizer.getDeviceID());
             FacilityList.add(facility);
             organizer.setFacilityAssociated(true);
         }
 
-        // Create additional facilities without events or organizers
-        for (int i = 11; i <= 15; i++) {
-            Facility facility = new Facility();
-            facility.setName("Facility" + i);
-            facility.setFacilityID("Facility" + (i + 1));
-            facility.setAddress("Address of Facility" + i);
-            facility.setOrganizer(null); // No organizer
-            FacilityList.add(facility);
-        }
+//        // Create additional facilities without events or organizers
+//        for (int i = 11; i <= 15; i++) {
+//            Facility facility = new Facility();
+//            facility.setName("Facility" + i);
+//            facility.setFacilityID("Facility" + (i + 1));
+//            facility.setAddress("Address of Facility" + i);
+//            facility.setOrganizer(null); // No organizer
+//            FacilityList.add(facility);
+//        }
     }
 
     /**
@@ -132,7 +132,7 @@ public class SampleTable {
         // Create 30 events
         for (int i = 1; i <= 30; i++) {
             Event event = new Event();
-            event.setEventId("event" + i);
+            event.setEventId("eventID" + i);
             event.setEventTitle("Event Title " + i);
             event.setDescription("Description for event " + i);
             event.setTimestamp(System.currentTimeMillis() + i * 100000);

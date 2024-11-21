@@ -2,6 +2,7 @@ package com.example.eventbooking.Admin.Event;
 
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.eventbooking.Events.EventData.Event;
 import com.example.eventbooking.R;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
@@ -288,16 +290,29 @@ public class EditEventFragment extends Fragment {
      * Deletes the selected event from Firebase Firestore. Displays a success message and navigates
      * back to the previous screen upon successful deletion, or shows an error message if the deletion fails.
      */
-    private void removeEvent(){
+    private void removeEvent() {
         db.collection("Events").document(selectedEvent.getEventId()).delete()
                 .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(getContext(), "User deleted successfully.", Toast.LENGTH_SHORT).show();
-                    getActivity().onBackPressed(); // Navigate back after deletion
+                    Toast.makeText(getContext(), "Event deleted successfully.", Toast.LENGTH_SHORT).show();
+                    db.collection("Facilities").get()
+                            .addOnSuccessListener(querySnapshot -> {
+                                for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                                    List<String> allEvents = (List<String>) doc.get("allEvents");
+                                    if (allEvents != null && allEvents.contains(selectedEvent.getEventId())) {
+                                        allEvents.remove(selectedEvent.getEventId());
+                                        db.collection("Facilities").document(doc.getId())
+                                                .update("allEvents", allEvents)
+                                                .addOnSuccessListener(aVoid2 -> Log.d("EditEventFragment", "Removed event ID from Facilities: " + doc.getId()))
+                                                .addOnFailureListener(e -> Log.e("EditEventFragment", "Failed to update Facilities: " + doc.getId(), e));
+                                    }
+                                }
+                            })
+                            .addOnFailureListener(e -> Log.e("EditEventFragment", "Failed to query Facilities collection", e));
+
+                    getActivity().onBackPressed();
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "Failed to delete user: ", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Failed to delete event: ", Toast.LENGTH_SHORT).show();
                 });
-
-
     }
 }

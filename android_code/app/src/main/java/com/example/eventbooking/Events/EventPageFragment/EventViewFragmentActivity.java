@@ -195,6 +195,7 @@ public class EventViewFragmentActivity extends Fragment {
      */
     private void navigateToEventCreation() {
         // Example of navigating to another fragment in the activity
+
         getParentFragmentManager().beginTransaction()
                 .replace(R.id.event_container, new EventCreateFragment())
                 .addToBackStack(null)

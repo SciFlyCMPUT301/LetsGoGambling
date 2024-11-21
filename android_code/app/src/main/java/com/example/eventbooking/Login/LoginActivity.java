@@ -48,6 +48,8 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 //        setContentView(R.layout.fragment_login);
         Log.d("Login Activity", "Activity Launched");
+        Log.d("Login Activity", "Launch, Loggedin: " + isLoggedIn);
+
         handleIntent(getIntent());
         initializeUI();
 
@@ -135,6 +137,7 @@ public class LoginActivity extends AppCompatActivity {
         UserManager.getInstance().setCurrentUser(user);
         Log.d("Login Activity", "Returning User, eventID: " + eventIdFromQR);
         new Handler().postDelayed(() -> {
+            Log.d("Login Activity", "isLoggedIn");
             isLoggedIn = true;
             Intent intent;
             if (eventIdFromQR != null) {
@@ -169,6 +172,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
+        Log.d("Login Acitivy", "New Intent Found");
 //        handleQRCodeScan(intent);
         handleIntent(intent);
     }
@@ -197,12 +201,12 @@ public class LoginActivity extends AppCompatActivity {
 
                     // Commenting this out for the time being so the buttons handle
                     // How we are choosing to navigate the app
-//                    Log.d("Moving to Event", "Event: " + eventIdFromQR);
-//                    Intent eventIntent = new Intent(this, EventViewActivity.class);
-//                    eventIntent.putExtra("eventId", eventIdFromQR);
+                    Log.d("Moving to Event", "Event: " + eventIdFromQR);
+                    Intent eventIntent = new Intent(this, EventViewActivity.class);
+                    eventIntent.putExtra("eventId", eventIdFromQR);
 //                    ///TODO: Change this to be the singleton later
 //                    eventIntent.putExtra("deviceId", "User1");
-//                    startActivity(eventIntent);
+                    startActivity(eventIntent);
                 } else {
                     // Show login screen first
                     Log.d("Login Activity", "User not Logged in");

@@ -16,6 +16,7 @@ import com.example.eventbooking.Events.EventData.Event;
 import com.example.eventbooking.Events.EventPageFragment.EventActivity;
 import com.example.eventbooking.Home.HomeActivity;
 import com.example.eventbooking.R;
+import com.example.eventbooking.UserManager;
 
 public class EventViewActivity extends AppCompatActivity {
     private String eventId;
@@ -40,13 +41,17 @@ public class EventViewActivity extends AppCompatActivity {
 
         // Get extras
         eventId = getIntent().getStringExtra("eventId");
-        deviceId = getIntent().getStringExtra("deviceId");
+        // Replacing with singleton below
+//        deviceId = getIntent().getStringExtra("deviceId");
+        deviceId = UserManager.getInstance().getUserId();
         source_file = getIntent().getStringExtra("source_file");
         Log.d("Event View Activity", "EventID: " + eventId);
         Log.d("Event View Activity", "DeviceID: " + deviceId);
         Log.d("Event View Activity", "Source File: " + source_file);
 
-        if(source_file != null || source_file.equals("LoginActivity"))
+        if(source_file == null)
+            source_file = "Home";
+        else if(source_file.equals("LoginActivity"))
             source_file = "Home";
         else
             source_file = "Event";

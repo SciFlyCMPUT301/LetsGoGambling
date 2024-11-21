@@ -1,5 +1,6 @@
 package com.example.eventbooking.Admin;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,12 +17,14 @@ import com.example.eventbooking.Admin.Event.ViewEventsFragment;
 import com.example.eventbooking.Admin.Facility.ViewFacilitiesFragment;
 import com.example.eventbooking.Admin.Images.ViewImagesFragment;
 import com.example.eventbooking.Admin.Users.ViewUsersFragment;
+import com.example.eventbooking.Home.HomeActivity;
 import com.example.eventbooking.R;
 import com.example.eventbooking.Testing.TestFragment;
 
 public class AdminViewFragment extends Fragment {
     private Button viewUsersButton, viewEventsButton, viewFacilitiesButton, viewImagesButton;
-//    initialize fragment
+    private Button backHomeButton;
+    //    initialize fragment
     private ViewUsersFragment usersFragment = new ViewUsersFragment();
     private ViewEventsFragment eventsFragment = new ViewEventsFragment();
     private ViewFacilitiesFragment facilitiesFragment = new ViewFacilitiesFragment();
@@ -36,6 +39,7 @@ public class AdminViewFragment extends Fragment {
         viewEventsButton = view.findViewById(R.id.viewEventsButton);
         viewFacilitiesButton = view.findViewById(R.id.viewFacilitiesButton);
         viewImagesButton = view.findViewById(R.id.viewImagesButton);
+        backHomeButton = view.findViewById(R.id.backHomeButton);
 
         //for now hiding it because not dealing with images
 //        viewImagesButton = view.findViewById(R.id.viewImagesButton);
@@ -49,6 +53,7 @@ public class AdminViewFragment extends Fragment {
         //for now hiding it because not dealing with images, it doesnt work
         viewImagesButton.setOnClickListener(v -> replaceFragment(imagesFragment));
 
+        backHomeButton.setOnClickListener(v -> startActivity(new Intent(getContext(), HomeActivity.class)));
         return view;
     }
 
@@ -66,5 +71,6 @@ public class AdminViewFragment extends Fragment {
                 .addToBackStack(null)
                 .commit();
     }
+
 //    backHomeButton
 }

@@ -57,6 +57,40 @@
             android:layout_height="wrap_content"
             android:text="Delete all data from firebase" />
 
+        <Button
+            android:id="@+id/button_back_home"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Go Back To Home" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <EditText
+                android:id="@+id/event_id_for_qr"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="EventID"
+                android:text=""
+                android:padding="20dp"/>
+
+            <Button
+                android:id="@+id/button_generate_qr_code"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Generate QR Code" />
+
+            <ImageView
+                android:id="@+id/potentialQRCode"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:contentDescription="QR Code Image"
+                android:scaleType="centerCrop"
+                android:layout_marginTop="16dp" />
+        </LinearLayout>
+
 
     </LinearLayout>
 </ScrollView>

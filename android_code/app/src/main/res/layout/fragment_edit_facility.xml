@@ -24,106 +24,83 @@
                 tools:ignore="MissingConstraints">
 
                 <EditText
-                    android:id="@+id/user_edit_username"
+                    android:id="@+id/facility_edit_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
-                    android:text="username"
+                    android:hint="Facility name"
                     android:textSize="18sp" />
 
                 <EditText
-                    android:id="@+id/user_edit_deviceID"
+                    android:id="@+id/facility_edit_facilityID"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
-                    android:text="deviceID"
+                    android:hint="FacilityID"
                     android:textSize="18sp" />
 
                 <EditText
-                    android:id="@+id/user_edit_email"
+                    android:id="@+id/facility_edit_organizer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
-                    android:text="email"
+                    android:hint="Facility Organizer"
                     android:textSize="18sp" />
 
                 <EditText
-                    android:id="@+id/user_edit_phoneNumber"
+                    android:id="@+id/facility_edit_location"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
-                    android:text="phoneNumber"
+                    android:text="Facility Location"
                     android:textSize="18sp" />
-
-                <EditText
-                    android:id="@+id/user_edit_profilePictureUrl"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
-                    android:text="profilePictureUrl"
-                    android:textSize="18sp" />
-
-                <EditText
-                    android:id="@+id/user_edit_location"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
-                    android:text="location"
-                    android:textSize="18sp" />
-
-                <EditText
-                    android:id="@+id/user_edit_dateJoined"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
-                    android:text="dateJoined"
-                    android:textSize="18sp" />
-
-                <EditText
-                    android:id="@+id/user_edit_roles"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
-                    android:text="roles"
-                    android:textSize="18sp" />
-
-                <Switch
-                    android:id="@+id/notificationAsk"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="notifications" />
-
-                <Switch
-                    android:id="@+id/geolocationAsk"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="geolocation" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="horizontal"
+                    android:orientation="vertical"
                     app:layout_constraintBottom_toBottomOf="parent">
 
-                    <Switch
-                        android:id="@+id/entrant_switch"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Entrant" />
+                    <ListView
+                        android:id="@+id/facility_event_list"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toTopOf="@+id/facility_event_add"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"/>
 
-                    <Switch
-                        android:id="@+id/organizer_switch"
+                    <EditText
+                        android:id="@+id/facility_event_add"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Organizer" />
+                        android:hint="EventID" />
 
-                    <Switch
-                        android:id="@+id/admin_switch"
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Admin" />
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal"
+                        android:layout_gravity="center"
+                        app:layout_constraintBottom_toBottomOf="parent">
+
+                        <Button
+                            android:id="@+id/facility_add_eventID"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Add EventID"
+                            app:layout_constraintLeft_toRightOf="parent" />
+
+                        <Button
+                            android:id="@+id/facility_remove_eventID"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Remove EventID"
+                            app:layout_constraintRight_toLeftOf="parent"/>
+
+                    </LinearLayout>
 
                 </LinearLayout>
+
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -132,19 +109,19 @@
                     app:layout_constraintBottom_toBottomOf="parent">
 
                     <Button
-                        android:id="@+id/save_button_user"
+                        android:id="@+id/save_button_facility"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Save" />
 
                     <Button
-                        android:id="@+id/delete_button_user"
+                        android:id="@+id/delete_button_facility"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Delete" />
 
                     <Button
-                        android:id="@+id/cancel_button_user"
+                        android:id="@+id/cancel_button_facility"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Cancel" />

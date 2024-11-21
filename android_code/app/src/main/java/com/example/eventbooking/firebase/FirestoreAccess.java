@@ -1,5 +1,7 @@
 package com.example.eventbooking.firebase;
 
+import android.util.Log;
+
 import com.example.eventbooking.User;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
@@ -24,6 +26,7 @@ public class FirestoreAccess {
         usersRef = db.collection("Users");
         eventsRef = db.collection("Events");
         facilitiesRef = db.collection("Facilities");
+        Log.d("Firestore Access", "Instantiating Firestore");
     }
 
     public static FirestoreAccess getInstance() {
@@ -34,7 +37,10 @@ public class FirestoreAccess {
     }
 
     public Task<DocumentSnapshot> getUser(String userId) {
-        return usersRef.document(userId).get();
+        Log.d("Firestore Access", "Getting User " + userId);
+//        return usersRef.document(userId).get();
+        DocumentReference userDoc = usersRef.document(userId);
+        return userDoc.get();
     }
 
     public Task<QuerySnapshot> getUserEvents(String userId) {
@@ -42,11 +48,22 @@ public class FirestoreAccess {
     }
 
     public Task<QuerySnapshot> getUserFacility(String userId) {
-        return facilitiesRef.whereEqualTo("userId", userId).get();  // Query facility data based on userId
+        return facilitiesRef.whereEqualTo("organizer", userId).get();  // Query facility data based on userId
     }
 
     public Task<QuerySnapshot> getOrganizerEvents(String userId) {
         return eventsRef.whereEqualTo("organizerId", userId).get();  // Assuming "organizerId" is the field linking events to the organizer
+    }
+
+    /**
+     * Retrieves all users with the given username.
+     *
+     * @param username The username to search for in the Users collection.
+     * @return A Task<QuerySnapshot> containing the query results.
+     */
+    public Task<QuerySnapshot> getUsersByUsername(String username) {
+        Log.d("Firestore Access", "Querying Users by username: " + username);
+        return usersRef.whereEqualTo("username", username).get();
     }
 
     public Task<Void> addUser(User user) {

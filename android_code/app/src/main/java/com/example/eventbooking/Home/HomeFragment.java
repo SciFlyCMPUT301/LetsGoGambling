@@ -7,21 +7,28 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.eventbooking.Admin.Users.UserViewAdapter;
 import com.example.eventbooking.Events.EventCreate.EventCreateFragment;
 import com.example.eventbooking.Events.EventPageFragment.EventFragment;
+import com.example.eventbooking.Events.EventView.EventViewFragment;
 import com.example.eventbooking.R;
 import com.example.eventbooking.User;
 import com.example.eventbooking.UserManager;
 import com.example.eventbooking.notification.NotificationFragment;
 import com.example.eventbooking.profile.ProfileEntrantFragment;
 import com.example.eventbooking.profile.ProfileFragment;
+import com.example.eventbooking.Events.EventData.Event;
+
+import java.util.ArrayList;
 
 // For now let the home page be where all users end up after sign up or device recognized
 
@@ -63,45 +70,66 @@ public class HomeFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.d("Home Fragment", "Home Fragment Launch");
 
         View rootView = inflater.inflate(R.layout.fragment_home, container, false);
 
+        ListView usersEventListView = rootView.findViewById(R.id.user_events_list);
+        String currentUserId = UserManager.getInstance().getUserId();
 
-        // Display the integer
-        TextView integerTextView = rootView.findViewById(R.id.home_integer_text);
-        integerTextView.setText("Integer: " + someInteger);
-        TextView page_name = rootView.findViewById(R.id.home_title);
+        Event.getUserEvents(currentUserId, userEvents -> {
+            HomeUserEventAdapter adapter = new HomeUserEventAdapter(getContext(), userEvents, currentUserId);
+            usersEventListView.setAdapter(adapter);
 
-        // Set up buttons to navigate to other fragments
-        Button eventCreateButton = rootView.findViewById(R.id.button_event_create);
-        eventCreateButton.setOnClickListener(v -> {
-            // Navigate to EventCreateFragment and pass the integer
-            getParentFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, EventCreateFragment.newInstance(true))
-                    .commit();
+            // Set item click listener
+            usersEventListView.setOnItemClickListener((parent, view, position, id) -> {
+                Event selectedEvent = userEvents.get(position);
+                EventViewFragment eventViewFragment = EventViewFragment.newInstance(selectedEvent.getEventId(), currentUserId);
+
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, eventViewFragment)
+                        .addToBackStack(null) // Ensures returning to HomeFragment
+                        .commit();
+            });
+        }, e -> {
+            Log.e("HomeFragment", "Failed to fetch events: " + e.getMessage());
         });
 
-        // Repeat for other buttons
-        Button eventButton = rootView.findViewById(R.id.button_event);
-        eventButton.setOnClickListener(v -> {
-            getParentFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, EventFragment.newInstance())
-                    .commit();
-        });
-        //set up button for navigate to notification fragment
-        Button notificationButton = rootView.findViewById(R.id.button_notification);
-        notificationButton.setOnClickListener(v -> {
-            getParentFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, NotificationFragment.newInstance())
-                    .commit();
-        });
-        //set up button for navigate to profile fragment
-        Button profileButton = rootView.findViewById(R.id.button_profile);
-        profileButton.setOnClickListener(v -> {
-            getParentFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, ProfileEntrantFragment.newInstance(false, null, UserManager.getInstance().getUserId()))
-                    .commit();
-        });
+//        // Display the integer
+//        TextView integerTextView = rootView.findViewById(R.id.home_integer_text);
+//        integerTextView.setText("Integer: " + someInteger);
+//        TextView page_name = rootView.findViewById(R.id.home_title);
+//
+//        // Set up buttons to navigate to other fragments
+//        Button eventCreateButton = rootView.findViewById(R.id.button_event_create);
+//        eventCreateButton.setOnClickListener(v -> {
+//            // Navigate to EventCreateFragment and pass the integer
+//            getParentFragmentManager().beginTransaction()
+//                    .replace(R.id.fragment_container, EventCreateFragment.newInstance(true))
+//                    .commit();
+//        });
+//
+//        // Repeat for other buttons
+//        Button eventButton = rootView.findViewById(R.id.button_event);
+//        eventButton.setOnClickListener(v -> {
+//            getParentFragmentManager().beginTransaction()
+//                    .replace(R.id.fragment_container, EventFragment.newInstance())
+//                    .commit();
+//        });
+//        //set up button for navigate to notification fragment
+//        Button notificationButton = rootView.findViewById(R.id.button_notification);
+//        notificationButton.setOnClickListener(v -> {
+//            getParentFragmentManager().beginTransaction()
+//                    .replace(R.id.fragment_container, NotificationFragment.newInstance())
+//                    .commit();
+//        });
+//        //set up button for navigate to profile fragment
+//        Button profileButton = rootView.findViewById(R.id.button_profile);
+//        profileButton.setOnClickListener(v -> {
+//            getParentFragmentManager().beginTransaction()
+//                    .replace(R.id.fragment_container, ProfileEntrantFragment.newInstance(false, null, UserManager.getInstance().getUserId()))
+//                    .commit();
+//        });
 
 
 

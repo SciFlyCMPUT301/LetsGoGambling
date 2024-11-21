@@ -1,5 +1,6 @@
 package com.example.eventbooking.Admin;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,7 +31,7 @@ import androidx.fragment.app.FragmentTransaction;
  */
 public class AdminFragment extends Fragment {
     private Button viewUsersButton, viewEventsButton, viewFacilitiesButton, viewImagesButton;
-
+    private Button backHomeButton;
     /**
      * Inflates the fragment's layout and initializes components.
      *
@@ -49,6 +50,7 @@ public class AdminFragment extends Fragment {
         viewEventsButton = view.findViewById(R.id.viewEventsButton);
         viewFacilitiesButton = view.findViewById(R.id.viewFacilitiesButton);
         viewImagesButton = view.findViewById(R.id.viewImagesButton);
+        backHomeButton = view.findViewById(R.id.backHomeButton);
 
         //for now hiding it because not dealing with images
 //        viewImagesButton = view.findViewById(R.id.viewImagesButton);
@@ -64,6 +66,7 @@ public class AdminFragment extends Fragment {
         viewFacilitiesButton.setOnClickListener(v -> replaceFragment(facilitiesFragment));
         //for now hiding it because not dealing with images, it doesnt work
         viewImagesButton.setOnClickListener(v -> replaceFragment(new ViewImagesFragment()));
+        backHomeButton.setOnClickListener(v -> replaceFragment(new HomeFragment()));
 
         return view;
     }

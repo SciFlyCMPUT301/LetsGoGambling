@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment;
 import com.example.eventbooking.Events.EventData.Event;
 import com.example.eventbooking.Events.EventPageFragment.EventFragment;
 import com.example.eventbooking.R;
+import com.example.eventbooking.UserManager;
 
 /**
  * EventViewFragment is a fragment that displays details of an event.
@@ -24,7 +25,7 @@ public class EventViewFragment extends Fragment {
 
     private String eventId;
     private String deviceId = "deviceID1";
-    private String userId = "User1";
+//    private String userId = "User1";
     private Event event;
     private ImageView eventPosterImage;
     private TextView eventTitleText, eventDescriptionText;
@@ -60,6 +61,8 @@ public class EventViewFragment extends Fragment {
         if (getArguments() != null) {
             eventId = getArguments().getString("eventId");
             deviceId = getArguments().getString("deviceId");
+            if(deviceId == null)
+                deviceId = UserManager.getInstance().getUserId();
             String listchoice = getArguments().getString("listAdd");
 
             // Fetch event data based on eventId
@@ -78,7 +81,7 @@ public class EventViewFragment extends Fragment {
                     }
                     Log.e("eventId", "Event found with ID: " + event.getEventId());
                     displayEventDetails(event);
-                    configureButtons(event, userId);
+                    configureButtons(event, deviceId);
                 } else {
                     Toast.makeText(getContext(), "Event not found", Toast.LENGTH_SHORT).show();
                     getActivity().getSupportFragmentManager().popBackStack();
@@ -117,6 +120,7 @@ public class EventViewFragment extends Fragment {
      * @param selectedUserId
      */
     private void configureButtons(Event selectedEvent, String selectedUserId) {
+        Log.d("Event View Fragment", "Button Add Start");
         // Clear existing buttons
         buttonContainer.removeAllViews();
         Log.d("Event View", "Button add: " + selectedEvent + ", " +
@@ -124,6 +128,7 @@ public class EventViewFragment extends Fragment {
 
         // If the user is in the accepted list
         if (selectedEvent.getAcceptedParticipantIds().contains(selectedUserId)) {
+            Log.d("Event View Fragment", "Add Sign Up");
             // Add "Sign Up" button to move user to signed-up list
             addButton("Sign Up", v -> {
                 selectedEvent.signUpParticipant(selectedUserId);
@@ -144,6 +149,7 @@ public class EventViewFragment extends Fragment {
 //                updateEventInFirestore(selectedEvent);
 //            });
         } else if(selectedEvent.getWaitingParticipantIds().contains(selectedUserId)){
+            Log.d("Event View Fragment", "Add WaitList");
             addButton("Leave Waitlist", v -> {
                 selectedEvent.removeWaitingParticipantId(selectedUserId);
                 updateEventInFirestore(selectedEvent);
@@ -154,6 +160,7 @@ public class EventViewFragment extends Fragment {
         else if (!selectedEvent.getWaitingParticipantIds().contains(selectedUserId) &&
                 !selectedEvent.getSignedUpParticipantIds().contains(selectedUserId) &&
                 !selectedEvent.getCanceledParticipantIds().contains(selectedUserId)) {
+            Log.d("Event View Fragment", "Not In Any List");
             // If user is not in any list, add "Waitlist" button to add user to waiting list
             addButton("Waitlist", v -> {
                 selectedEvent.addWaitingParticipantIds(selectedUserId);

@@ -18,6 +18,7 @@ import com.example.eventbooking.R;
 import com.example.eventbooking.User;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
@@ -161,16 +162,80 @@ public class EditUserFragment extends Fragment {
      */
 
     // change this so it deletes it from firebase
+//    private void deleteUser(String documentId) {
+//        db.collection("Users").document(documentId).delete()
+//                .addOnSuccessListener(aVoid -> {
+//                    Toast.makeText(getContext(), "User deleted successfully.", Toast.LENGTH_SHORT).show();
+//                    getActivity().onBackPressed(); // Navigate back after deletion
+//                })
+//                .addOnFailureListener(e -> {
+//                    Toast.makeText(getContext(), "Failed to delete user: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+//                });
+////        getActivity().onBackPressed();
+//    }
+// Cascade deletes all references to said user
     private void deleteUser(String documentId) {
+        String deviceId = deviceIdEditText.getText().toString();
+
         db.collection("Users").document(documentId).delete()
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(getContext(), "User deleted successfully.", Toast.LENGTH_SHORT).show();
-                    getActivity().onBackPressed(); // Navigate back after deletion
+
+
+                    db.collection("Events").get()
+                            .addOnSuccessListener(querySnapshot -> {
+                                for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                                    Map<String, Object> updates = new HashMap<>();
+
+
+                                    String[] fieldsToCheck = {
+                                            "acceptedParticipantIds",
+                                            "canceledParticipantIds",
+                                            "declinedParticipantIds",
+                                            "signedUpParticipantIds",
+                                            "waitingParticipantIds"
+                                    };
+
+                                    for (String field : fieldsToCheck) {
+                                        List<String> participants = (List<String>) doc.get(field);
+                                        if (participants != null && participants.contains(deviceId)) {
+                                            participants.remove(deviceId);
+                                            updates.put(field, participants);
+                                        }
+                                    }
+
+
+                                    if (!updates.isEmpty()) {
+                                        db.collection("Events").document(doc.getId())
+                                                .update(updates)
+                                                .addOnSuccessListener(aVoid2 -> Log.d("EditUserFragment", "Updated Events for user removal"))
+                                                .addOnFailureListener(e -> Log.e("EditUserFragment", "Failed to update Events: " + doc.getId(), e));
+                                    }
+                                }
+                            })
+                            .addOnFailureListener(e -> Log.e("EditUserFragment", "Failed to query Events collection", e));
+
+
+                    db.collection("Facilities").get()
+                            .addOnSuccessListener(querySnapshot -> {
+                                for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                                    String organizer = doc.getString("organizer");
+                                    if (organizer != null && organizer.equals(deviceId)) {
+                                        db.collection("Facilities").document(doc.getId())
+                                                .update("organizer", null) // Set organizer to null
+                                                .addOnSuccessListener(aVoid3 -> Log.d("EditUserFragment", "Removed user from Facilities: " + doc.getId()))
+                                                .addOnFailureListener(e -> Log.e("EditUserFragment", "Failed to update Facilities: " + doc.getId(), e));
+                                    }
+                                }
+                            })
+                            .addOnFailureListener(e -> Log.e("EditUserFragment", "Failed to query Facilities collection", e));
+
+                    // Navigate back after all operations
+                    getActivity().onBackPressed();
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(getContext(), "Failed to delete user: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
-//        getActivity().onBackPressed();
     }
 
     /**

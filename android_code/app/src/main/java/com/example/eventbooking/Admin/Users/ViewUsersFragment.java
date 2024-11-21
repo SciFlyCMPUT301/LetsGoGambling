@@ -115,7 +115,6 @@ public class ViewUsersFragment extends Fragment {
     private void openUserDetailsFragment(User selectedUser) {
         FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
         EditUserFragment fragment = new EditUserFragment();
-
         Bundle bundle = new Bundle();
         bundle.putString("deviceId", selectedUser.getDeviceID());
         Log.d("Loading User", "Document ID: "+ selectedUser.getDeviceID());

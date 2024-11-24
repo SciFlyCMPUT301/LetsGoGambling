@@ -7,6 +7,7 @@ import com.example.eventbooking.Facility;
 import com.example.eventbooking.Role;
 import com.example.eventbooking.User;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.firebase.firestore.GeoPoint;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -33,10 +34,36 @@ public class SampleTable {
 
 
     /**
+     * Generates a random GeoPoint within a given radius from a base latitude and longitude.
+     *
+     * @param baseLatitude The base latitude.
+     * @param baseLongitude The base longitude.
+     * @param radiusInDegrees The radius around the base point in degrees.
+     * @return A random GeoPoint within the specified radius.
+     */
+    private GeoPoint generateRandomGeoPoint(double baseLatitude, double baseLongitude, double radiusInDegrees) {
+        Random random = new Random();
+
+        // Generate random offsets within the radius
+        double offsetLatitude = radiusInDegrees * (random.nextDouble() - 0.5);
+        double offsetLongitude = radiusInDegrees * (random.nextDouble() - 0.5);
+
+        double randomLatitude = baseLatitude + offsetLatitude;
+        double randomLongitude = baseLongitude + offsetLongitude;
+
+        return new GeoPoint(randomLatitude, randomLongitude);
+    }
+
+
+    /**
      * Generates a list of sample users with different roles (admin, organizer, and normal users).
      */
     public void makeUserList() {
+        double baseLatitude = 53.526131057259526;
+        double baseLongitude = -113.5260486490807;
+        double radiusInDegrees = 0.01;
 
+        Random random = new Random();
 
         // Create 5 admin users
         for (int i = 1; i <= 5; i++) {
@@ -52,6 +79,9 @@ public class SampleTable {
             String profileURL = user.defaultProfilePictureUrl(user.getUsername()).toString();
             user.setdefaultProfilePictureUrl(profileURL);
             user.setProfilePictureUrl(profileURL);
+
+            GeoPoint randomGeoPoint = generateRandomGeoPoint(baseLatitude, baseLongitude, radiusInDegrees);
+            user.setGeolocation(randomGeoPoint);
             UserList.add(user);
         }
 
@@ -68,6 +98,8 @@ public class SampleTable {
             String profileURL = user.defaultProfilePictureUrl(user.getUsername()).toString();
             user.setdefaultProfilePictureUrl(profileURL);
             user.setProfilePictureUrl(profileURL);
+            GeoPoint randomGeoPoint = generateRandomGeoPoint(baseLatitude, baseLongitude, radiusInDegrees);
+            user.setGeolocation(randomGeoPoint);
             UserList.add(user);
         }
 
@@ -83,6 +115,8 @@ public class SampleTable {
             String profileURL = user.defaultProfilePictureUrl(user.getUsername()).toString();
             user.setdefaultProfilePictureUrl(profileURL);
             user.setProfilePictureUrl(profileURL);
+            GeoPoint randomGeoPoint = generateRandomGeoPoint(baseLatitude, baseLongitude, radiusInDegrees);
+            user.setGeolocation(randomGeoPoint);
             UserList.add(user);
         }
         Log.d("User list", "Done List");

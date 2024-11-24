@@ -38,6 +38,7 @@ import com.example.eventbooking.profile.ProfileFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.GeoPoint;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -276,6 +277,10 @@ public class LoginFragment extends Fragment {
 
     private void handleReturningUser(User user, String deviceId) {
         Log.d("LoginFragment", "Returning User: " + user.getUsername());
+        if(user.isGeolocationAsk()){
+            user.updateGeolocation();
+        }
+        user.saveUserDataToFirestore();
         UserManager.getInstance().setCurrentUser(user);
         new Handler().postDelayed(() -> {
             if (eventIdFromQR != null) {
@@ -306,6 +311,10 @@ public class LoginFragment extends Fragment {
         FirestoreAccess.getInstance().getUser(documentId).addOnSuccessListener(snapshot -> {
             if (snapshot.exists()) {
                 User user = snapshot.toObject(User.class);
+                if(user.isGeolocationAsk()){
+                    user.updateGeolocation();
+                }
+                user.saveUserDataToFirestore();
                 UserManager.getInstance().setCurrentUser(user);
                 Toast.makeText(getActivity(), "User set by Document ID", Toast.LENGTH_SHORT).show();
                 handleReturningUser(user, user.getDeviceID());
@@ -317,7 +326,7 @@ public class LoginFragment extends Fragment {
     }
 
     private void setUserToDeviceID1() {
-        FirestoreAccess.getInstance().getUser("deviceID1").addOnSuccessListener(snapshot -> {
+        FirestoreAccess.getInstance().getUser("deviceID2").addOnSuccessListener(snapshot -> {
             if (snapshot.exists()) {
                 User user = snapshot.toObject(User.class);
                 UserManager.getInstance().setCurrentUser(user);
@@ -338,6 +347,10 @@ public class LoginFragment extends Fragment {
         FirestoreAccess.getInstance().getUsersByUsername(username).addOnSuccessListener(querySnapshot -> {
             if (!querySnapshot.isEmpty()) {
                 User user = querySnapshot.getDocuments().get(0).toObject(User.class);
+                if(user.isGeolocationAsk()){
+                    user.updateGeolocation();
+                }
+                user.saveUserDataToFirestore();
                 UserManager.getInstance().setCurrentUser(user);
                 Toast.makeText(getActivity(), "User set by Username", Toast.LENGTH_SHORT).show();
                 handleReturningUser(user, user.getDeviceID());

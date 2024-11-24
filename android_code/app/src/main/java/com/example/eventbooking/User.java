@@ -1,5 +1,6 @@
 package com.example.eventbooking;
 
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -7,9 +8,12 @@ import android.graphics.Paint;
 import android.net.Uri;
 import android.util.Log;
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -21,6 +25,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import android.location.Location;
+import com.google.firebase.firestore.GeoPoint;
+import android.Manifest;
+import android.content.Context;
 
 /**
  * The User class where we are storing the data and is the main model for User.
@@ -38,6 +48,7 @@ public class User {
     private String deviceId;//changed from int to string here
     private String email;
     private String phoneNumber;
+    private GeoPoint geolocation;
     // profile picture
     private String profilePictureUrl;
     private String defaultprofilepictureurl;
@@ -53,6 +64,7 @@ public class User {
     //Firebase
     public StorageReference storageReference;
     FirebaseFirestore db;
+    private FusedLocationProviderClient fusedLocationClient;
 
     /**
      * This constructor is used to instantiate lists inside of the class so when calling them
@@ -130,6 +142,13 @@ public class User {
     }
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+    public GeoPoint getGeolocation() {
+        return geolocation;
+    }
+    public void setGeolocation(GeoPoint geolocation) {
+        this.geolocation = geolocation;
     }
 
     public String getProfilePictureUrl() {
@@ -366,6 +385,7 @@ public class User {
         userData.put("notificationAsk", notificationAsk);
         userData.put("geolocationAsk", geolocationAsk);
         userData.put("roles", roles);
+        userData.put("geolocation", geolocation);
 
         // Save data under "Users" collection and return the Task
         return db.collection("Users").document(deviceId)
@@ -420,6 +440,7 @@ public class User {
         userData.put("facilityAssociated", facilityAssociated);
         userData.put("notificationAsk", notificationAsk);
         userData.put("geolocationAsk", geolocationAsk);
+        userData.put("geolocation", geolocation);
         userData.put("roles", roles);
 
         // Save data under "Users" collection and return the Task
@@ -610,5 +631,32 @@ public class User {
                 }
             }
         });
+    }
+
+
+    /**
+     * Updates the user's geolocation and returns it as a GeoPoint.
+     * If location is unavailable, returns a default GeoPoint (1,1).
+     *
+     * @return A GeoPoint object with the current location or a default point (1,1).
+     */
+    public GeoPoint updateGeolocation() {
+        final GeoPoint[] geoPoint = {new GeoPoint(1.0, 1.0)}; // Default GeoPoint
+
+        try {
+            fusedLocationClient.getLastLocation().addOnCompleteListener(task -> {
+                if (task.isSuccessful() && task.getResult() != null) {
+                    Location location = task.getResult();
+                    geoPoint[0] = new GeoPoint(location.getLatitude(), location.getLongitude());
+                    Log.d("Geolocation", "Location updated: " + geoPoint[0].toString());
+                } else {
+                    Log.w("Geolocation", "Failed to retrieve location. Returning default GeoPoint (1,1).");
+                }
+            });
+        } catch (SecurityException e) {
+            Log.e("Geolocation", "Location permissions are missing. Returning default GeoPoint (1,1).", e);
+        }
+
+        return geoPoint[0];
     }
 }

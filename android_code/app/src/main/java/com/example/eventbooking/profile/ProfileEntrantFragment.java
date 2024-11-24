@@ -59,14 +59,11 @@ public class ProfileEntrantFragment extends Fragment {
     private Button uploadButton;
     protected Button editButton;
     protected Switch notificationsSwitch;
+    private Switch geolocationSwitch;
     private ImageView userImage;
     private ActivityResultLauncher<Intent> pickImageLauncher;
     private Uri selectedImageUri;
 
-    // Start of Testing values
-    private Switch testingSwitch;
-    private EditText deviceIDEntry;
-    // End of Testing Values
 
     private EntrantProfileManager profileManager;
     private EntrantProfile currentProfile;
@@ -151,11 +148,10 @@ public class ProfileEntrantFragment extends Fragment {
         editEmail = view.findViewById(R.id.edit_email);
         editPhone = view.findViewById(R.id.edit_phone);
         notificationsSwitch = view.findViewById(R.id.notifications_switch);
-        testingSwitch = view.findViewById(R.id.testing_switch);
+        geolocationSwitch = view.findViewById(R.id.geolocation_switch);
         saveButton = view.findViewById(R.id.button_save_profile);
         backButton = view.findViewById(R.id.button_back_home);
         editButton = view.findViewById(R.id.button_edit_profile);
-        deviceIDEntry = view.findViewById(R.id.device_id_entry);
         uploadButton = view.findViewById(R.id.button_upload_photo);
         userImage = view.findViewById(R.id.user_image);
         removeImageButton = view.findViewById(R.id.button_remove_photo);
@@ -280,6 +276,7 @@ public class ProfileEntrantFragment extends Fragment {
             editEmail.setText(loadingUser.getEmail());
             editPhone.setText(loadingUser.getPhoneNumber());
             notificationsSwitch.setChecked(loadingUser.isNotificationAsk());
+            geolocationSwitch.setChecked(loadingUser.isGeolocationAsk());
             currentUser.setdefaultProfilePictureUrl(loadingUser.getdefaultProfilePictureUrl());
             String profilePictureUrl = loadingUser.getProfilePictureUrl();
             Log.d("Profile", "URL "+ profilePictureUrl);
@@ -348,14 +345,11 @@ public class ProfileEntrantFragment extends Fragment {
         currentUser.setEmail(editEmail.getText().toString().trim());
         currentUser.setPhoneNumber(editPhone.getText().toString().trim());
         currentUser.setNotificationAsk(notificationsSwitch.isChecked());
+        currentUser.setGeolocationAsk(geolocationSwitch.isChecked());
         Log.d("Profile save", "Profile " + currentUser.getdefaultProfilePictureUrl());
 //        if(selectedImageUri != null){
 //            currentUser.setProfilePictureUrl(selectedImageUri.toString());
 //        }
-
-        if(testing){
-            currentUser.setDeviceID(deviceIDEntry.getText().toString().trim());
-        }
 
         UserManager.getInstance().setCurrentUser(currentUser);
 
@@ -471,6 +465,7 @@ public class ProfileEntrantFragment extends Fragment {
         editEmail.setEnabled(enable);
         editPhone.setEnabled(enable);
         notificationsSwitch.setEnabled(enable);
+        geolocationSwitch.setEnabled(enable);
         saveButton.setEnabled(enable);
         editButton.setText(enable ? "Cancel" : "Edit");
         uploadButton.setVisibility(View.VISIBLE);

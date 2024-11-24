@@ -50,7 +50,7 @@ public class TestFragment extends Fragment {
     private static final String TAG = "FirebaseTestingFragment";
     private static final int PICK_IMAGE_REQUEST = 1;
 
-    private Button btnGenerateData, btnLoadData, btnSelectImage;
+    private Button btnGenerateData, btnLoadData, btnSelectImage, btnMapEvent;
     private Button generateQRCode,  btnUploadImage, btnDelete, btnBackHome;
     private ImageView imageView, QRCode;
     private TextView txtStatus;
@@ -114,6 +114,8 @@ public class TestFragment extends Fragment {
         txtStatus = view.findViewById(R.id.txtStatus);
         eventIDForQR = view.findViewById(R.id.event_id_for_qr);
 
+        btnMapEvent = view.findViewById(R.id.button_event_map);
+
         if (francisTest == false) {
             btnDelete.setVisibility(View.GONE);
         }
@@ -126,6 +128,7 @@ public class TestFragment extends Fragment {
         btnDelete.setOnClickListener(v -> deleteAllData());
         btnBackHome.setOnClickListener(v -> backToHome());
         generateQRCode.setOnClickListener(v -> generateAndDisplayQRCode());
+        btnMapEvent.setOnClickListener(v -> goToMap());
         return view;
     }
 
@@ -417,6 +420,13 @@ public class TestFragment extends Fragment {
     private void backToHome(){
         FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, new HomeFragment());
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
+
+    private void goToMap(){
+        FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, new EventMapFragment());
         transaction.addToBackStack(null);
         transaction.commit();
     }

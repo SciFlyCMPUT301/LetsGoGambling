@@ -39,7 +39,7 @@ public class ProfileFragment extends Fragment {
     private EditText editName, editEmail, editPhone;
     private TextView profileTitle;
     private Button editButton, uploadButton, backButton, removeImageButton, saveButton, notification_button;
-    private Switch notificationsSwitch;
+    private Switch notificationsSwitch, geolocationSwitch;
     private ImageView userImage;
     private ActivityResultLauncher<Intent> pickImageLauncher;
     private Uri selectedImageUri;
@@ -109,6 +109,7 @@ public class ProfileFragment extends Fragment {
         editEmail = view.findViewById(R.id.edit_email);
         editPhone = view.findViewById(R.id.edit_phone);
         notificationsSwitch = view.findViewById(R.id.notifications_switch);
+        geolocationSwitch = view.findViewById(R.id.geolocation_switch);
         saveButton = view.findViewById(R.id.button_save_profile);
         backButton = view.findViewById(R.id.button_back_home);
         editButton = view.findViewById(R.id.button_edit_profile);
@@ -116,6 +117,7 @@ public class ProfileFragment extends Fragment {
         userImage = view.findViewById(R.id.user_image);
         removeImageButton = view.findViewById(R.id.button_remove_photo);
         notification_button = view.findViewById(R.id.button_notification);
+
 
         saveButton.setOnClickListener(v -> saveUserProfile());
         backButton.setOnClickListener(v -> goToHome());
@@ -132,6 +134,7 @@ public class ProfileFragment extends Fragment {
             editEmail.setText(user.getEmail());
             editPhone.setText(user.getPhoneNumber());
             notificationsSwitch.setChecked(user.isNotificationAsk());
+            geolocationSwitch.setChecked(user.isGeolocationAsk());
 
             String profilePictureUrl = user.getProfilePictureUrl();
             if (profilePictureUrl != null && !profilePictureUrl.isEmpty()) {
@@ -145,6 +148,16 @@ public class ProfileFragment extends Fragment {
         currentUser.setEmail(editEmail.getText().toString().trim());
         currentUser.setPhoneNumber(editPhone.getText().toString().trim());
         currentUser.setNotificationAsk(notificationsSwitch.isChecked());
+        currentUser.setGeolocationAsk(geolocationSwitch.isChecked());
+        if(isNewUser){
+            currentUser.updateGeolocation();
+            UserManager.getInstance().setCurrentUser(currentUser);
+        }
+        if(currentUser.isGeolocationAsk()){
+            currentUser.updateGeolocation();
+        }
+
+
         currentUser.saveUserDataToFirestore().addOnSuccessListener(aVoid -> {
             Toast.makeText(getContext(), "Profile saved successfully.", Toast.LENGTH_SHORT).show();
             setEditMode(false);

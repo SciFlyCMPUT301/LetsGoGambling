@@ -110,7 +110,6 @@
                 android:enabled="false"
                 android:padding="20dp"/>
 
-            <!-- Notification preference switch -->
             <Switch
                 android:id="@+id/notifications_switch"
                 android:layout_width="wrap_content"
@@ -121,20 +120,12 @@
                 android:padding="20dp"/>
 
             <Switch
-                android:id="@+id/testing_switch"
+                android:id="@+id/geolocation_switch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Enable Testing"
+                android:text="Enable Goelocation"
                 android:checked="true"
                 android:enabled="false"
-                android:padding="20dp"/>
-
-            <EditText
-                android:id="@+id/device_id_entry"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="DeviceID"
-                android:text="deviceID1"
                 android:padding="20dp"/>
 
             <Button

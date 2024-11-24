@@ -5,4 +5,12 @@
         <item>Home</item>
         <item>Slideshow</item>
     </string-array>
+
+    <string-array name="list_options">
+        <item>Waitlist</item>
+        <item>Selected List</item>
+        <item>Accepted List</item>
+        <item>Declined List</item>
+        <item>Cancelled List</item>
+    </string-array>
 </resources>

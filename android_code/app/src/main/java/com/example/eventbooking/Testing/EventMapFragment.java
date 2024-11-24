@@ -29,6 +29,8 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 import com.example.eventbooking.R;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -183,18 +185,18 @@ public class EventMapFragment extends Fragment implements OnMapReadyCallback {
         mapView.onLowMemory();
     }
 
-    private void loadUsersFromFirestore() {
-        db.collection("Users").get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                for (QueryDocumentSnapshot document : task.getResult()) {
-                    User user = document.toObject(User.class);
-                    userList.add(user);
-                    Log.d("EventMapFragment", "User loaded: " + user.getDeviceID());
-                }
+    private void loadUserFromFirebase(String userId, OnSuccessListener<User> onSuccess, OnFailureListener onFailure) {
+        Log.d("Event Map", "Load UserID");
+        db.collection("Users").document(userId).get().addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.exists()) {
+                User user = documentSnapshot.toObject(User.class);
+                Log.d("Event Map", "Success Load UserID " + user.getDeviceID());
+                onSuccess.onSuccess(user);
             } else {
-                Log.e("FirestoreError", "Error loading users: ", task.getException());
+                Log.w("EventMapFragment", "User not found: " + userId);
+                onFailure.onFailure(new Exception("User not found"));
             }
-        });
+        }).addOnFailureListener(onFailure);
     }
 
 
@@ -241,22 +243,31 @@ public class EventMapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     private void addMarkersForUsers(List<String> userIds) {
+        Log.d("Event Map", "Marker start");
         googleMap.clear(); // Clear previous markers
 
         for (String userId : userIds) {
-            for (User user : userList) {
-                if (user.getDeviceID().equals(userId)) {
-                    GeoPoint location = user.getGeolocation();
-                    if (location != null) {
-                        LatLng position = new LatLng(location.getLatitude(), location.getLongitude());
-                        googleMap.addMarker(new MarkerOptions()
-                                .position(position)
-                                .title(user.getUsername())
-                                .snippet("Email: " + user.getEmail() + "\nPhone: " + user.getPhoneNumber()));
-                    }
+            Log.d("Event Map", "UserID String: " + userId);
+            loadUserFromFirebase(userId, user -> {
+                GeoPoint location = user.getGeolocation();
+                Log.d("Event Map", "User Geopoint: " + location);
+                if (location != null) {
+                    LatLng position = new LatLng(location.getLatitude(), location.getLongitude());
+                    googleMap.addMarker(new MarkerOptions()
+                            .position(position)
+                            .title(user.getUsername())
+                            .snippet("Email: " + user.getEmail() + "\nPhone: " + user.getPhoneNumber()));
+                    CameraPosition cameraPosition = new CameraPosition.Builder()
+                            .target(position)
+                            .zoom(14) // Zoom level
+                            .build();
+                    googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                } else {
+                    Log.w("EventMapFragment", "User " + user.getUsername() + " does not have a geolocation.");
                 }
-            }
+            }, e -> Log.e("EventMapFragment", "Failed to load user: " + userId, e));
         }
+
 
         // Set marker click listener
         googleMap.setOnMarkerClickListener(marker -> {

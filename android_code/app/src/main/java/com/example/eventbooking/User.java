@@ -659,4 +659,7 @@ public class User {
 
         return geoPoint[0];
     }
+
+
+
 }

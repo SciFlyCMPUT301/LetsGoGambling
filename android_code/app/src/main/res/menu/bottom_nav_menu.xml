@@ -15,6 +15,11 @@
         android:id="@+id/nav_test"
         android:icon="@drawable/ic_test_foreground"
         android:title="Test" />
+    <item
+        android:id="@+id/nav_organizer"
+        android:icon="@drawable/ic_organizer_foreground"
+        android:title="organizer" />
+
 <!--    <item-->
 <!--        android:id="@+id/nav_admin"-->
 <!--        android:icon="@drawable/ic_admin_foreground"-->

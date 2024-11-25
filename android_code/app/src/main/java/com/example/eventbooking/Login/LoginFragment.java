@@ -274,6 +274,10 @@ public class LoginFragment extends Fragment {
 //                    .replace(R.id.fragment_container, profileFragment)
 //                    .commit();
 //        }, 3000);
+        // Temp setting this for Profile fragment
+        User newUser = new User();
+        newUser.setDeviceID(deviceId);
+        UserManager.getInstance().setCurrentUser(newUser);
         handler = new Handler();
         handler.postDelayed(() -> {
             if (isAdded() && getActivity() instanceof MainActivity) {
@@ -289,11 +293,13 @@ public class LoginFragment extends Fragment {
 
     private void handleReturningUser(User user, String deviceId) {
         Log.d("LoginFragment", "Returning User: " + user.getUsername());
-        if(user.isGeolocationAsk()){
-            user.updateGeolocation();
-        }
+
         user.saveUserDataToFirestore();
         UserManager.getInstance().setCurrentUser(user);
+        if(user.isGeolocationAsk()){
+            UserManager.getInstance().updateGeolocation();
+//            user.updateGeolocation();
+        }
         new Handler().postDelayed(() -> {
             if (eventIdFromQR != null) {
                 ((MainActivity) getActivity()).showNavigationUI();
@@ -323,11 +329,15 @@ public class LoginFragment extends Fragment {
         FirestoreAccess.getInstance().getUser(documentId).addOnSuccessListener(snapshot -> {
             if (snapshot.exists()) {
                 User user = snapshot.toObject(User.class);
-                if(user.isGeolocationAsk()){
-                    user.updateGeolocation();
-                }
+//                if(user.isGeolocationAsk()){
+//                    user.updateGeolocation();
+//                }
                 user.saveUserDataToFirestore();
                 UserManager.getInstance().setCurrentUser(user);
+                if(user.isGeolocationAsk()){
+                    UserManager.getInstance().updateGeolocation();
+//            user.updateGeolocation();
+                }
                 Toast.makeText(getActivity(), "User set by Document ID", Toast.LENGTH_SHORT).show();
                 handleReturningUser(user, user.getDeviceID());
             } else {
@@ -359,11 +369,15 @@ public class LoginFragment extends Fragment {
         FirestoreAccess.getInstance().getUsersByUsername(username).addOnSuccessListener(querySnapshot -> {
             if (!querySnapshot.isEmpty()) {
                 User user = querySnapshot.getDocuments().get(0).toObject(User.class);
-                if(user.isGeolocationAsk()){
-                    user.updateGeolocation();
-                }
+//                if(user.isGeolocationAsk()){
+//                    user.updateGeolocation();
+//                }
                 user.saveUserDataToFirestore();
                 UserManager.getInstance().setCurrentUser(user);
+                if(user.isGeolocationAsk()){
+                    UserManager.getInstance().updateGeolocation();
+//            user.updateGeolocation();
+                }
                 Toast.makeText(getActivity(), "User set by Username", Toast.LENGTH_SHORT).show();
                 handleReturningUser(user, user.getDeviceID());
             } else {

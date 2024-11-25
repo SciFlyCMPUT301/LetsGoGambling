@@ -1,20 +1,33 @@
 package com.example.eventbooking;
 
+import static android.Manifest.permission.ACCESS_FINE_LOCATION;
+
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Looper;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
+
 import androidx.appcompat.widget.Toolbar;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
@@ -44,11 +57,28 @@ import com.example.eventbooking.waitinglist.ViewAcceptedListFragment;
 import com.example.eventbooking.waitinglist.ViewCanceledListFragment;
 import com.example.eventbooking.waitinglist.ViewSignedListFragment;
 import com.example.eventbooking.waitinglist.ViewWaitingListFragment;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.api.ResolvableApiException;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.firestore.GeoPoint;
+
+
+import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
+import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
 /**
  * MainActivity, this is the main portion to define navigation views and a controller to move
@@ -73,6 +103,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static boolean isLoggedIn = false;
 //    private ActivityMainBinding binding;
 
+
     /**
      * Setting fragments here any calls will be based off of this, easier to track what fragments
      * are being called in the navigation bar and to see if they are being used at all
@@ -95,11 +126,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private AdminFragment adminFragment = new AdminFragment();
     private ProfileEntrantFragment profileEntrantFragment = new ProfileEntrantFragment();
 
+//    LocationManager manager;
+    public GeoPoint currentGeoPoint;
+    private LocationRequest locationRequest;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d("Main Activity", "Create Activity");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        UserManager.getInstance().setFusedLocationClient(fusedLocationClient);
+        UserManager.getInstance().setContext(this);
 
         /**
          * Finding and setting the views for the navigation inside of activity_main
@@ -130,30 +169,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawerLayout.addDrawerListener(drawerToggle);
         drawerToggle.syncState();
 
+
+
+
+        //For location:
+        locationRequest = LocationRequest.create();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(5000);
+        locationRequest.setFastestInterval(2000);
+        getCurrentLocation();
+
+
+
         // Getting the login fragment given intent
         handleIntent(getIntent());
-
-
-//        SharedPreferences preferences = getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);
-////        boolean dataUploaded = preferences.getBoolean("dataUploaded", false);
-////
-////        if (!dataUploaded) {
-//            // Call DataGenerator to upload data
-//            DataGenerator dataGenerator = new DataGenerator();
-//            dataGenerator.generateAndUploadData();
-//
-//            // Set flag to true
-////            SharedPreferences.Editor editor = preferences.edit();
-////            editor.putBoolean("dataUploaded", true);
-////            editor.apply();
-////        }
-
-//        if (savedInstanceState == null) {
-//            // Load HomeFragment by default
-//            getSupportFragmentManager().beginTransaction()
-//                    .replace(R.id.fragment_container, new LoginFragment())
-//                    .commit();
-//        }
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -175,32 +204,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (itemId == R.id.nav_home || itemId == R.id.nav_profile ||
         itemId == R.id.nav_events || itemId == R.id.nav_test){
             Log.d("Main Activity", "Navigation Item Bottom Bar");
-
             if (itemId == R.id.nav_home) {
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.fragment_container, homeFragment)
-                        .commit();
+                moveToFragment(homeFragment);
                 return true;
             } else if (itemId == R.id.nav_profile) {
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        // little scooby doo switcheroo
-//                        .replace(R.id.fragment_container, profileEntrantFragment)
-                        .replace(R.id.fragment_container, profileFragment)
-                        .commit();
+                moveToFragment(profileFragment);
                 return true;
             } else if (itemId == R.id.nav_events) {
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.fragment_container, eventFragment)
-                        .commit();
+                moveToFragment(eventFragment);
                 return true;
             }else if (itemId == R.id.nav_test) {
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.fragment_container, testFragment)
-                        .commit();
+                moveToFragment(testFragment);
                 return true;
             }
         }
@@ -216,83 +230,51 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 //bundle.putInt("maxParticipants",100);
                 OrganizerMenuFragment organizerMenuFragment = new OrganizerMenuFragment();
                 organizerMenuFragment.setArguments(bundle);
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, organizerMenuFragment)
-                        .commit();
+                moveToFragment(organizerMenuFragment);
             } else if (itemId == R.id.nav_view_accepted) {
                 Bundle bundle = new Bundle();
                 bundle.putString("eventId","event1");
                 ViewAcceptedListFragment viewAcceptedListFragment = new ViewAcceptedListFragment();
                 viewAcceptedListFragment.setArguments(bundle);
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, viewAcceptedListFragment)
-                        .commit();
+                moveToFragment(viewAcceptedListFragment);
             } else if (itemId == R.id.nav_view_canceled) {
                 Bundle bundle = new Bundle();
                 bundle.putString("eventId","event1");
                 ViewCanceledListFragment viewCanceledListFragment = new ViewCanceledListFragment();
                 viewCanceledListFragment.setArguments(bundle);
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, viewCanceledListFragment)
-                        .commit();
+                moveToFragment(viewCanceledListFragment);
             } else if (itemId == R.id.nav_view_signed) {
                 Bundle bundle = new Bundle();
                 bundle.putString("eventId","event1");
                 ViewSignedListFragment viewSignedListFragment = new ViewSignedListFragment();
                 viewSignedListFragment.setArguments(bundle);
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, viewSignedListFragment)
-                        .commit();
+                moveToFragment(viewSignedListFragment);
             } else if (itemId == R.id.nav_view_waiting) {
                 Bundle bundle = new Bundle();
                 bundle.putString("eventId","event1");
                 ViewWaitingListFragment viewWaitingListFragment = new ViewWaitingListFragment();
                 viewWaitingListFragment.setArguments(bundle);
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, viewWaitingListFragment)
-                        .commit();
+                moveToFragment(viewWaitingListFragment);
             } else if (itemId == R.id.nav_profile) {
-                getSupportFragmentManager().beginTransaction()
-                        // little scooby doo switcheroo
-//                        .replace(R.id.fragment_container, profileEntrantFragment)
-                        .replace(R.id.fragment_container, profileFragment)
-                        .commit();
+                moveToFragment(profileFragment);
             } else if (itemId == R.id.nav_notifications) {
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, notificationFragment)
-                        .commit();
+                moveToFragment(notificationFragment);
             } else if (itemId == R.id.nav_login) {
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, loginFragment)
-                        .commit();
+                moveToFragment(loginFragment);
             } else if (itemId == R.id.nav_home) {
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, homeFragment)
-                        .commit();
+                moveToFragment(homeFragment);
             } else if (itemId == R.id.nav_event) {
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, eventFragment)
-                        .commit();
+                moveToFragment(eventFragment);
             } else if (itemId == R.id.nav_event_create) {
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, eventCreateFragment)
-                        .commit();
+                moveToFragment(eventCreateFragment);
             } else if (itemId == R.id.nav_camera) {
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, cameraFragment)
-                        .commit();
+                moveToFragment(cameraFragment);
             } else if (itemId == R.id.nav_scanned_event) {
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, scannedFragment)
-                        .commit();
+                moveToFragment(scannedFragment);
             } else if (itemId == R.id.nav_event_code_generate) {
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, eventCodeGenerate)
-                        .commit();
+                moveToFragment(eventCodeGenerate);
             }else if (itemId == R.id.nav_admin) {
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, adminFragment)
-                        .commit();
+                moveToFragment(adminFragment);
             }
             // Close the drawer after an item is selected
             drawerLayout.closeDrawer(GravityCompat.START);
@@ -315,10 +297,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-
-    //QR code intent here, this is to get the links intercepted such that we can then pass
-    //Them into the program
-
     /**
      * The below two functions are intended on getting the QR code scanning outside of the app
      * and then passing the data inside of the QR code into the app such that we can use it.
@@ -330,21 +308,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-//        handleQRCodeScan(intent);
         handleIntent(intent);
     }
 
-//    private void handleQRCodeScan(Intent intent) {
-//        if (LoginFragment.isLoggedIn) { // Check if user is logged in
-//            String scannedData = intent.getStringExtra("scanned_data");
-//            if (scannedData != null) {
-//                ScannedFragment scannedFragment = ScannedFragment.newInstance(scannedData);
-//                getSupportFragmentManager().beginTransaction()
-//                        .replace(R.id.fragment_container, scannedFragment)
-//                        .commit();
-//            }
-//        }
-//    }
 
     /**
      * Handling of external links and QR code scanning from outside of the app
@@ -471,5 +437,113 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
 
+    private void getCurrentLocation() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
+                if (isGPSEnabled()) {
+
+                    LocationServices.getFusedLocationProviderClient(MainActivity.this)
+                            .requestLocationUpdates(locationRequest, new LocationCallback() {
+                                @Override
+                                public void onLocationResult(@NonNull LocationResult locationResult) {
+                                    super.onLocationResult(locationResult);
+                                    LocationServices.getFusedLocationProviderClient(MainActivity.this)
+                                            .removeLocationUpdates(this);
+                                    if (locationResult != null && locationResult.getLocations().size() >0){
+                                        int index = locationResult.getLocations().size() - 1;
+                                        double latitude = locationResult.getLocations().get(index).getLatitude();
+                                        double longitude = locationResult.getLocations().get(index).getLongitude();
+                                        GeoPoint point = new GeoPoint(latitude, longitude);
+                                        currentGeoPoint = point;
+//                                        AddressText.setText("Latitude: "+ latitude + "\n" + "Longitude: "+ longitude);
+                                        UserManager.getInstance().setGeolocation(point);
+                                    }
+                                }
+                            }, Looper.getMainLooper());
+
+                } else {
+                    turnOnGPS();
+                }
+
+            } else {
+                requestPermissions(new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+            }
+        }
+    }
+
+    private void turnOnGPS() {
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+                .addLocationRequest(locationRequest);
+        builder.setAlwaysShow(true);
+
+        Task<LocationSettingsResponse> result = LocationServices.getSettingsClient(getApplicationContext())
+                .checkLocationSettings(builder.build());
+
+        result.addOnCompleteListener(new OnCompleteListener<LocationSettingsResponse>() {
+            @Override
+            public void onComplete(@NonNull Task<LocationSettingsResponse> task) {
+
+                try {
+                    LocationSettingsResponse response = task.getResult(ApiException.class);
+                    Toast.makeText(MainActivity.this, "GPS is already tured on", Toast.LENGTH_SHORT).show();
+
+                } catch (ApiException e) {
+
+                    switch (e.getStatusCode()) {
+                        case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+
+                            try {
+                                ResolvableApiException resolvableApiException = (ResolvableApiException) e;
+                                resolvableApiException.startResolutionForResult(MainActivity.this, 2);
+                            } catch (IntentSender.SendIntentException ex) {
+                                ex.printStackTrace();
+                            }
+                            break;
+
+                        case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                            //Device does not have location
+                            break;
+                    }
+                }
+            }
+        });
+
+    }
+
+    private boolean isGPSEnabled() {
+        LocationManager locationManager = null;
+        boolean isEnabled = false;
+
+        if (locationManager == null) {
+            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        }
+
+        isEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        return isEnabled;
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == 1){
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
+
+                if (isGPSEnabled()) {
+                    getCurrentLocation();
+                }else {
+                    turnOnGPS();
+                }
+            }
+        }
+    }
+
+
+    private void moveToFragment(Fragment movingFragment){
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, movingFragment)
+                .commit();
+    }
 }

@@ -1,5 +1,7 @@
 package com.example.eventbooking;
 
+import static android.app.PendingIntent.getActivity;
+
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -64,7 +66,7 @@ public class User {
     //Firebase
     public StorageReference storageReference;
     FirebaseFirestore db;
-    private FusedLocationProviderClient fusedLocationClient;
+
 
     /**
      * This constructor is used to instantiate lists inside of the class so when calling them
@@ -350,19 +352,24 @@ public class User {
         Log.d("User", "User ID: " + defaultprofilepictureurl);
         final String[] new_userID = {deviceId};
         if(deviceId == null){
+            Log.d("User", "User ID is null");
             getNewUserID(new OnUserIDGenerated() {
                 @Override
                 public void onUserIDGenerated(String userID) {
                     if (userID != null) {
-                        new_userID[0] = userID;
+                        deviceId = userID;
+                        userData.put("eventId", deviceId);
+                        saveDataToFirestore(userData);
+//                        new_userID[0] = userID;
                         Log.d("New User", userID);
                     } else {
                         // Handle the error if userID is null
                         Log.e("New User", "Failed to generate user ID.");
+                        Log.d("New User", "Failed to generate user ID");
                     }
                 }
             });
-
+            Log.d("User", "User ID generated to be: " + new_userID[0]);
             userData.put("deviceId", new_userID[0]);
             this.deviceId = new_userID[0];
         }
@@ -609,23 +616,18 @@ public class User {
      * @param callback
      */
     public void getNewUserID(final OnUserIDGenerated callback) {
+        Log.d("User", "Generating new user ID");
         db.collection("Users").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
-                    // Calculate the new user ID by adding 1 to the current size
                     int newUserID = task.getResult().size() + 1;
-
-                    // Create the final user ID with deviceID prefix
                     String userID = "deviceID" + newUserID;
-
-                    // Pass the user ID to the callback
                     callback.onUserIDGenerated(userID);
-
-                    // Log the user ID
                     Log.d("New User", "Generated user ID: " + userID);
                 } else {
                     // Handle error if necessary
+                    Log.d("New User", "Error getting new user ID");
                     Log.e("Firebase", "Error getting documents: ", task.getException());
                     callback.onUserIDGenerated(null); // Notify callback about failure
                 }
@@ -634,31 +636,10 @@ public class User {
     }
 
 
-    /**
-     * Updates the user's geolocation and returns it as a GeoPoint.
-     * If location is unavailable, returns a default GeoPoint (1,1).
-     *
-     * @return A GeoPoint object with the current location or a default point (1,1).
-     */
-    public GeoPoint updateGeolocation() {
-        final GeoPoint[] geoPoint = {new GeoPoint(1.0, 1.0)}; // Default GeoPoint
 
-        try {
-            fusedLocationClient.getLastLocation().addOnCompleteListener(task -> {
-                if (task.isSuccessful() && task.getResult() != null) {
-                    Location location = task.getResult();
-                    geoPoint[0] = new GeoPoint(location.getLatitude(), location.getLongitude());
-                    Log.d("Geolocation", "Location updated: " + geoPoint[0].toString());
-                } else {
-                    Log.w("Geolocation", "Failed to retrieve location. Returning default GeoPoint (1,1).");
-                }
-            });
-        } catch (SecurityException e) {
-            Log.e("Geolocation", "Location permissions are missing. Returning default GeoPoint (1,1).", e);
-        }
 
-        return geoPoint[0];
-    }
+
+
 
 
 

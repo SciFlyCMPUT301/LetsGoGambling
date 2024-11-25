@@ -32,6 +32,8 @@ import com.example.eventbooking.Role;
 import com.example.eventbooking.User;
 import com.example.eventbooking.UserManager;
 import com.example.eventbooking.notification.NotificationFragment;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.squareup.picasso.Picasso;
 
 public class ProfileFragment extends Fragment {
@@ -66,15 +68,12 @@ public class ProfileFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_profile_view, container, false);
 
         if (getArguments() != null) {
+            Log.d("Profile Fragment", "Arguments passed");
             isNewUser = getArguments().getBoolean("isNewUser", false);
             eventIDFromQR = getArguments().getString("eventId", null);
-            deviceId = getArguments().getString("deviceId", null);
-//            deviceId = getArguments().getString("deviceId", UserManager.getInstance().getUserId());
+//            deviceId = getArguments().getString("deviceId", null);
+            deviceId = getArguments().getString("deviceId", UserManager.getInstance().getUserId());
         }
-
-        //
-
-
 
         initializeUI(view);
         if(isNewUser)
@@ -86,7 +85,7 @@ public class ProfileFragment extends Fragment {
             onProfileLoaded(currentUser);
             setEditMode(false);
         } else {
-            currentUser = new User();
+            currentUser = UserManager.getInstance().getCurrentUser();
             setEditMode(true);
         }
 
@@ -150,18 +149,27 @@ public class ProfileFragment extends Fragment {
         currentUser.setNotificationAsk(notificationsSwitch.isChecked());
         currentUser.setGeolocationAsk(geolocationSwitch.isChecked());
         if(isNewUser){
-            currentUser.updateGeolocation();
+            Log.d("Profile Fragment", "Setting new User");
             UserManager.getInstance().setCurrentUser(currentUser);
         }
-        if(currentUser.isGeolocationAsk()){
-            currentUser.updateGeolocation();
-        }
-
 
         currentUser.saveUserDataToFirestore().addOnSuccessListener(aVoid -> {
             Toast.makeText(getContext(), "Profile saved successfully.", Toast.LENGTH_SHORT).show();
             setEditMode(false);
+            if(isNewUser){
+                if(currentUser.isGeolocationAsk()){
+                    UserManager.getInstance().updateGeolocation();
+                }
+
+            }
+            if(currentUser.isGeolocationAsk()){
+                UserManager.getInstance().updateGeolocation();
+            }
+            ((MainActivity) getActivity()).showNavigationUI();
+            goToHome();
+
         }).addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to save profile.", Toast.LENGTH_SHORT).show());
+
     }
 
     private void toggleEditMode() {

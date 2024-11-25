@@ -22,6 +22,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -334,43 +335,67 @@ public class Event {
      *
      * @return A task representing the asynchronous save operation.
      */
-
     public Task<Void> saveEventDataToFirestore() {
-        Log.d("Event", "Saving Event to Firestore");
-        Map<String, Object> eventData = new HashMap<>();
-
-        Task<Void> saveTask;
-
         if (eventId == null) {
-            Log.d("Event", "EventID null");
-            // Generate a new Event ID and then save the data
-            saveTask = getNewEventID()
-                    .continueWithTask(newEventIDTask -> {
-                        if (!newEventIDTask.isSuccessful() || newEventIDTask.getResult() == null) {
-                            throw new Exception("Failed to generate new Event ID");
-                        }
-                        String new_eventID = newEventIDTask.getResult();
-                        Log.d("Event", "New EventID: " + new_eventID);
-                        eventData.put("eventId", new_eventID);
-                        this.eventId = new_eventID;
+            return getNewEventID().continueWithTask(newEventIDTask -> {
+                if (!newEventIDTask.isSuccessful() || newEventIDTask.getResult() == null) {
+                    throw new Exception("Failed to generate new Event ID");
+                }
+                String newEventID = newEventIDTask.getResult();
+                this.eventId = newEventID;
 
-                        // Populate remaining fields
-                        populateEventData(eventData);
+                Map<String, Object> eventData = new HashMap<>();
+                eventData.put("eventId", newEventID);
+                populateEventData(eventData);
 
-                        // Save the data to Firestore
-                        return db.collection("Events").document(new_eventID).set(eventData);
-                    });
+                return db.collection("Events").document(newEventID).set(eventData);
+            });
         } else {
-            Log.d("Event", "EventID: " + eventId);
+            Map<String, Object> eventData = new HashMap<>();
             eventData.put("eventId", eventId);
             populateEventData(eventData);
-            saveTask = db.collection("Events").document(eventId).set(eventData);
-        }
 
-        return saveTask
-                .addOnSuccessListener(aVoid -> Log.d("Event", "Event data successfully saved to Firestore."))
-                .addOnFailureListener(e -> Log.e("Event", "Error saving event data to Firestore", e));
+            return db.collection("Events").document(eventId).set(eventData);
+        }
     }
+
+
+//    public Task<Void> saveEventDataToFirestore() {
+////        Log.d("Event", "Saving Event to Firestore");
+//        Map<String, Object> eventData = new HashMap<>();
+//
+//        Task<Void> saveTask;
+//
+//        if (eventId == null) {
+////            Log.d("Event", "EventID null");
+//            // Generate a new Event ID and then save the data
+//            saveTask = getNewEventID()
+//                    .continueWithTask(newEventIDTask -> {
+//                        if (!newEventIDTask.isSuccessful() || newEventIDTask.getResult() == null) {
+//                            throw new Exception("Failed to generate new Event ID");
+//                        }
+//                        String new_eventID = newEventIDTask.getResult();
+////                        Log.d("Event", "New EventID: " + new_eventID);
+//                        eventData.put("eventId", new_eventID);
+//                        this.eventId = new_eventID;
+//
+//                        // Populate remaining fields
+//                        populateEventData(eventData);
+//
+//                        // Save the data to Firestore
+//                        return db.collection("Events").document(new_eventID).set(eventData);
+//                    });
+//        } else {
+//            Log.d("Event", "EventID: " + eventId);
+//            eventData.put("eventId", eventId);
+//            populateEventData(eventData);
+//            saveTask = db.collection("Events").document(eventId).set(eventData);
+//        }
+//
+//        return saveTask
+//                .addOnSuccessListener(aVoid -> Log.d("Event", "Event data successfully saved to Firestore."))
+//                .addOnFailureListener(e -> Log.e("Event", "Error saving event data to Firestore", e));
+//    }
 
 
     private void populateEventData(Map<String, Object> eventData) {
@@ -497,17 +522,40 @@ public class Event {
      * geenrate new event id
      * @return
      */
+//    public Task<String> getNewEventID() {
+//        return db.collection("Events").get()
+//                .continueWith(task -> {
+//                    if (task.isSuccessful() && task.getResult() != null) {
+//                        int newIdNumber = task.getResult().size() + 1;
+//                        return "eventID" + newIdNumber;
+//                    } else {
+//                        String errorMessage = "Failed to fetch event count";
+//                        if (task.getException() != null) {
+//                            throw new Exception(errorMessage, task.getException());
+//                        } else {
+//                            throw new Exception(errorMessage);
+//                        }
+//                    }
+//                });
+//    }
     public Task<String> getNewEventID() {
-        return db.collection("Events").get()
-                .continueWith(task -> {
-                    if (task.isSuccessful() && task.getResult() != null) {
-                        int newIdNumber = task.getResult().size() + 1;
-                        return "eventID" + newIdNumber;
-                    } else {
-                        throw task.getException() != null ? task.getException() : new Exception("Failed to fetch event count");
-                    }
-                });
+        Task<QuerySnapshot> queryTask = db.collection("Events").get();
+        if (queryTask == null) {
+            return Tasks.forException(new NullPointerException("Firestore query returned null"));
+        }
+        return queryTask.continueWith(task -> {
+            if (!task.isSuccessful() || task.getResult() == null) {
+                throw task.getException() != null
+                        ? task.getException()
+                        : new Exception("Failed to fetch event count");
+            }
+            int newIdNumber = task.getResult().size() + 1;
+            return "eventID" + newIdNumber;
+        });
     }
+
+
+
 
 
     /**

@@ -20,6 +20,7 @@ import com.example.eventbooking.Admin.Users.UserViewAdapter;
 import com.example.eventbooking.Events.EventCreate.EventCreateFragment;
 import com.example.eventbooking.Events.EventPageFragment.EventFragment;
 import com.example.eventbooking.Events.EventView.EventViewFragment;
+import com.example.eventbooking.MainActivity;
 import com.example.eventbooking.R;
 import com.example.eventbooking.User;
 import com.example.eventbooking.UserManager;
@@ -78,19 +79,21 @@ public class HomeFragment extends Fragment {
         String currentUserId = UserManager.getInstance().getUserId();
 
         Event.getUserEvents(currentUserId, userEvents -> {
-            HomeUserEventAdapter adapter = new HomeUserEventAdapter(getContext(), userEvents, currentUserId);
-            usersEventListView.setAdapter(adapter);
+            if (isAdded() && getActivity() instanceof MainActivity) {
+                HomeUserEventAdapter adapter = new HomeUserEventAdapter(getContext(), userEvents, currentUserId);
+                usersEventListView.setAdapter(adapter);
 
-            // Set item click listener
-            usersEventListView.setOnItemClickListener((parent, view, position, id) -> {
-                Event selectedEvent = userEvents.get(position);
-                EventViewFragment eventViewFragment = EventViewFragment.newInstance(selectedEvent.getEventId(), currentUserId);
+                // Set item click listener
+                usersEventListView.setOnItemClickListener((parent, view, position, id) -> {
+                    Event selectedEvent = userEvents.get(position);
+                    EventViewFragment eventViewFragment = EventViewFragment.newInstance(selectedEvent.getEventId(), currentUserId);
 
-                getParentFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, eventViewFragment)
-                        .addToBackStack(null) // Ensures returning to HomeFragment
-                        .commit();
-            });
+                    getParentFragmentManager().beginTransaction()
+                            .replace(R.id.fragment_container, eventViewFragment)
+                            .addToBackStack(null) // Ensures returning to HomeFragment
+                            .commit();
+                });
+            }
         }, e -> {
             Log.e("HomeFragment", "Failed to fetch events: " + e.getMessage());
         });

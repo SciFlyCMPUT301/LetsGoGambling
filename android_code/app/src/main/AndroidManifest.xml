@@ -5,6 +5,8 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission
         android:name="android.permission.POST_NOTIFICATIONS"
         tools:ignore="NotificationPermission"/>
@@ -23,6 +25,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.EventBooking"
         tools:targetApi="31">
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCq133I2AI1KxVNUpolIHzMKpTY5DYpWfs" />
 
 
         <activity

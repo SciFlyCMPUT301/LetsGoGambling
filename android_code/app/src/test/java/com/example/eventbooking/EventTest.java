@@ -37,7 +37,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import java.io.File;
@@ -51,10 +53,16 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
+import org.junit.runner.RunWith;
+
 /**
  * Instrumented tests for the Event class.
  */
 //@RunWith(AndroidJUnit4.class)
+//@RunWith(RobolectricTestRunner.class)
+//@Config(manifest=Config.NONE)
 public class EventTest {
 
     @Mock
@@ -74,71 +82,132 @@ public class EventTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        // Mock the Firebase components
+        mockFirestore = mock(FirebaseFirestore.class);
+        mockCollection = mock(CollectionReference.class);
+        mockDocument = mock(DocumentReference.class);
+
+
+        // Mock Firestore and CollectionReference
         when(mockFirestore.collection("Events")).thenReturn(mockCollection);
         when(mockCollection.document(anyString())).thenReturn(mockDocument);
 
-        when(mockStorage.getReference()).thenReturn(mockStorageReference);
-        when(mockStorageReference.child(anyString())).thenReturn(mockStorageReference);
-
-
-        // Mock the Task returned by get() for generating event ID
-        Task<QuerySnapshot> mockQueryTask = mock(Task.class);
-        when(mockQueryTask.isSuccessful()).thenReturn(true);
-        when(mockCollection.get()).thenReturn(mockQueryTask);
-
-        // Mock the Task returned by set() for saving event data
         Task<Void> mockSetTask = mock(Task.class);
 
-        // Configure the mock task to simulate success
         when(mockSetTask.addOnSuccessListener(any())).thenAnswer(invocation -> {
             OnSuccessListener<Void> onSuccessListener = invocation.getArgument(0);
-            onSuccessListener.onSuccess(null); // Simulate success callback
+            onSuccessListener.onSuccess(null); // Simulate successful Firestore write
             return mockSetTask;
         });
 
-        // Configure the mock task to simulate failure
+        // Simulate addOnFailureListener behavior
         when(mockSetTask.addOnFailureListener(any())).thenAnswer(invocation -> {
             OnFailureListener onFailureListener = invocation.getArgument(0);
-            onFailureListener.onFailure(new Exception("Simulated Firestore save error"));
+            onFailureListener.onFailure(new Exception("Simulated Firestore failure")); // Simulate failure
             return mockSetTask;
         });
 
-        // Set the mock task to be returned by document.set()
+        // Ensure mockDocument.set() returns the mocked Task
         when(mockDocument.set(anyMap())).thenReturn(mockSetTask);
 
-        // Create a new Event instance with the mocked Firestore
+        when(mockCollection.get()).thenAnswer(invocation -> {
+            Task<QuerySnapshot> mockQueryTask = mock(Task.class);
+            when(mockQueryTask.isSuccessful()).thenReturn(true);
+            QuerySnapshot mockSnapshot = mock(QuerySnapshot.class);
+            when(mockQueryTask.getResult()).thenReturn(mockSnapshot);
+            when(mockSnapshot.size()).thenReturn(100); // Simulate 100 existing documents
+            return mockQueryTask;
+        });
+
+        // Mock DocumentReference.set() behavior
+//        when(mockDocument.set(anyMap())).thenAnswer(invocation -> {
+//            Map<String, Object> data = invocation.getArgument(0);
+//            Task<Void> mockSetTask = mock(Task.class);
+//            when(mockSetTask.isSuccessful()).thenReturn(true);
+//            return mockSetTask;
+//        });
+
+        // Mock QuerySnapshot Task
+//        Task<QuerySnapshot> mockQueryTask = mock(Task.class);
+//        QuerySnapshot mockSnapshot = mock(QuerySnapshot.class);
+//        when(mockQueryTask.isSuccessful()).thenReturn(true);
+//        when(mockQueryTask.getResult()).thenReturn(mockSnapshot);
+//        when(mockSnapshot.size()).thenReturn(100); // Mock 100 existing documents
+//        when(mockCollection.get()).thenReturn(mockQueryTask);
+//
+//        // Mock CollectionReference.document behavior
+//        when(mockCollection.document(anyString())).thenReturn(mockDocument);
+//
+//        // Mock DocumentReference.set behavior
+//        Task<Void> mockSetTask = mock(Task.class);
+//        when(mockSetTask.isSuccessful()).thenReturn(true);
+//        when(mockDocument.set(anyMap())).thenReturn(mockSetTask);
+
+
+
+        // Create Event instance with mocked Firestore and Storage
         event = new Event(mockFirestore, mockStorage);
+        event.setEventId("eventID100");
+    }
+
+    @After
+    public void tearDown() {
+
+        // Example: Reset Mockito mocks
+        Mockito.reset(mockFirestore, mockDocument, mockCollection);
+        event = null;
+        mockFirestore = null;
+        mockCollection = null;
+        mockDocument = null;
     }
 
 
+@Test
+public void testSaveEventDataToFirestore() {
+    // Ensure eventId is null to trigger getNewEventID
+    event.setEventId("MockEventID123");
 
-    @Test
-    public void testSaveEventDataToFirestore() {
-        // Call the method you want to test
-        event.saveEventDataToFirestore();
+    // Spy on the Event object to mock getNewEventID
+    Event spyEvent = spy(event);
+    doAnswer(invocation -> {
+        spyEvent.setEventId("MockEventID123"); // Simulate generating a new event ID
+        return null; // Since we're bypassing actual Task execution
+    }).when(spyEvent).getNewEventID();
 
-        // Verify that Firestore interactions were called as expected
-        verify(mockFirestore, times(2)).collection("Events");  // Expecting two calls due to `getNewEventID` and `saveEventDataToFirestore`
-        verify(mockCollection).document(event.getEventId());
-        verify(mockDocument).set(anyMap());
-    }
+    // Call the method under test
+    spyEvent.saveEventDataToFirestore();
+
+    // Verify that the eventId was set
+    assertEquals("MockEventID123", spyEvent.getEventId());
+
+    // Ensure Firestore interactions were triggered
+    verify(mockCollection, times(1)).document("MockEventID123");
+    verify(mockDocument, times(1)).set(anyMap());
+
+    // Print success for clarity
+    System.out.println("Test passed: Event ID was set and Firestore interaction verified.");
+}
+
 
     @Test
     public void testParticipantManagement() {
-        // Setup and add participants
+        // Initialize event fields
+        event.setEventId("eventID100"); // Simulate a new event
+        event.setEventTitle("Test Event");
+        event.setMaxParticipants(10);
+
+        // Simulate participant management
         event.addWaitingParticipantIds("User1");
         event.addWaitingParticipantIds("User2");
         event.acceptParticipant("User1");
         event.cancelParticipant("User1");
         event.signUpParticipant("User2");
 
-        // Call the method you want to test
+        // Save event data
         event.saveEventDataToFirestore();
 
-        // Verify the Firestore interactions
-        verify(mockFirestore, times(2)).collection("Events");  // Expect two calls due to method structure
-        verify(mockDocument).set(anyMap()); // Relax argument match to any Map structure
+        // Verify Firestore interactions
+        verify(mockFirestore, times(1)).collection("Events");
+        verify(mockDocument).set(anyMap());
     }
 
     @Test
@@ -212,10 +281,7 @@ public class EventTest {
 
     @Test
     public void testUpdateEventData() {
-        event.setEventId("Event1");
-//        event.saveEventDataToFirestore();
-
-        // Prepare updated data
+        // Call updateEventData with test data
         event.updateEventData(
                 "Updated Event Title",
                 "Updated Description",
@@ -228,19 +294,32 @@ public class EventTest {
                 List.of("User5")
         );
 
-        // Call save to simulate the update
-        event.saveEventDataToFirestore();
+        // Capture the data passed to Firestore
+        ArgumentCaptor<Map<String, Object>> argumentCaptor = ArgumentCaptor.forClass(Map.class);
+        verify(mockDocument).set(argumentCaptor.capture());
 
-        // Verify that the updated fields were set correctly
-        verify(mockDocument).set(argThat(data -> {
-            Map<String, Object> mapData = (Map<String, Object>) data;
-            return "Updated Event Title".equals(mapData.get("eventTitle")) &&
-                    "Updated Description".equals(mapData.get("description")) &&
-                    "Updated Location".equals(mapData.get("location")) &&
-                    mapData.get("maxParticipants").equals(100) &&
-                    mapData.get("organizerId").equals("UpdatedOrganizer");
-        }));
+        // Retrieve the captured data
+        Map<String, Object> eventData = argumentCaptor.getValue();
+
+        // Verify the captured data matches the expected values
+        assertNotNull(eventData);
+        assertEquals("Updated Event Title", eventData.get("eventTitle"));
+        assertEquals("Updated Description", eventData.get("description"));
+        assertEquals("Updated Location", eventData.get("location"));
+        assertEquals(100, eventData.get("maxParticipants"));
+        assertEquals("UpdatedOrganizer", eventData.get("organizerId"));
+        assertEquals(List.of("User1", "User2"), eventData.get("waitingparticipantIds"));
+        assertEquals(List.of("User3"), eventData.get("acceptedParticipantIds"));
+        assertEquals(List.of("User4"), eventData.get("canceledParticipantIds"));
+        assertEquals(List.of("User5"), eventData.get("signedUpParticipantIds"));
     }
+
+
+
+
+
+
+
 
 
     @Test

@@ -1,11 +1,28 @@
 package com.example.eventbooking;
 
+import static android.app.PendingIntent.getActivity;
+import static java.security.AccessController.getContext;
+
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.location.LocationProvider;
+import android.os.Message;
 import android.util.Log;
+import android.widget.Toast;
+
+import androidx.core.app.ActivityCompat;
 
 import com.example.eventbooking.Events.EventData.Event;
 import com.example.eventbooking.firebase.FirestoreAccess;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -25,6 +42,10 @@ public class UserManager {
     private List<Event> organizerEvents;
     private List<Event> userEvents;
     private List<Event> eventDatabase;
+    private FusedLocationProviderClient fusedLocationClient;
+    private Location currentBestLocation;
+    private Context context;
+    private GeoPoint geoLocation;
 
     private UserManager(){
         organizerEvents = new ArrayList<>();
@@ -159,4 +180,102 @@ public class UserManager {
     }
 
     public String getUserId() { return currentUser.getDeviceID(); }
+
+    /**
+     * Updates the user's geolocation and returns it as a GeoPoint.
+     * If location is unavailable, returns a default GeoPoint (1,1).
+     *
+     * @return A GeoPoint object with the current location or a default point (1,1).
+     */
+    public GeoPoint getNewGeolocation() {
+
+
+        final GeoPoint[] geoPoint = {new GeoPoint(1.0, 1.0)}; // Default GeoPoint
+        try {
+            fusedLocationClient.getLastLocation().addOnCompleteListener(task -> {
+                if (task.isSuccessful() && task.getResult() != null) {
+                    Location location = task.getResult();
+                    geoPoint[0] = new GeoPoint(location.getLatitude(), location.getLongitude());
+                    Log.d("Geolocation", "Location updated: " + geoPoint[0].toString());
+                } else {
+                    Log.w("Geolocation", "Failed to retrieve location. Returning default GeoPoint (1,1).");
+                }
+            });
+        } catch (SecurityException e) {
+            Log.e("Geolocation", "Location permissions are missing. Returning default GeoPoint (1,1).", e);
+        }
+
+        return geoPoint[0];
+    }
+
+//    public void updateGeolocation() {
+//        LocationListener locationListener = new LocationListener() {
+//            @Override
+//            public void onLocationChanged(android.location.Location location) {
+//                //get the attributes of current location using the location variable
+//                //example, location.getLatitude()
+//
+////                location.getLatitude();
+////                location.getLongitude();
+//            }
+//
+//            @Override
+//            public void onProviderEnabled(String provider) {
+//
+//            }
+//
+//            @Override
+//            public void onProviderDisabled(String provider) {
+//
+//            }
+//        };
+//        LocationManager locationManager =
+//                (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+////        LocationProvider provider =
+////                locationManager.getProvider(LocationManager.GPS_PROVIDER);
+//
+//        if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//            // TODO: Consider calling
+//            //    ActivityCompat#requestPermissions
+//            // here to request the missing permissions, and then overriding
+//            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+//            //                                          int[] grantResults)
+//            // to handle the case where the user grants the permission. See the documentation
+//            // for ActivityCompat#requestPermissions for more details.
+//            return;
+//        }
+//        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+//        currentUser.setGeolocation(getNewGeolocation());
+//        Log.d("User Manager", "Updated Geopoint to be: " + currentUser.getGeolocation());
+//        currentUser.saveUserDataToFirestore().addOnSuccessListener(aVoid -> {
+//        }).addOnFailureListener(e -> Log.d("User Manager", "Failed to Update Geopoint"));
+//        UserManager.getInstance().setCurrentUser(currentUser);
+//
+//    }
+
+//    stuff.mit.edu/afs/sipb/project/android/docs/training/basics/location/currentlocation.html
+
+
+    public void setFusedLocationClient(FusedLocationProviderClient client) {
+        this.fusedLocationClient = client;
+    }
+
+    public void setContext (Context newContext){
+        this.context = newContext;
+    }
+
+    public void setGeolocation(GeoPoint newPoint){
+        this.geoLocation = newPoint;
+    }
+
+    public void updateGeolocation() {
+        currentUser.setGeolocation(geoLocation);
+        Log.d("User Manager", "Updated Geopoint to be: " + currentUser.getGeolocation());
+        currentUser.saveUserDataToFirestore().addOnSuccessListener(aVoid -> {
+        }).addOnFailureListener(e -> Log.d("User Manager", "Failed to Update Geopoint"));
+        UserManager.getInstance().setCurrentUser(currentUser);
+    }
+
+
+
 }

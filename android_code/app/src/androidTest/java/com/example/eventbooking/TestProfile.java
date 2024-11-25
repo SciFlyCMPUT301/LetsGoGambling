@@ -25,12 +25,14 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import static androidx.test.espresso.Espresso.*;
+import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static androidx.test.espresso.intent.Intents.intended;
 import static androidx.test.espresso.intent.Intents.intending;
 import static androidx.test.espresso.matcher.ViewMatchers.*;
 import static androidx.test.espresso.action.ViewActions.*;
 import static androidx.test.espresso.assertion.ViewAssertions.*;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -39,6 +41,7 @@ import android.app.Instrumentation;
 import android.content.Intent;
 import android.net.Uri;
 import android.view.View;
+import android.widget.ScrollView;
 
 @RunWith(AndroidJUnit4.class)
 public class TestProfile {
@@ -255,6 +258,24 @@ public class TestProfile {
 
         // Release Intents
         Intents.release();
+    }
+
+    @Test
+    public void testEditProfile() {
+//        onView(withId(R.id.text_login_welcome)).check(matches(isDisplayed()));
+//        SystemClock.sleep(5000);
+//        onView(withId(R.id.home_title)).check(matches(isDisplayed()));
+//        onView(withId(R.id.button_profile)).perform(click());
+        onView(withId(R.id.button_edit_profile)).perform(click());
+        onView(withId(R.id.edit_name)).perform(clearText(), typeText("test1"), closeSoftKeyboard());
+        onView(withId(R.id.edit_email)).perform(clearText(), typeText("test2"), closeSoftKeyboard());
+        onView(withId(R.id.edit_phone)).perform(clearText(), typeText("test3"), closeSoftKeyboard());
+        onView(withClassName(containsString(ScrollView.class.getSimpleName()))).perform(swipeUp());
+        //onView(withId(R.id.button_save_profile)).perform(scrollTo());
+        onView(withId(R.id.button_save_profile)).perform(click());
+        onView(withId(R.id.edit_name)).check(matches(withText("test1")));
+        onView(withId(R.id.edit_email)).check(matches(withText("test2")));
+        onView(withId(R.id.edit_phone)).check(matches(withText("3")));
     }
 
 

@@ -74,6 +74,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.firestore.GeoPoint;
 
 
@@ -190,6 +191,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             return insets;
         });
 
+        FirebaseMessaging.getInstance().subscribeToTopic("test_topic").addOnCompleteListener(task -> {
+            String msg = task.isSuccessful() ? "Subscribed" : "Subscription failed";
+            Log.d(TAG, msg);
+        });
     }
 
     /**

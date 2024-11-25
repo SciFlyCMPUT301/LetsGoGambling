@@ -46,11 +46,11 @@ public class AdminFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_admin, container, false);
 
         // Initialize buttons
-        viewUsersButton = view.findViewById(R.id.viewUsersButton);
-        viewEventsButton = view.findViewById(R.id.viewEventsButton);
-        viewFacilitiesButton = view.findViewById(R.id.viewFacilitiesButton);
-        viewImagesButton = view.findViewById(R.id.viewImagesButton);
-        backHomeButton = view.findViewById(R.id.backHomeButton);
+        viewUsersButton = view.findViewById(R.id.users_button);
+        viewEventsButton = view.findViewById(R.id.events_button);
+        viewFacilitiesButton = view.findViewById(R.id.facilities_button);
+        viewImagesButton = view.findViewById(R.id.images_button);
+        backHomeButton = view.findViewById(R.id.home_button);
 
         //for now hiding it because not dealing with images
 //        viewImagesButton = view.findViewById(R.id.viewImagesButton);

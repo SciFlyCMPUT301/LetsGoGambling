@@ -74,7 +74,7 @@ public class UserManager {
         Log.d("UserManager", "User set with ID: " + currentUser.getDeviceID() + " and Name: " + currentUser.getUsername());
 
         // Optionally load related data if needed
-        // findUserFacility();
+         findUserFacility();
         // findUserEvents();
     }
 

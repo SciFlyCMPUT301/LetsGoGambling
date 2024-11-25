@@ -1,91 +1,204 @@
 package com.example.eventbooking.profile;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.provider.Settings;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.example.eventbooking.Events.EventCreate.EventCreateFragment;
+import com.example.eventbooking.Events.EventView.EventViewFragment;
 import com.example.eventbooking.Home.HomeFragment;
+import com.example.eventbooking.MainActivity;
 import com.example.eventbooking.R;
+import com.example.eventbooking.Role;
+import com.example.eventbooking.User;
+import com.example.eventbooking.UserManager;
 import com.example.eventbooking.notification.NotificationFragment;
-
+import com.squareup.picasso.Picasso;
 
 public class ProfileFragment extends Fragment {
 
-    private static final String ARG_INTEGER = "arg_integer";
-    private int receivedInteger;
-    /**
-     * Creates a new instance of ProfileFragment.
-     *
-     * @return A new instance of ProfileFragment
-     */
+    private EditText editName, editEmail, editPhone;
+    private TextView profileTitle;
+    private Button editButton, uploadButton, backButton, removeImageButton, saveButton, notification_button;
+    private Switch notificationsSwitch;
+    private ImageView userImage;
+    private ActivityResultLauncher<Intent> pickImageLauncher;
+    private Uri selectedImageUri;
 
-    public static ProfileFragment newInstance() {
+    private User currentUser;
+    private boolean isEditing = false;
+    private boolean isNewUser = false;
+    private String deviceId;
+    private String eventIDFromQR = "";
+
+    public static ProfileFragment newInstance(boolean isNewUser, String eventId, String deviceId) {
         ProfileFragment fragment = new ProfileFragment();
-//        Bundle args = new Bundle();
-//        args.putInt(ARG_INTEGER, integer);
-//        fragment.setArguments(args);
+        Bundle args = new Bundle();
+        args.putBoolean("isNewUser", isNewUser);
+        args.putString("eventId", eventId);
+        args.putString("deviceId", deviceId);
+        fragment.setArguments(args);
         return fragment;
     }
-    /**
-     * Initializes the fragment by retrieving any passed arguments.
-     *
-     * @param savedInstanceState The saved state of the fragment, if any
-     */
 
+    @Nullable
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        // Retrieve the integer from arguments
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_profile_view, container, false);
+
         if (getArguments() != null) {
-            receivedInteger = getArguments().getInt(ARG_INTEGER);
+            isNewUser = getArguments().getBoolean("isNewUser", false);
+            eventIDFromQR = getArguments().getString("eventId", null);
+            deviceId = getArguments().getString("deviceId", null);
+//            deviceId = getArguments().getString("deviceId", UserManager.getInstance().getUserId());
+        }
+
+        //
+
+
+
+        initializeUI(view);
+        if(isNewUser)
+            hideUIButtons();
+
+        // Load user data
+        if (!isNewUser) {
+            currentUser = UserManager.getInstance().getCurrentUser();
+            onProfileLoaded(currentUser);
+            setEditMode(false);
+        } else {
+            currentUser = new User();
+            setEditMode(true);
+        }
+
+        pickImageLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                        selectedImageUri = result.getData().getData();
+                        currentUser.uploadImage(selectedImageUri);
+                        userImage.setImageURI(selectedImageUri);
+                    }
+                });
+
+        return view;
+    }
+
+    private void initializeUI(View view) {
+        profileTitle = view.findViewById(R.id.profile_title);
+        editName = view.findViewById(R.id.edit_name);
+        editEmail = view.findViewById(R.id.edit_email);
+        editPhone = view.findViewById(R.id.edit_phone);
+        notificationsSwitch = view.findViewById(R.id.notifications_switch);
+        saveButton = view.findViewById(R.id.button_save_profile);
+        backButton = view.findViewById(R.id.button_back_home);
+        editButton = view.findViewById(R.id.button_edit_profile);
+        uploadButton = view.findViewById(R.id.button_upload_photo);
+        userImage = view.findViewById(R.id.user_image);
+        removeImageButton = view.findViewById(R.id.button_remove_photo);
+        notification_button = view.findViewById(R.id.button_notification);
+
+        saveButton.setOnClickListener(v -> saveUserProfile());
+        backButton.setOnClickListener(v -> goToHome());
+        editButton.setOnClickListener(v -> toggleEditMode());
+        uploadButton.setOnClickListener(v -> uploadPhoto());
+        removeImageButton.setOnClickListener(v -> removeImage());
+        notification_button.setOnClickListener(v -> navigateNotif());
+
+    }
+
+    private void onProfileLoaded(User user) {
+        if (user != null) {
+            editName.setText(user.getUsername());
+            editEmail.setText(user.getEmail());
+            editPhone.setText(user.getPhoneNumber());
+            notificationsSwitch.setChecked(user.isNotificationAsk());
+
+            String profilePictureUrl = user.getProfilePictureUrl();
+            if (profilePictureUrl != null && !profilePictureUrl.isEmpty()) {
+                Picasso.get().load(profilePictureUrl).into(userImage);
+            }
         }
     }
-    /**
-     * Inflates the layout for the fragment and sets up the UI components.
-     *
-     * @param inflater           The LayoutInflater object used to inflate the view
-     * @param container          The container that will hold the fragment's view
-     * @param savedInstanceState The saved state of the fragment, if any
-     * @return The inflated view for the fragment
-     */
 
-    // Inflate the layout and display the integer
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for the fragment
-        View rootView = inflater.inflate(R.layout.fragment_profile, container, false);
-        // Display the received integer on the UI
-        TextView integerTextView = rootView.findViewById(R.id.profile_integer_text);
-        integerTextView.setText("Integer: " + receivedInteger);
-        // Set the page title text
-        TextView page_name = rootView.findViewById(R.id.profile_title);
-        // Set up button to go back to NavigationFragment
-        Button notification_button = rootView.findViewById(R.id.notification_button);
-        notification_button.setOnClickListener(v -> {
-            // Navigate back to NavigationFragment
-            getParentFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new NotificationFragment())
-                    .commit();
-        });
-
-        Button backButton = rootView.findViewById(R.id.button_back_home);
-        backButton.setOnClickListener(v -> {
-            // Navigate back to HomeFragment
-            getParentFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new HomeFragment())
-                    .commit();
-        });
-        // Return the root view for the fragment
-        return rootView;
+    private void saveUserProfile() {
+        currentUser.setUsername(editName.getText().toString().trim());
+        currentUser.setEmail(editEmail.getText().toString().trim());
+        currentUser.setPhoneNumber(editPhone.getText().toString().trim());
+        currentUser.setNotificationAsk(notificationsSwitch.isChecked());
+        currentUser.saveUserDataToFirestore().addOnSuccessListener(aVoid -> {
+            Toast.makeText(getContext(), "Profile saved successfully.", Toast.LENGTH_SHORT).show();
+            setEditMode(false);
+        }).addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to save profile.", Toast.LENGTH_SHORT).show());
     }
 
+    private void toggleEditMode() {
+        isEditing = !isEditing;
+        setEditMode(isEditing);
+    }
 
+    private void setEditMode(boolean enable) {
+        editName.setEnabled(enable);
+        editEmail.setEnabled(enable);
+        editPhone.setEnabled(enable);
+        notificationsSwitch.setEnabled(enable);
+        saveButton.setEnabled(enable);
+        editButton.setText(enable ? "Cancel" : "Edit");
+    }
 
+    private void uploadPhoto() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        pickImageLauncher.launch(intent);
+    }
+
+    private void removeImage() {
+        if (!currentUser.isDefaultURLMain()) {
+            currentUser.deleteSelectedImageFromFirebase(currentUser.getProfilePictureUrl());
+            userImage.setImageResource(R.drawable.placeholder_image_foreground);
+            Toast.makeText(getContext(), "Profile image removed.", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getContext(), "Default image is already set.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void goToHome() {
+        getParentFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, new HomeFragment())
+                .commit();
+    }
+
+    private void navigateNotif(){
+        getParentFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, new NotificationFragment())
+                .commit();
+    }
+
+    private void hideUIButtons(){
+        editButton.setVisibility(View.GONE);
+        uploadButton.setVisibility(View.GONE);
+        userImage.setVisibility(View.GONE);
+        removeImageButton.setVisibility(View.GONE);
+        notification_button.setVisibility(View.GONE);
+        backButton.setVisibility(View.GONE);
+        ((MainActivity) getActivity()).hideNavigationUI();
+    }
 }

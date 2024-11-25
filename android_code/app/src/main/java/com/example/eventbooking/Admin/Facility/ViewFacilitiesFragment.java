@@ -104,7 +104,7 @@ public class ViewFacilitiesFragment extends Fragment {
      */
     private void openFacilityDetailsFragment(Facility selectedFacility) {
         FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
-        EditFacilityFragment fragment = new EditFacilityFragment();
+        EditFacilityFragment fragment = new EditFacilityFragment(selectedFacility);
 
         Bundle bundle = new Bundle();
         bundle.putString("facilityId", selectedFacility.getFacilityID());

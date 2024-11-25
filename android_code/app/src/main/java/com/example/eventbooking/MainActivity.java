@@ -97,6 +97,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d("Main Activity", "Create Activity");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -108,7 +109,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 = findViewById(R.id.bottom_navigation);
         bottomNavigationView
                 .setOnNavigationItemSelectedListener(this);
-        bottomNavigationView.setSelectedItemId(R.id.nav_home);
+        // On create dont want to go here immediately
+//        bottomNavigationView.setSelectedItemId(R.id.nav_home);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -172,6 +174,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int itemId = item.getItemId();
         if (itemId == R.id.nav_home || itemId == R.id.nav_profile ||
         itemId == R.id.nav_events || itemId == R.id.nav_test){
+            Log.d("Main Activity", "Navigation Item Bottom Bar");
 
             if (itemId == R.id.nav_home) {
                 getSupportFragmentManager()
@@ -182,7 +185,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             } else if (itemId == R.id.nav_profile) {
                 getSupportFragmentManager()
                         .beginTransaction()
-                        .replace(R.id.fragment_container, profileEntrantFragment)
+                        // little scooby doo switcheroo
+//                        .replace(R.id.fragment_container, profileEntrantFragment)
+                        .replace(R.id.fragment_container, profileFragment)
                         .commit();
                 return true;
             } else if (itemId == R.id.nav_events) {
@@ -203,6 +208,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
          * Drawer side bar navigation
          */
         else {
+            Log.d("Main Activity", "Navigation Item Side Bar");
             if (itemId == R.id.nav_organizer_menu) {
                 //here is testing by iris added
                 Bundle bundle = new Bundle();
@@ -247,7 +253,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         .commit();
             } else if (itemId == R.id.nav_profile) {
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, profileEntrantFragment)
+                        // little scooby doo switcheroo
+//                        .replace(R.id.fragment_container, profileEntrantFragment)
+                        .replace(R.id.fragment_container, profileFragment)
                         .commit();
             } else if (itemId == R.id.nav_notifications) {
                 getSupportFragmentManager().beginTransaction()
@@ -344,6 +352,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      * @param intent
      */
     private void handleIntent(Intent intent) {
+        Log.d("Main Activity", "Handle Intent: ");
         boolean loggingin = false;
         if (intent != null && intent.getData() != null) {
             String url = intent.getData().toString();
@@ -370,6 +379,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         }
         if (!LoginFragment.isLoggedIn) {
+            Log.d("Main Activity", "Login Fragment");
             showLoginFragment(null);
         }
     }
@@ -436,6 +446,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .replace(R.id.fragment_container, eventViewFragment)
                 .addToBackStack(null)
                 .commit();
+    }
+
+
+
+    public void showNavigationUI() {
+        BottomNavigationView nav = findViewById(R.id.bottom_navigation);
+        NavigationView sidebar = findViewById(R.id.nav_view);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+
+        if (nav != null) nav.setVisibility(View.VISIBLE);
+        if (sidebar != null) sidebar.setVisibility(View.VISIBLE);
+        if (toolbar != null) toolbar.setVisibility(View.VISIBLE);
+    }
+
+    public void hideNavigationUI() {
+        BottomNavigationView nav = findViewById(R.id.bottom_navigation);
+        NavigationView sidebar = findViewById(R.id.nav_view);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+
+        if (nav != null) nav.setVisibility(View.GONE);
+        if (sidebar != null) sidebar.setVisibility(View.GONE);
+        if (toolbar != null) toolbar.setVisibility(View.GONE);
     }
 
 

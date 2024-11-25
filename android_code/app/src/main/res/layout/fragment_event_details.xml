@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- res/layout/fragment_event_details.xml -->
+<!--
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -51,5 +52,134 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Join Waiting List" />
+    </LinearLayout>
+</ScrollView>
+-->
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F8F8F8"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/rounded_background"
+        android:padding="16dp">
+
+        <!-- Event Poster -->
+        <ImageView
+            android:id="@+id/image_event_poster"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:scaleType="centerCrop"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/placeholder_event_poster"
+            android:text="Event poster"/>
+
+        <!-- Event Name -->
+        <TextView
+            android:id="@+id/text_event_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="Event Title"
+            android:textColor="#222222"
+            android:textSize="20sp"
+            android:fontFamily="sans-serif-medium"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Event Date -->
+        <TextView
+            android:id="@+id/text_event_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Date: 16 November 2024"
+            android:textColor="#555555"
+            android:textSize="14sp"
+            android:fontFamily="sans-serif"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="4dp" />
+
+        <!-- Event Location -->
+        <TextView
+            android:id="@+id/text_event_location"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Location: London"
+            android:textColor="#555555"
+            android:textSize="14sp"
+            android:fontFamily="sans-serif"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Join Button -->
+        <Button
+            android:id="@+id/button_register_event"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:backgroundTint="#5578EB"
+            android:text="Join"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:fontFamily="sans-serif-medium"
+            android:elevation="4dp"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- Organizer Details Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:background="#E3F2FD"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:id="@+id/text_organizer_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Organizer:name"
+                android:textColor="#333333"
+                android:textSize="16sp"
+                android:fontFamily="sans-serif-medium"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:id="@+id/text_organizer_contact"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Contact:email"
+                android:textColor="#333333"
+                android:textSize="14sp"
+                android:fontFamily="sans-serif"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:id="@+id/text_organizer_phone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Phone(optional):+1__...."
+                android:textColor="#333333"
+                android:textSize="14sp"
+                android:fontFamily="sans-serif"
+                android:layout_marginBottom="4dp" />
+        </LinearLayout>
+
+        <!-- Event Description -->
+        <TextView
+            android:id="@+id/text_event_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Some description about the event"
+            android:textColor="#666666"
+            android:textSize="14sp"
+            android:fontFamily="sans-serif"
+            android:lineSpacingExtra="4dp"
+            android:layout_marginBottom="24dp" />
+
     </LinearLayout>
 </ScrollView>

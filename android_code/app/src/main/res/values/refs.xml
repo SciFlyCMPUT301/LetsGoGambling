@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="ic_logo" type="drawable">@drawable/ic_logo_placeholder</item>
+    <item name="ic_upload" type="drawable">@drawable/ic_upload</item>
+    <item name="ic_remove_photo" type="drawable">@drawable/ic_remove_photo</item>
+    <item name="ic_arrow_right" type="drawable">@drawable/ic_arrow_right</item>
+    <drawable name="ic_search" />
+</resources>
+

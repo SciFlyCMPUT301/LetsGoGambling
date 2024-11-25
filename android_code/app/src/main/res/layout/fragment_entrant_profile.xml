@@ -1,3 +1,4 @@
+<!--
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -52,7 +53,7 @@
                 android:layout_gravity="right"/>
         </LinearLayout>
 
-        <!-- Section for user profile image -->
+        &lt;!&ndash; Section for user profile image &ndash;&gt;
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -67,7 +68,7 @@
                 android:contentDescription="Profile Image" />
         </LinearLayout>
 
-        <!-- Section for user profile details -->
+        &lt;!&ndash; Section for user profile details &ndash;&gt;
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -110,7 +111,7 @@
                 android:enabled="false"
                 android:padding="20dp"/>
 
-            <!-- Notification preference switch -->
+            &lt;!&ndash; Notification preference switch &ndash;&gt;
             <Switch
                 android:id="@+id/notifications_switch"
                 android:layout_width="wrap_content"
@@ -155,3 +156,122 @@
     </LinearLayout>
 
 </ScrollView>
+-->
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        <!-- App Logo -->
+        <ImageView
+            android:id="@+id/app_logo"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/ic_logo"
+        android:contentDescription="App Logo"
+        android:layout_marginBottom="16dp" />
+
+        <!-- Title -->
+        <TextView
+            android:id="@+id/welcome_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="{App name}"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Please put in your information"
+            android:textSize="16sp"
+            android:gravity="center"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Profile Photo Section -->
+        <Button
+            android:id="@+id/button_upload_photo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Profile photo upload"
+            android:drawableStart="@drawable/ic_upload"
+        android:padding="8dp"
+        android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/button_remove_photo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Remove photo"
+            android:drawableStart="@drawable/ic_remove_photo"
+            android:padding="8dp"
+            android:layout_marginBottom="16dp" />
+
+        <!-- User Information Inputs -->
+        <EditText
+            android:id="@+id/edit_full_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Full name"
+            android:inputType="textPersonName"
+            android:padding="12dp"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/edit_email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="abc@email.com"
+            android:inputType="textEmailAddress"
+            android:padding="12dp"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/edit_phone_number"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Phone Number"
+            android:inputType="phone"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Notification Preference -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp">
+
+            <Switch
+                android:id="@+id/switch_notifications"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Notifications" />
+        </LinearLayout>
+
+        <!-- Sign In Button -->
+        <Button
+            android:id="@+id/button_sign_in"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="SIGN IN"
+            android:textAllCaps="true"
+            android:backgroundTint="@color/purple_500"
+            android:textColor="@android:color/white"
+            android:layout_marginTop="16dp"
+            android:drawableEnd="@drawable/ic_arrow_right"
+        android:padding="12dp" />
+
+    </LinearLayout>
+</ScrollView>
+

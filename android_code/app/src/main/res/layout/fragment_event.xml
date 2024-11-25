@@ -1,17 +1,31 @@
-<!-- fragment_create.xml -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:orientation="vertical"
     android:layout_height="match_parent"
     android:gravity="center"
-    android:layout_marginTop="65dp">
+    android:layout_marginTop="65dp"
+    tools:ignore="ExtraText">
+
     <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <!-- Search Bar -->
+        <EditText
+            android:id="@+id/search_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Search events..."
+            android:padding="12dp"
+            android:background="@drawable/rounded_edittext"
+            android:layout_margin="8dp"
+            android:textColorHint="@color/hint_text"
+            android:drawableStart="@drawable/ic_search"
+            android:drawablePadding="8dp" />
+
+        <!-- Switch -->
         <Switch
             android:id="@+id/event_switch"
             android:layout_width="wrap_content"
@@ -20,12 +34,14 @@
             android:layout_gravity="center_horizontal"
             tools:ignore="UseSwitchCompatOrMaterialXml" />
 
+        <!-- ListView -->
         <ListView
             android:id="@+id/event_list_view"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"/>
+            android:layout_weight="1" />
 
+        <!-- Add Button -->
         <Button
             android:id="@+id/add_button"
             android:layout_width="wrap_content"
@@ -34,40 +50,41 @@
 
     </LinearLayout>
 
-
+    <!-- Back to Home Button -->
     <Button
         android:id="@+id/button_back_home"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Back to Home" />
 
+    <!-- Create Facility Button -->
     <Button
         android:id="@+id/add_facility_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Create Facility"
         android:layout_gravity="center"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
-<!--    <Button-->
-<!--        android:id="@+id/join_waiting_list"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:text="JOIN" />-->
+    <!-- Join Waiting List Button -->
+    <Button
+        android:id="@+id/join_waiting_list"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="JOIN" />
 
-<!--    <Button-->
-<!--        android:id="@+id/leave_waiting_list"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:text="LEAVE"/>-->
+    <!-- Leave Waiting List Button -->
+    <Button
+        android:id="@+id/leave_waiting_list"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="LEAVE" />
 
+    <!-- Organizer Menu Button -->
     <Button
         android:id="@+id/organizer_menu"
-        android:layout_height="wrap_content"
         android:layout_width="wrap_content"
-        android:text="Actions"
-        android:visibility="gone"
-        />
-
+        android:layout_height="wrap_content"
+        android:text="Actions" />
 
 </LinearLayout>

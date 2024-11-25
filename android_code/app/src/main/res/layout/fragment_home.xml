@@ -1,45 +1,145 @@
-<!-- fragment_home.xml -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:orientation="vertical"
     android:layout_height="match_parent"
-    android:gravity="center">
+    android:background="@drawable/background_gradient">
 
+    <!-- Back Button -->
+    <ImageButton
+        android:id="@+id/button_back"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/ic_back"
+        android:contentDescription="Back"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp" />
+
+    <!-- Admin Profile Title -->
     <TextView
-        android:id="@+id/home_title"
+        android:id="@+id/admin_profile_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Home Page"
-        android:textSize="18sp" />
+        android:text="Admin Profile"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/black"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp" />
+
+    <!-- Profile Picture -->
+    <ImageView
+        android:id="@+id/profile_picture"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:src="@drawable/ic_profile"
+        android:layout_below="@id/admin_profile_title"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp" />
+
+    <!-- Username -->
     <TextView
-        android:id="@+id/home_integer_text"
+        android:id="@+id/username"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Integer: 0"
-        android:textSize="18sp" />
+        android:text="Username"
+        android:textSize="18sp"
+        android:textColor="@android:color/black"
+        android:layout_below="@id/profile_picture"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="8dp" />
 
-    <Button
-        android:id="@+id/button_event_create"
-        android:layout_width="wrap_content"
+    <!-- Buttons Container -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Go to EventCreate" />
+        android:orientation="vertical"
+        android:layout_below="@id/username"
+        android:layout_marginTop="24dp"
+        android:paddingHorizontal="32dp">
 
-    <Button
-        android:id="@+id/button_event"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Go to Event" />
+        <!-- Button Template -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:background="@drawable/rounded_button_background"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp"
+            android:elevation="4dp">
 
-    <Button
-        android:id="@+id/button_notification"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Go to Notification" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="EVENTS"
+                android:textSize="16sp"
+                android:textColor="@android:color/white"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp" />
 
-    <Button
-        android:id="@+id/button_profile"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Go to Profile" />
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_arrow_right"
+                android:tint="@android:color/white"
+                android:layout_marginEnd="16dp" />
+        </LinearLayout>
 
-</LinearLayout>
+        <!-- Repeat for other buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:background="@drawable/rounded_button_background"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp"
+            android:elevation="4dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="USERS"
+                android:textSize="16sp"
+                android:textColor="@android:color/white"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp" />
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_arrow_right"
+                android:tint="@android:color/white"
+                android:layout_marginEnd="16dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:background="@drawable/rounded_button_background"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:elevation="4dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="FACILITIES"
+                android:textSize="16sp"
+                android:textColor="@android:color/white"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp" />
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_arrow_right"
+                android:tint="@android:color/white"
+                android:layout_marginEnd="16dp" />
+        </LinearLayout>
+
+    </LinearLayout>
+</RelativeLayout>

@@ -1,5 +1,5 @@
 <!-- fragment_event_create.xml -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!--<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:orientation="vertical"
     android:layout_height="match_parent"
@@ -65,4 +65,137 @@
 
 
 
+</LinearLayout>
+-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@color/white">
+
+    <ImageButton
+        android:id="@+id/button_back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_back"
+        android:contentDescription="Back"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:layout_gravity="start"
+        android:layout_marginBottom="8dp" />
+
+    <TextView
+        android:id="@+id/event_creation_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Event Creation"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginBottom="24dp" />
+
+    <EditText
+        android:id="@+id/event_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Event Name"
+        android:inputType="text"
+        android:textSize="16sp"
+        android:layout_marginBottom="16dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="16dp">
+
+        <TextView
+            android:id="@+id/poster_file_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="POSTER FILE NAME"
+            android:textSize="14sp"
+            android:textColor="@color/black"
+            android:ellipsize="end"
+            android:maxLines="1" />
+
+        <Button
+            android:id="@+id/button_upload_poster"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Upload Poster"
+            android:textAllCaps="false"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/event_date_time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Event Date, Time"
+        android:inputType="datetime"
+        android:textSize="16sp"
+        android:layout_marginBottom="16dp" />
+
+    <EditText
+        android:id="@+id/event_size"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Event size"
+        android:inputType="number"
+        android:textSize="16sp"
+        android:layout_marginBottom="16dp" />
+
+    <EditText
+        android:id="@+id/waitlist_limit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Waitlist limit"
+        android:inputType="number"
+        android:textSize="16sp"
+        android:layout_marginBottom="16dp" />
+
+    <EditText
+        android:id="@+id/about_event"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="About Event"
+        android:inputType="textMultiLine"
+        android:minHeight="100dp"
+        android:textSize="16sp"
+        android:layout_marginBottom="24dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/button_cancel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="CANCEL"
+            android:backgroundTint="@color/cancel_button_color"
+            android:textSize="16sp"
+            android:textAllCaps="true" />
+
+        <Space
+            android:layout_width="16dp"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/button_save"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="SAVE"
+            android:backgroundTint="@color/save_button_color"
+            android:textSize="16sp"
+            android:textAllCaps="true" />
+    </LinearLayout>
 </LinearLayout>

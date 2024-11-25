@@ -147,17 +147,17 @@ public class ProfileEntrantFragment extends Fragment {
 
         // Initialize views
         profileTitle = view.findViewById(R.id.profile_title);
-        editName = view.findViewById(R.id.edit_name);
+        editName = view.findViewById(R.id.edit_full_name);
         editEmail = view.findViewById(R.id.edit_email);
-        editPhone = view.findViewById(R.id.edit_phone);
-        notificationsSwitch = view.findViewById(R.id.notifications_switch);
-        testingSwitch = view.findViewById(R.id.testing_switch);
-        saveButton = view.findViewById(R.id.button_save_profile);
-        backButton = view.findViewById(R.id.button_back_home);
-        editButton = view.findViewById(R.id.button_edit_profile);
-        deviceIDEntry = view.findViewById(R.id.device_id_entry);
+        editPhone = view.findViewById(R.id.edit_phone_number);
+        notificationsSwitch = view.findViewById(R.id.switch_notifications);
+        //testingSwitch = view.findViewById(R.id.testing_switch);
+        saveButton = view.findViewById(R.id.button_sign_in);
+        //backButton = view.findViewById(R.id.button_back_home);
+        //editButton = view.findViewById(R.id.button_edit_profile);
+        //deviceIDEntry = view.findViewById(R.id.device_id_entry);
         uploadButton = view.findViewById(R.id.button_upload_photo);
-        userImage = view.findViewById(R.id.user_image);
+        //userImage = view.findViewById(R.id.user_image);
         removeImageButton = view.findViewById(R.id.button_remove_photo);
         // Initialize EntrantProfileManager
         profileManager = new EntrantProfileManager();

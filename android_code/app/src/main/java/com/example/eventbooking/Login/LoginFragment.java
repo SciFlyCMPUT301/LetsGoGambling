@@ -66,6 +66,7 @@ public class LoginFragment extends Fragment {
     private EditText documentIdInput, usernameInput;
     private Button setByDocumentIdButton, setByUsernameButton, setToDeviceID1;
 
+    private Handler handler;
 
 
     public void setEventId(String eventId) {
@@ -267,11 +268,22 @@ public class LoginFragment extends Fragment {
         welcomeText.setText("Welcome new user");
         ProfileFragment profileFragment = ProfileFragment.newInstance(true, eventIdFromQR, deviceId);
 //        ProfileEntrantFragment profileFragment = ProfileEntrantFragment.newInstance(true, eventIdFromQR, deviceId);
-        new Handler().postDelayed(() -> {
-            ((MainActivity) getActivity()).showNavigationUI();
-            getParentFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, profileFragment)
-                    .commit();
+//        new Handler().postDelayed(() -> {
+//            ((MainActivity) getActivity()).showNavigationUI();
+//            getParentFragmentManager().beginTransaction()
+//                    .replace(R.id.fragment_container, profileFragment)
+//                    .commit();
+//        }, 3000);
+        handler = new Handler();
+        handler.postDelayed(() -> {
+            if (isAdded() && getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).showNavigationUI();
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, profileFragment)
+                        .commitAllowingStateLoss();
+            } else {
+                Log.e("LoginFragment", "Fragment is not attached or MainActivity is null.");
+            }
         }, 3000);
     }
 
@@ -361,6 +373,12 @@ public class LoginFragment extends Fragment {
     }
 
 
-
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (handler != null) {
+            handler.removeCallbacksAndMessages(null); // Cancel all pending callbacks
+        }
+    }
 
 }

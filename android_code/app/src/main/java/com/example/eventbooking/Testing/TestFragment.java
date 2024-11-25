@@ -20,6 +20,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.eventbooking.Events.EventData.Event;
+import com.example.eventbooking.Events.EventView.EventViewFragment;
 import com.example.eventbooking.Facility;
 import com.example.eventbooking.Facility;
 import com.example.eventbooking.Home.HomeFragment;
@@ -425,6 +426,10 @@ public class TestFragment extends Fragment {
     }
 
     private void goToMap(){
+        Bundle bundle = new Bundle();
+        bundle.putString("eventId", "eventID5");
+        EventMapFragment eventMapFragment = new EventMapFragment();
+        eventMapFragment.setArguments(bundle);
         FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, new EventMapFragment());
         transaction.addToBackStack(null);

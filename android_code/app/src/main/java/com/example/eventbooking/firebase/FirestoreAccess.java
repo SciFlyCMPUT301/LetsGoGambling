@@ -21,6 +21,7 @@ public class FirestoreAccess {
     private static FirestoreAccess instance;
     private CollectionReference facilitiesRef;
 
+
     public FirestoreAccess() {
         db = FirebaseFirestore.getInstance();
         usersRef = db.collection("Users");
@@ -34,6 +35,10 @@ public class FirestoreAccess {
             instance = new FirestoreAccess();
         }
         return instance;
+    }
+
+    public static void setInstance(FirestoreAccess firestoreAccess) {
+        instance = firestoreAccess;
     }
 
     public Task<DocumentSnapshot> getUser(String userId) {

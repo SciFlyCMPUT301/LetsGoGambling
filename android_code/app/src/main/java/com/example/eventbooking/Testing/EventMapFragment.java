@@ -1,6 +1,7 @@
 package com.example.eventbooking.Testing;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -10,6 +11,7 @@ import com.example.eventbooking.Events.EventData.Event;
 import com.example.eventbooking.Events.EventView.EventViewFragment;
 import com.example.eventbooking.Home.HomeUserEventAdapter;
 import com.example.eventbooking.User;
+import com.example.eventbooking.UserManager;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -48,7 +50,15 @@ public class EventMapFragment extends Fragment implements OnMapReadyCallback {
     private FirebaseFirestore db;
     private String selectedListType = "Waitlist";
     private List<User> userList;
+    private String eventID;
 
+    public static EventMapFragment newInstance(String eventID) {
+        EventMapFragment fragment = new EventMapFragment();
+        Bundle args = new Bundle();
+        args.putString("eventId", eventID);
+        fragment.setArguments(args);
+        return fragment;
+    }
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -79,6 +89,10 @@ public class EventMapFragment extends Fragment implements OnMapReadyCallback {
                 selectedListType = "Waitlist";
             }
         });
+        if(getArguments() != null){
+            eventID = getArguments().getString("eventId");
+            loadEventUsers(eventID, selectedListType);
+        }
 
         activateButton.setOnClickListener(v -> {
             String eventId = eventIdEditText.getText().toString().trim();

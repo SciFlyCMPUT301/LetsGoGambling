@@ -17,6 +17,12 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    packaging {
+        resources {
+            excludes += "mockito-extensions/org.mockito.plugins.StackTraceCleanerProvider"
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -26,6 +32,7 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -58,8 +65,25 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     testImplementation(libs.junit)
-    testImplementation("org.mockito:mockito-core:2.28.2")
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
-    androidTestImplementation("org.mockito:mockito-core:2.28.2")
+//    androidTestImplementation("org.mockito:mockito-core:2.28.2")
+    testImplementation("org.mockito:mockito-core:2.28.2")
+    testImplementation("org.robolectric:robolectric:4.10")
+//    testImplementation("org.mockito:mockito-android:2.28.2")
+//    testImplementation("com.linkedin.dexmaker:dexmaker-mockito:2.28.1")
+
+//    androidTestImplementation("org.mockito:mockito-core:5.4.0")
+//    androidTestImplementation("com.linkedin.dexmaker:dexmaker-mockito-inline:2.28.1")
+//    androidTestImplementation("androidx.test.espresso:espresso-intents:3.5.1")
+//    androidTestImplementation("org.mockito:mockito-core:2.28.2")
+//    androidTestImplementation("org.mockito:mockito-core:2.28.2")
+//    androidTestImplementation("org.mockito:mockito-android:2.28.2")
+//    androidTestImplementation("com.linkedin.dexmaker:dexmaker-mockito:2.28.1")
+//    androidTestImplementation("org.mockito:mockito-core:4.8.1")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation("androidx.test.espresso:espresso-intents:3.5.1")
+    androidTestImplementation("org.mockito:mockito-android:2.28.2")
+    androidTestImplementation("com.linkedin.dexmaker:dexmaker-mockito-inline:2.28.1")
+    androidTestImplementation("com.linkedin.dexmaker:dexmaker-mockito:2.28.1")
 }

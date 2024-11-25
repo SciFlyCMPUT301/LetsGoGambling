@@ -1,44 +1,134 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.drawerlayout.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:layout_marginTop="70dp"
-    android:padding="16dp">
+    android:layout_height="match_parent">
 
-    <Button
-        android:id="@+id/viewUsersButton"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/main"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="View All Users" />
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        tools:ignore="ExtraText"> <!-- Set background color -->
 
-    <Button
-        android:id="@+id/viewEventsButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="View All Events"
-        android:layout_marginTop="8dp" />
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="0dp"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:title="Admin Profile"
+            app:titleTextColor="@android:color/white" />
 
-    <Button
-        android:id="@+id/viewFacilitiesButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="View All Facilities"
-        android:layout_marginTop="8dp" />
+        <!-- Back to Home Button -->
 
-    <Button
-        android:id="@+id/viewImagesButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="View All Images"
-        android:layout_marginTop="8dp" />
+        <!-- Profile Image -->
+        <!-- Replace with actual drawable -->
+            android:contentDescription="Profile Image"
+            app:layout_constraintTop_toBottomOf="@id/home_button"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-    <Button
-        android:id="@+id/backHomeButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Go Back To Home"
-        android:layout_marginTop="8dp" />
+        <Button
+            android:id="@+id/home_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="356dp"
+            android:backgroundTint="@color/purple"
+            android:text="Home"
+            android:textColor="@android:color/white"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toolbar" />
 
+        <ImageView
+            android:id="@+id/profile_image"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/ic_profile_foreground"
+            tools:layout_editor_absoluteX="155dp"
+            tools:layout_editor_absoluteY="64dp" />
 
-</LinearLayout>
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/profile_image"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="20dp">
+
+            <!-- Events Button -->
+            <Button
+                android:id="@+id/events_button"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:text="EVENTS"
+                android:backgroundTint="@color/purple"
+                android:textColor="@android:color/white"
+                android:drawableEnd="@drawable/ic_arrow_right"
+                android:gravity="start|center_vertical"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <!-- Users Button -->
+            <Button
+                android:id="@+id/users_button"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:text="USERS"
+                android:backgroundTint="@color/purple"
+                android:textColor="@android:color/white"
+                android:drawableEnd="@drawable/ic_arrow_right"
+                android:gravity="start|center_vertical"
+                app:layout_constraintTop_toBottomOf="@id/events_button"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <!-- Facilities Button -->
+            <Button
+                android:id="@+id/facilities_button"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:text="FACILITIES"
+                android:backgroundTint="@color/purple"
+                android:textColor="@android:color/white"
+                android:drawableEnd="@drawable/ic_arrow_right"
+                android:gravity="start|center_vertical"
+                app:layout_constraintTop_toBottomOf="@id/users_button"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <!-- Images Button -->
+            <Button
+                android:id="@+id/images_button"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:text="IMAGES"
+                android:backgroundTint="@color/purple"
+                android:textColor="@android:color/white"
+                android:drawableEnd="@drawable/ic_arrow_right"
+                android:gravity="start|center_vertical"
+                app:layout_constraintTop_toBottomOf="@id/facilities_button"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/nav_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        app:menu="@menu/drawer_menu" />
+
+</androidx.drawerlayout.widget.DrawerLayout>

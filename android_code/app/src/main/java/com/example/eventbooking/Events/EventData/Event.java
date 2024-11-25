@@ -590,4 +590,24 @@ public class Event {
                 })
                 .addOnFailureListener(onFailure);
     }
+
+    //get organizer event
+    public static void getOragnizerEvents(String userId, OnSuccessListener<List<Event>> onSuccess, OnFailureListener onFailure) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        db.collection("Events")
+                .whereEqualTo("organizerId",userId)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    List<Event> userEvents = new ArrayList<>();
+                    for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
+                        Event event = doc.toObject(Event.class);
+                        if (event != null) {
+                            userEvents.add(event);
+                        }
+                    }
+                    onSuccess.onSuccess(userEvents);
+                })
+                .addOnFailureListener(onFailure);
+    }
 }

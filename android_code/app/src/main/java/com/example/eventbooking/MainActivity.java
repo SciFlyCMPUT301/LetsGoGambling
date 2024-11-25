@@ -28,6 +28,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.example.eventbooking.Admin.AdminFragment;
 import com.example.eventbooking.Events.EventCreate.EventCreateFragment;
 import com.example.eventbooking.Events.EventPageFragment.EventFragment;
+import com.example.eventbooking.Events.EventPageFragment.OragnizerEventFragment;
 import com.example.eventbooking.Events.EventView.EventViewFragment;
 import com.example.eventbooking.Home.HomeFragment;
 import com.example.eventbooking.Login.LoginFragment;
@@ -77,6 +78,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      * Setting fragments here any calls will be based off of this, easier to track what fragments
      * are being called in the navigation bar and to see if they are being used at all
      */
+    private OragnizerEventFragment organizerFragment = new OragnizerEventFragment();
+
     private HomeFragment homeFragment = new HomeFragment();
     private ProfileFragment profileFragment = new ProfileFragment();
     private EventFragment eventFragment = new EventFragment();
@@ -173,7 +176,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int itemId = item.getItemId();
         if (itemId == R.id.nav_home || itemId == R.id.nav_profile ||
-        itemId == R.id.nav_events || itemId == R.id.nav_test){
+        itemId == R.id.nav_events || itemId == R.id.nav_test || itemId== R.id.nav_organizer){
             Log.d("Main Activity", "Navigation Item Bottom Bar");
 
             if (itemId == R.id.nav_home) {
@@ -200,6 +203,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 getSupportFragmentManager()
                         .beginTransaction()
                         .replace(R.id.fragment_container, testFragment)
+                        .commit();
+                return true;
+            }
+            else if (itemId == R.id.nav_organizer){
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragment_container, organizerFragment)
                         .commit();
                 return true;
             }

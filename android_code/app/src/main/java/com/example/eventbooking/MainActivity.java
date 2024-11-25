@@ -194,10 +194,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             return insets;
         });
 
-        FirebaseMessaging.getInstance().subscribeToTopic("test_topic").addOnCompleteListener(task -> {
-            String msg = task.isSuccessful() ? "Subscribed" : "Subscription failed";
-            Log.d(TAG, msg);
-        });
+//        FirebaseMessaging.getInstance().subscribeToTopic("test_topic").addOnCompleteListener(task -> {
+//            String msg = task.isSuccessful() ? "Subscribed" : "Subscription failed";
+//            Log.d(TAG, msg);
+//        });
     }
 
     /**

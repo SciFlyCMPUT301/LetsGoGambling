@@ -71,7 +71,7 @@ public class Event {
     private List<String> signedUpParticipantIds;
     private List<String> enrolledParticipantIds;
     private List<String> declinedParticipantIds;
-   // private String defaultEventpictureurl;
+//    private String defaultEventpictureurl;
     //private String customImageUrl;
 
     private WaitingList waitingList;
@@ -250,6 +250,20 @@ public class Event {
         this.location = location;
     }
 
+    public String getDefaultEventpictureurl() {
+        return defaultEventpictureurl;
+    }
+    public void setDefaultEventpictureurl(String defaultEventpictureurl) {
+        this.defaultEventpictureurl = defaultEventpictureurl;
+    }
+
+    public String getEventPictureUrl() {
+        return eventPictureUrl;
+    }
+    public void setEventPictureUrl(String eventPictureUrl) {
+        this.eventPictureUrl = eventPictureUrl;
+    }
+
     /**
      * Adding new information here for the different lists that are in the event
      * the first part is getters, the last bit are moving from one list to another,
@@ -422,6 +436,8 @@ public class Event {
         eventData.put("signedUpParticipantIds", signedUpParticipantIds);
         eventData.put("declinedParticipantIds", declinedParticipantIds);
         eventData.put("organizerId", organizerId);
+        eventData.put("eventPosterURL", eventPictureUrl);
+        eventData.put("defaultEventPosterURL", defaultEventpictureurl);
         //eventData.put("eventPictureUrl",eventPictureUrl);
         //eventData.put("defaultEventpictureurl",defaultEventpictureurl);
 

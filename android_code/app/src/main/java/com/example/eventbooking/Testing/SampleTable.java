@@ -59,6 +59,7 @@ public class SampleTable {
      * Generates a list of sample users with different roles (admin, organizer, and normal users).
      */
     public void makeUserList() {
+        Log.d("Sample Table", "Making Users");
         double baseLatitude = 53.526131057259526;
         double baseLongitude = -113.5260486490807;
         double radiusInDegrees = 0.01;
@@ -126,6 +127,7 @@ public class SampleTable {
      * Generates a list of sample facilities and associates them with organizer users.
      */
     public void makeFacilityList() {
+        Log.d("Sample Table", "Making Facility");
         List<User> organizers = new ArrayList<>();
         // Collect organizers from the UserList
         for (User user : UserList) {
@@ -161,7 +163,17 @@ public class SampleTable {
      * Generates a list of sample events, randomly assigning facilities, participants, and statuses.
      */
     public void makeEventList() {
+        Log.d("Sample Table", "Making event");
         Random random = new Random();
+        List<User> organizer_list = new ArrayList<>();
+        for (User user : UserList) {
+            if (user.hasRole(Role.ORGANIZER)) {
+                // Adding them twice so we can just remove as we go
+                organizer_list.add(user);
+                organizer_list.add(user);
+            }
+        }
+        Log.d("Sample Table", "Organizer list length: " + organizer_list.size());
 
         // Create 30 events
         for (int i = 1; i <= 30; i++) {
@@ -171,6 +183,7 @@ public class SampleTable {
             event.setDescription("Description for event " + i);
             event.setTimestamp(System.currentTimeMillis() + i * 100000);
             event.setMaxParticipants(20);
+            event.setOrganizerId(organizer_list.get(i-1).getDeviceID());
 
             // Assign a facility to the event (if applicable)
             if (!FacilityList.isEmpty() && random.nextBoolean()) {

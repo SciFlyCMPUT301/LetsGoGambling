@@ -88,12 +88,15 @@ public class OrganizerMenuFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Log.d("Organizer Menu Fragment", "Launched Fragment");
         super.onCreate(savedInstanceState);
         // Retrieve eventId from arguments
         if (getArguments() != null) {
             eventId = getArguments().getString("eventId");
+            Log.d("Organizer Menu Fragment", "Found Event ID: " + eventId);
         }
         if (eventId == null || eventId.isEmpty()) {
+            Log.d("Organizer Menu Fragment", "Couldnt Find Event ID");
             Toast.makeText(getContext(), "Event ID is missing", Toast.LENGTH_SHORT).show();
             Log.e("OrganizerMenuFragment", "Event ID is null or empty.");
             getParentFragmentManager().popBackStack(); // Exit the fragment
@@ -110,9 +113,12 @@ public class OrganizerMenuFragment extends Fragment {
         // Initialize the WaitingList instance as a placeholder
         Event.findEventById(eventId, event -> {
             if (event != null) {
+                Log.d("Organizer Menu Fragment", "Loading Waiting List");
                 currentEvent = event;
                 waitingList = new WaitingList(eventId); // Initialize waitingList
                 waitingList.setMaxParticipants(event.getMaxParticipants());
+                Log.d("Organizer Menu Fragment", "Waiting list event ID: " + waitingList.getEventId());
+                Log.d("Organizer Menu Fragment", "Waiting list max: " + waitingList.getMaxParticipants());
 
                 // Update to Firebase only if waitingList is initialized
                 waitingList.updateToFirebase().addOnSuccessListener(aVoid -> {
@@ -129,10 +135,12 @@ public class OrganizerMenuFragment extends Fragment {
                     }
                 });
             } else {
+                Log.d("Organizer Menu Fragment", "Waiting list not made");
                 Toast.makeText(getContext(), "Event not found.", Toast.LENGTH_SHORT).show();
                 getParentFragmentManager().popBackStack();
             }
         }, e -> {
+            Log.d("Organizer Menu Fragment", "Error Waiting list not made");
             Toast.makeText(getContext(), "Error fetching event data.", Toast.LENGTH_SHORT).show();
             Log.e("OrganizerMenuFragment", "Error fetching event", e);
             getParentFragmentManager().popBackStack();
@@ -185,19 +193,19 @@ public class OrganizerMenuFragment extends Fragment {
 
 
         //load and update from firebase operations
-        waitingList.updateToFirebase().addOnSuccessListener(aVoid -> {
-            // Data updated successfully
-        }).addOnFailureListener(e -> {
-            // Handle error
-        });
+//        waitingList.updateToFirebase().addOnSuccessListener(aVoid -> {
+//            // Data updated successfully
+//        }).addOnFailureListener(e -> {
+//            // Handle error
+//        });
 
-        waitingList.loadFromFirebase().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                Toast.makeText(getContext(), "Waiting list loaded successfully.", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(getContext(), "Failed to load waiting list from Firebase.", Toast.LENGTH_SHORT).show();
-            }
-        });
+//        waitingList.loadFromFirebase().addOnCompleteListener(task -> {
+//            if (task.isSuccessful()) {
+//                Toast.makeText(getContext(), "Waiting list loaded successfully.", Toast.LENGTH_SHORT).show();
+//            } else {
+//                Toast.makeText(getContext(), "Failed to load waiting list from Firebase.", Toast.LENGTH_SHORT).show();
+//            }
+//        });
     }
     /**
      * binding the UI component to the actual java var

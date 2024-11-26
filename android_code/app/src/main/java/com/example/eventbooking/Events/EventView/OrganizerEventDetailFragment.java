@@ -35,14 +35,12 @@ public class OrganizerEventDetailFragment extends Fragment {
      * Creates a new instance of OrganizerEventDetailFragment.
      *
      * @param eventID The ID of the event.
-     * @param userID  The ID of the organizer (user).
      * @return A new fragment instance.
      */
-    public static OrganizerEventDetailFragment newInstance(String eventID, String userID) {
+    public static OrganizerEventDetailFragment newInstance(String eventID) {
         OrganizerEventDetailFragment fragment = new OrganizerEventDetailFragment();
         Bundle args = new Bundle();
         args.putString("eventId", eventID);
-        args.putString("userId", userID);
         fragment.setArguments(args);
         return fragment;
     }
@@ -61,8 +59,9 @@ public class OrganizerEventDetailFragment extends Fragment {
         // Retrieve arguments
         if (getArguments() != null) {
             eventId = getArguments().getString("eventId");
-            userId = getArguments().getString("userId");
+
         }
+        userId = UserManager.getInstance().getUserId();
 
         // Fetch event data based on eventId
         Event.findEventById(eventId, event -> {
@@ -107,6 +106,7 @@ public class OrganizerEventDetailFragment extends Fragment {
      * Navigates to the OrganizerMenuFragment.
      */
     private void navigateToOrganizerMenu() {
+        Log.d("Organizer Event Detail", "Navigate to menu");
         OrganizerMenuFragment organizerMenuFragment = OrganizerMenuFragment.newInstance(eventId);
         getParentFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, organizerMenuFragment)

@@ -1,5 +1,7 @@
 package com.example.eventbooking.Events.EventData;
 
+
+import static android.app.PendingIntent.getActivity;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -19,6 +21,8 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 
+import com.example.eventbooking.MainActivity;
+import com.example.eventbooking.QRCode.QRcodeGenerator;
 import com.example.eventbooking.Role;
 import com.example.eventbooking.User;
 
@@ -78,6 +82,7 @@ public class Event {
     private String organizerId;
     private FirebaseFirestore db;
     private FirebaseStorage storage;
+    private String QRcodeHash;
     /**
      * Default constructor that initializes Firebase Firestore and Storage instances, as well as
      * participant lists.
@@ -250,6 +255,14 @@ public class Event {
         this.location = location;
     }
 
+    public String getQRcodeHash() {
+        return QRcodeHash;
+    }
+
+    public void setQRcodeHash(String QRcodeHash) {
+        this.QRcodeHash = QRcodeHash;
+    }
+
     public String getDefaultEventpictureurl() {
         return defaultEventpictureurl;
     }
@@ -355,12 +368,42 @@ public class Event {
             throw new IllegalArgumentException("Event ID is invalid");
         }
     }
-    /**
-     * Saves event data to Firestore with event details and participant lists.
-     *
-     * @return A task representing the asynchronous save operation.
-     */
+//    /**
+//     * Saves event data to Firestore with event details and participant lists.
+//     *
+//     * @return A task representing the asynchronous save operation.
+//     */
 //    public Task<Void> saveEventDataToFirestore() {
+//        if (eventId == null) {
+//            return getNewEventID().continueWithTask(newEventIDTask -> {
+//                if (!newEventIDTask.isSuccessful() || newEventIDTask.getResult() == null) {
+//                    throw new Exception("Failed to generate new Event ID");
+//                }
+//                String newEventID = newEventIDTask.getResult();
+//                this.eventId = newEventID;
+//
+//                Map<String, Object> eventData = new HashMap<>();
+//                eventData.put("eventId", newEventID);
+//                populateEventData(eventData);
+//
+//                return db.collection("Events").document(newEventID).set(eventData);
+//            });
+//        } else {
+//            Map<String, Object> eventData = new HashMap<>();
+//            eventData.put("eventId", eventId);
+//            populateEventData(eventData);
+//
+//            return db.collection("Events").document(eventId).set(eventData);
+//        }
+//    }
+
+
+//    public Task<Void> saveEventDataToFirestore() {
+////        Log.d("Event", "Saving Event to Firestore");
+//        Map<String, Object> eventData = new HashMap<>();
+//
+//        Task<Void> saveTask;
+//
 //        if (eventId == null) {
 //            return getNewEventID().continueWithTask(newEventIDTask -> {
 //                if (!newEventIDTask.isSuccessful() || newEventIDTask.getResult() == null) {
@@ -440,9 +483,11 @@ public class Event {
         eventData.put("defaultEventPosterURL", defaultEventpictureurl);
         //eventData.put("eventPictureUrl",eventPictureUrl);
         //eventData.put("defaultEventpictureurl",defaultEventpictureurl);
-
-
-
+        String eventUrl = "eventbooking://eventDetail?eventID=" + eventId;
+        QRcodeGenerator qrCodeGenerator = new QRcodeGenerator();
+        String QRHash = qrCodeGenerator.createQRCodeHash(eventUrl);
+        this.QRcodeHash = QRHash;
+        eventData.put("qrcodehash", QRHash);
     }
 
     /**
@@ -475,19 +520,26 @@ public class Event {
 
         // Prepare the updated event data map
         Map<String, Object> eventData = new HashMap<>();
-        eventData.put("eventId", eventId);
-        eventData.put("eventTitle", eventTitle);
-        eventData.put("description", description);
-        eventData.put("location", location);
-        eventData.put("maxParticipants", maxParticipants);
-        eventData.put("waitingparticipantIds", waitingparticipantIds);
-        eventData.put("acceptedParticipantIds", acceptedParticipantIds);
-        eventData.put("canceledParticipantIds", canceledParticipantIds);
-        eventData.put("signedUpParticipantIds", signedUpParticipantIds);
-        eventData.put("organizerId", organizerId);
-        eventData.put("imageUrl",imageUrl);
-
-        //eventData.put("customeImage",customImageUrl);
+        populateEventData(eventData);
+//        eventData.put("eventId", eventId);
+//        eventData.put("eventTitle", eventTitle);
+//        eventData.put("description", description);
+//        eventData.put("location", location);
+//        eventData.put("maxParticipants", maxParticipants);
+//        eventData.put("waitingparticipantIds", waitingparticipantIds);
+//        eventData.put("acceptedParticipantIds", acceptedParticipantIds);
+//        eventData.put("canceledParticipantIds", canceledParticipantIds);
+//        eventData.put("signedUpParticipantIds", signedUpParticipantIds);
+//        eventData.put("organizerId", organizerId);
+//        eventData.put("imageUrl",imageUrl);
+//        eventData.put("eventPosterURL", eventPictureUrl);
+//        eventData.put("defaultEventPosterURL", defaultEventpictureurl);
+//        //eventData.put("customeImage",customImageUrl);
+//        String eventUrl = "eventbooking://eventDetail?eventID=" + eventId;
+//        QRcodeGenerator qrCodeGenerator = new QRcodeGenerator();
+//        String QRHash = qrCodeGenerator.createQRCodeHash(eventUrl);
+//        this.QRcodeHash = QRHash;
+//        eventData.put("qrcodehash", QRHash);
 
         // Save or update the event data in Firestore
         return db.collection("Events").document(eventId)
@@ -500,10 +552,10 @@ public class Event {
                 });
     }
 
-//    /***
-//     * upload the evnet poster to the firebase
-//     * @param picture
-//     */
+    /***
+     * upload the evnet poster to the firebase
+     * @param picture
+     */
 //    public void uploadEventPosterToFirebase(String picture) {
 //        if (eventId == null || eventId.isEmpty()) {
 //            throw new IllegalArgumentException("Event ID must be set before uploading an event poster.");
@@ -546,11 +598,11 @@ public class Event {
 //            throw new IllegalArgumentException("Failed to upload the event poster to Firebase.", exception);
 //        });
 //    }
-
-    /**
-     * update the event poster to firebase
-     * @param newPoster
-     */
+//
+//    /**
+//     * update the event poster to firebase
+//     * @param newPoster
+//     */
 //    public void updateEventPosterToFirebase(String newPoster) {
 //        uploadEventPosterToFirebase(newPoster);
 //    }
@@ -677,7 +729,7 @@ public class Event {
     }
 
     //get organizer event
-    public static void getOragnizerEvents(String userId, OnSuccessListener<List<Event>> onSuccess, OnFailureListener onFailure) {
+    public static void getOrganizerEvents(String userId, OnSuccessListener<List<Event>> onSuccess, OnFailureListener onFailure) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         db.collection("Events")

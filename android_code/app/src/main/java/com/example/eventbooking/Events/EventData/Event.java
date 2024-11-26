@@ -640,7 +640,7 @@ public class Event {
     }
 
     //get organizer event
-    public static void getOragnizerEvents(String userId, OnSuccessListener<List<Event>> onSuccess, OnFailureListener onFailure) {
+    public static void getOrganizerEvents(String userId, OnSuccessListener<List<Event>> onSuccess, OnFailureListener onFailure) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         db.collection("Events")

@@ -58,8 +58,8 @@ public class OragnizerEventFragment  extends Fragment{
      * @param userId
      * @return
      */
-    public static HomeFragment newInstance(String userId) {
-        HomeFragment fragment = new HomeFragment();
+    public static OragnizerEventFragment newInstance(String userId) {
+        OragnizerEventFragment fragment = new OragnizerEventFragment();
         Bundle args = new Bundle();
         args.putString("userId", userId);
         fragment.setArguments(args);
@@ -89,17 +89,17 @@ public class OragnizerEventFragment  extends Fragment{
         ListView usersEventListView = rootView.findViewById(R.id.user_events_list);
         String currentUserId = UserManager.getInstance().getUserId();
 
-        Event.getOragnizerEvents(currentUserId, userEvents -> {
+        Event.getOrganizerEvents(currentUserId, userEvents -> {
             HomeUserEventAdapter adapter = new HomeUserEventAdapter(getContext(), userEvents, currentUserId);
             usersEventListView.setAdapter(adapter);
 
             // Set item click listener
             usersEventListView.setOnItemClickListener((parent, view, position, id) -> {
                 Event selectedEvent = userEvents.get(position);
-                EventViewFragment eventViewFragment = EventViewFragment.newInstance(selectedEvent.getEventId(), currentUserId);
+                OrganizerMenuFragment organizerMenuFragment = OrganizerMenuFragment.newInstance(selectedEvent.getEventId());
 
                 getParentFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, eventViewFragment)
+                        .replace(R.id.fragment_container, organizerMenuFragment)
                         .addToBackStack(null) // Ensures returning to HomeFragment
                         .commit();
             });

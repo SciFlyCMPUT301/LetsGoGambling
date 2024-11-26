@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_marginTop="65dp">
+    android:layout_height="match_parent">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -15,80 +14,51 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:padding="16dp"
-            android:layout_marginTop="65dp">
+            android:layout_marginTop="80dp">
 
 
-            <EditText
-                android:id="@+id/edit_text_event_title"
+            <TextView
+                android:id="@+id/view_text_event_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Event Title"
-                android:inputType="text" />
+                android:inputType="text"
+                android:textSize="30sp"/>
 
 
-            <EditText
-                android:id="@+id/edit_text_event_description"
+            <TextView
+                android:id="@+id/view_text_event_description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Event Description"
-                android:inputType="text" />
+                android:inputType="text"
+                android:textSize="30sp"/>
 
 
-            <EditText
-                android:id="@+id/edit_text_event_location"
+            <TextView
+                android:id="@+id/view_text_event_location"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Event Location"
-                android:inputType="text" />
+                android:inputType="text"
+                android:textSize="30sp"/>
 
 
-            <EditText
-                android:id="@+id/edit_text_max_participants"
+            <TextView
+                android:id="@+id/view_text_max_participants"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Max Participants"
-                android:inputType="number" />
+                android:inputType="number"
+                android:textSize="30sp"/>
 
-            <EditText
-                android:id="@+id/edit_organizer_text"
+            <TextView
+                android:id="@+id/view_organizer_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Organizer ID"
-                android:inputType="text" />
-
-            <Spinner
-                android:id="@+id/spinner_list_selector"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <ListView
-                android:id="@+id/participants_list_view"
-                android:layout_width="match_parent"
-                android:layout_height="200dp" />
-            <EditText
-                android:id="@+id/edit_participant"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Participant Add"
-                android:inputType="text" />
-
-            <Button
-                android:id="@+id/button_add_participant"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Add Participant" />
-
-            <Button
-                android:id="@+id/button_remove_participant"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Remove Participant" />
-
-            <Button
-                android:id="@+id/button_save"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Save" />
+                android:inputType="text"
+                android:textSize="30sp"/>
 
             <Button
                 android:id="@+id/button_remove_event"

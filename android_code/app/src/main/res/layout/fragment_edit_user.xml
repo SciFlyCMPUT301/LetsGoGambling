@@ -34,8 +34,8 @@
                     tools:layout_editor_absoluteX="155dp"
                     tools:layout_editor_absoluteY="64dp" />
 
-                <EditText
-                    android:id="@+id/user_edit_username"
+                <TextView
+                    android:id="@+id/user_view_username"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="12dp"
@@ -44,8 +44,8 @@
                     android:padding="12dp"
                     android:textSize="16sp" />
 
-                <EditText
-                    android:id="@+id/user_edit_deviceID"
+                <TextView
+                    android:id="@+id/user_view_deviceID"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="12dp"
@@ -54,8 +54,8 @@
                     android:background="@drawable/rounded_edittext"
                     android:textSize="16sp" />
 
-                <EditText
-                    android:id="@+id/user_edit_email"
+                <TextView
+                    android:id="@+id/user_view_email"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="12dp"
@@ -64,8 +64,8 @@
                     android:background="@drawable/rounded_edittext"
                     android:textSize="16sp" />
 
-                <EditText
-                    android:id="@+id/user_edit_phoneNumber"
+                <TextView
+                    android:id="@+id/user_view_phoneNumber"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="12dp"
@@ -74,8 +74,8 @@
                     android:background="@drawable/rounded_edittext"
                     android:textSize="16sp" />
 
-                <EditText
-                    android:id="@+id/user_edit_profilePictureUrl"
+                <TextView
+                    android:id="@+id/user_view_profilePictureUrl"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="12dp"
@@ -84,8 +84,8 @@
                     android:background="@drawable/rounded_edittext"
                     android:textSize="16sp" />
 
-                <EditText
-                    android:id="@+id/user_edit_location"
+                <TextView
+                    android:id="@+id/user_view_location"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="12dp"
@@ -94,8 +94,8 @@
                     android:background="@drawable/rounded_edittext"
                     android:textSize="16sp" />
 
-                <EditText
-                    android:id="@+id/user_edit_dateJoined"
+                <TextView
+                    android:id="@+id/user_view_dateJoined"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="12dp"
@@ -104,8 +104,8 @@
                     android:background="@drawable/rounded_edittext"
                     android:textSize="16sp" />
 
-                <EditText
-                    android:id="@+id/user_edit_roles"
+                <TextView
+                    android:id="@+id/user_view_roles"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="12dp"
@@ -168,13 +168,6 @@
                     android:orientation="horizontal"
                     android:layout_marginTop="16dp"
                     android:gravity="center">
-
-                    <Button
-                        android:id="@+id/save_button_user"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="8dp"
-                        android:text="Save" />
 
                     <Button
                         android:id="@+id/delete_button_user"

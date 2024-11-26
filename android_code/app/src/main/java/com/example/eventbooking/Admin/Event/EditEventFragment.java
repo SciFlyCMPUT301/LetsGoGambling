@@ -1,18 +1,16 @@
 package com.example.eventbooking.Admin.Event;
 
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.AdapterView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,7 +21,6 @@ import com.example.eventbooking.R;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -39,9 +36,7 @@ import java.util.List;
  * {@link Event} class representing the event data structure.</p>
  */
 public class EditEventFragment extends Fragment {
-    private Spinner listSelectorSpinner;
-    private EditText eventTitleEditText, eventDescriptionEditText, maxParticipantsEditText, eventLocationEditText, organiserIDEditText
-            , participantEditText;
+    private TextView eventTitleText, eventDescriptionText, maxParticipantsText, eventLocationText, organiserIDText;
     private Button saveButton, cancelButton, addParticipantButton, removeParticipantButton, removeEventButton;
     private ListView participantsListView;
     private Event selectedEvent;
@@ -80,49 +75,22 @@ public class EditEventFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_edit_event, container, false);
         db = FirebaseFirestore.getInstance();
         // Initialize views
-        listSelectorSpinner = view.findViewById(R.id.spinner_list_selector);
-        eventTitleEditText = view.findViewById(R.id.edit_text_event_title);
-        eventDescriptionEditText = view.findViewById(R.id.edit_text_event_description);
-        maxParticipantsEditText = view.findViewById(R.id.edit_text_max_participants);
-        eventLocationEditText = view.findViewById(R.id.edit_text_event_location);
-        organiserIDEditText = view.findViewById(R.id.edit_organizer_text);
-        participantEditText = view.findViewById(R.id.edit_participant);
+        eventTitleText = view.findViewById(R.id.view_text_event_title);
+        eventDescriptionText = view.findViewById(R.id.view_text_event_description);
+        maxParticipantsText = view.findViewById(R.id.view_text_max_participants);
+        eventLocationText = view.findViewById(R.id.view_text_event_location);
+        organiserIDText = view.findViewById(R.id.view_organizer_text);
 
         removeEventButton = view.findViewById(R.id.button_remove_event);
-        saveButton = view.findViewById(R.id.button_save);
         cancelButton = view.findViewById(R.id.button_cancel);
-        participantsListView = view.findViewById(R.id.participants_list_view);
-        addParticipantButton = view.findViewById(R.id.button_add_participant);
-        removeParticipantButton = view.findViewById(R.id.button_remove_participant);
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item,
-                new String[]{"Waiting List", "Accepted List", "Canceled List", "Signed Up List"});
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        listSelectorSpinner.setAdapter(adapter);
 
         if (selectedEvent != null) {
             populateEventDetails();
         }
 
-        listSelectorSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                updateParticipantsList(position);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                // Handle when no item is selected
-            }
-        });
-
-        saveButton.setOnClickListener(v -> saveEvent());
 
         cancelButton.setOnClickListener(v -> goBackToViewEvents());
-
-        addParticipantButton.setOnClickListener(v -> addParticipant());
-
-        removeParticipantButton.setOnClickListener(v -> removeParticipant());
 
         removeEventButton.setOnClickListener(v->removeEvent());
         return view;
@@ -134,46 +102,15 @@ public class EditEventFragment extends Fragment {
      */
     private void populateEventDetails() {
         if (selectedEvent != null) {
-            eventTitleEditText.setText(selectedEvent.getEventTitle());
-            eventDescriptionEditText.setText(selectedEvent.getDescription());
-            eventLocationEditText.setText(selectedEvent.getLocation());
-            maxParticipantsEditText.setText(String.valueOf(selectedEvent.getMaxParticipants()));
-            organiserIDEditText.setText(selectedEvent.getOrganizerId());
+            eventTitleText.setText(selectedEvent.getEventTitle());
+            eventDescriptionText.setText(selectedEvent.getDescription());
+            eventLocationText.setText(selectedEvent.getLocation());
+            maxParticipantsText.setText(String.valueOf(selectedEvent.getMaxParticipants()));
+            organiserIDText.setText(selectedEvent.getOrganizerId());
 
-            updatedWaitingList = new ArrayList<>(selectedEvent.getWaitingParticipantIds());
-            updatedAcceptedList = new ArrayList<>(selectedEvent.getAcceptedParticipantIds());
-            updatedCanceledList = new ArrayList<>(selectedEvent.getCanceledParticipantIds());
-            updatedSignedUpList = new ArrayList<>(selectedEvent.getSignedUpParticipantIds());
         }
     }
 
-    /**
-     * Saves the modified event details to the Firebase Firestore database. Checks for valid input
-     * and displays appropriate messages based on the success or failure of the update operation.
-     */
-    private void saveEvent() {
-        String newTitle = eventTitleEditText.getText().toString().trim();
-        String newDescription = eventDescriptionEditText.getText().toString().trim();
-        String newLocation = eventLocationEditText.getText().toString().trim();
-        String maxParticipantsStr = maxParticipantsEditText.getText().toString().trim();
-        String newOrganizerID = organiserIDEditText.getText().toString().trim();
-        if (TextUtils.isEmpty(newTitle) || TextUtils.isEmpty(newDescription) || TextUtils.isEmpty(newLocation) ||
-                TextUtils.isEmpty(maxParticipantsStr) || TextUtils.isEmpty(newOrganizerID)) {
-            Toast.makeText(getContext(), "Please fill all fields.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        int newMaxParticipants = Integer.parseInt(maxParticipantsStr);
-
-        // Update the event data
-        selectedEvent.updateEventData(newTitle, newDescription, newLocation, newMaxParticipants, newOrganizerID,
-                        updatedWaitingList, updatedAcceptedList, updatedCanceledList, updatedSignedUpList)
-                .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(getContext(), "Event updated successfully", Toast.LENGTH_SHORT).show();
-                    goBackToViewEvents();
-                })
-                .addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to update event", Toast.LENGTH_SHORT).show());
-    }
 
     /**
      * Returns the user to the view events screen by replacing this fragment with the ViewEventsFragment.
@@ -184,107 +121,6 @@ public class EditEventFragment extends Fragment {
                 .commit();
     }
 
-    /**
-     *Updates the participant list displayed in the ListView based on the selected category in the spinner.
-     *
-     * @param position
-     */
-    private void updateParticipantsList(int position) {
-        selectedList = null;
-        switch (position) {
-            case 0:
-                selectedList = selectedEvent.getWaitingParticipantIds();
-                break;
-            case 1:
-                selectedList = selectedEvent.getAcceptedParticipantIds();
-                break;
-            case 2:
-                selectedList = selectedEvent.getCanceledParticipantIds();
-                break;
-            case 3:
-                selectedList = selectedEvent.getSignedUpParticipantIds();
-                break;
-        }
-
-        if (selectedList != null) {
-            participantsAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, selectedList);
-            participantsListView.setAdapter(participantsAdapter);
-        }
-    }
-
-    /**
-     * Adds a participant to the currently selected participant list, if the participant name
-     * is not already in the list. Displays a message if the input is empty or the participant already exists.
-     */
-    private void addParticipant() {
-        String participant = participantEditText.getText().toString().trim();
-
-        if (TextUtils.isEmpty(participant)) {
-            Toast.makeText(getContext(), "Please enter a participant name.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        if (selectedList != null && !selectedList.contains(participant)) {
-            // Add participant to the list
-            selectedList.add(participant);
-            // Add participant to the specific list
-            int position = listSelectorSpinner.getSelectedItemPosition();
-            switch (position) {
-                case 0:
-                    updatedWaitingList.add(participant);
-                    break;
-                case 1:
-                    updatedAcceptedList.add(participant);
-                    break;
-                case 2:
-                    updatedCanceledList.add(participant);
-                    break;
-                case 3:
-                    updatedSignedUpList.add(participant);
-                    break;
-            }
-            participantsAdapter.notifyDataSetChanged(); // Refresh the ListView
-        } else {
-            Toast.makeText(getContext(), "Participant already exists.", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    /**
-     * Removes a participant from the currently selected participant list, if the participant name
-     * exists in the list. Displays a message if the input is empty or the participant is not found.
-     */
-    // Method to remove a participant
-    private void removeParticipant() {
-        String participant = participantEditText.getText().toString().trim();
-
-        if (TextUtils.isEmpty(participant)) {
-            Toast.makeText(getContext(), "Please enter a participant name.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        if (selectedList != null && selectedList.contains(participant)) {
-            selectedList.remove(participant);
-            // Remove participant to the specific list
-            int position = listSelectorSpinner.getSelectedItemPosition();
-            switch (position) {
-                case 0:
-                    updatedWaitingList.remove(participant);
-                    break;
-                case 1:
-                    updatedAcceptedList.remove(participant);
-                    break;
-                case 2:
-                    updatedCanceledList.remove(participant);
-                    break;
-                case 3:
-                    updatedSignedUpList.remove(participant);
-                    break;
-            }
-            participantsAdapter.notifyDataSetChanged();
-        } else {
-            Toast.makeText(getContext(), "Participant not found.", Toast.LENGTH_SHORT).show();
-        }
-    }
 
     /**
      * Deletes the selected event from Firebase Firestore. Displays a success message and navigates

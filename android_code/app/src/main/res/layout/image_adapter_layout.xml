@@ -1,35 +1,36 @@
-<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:paddingTop="10dp"
-    android:paddingBottom="10dp">
+    android:padding="10dp">
 
     <ImageView
-        android:id="@+id/image"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:id="@+id/image_view"
+        android:layout_width="110dp"
+        android:layout_height="110dp"
         android:layout_marginRight="10dp"
-        android:contentDescription="Property Image" />
+        android:contentDescription="Images" />
 
     <LinearLayout
         android:id="@+id/infoSection"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/image"
+        android:layout_toRightOf="@+id/image_view"
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/image_link"
+            android:id="@+id/collection"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-            android:text="Image link"
+            android:text="Collection"
             android:textSize="18sp" />
 
+        <TextView
+            android:id="@+id/source_id"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:text="Source ID"
+            android:textSize="15sp" />
     </LinearLayout>
-
-
-
 </RelativeLayout>

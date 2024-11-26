@@ -65,7 +65,25 @@
         android:layout_width="match_parent"
         android:layout_height="58dp"
         android:text="back to event" />
-
+    <Button
+        android:id="@+id/cancel_entrant"
+        android:layout_width="match_parent"
+        android:layout_height="58dp"
+        android:text="cancel entrant didnot sign up" />
+    <Button
+        android:id="@+id/button_remove_poster"
+        android:layout_width="match_parent"
+        android:layout_height="58dp"
+        android:text="remove custom poster" />
+    <Button
+        android:id="@+id/button_upload_poster"
+        android:layout_width="match_parent"
+        android:layout_height="58dp"
+        android:text="upload custom poster" />
+    <ImageView
+        android:id="@+id/poster_image_view"
+        android:layout_width="wrap_content"
+        android:layout_height="200dp"/>
     <ImageView
         android:id="@+id/QR_image"
         android:layout_width="wrap_content"

@@ -1,4 +1,3 @@
-<!-- fragment_create.xml -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -6,11 +5,23 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:layout_marginTop="65dp">
+
+    <!-- Page Title -->
+    <TextView
+        android:id="@+id/title_event_list"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Event List"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_gravity="center"
+        android:layout_marginBottom="16dp" />
+
     <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_weight="1">
 
         <Switch
             android:id="@+id/event_switch"
@@ -24,50 +35,43 @@
             android:id="@+id/event_list_view"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"/>
+            android:layout_weight="1"
+            android:divider="@android:color/darker_gray"
+            android:dividerHeight="1dp"
+            android:padding="8dp"
+            android:clipToPadding="false" />
 
+        <!-- Add Button -->
         <Button
             android:id="@+id/add_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Add" />
-
+            android:text="Add"
+            android:layout_gravity="center" />
     </LinearLayout>
 
-
-    <Button
-        android:id="@+id/button_back_home"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Back to Home" />
-
+    <!-- Hidden Buttons -->
     <Button
         android:id="@+id/add_facility_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Create Facility"
         android:layout_gravity="center"
-        android:visibility="gone"/>
-
-<!--    <Button-->
-<!--        android:id="@+id/join_waiting_list"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:text="JOIN" />-->
-
-<!--    <Button-->
-<!--        android:id="@+id/leave_waiting_list"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:text="LEAVE"/>-->
+        android:visibility="gone" />
 
     <Button
         android:id="@+id/organizer_menu"
-        android:layout_height="wrap_content"
         android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="Actions"
-        android:visibility="gone"
-        />
+        android:visibility="gone" />
 
-
+    <!-- Back to Home Button -->
+    <Button
+        android:id="@+id/button_back_home"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Back to Home"
+        android:layout_gravity="center"
+        android:layout_marginTop="16dp" />
 </LinearLayout>

@@ -1,8 +1,11 @@
 package com.example.eventbooking.Events.EventCreate;
 
 
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,6 +17,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
@@ -35,6 +40,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -56,6 +62,13 @@ public class EventCreateFragment extends Fragment {
     private Button backButton;
     private FirebaseFirestore db;
     private ImageView QRCode;
+    private ImageView posterImageView;
+    private Button uploadPosterButton;
+    private Button deletePosterButton;
+    private static final int PICK_IMAGE_REQUEST = 1;
+    private Event currentEvent;
+    private ActivityResultLauncher<Intent> pickImageLauncher;
+
     private QRcodeGenerator qrCodeGenerator;
     //empty constructor
     private boolean roleAssigned = false, testingFlag;
@@ -112,6 +125,27 @@ public class EventCreateFragment extends Fragment {
         editTextImageUrl = rootView.findViewById(R.id.event_image_url);
         createEventButton= rootView.findViewById(R.id.button_create_event);
         QRCode = rootView.findViewById(R.id.qr_image_view);
+        //button of the posters
+        deletePosterButton = rootView.findViewById(R.id.button_delete_poster);
+        uploadPosterButton = rootView.findViewById(R.id.button_upload_poster);
+        pickImageLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == getActivity().RESULT_OK && result.getData() != null) {
+                        Uri selectedImageUri = result.getData().getData();
+                        if (selectedImageUri != null) {
+                            uploadCustomPoster(selectedImageUri);
+                        } else {
+                            Toast.makeText(getContext(), "Failed to select image.", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Toast.makeText(getContext(), "Image selection cancelled.", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+
+
+
 
         // Set up button to go back to HomeFragment
         Button backButton = rootView.findViewById(R.id.button_back_home);
@@ -125,7 +159,13 @@ public class EventCreateFragment extends Fragment {
         createEventButton.setOnClickListener(v->{
             createEvent();
         });
+        uploadPosterButton.setOnClickListener(v->{
+            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            pickImageLauncher.launch(intent);
 
+
+        });
+        deletePosterButton.setOnClickListener(v->deletePoster());
 
 
         return rootView;
@@ -161,13 +201,15 @@ public class EventCreateFragment extends Fragment {
             return;
         }
 
-        int waitingListLimit;
-        try{
-            waitingListLimit = Integer.parseInt(waitingListLimitStr);
-            if(waitingListLimit<=0) throw new NumberFormatException();
-        }catch(NumberFormatException e){
-            Toast.makeText(getContext(),"Please enter valid participant", Toast.LENGTH_SHORT).show();
-            return;
+        Integer waitingListLimit = null;
+        if (!TextUtils.isEmpty(waitingListLimitStr)) {
+            try {
+                waitingListLimit = Integer.parseInt(waitingListLimitStr);
+                if (waitingListLimit <= 0) throw new NumberFormatException();
+            } catch (NumberFormatException e) {
+                Toast.makeText(getContext(), "Please enter a valid number for the waiting list limit", Toast.LENGTH_SHORT).show();
+                return;
+            }
         }
         //location, revise later after location class implemented
         //Location location = new Location(locationStr);
@@ -183,7 +225,14 @@ public class EventCreateFragment extends Fragment {
         DocumentReference newEventRef = eventRef.document();
         String eventId = newEventRef.getId();
         Event event = new Event(eventId, title, description,imageUrl,System.currentTimeMillis(),locationStr,maxParticipants,currentUser.getDeviceID());
+        currentEvent = event;
 
+
+        WaitingList waitingList = new WaitingList(eventId);
+        waitingList.setMaxParticipants(maxParticipants);
+        if(waitingListLimit != null){
+            waitingList.setWaitingListLimit(waitingListLimit);
+        }
 
         //assign organizer to the current user
 
@@ -193,6 +242,7 @@ public class EventCreateFragment extends Fragment {
 
 
         }
+
 
         //update role in firebase
         if (roleAssigned) {
@@ -207,7 +257,16 @@ public class EventCreateFragment extends Fragment {
                         Toast.makeText(getContext(), "Failed to update user role", Toast.LENGTH_SHORT).show();
                     });
         }
-
+        if (currentEvent != null && TextUtils.isEmpty(currentEvent.getImageUrl())) {
+            currentEvent.uploadDefaultPoster(title)
+                    .addOnSuccessListener(aVoid -> {
+                        Log.d("EventCreateFragment", "Default poster uploaded successfully.");
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e("EventCreateFragment", "Failed to upload default poster.", e);
+                        Toast.makeText(getContext(), "Failed to upload default poster.", Toast.LENGTH_SHORT).show();
+                    });
+        }
         Log.d("Create Event Fragment", "Save Event");
         event.saveEventDataToFirestore()
                 .addOnSuccessListener(aVoid -> {
@@ -220,6 +279,59 @@ public class EventCreateFragment extends Fragment {
 
 
     }
+    private void uploadCustomPoster(Uri imageUri) {
+        if (currentEvent == null) {
+            Toast.makeText(getContext(), "Please create the event first.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        currentEvent.uploadCustomPoster(imageUri)
+                .addOnSuccessListener(aVoid -> {
+                    // Update the UI with the uploaded custom poster
+                    Picasso.get().load(currentEvent.getImageUrl())
+                            .placeholder(R.drawable.placeholder_image_foreground)
+                            .error(R.drawable.error_image_foreground)
+                            .into(posterImageView);
+                    Toast.makeText(getContext(), "Custom poster uploaded successfully.", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("EventCreateFragment", "Failed to upload custom poster.", e);
+                    Toast.makeText(getContext(), "Failed to upload custom poster.", Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    private void deletePoster() {
+        if (currentEvent == null) {
+            Toast.makeText(getContext(), "Please create the event first.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        currentEvent.deleteSelectedPosterFromFirebase(currentEvent.getImageUrl())
+                .addOnSuccessListener(aVoid -> {
+                    currentEvent.uploadDefaultPoster(currentEvent.getEventTitle())
+                            .addOnSuccessListener(uploaded -> {
+                                Picasso.get().load(currentEvent.getImageUrl())
+                                        .placeholder(R.drawable.placeholder_image_foreground)
+                                        .error(R.drawable.error_image_foreground)
+                                        .into(posterImageView);
+                                Toast.makeText(getContext(), "Poster reset to default successfully.", Toast.LENGTH_SHORT).show();
+                            }).addOnFailureListener(e -> {
+                                Log.e("EventCreateFragment", "Failed to reset poster to default.", e);
+                                Toast.makeText(getContext(), "Failed to reset poster to default.", Toast.LENGTH_SHORT).show();
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("EventCreateFragment", "Failed to delete poster.", e);
+                    Toast.makeText(getContext(), "Failed to delete poster.", Toast.LENGTH_SHORT).show();
+                });
+    }
+
+
+
+
+
+
+
+
     /**
      * Clears the input fields in the event creation form, resetting them to their default empty state.
      */

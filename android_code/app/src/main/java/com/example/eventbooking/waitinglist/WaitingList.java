@@ -14,7 +14,16 @@ public class WaitingList {
     //initialize the variables
     private String eventId;
     private int maxParticipants;
-    //private int waitingListLimit;
+
+    public int getWaitingListLimit() {
+        return waitingListLimit;
+    }
+
+    public void setWaitingListLimit(int waitingListLimit) {
+        this.waitingListLimit = waitingListLimit;
+    }
+
+    private int waitingListLimit;
     private List<String> waitingParticipantIds;
     private List<String> acceptedParticipantIds;
     private List<String> signedUpParticipantIds;

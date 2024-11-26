@@ -1,8 +1,12 @@
 package com.example.eventbooking.waitinglist;
 
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,6 +17,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
@@ -22,6 +28,8 @@ import com.example.eventbooking.Events.EventPageFragment.EventFragment;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.qrcode.QRCodeWriter;
+import com.example.eventbooking.Events.EventData.Event;
+import com.squareup.picasso.Picasso;
 
 import java.util.Hashtable;
 import java.util.List;
@@ -39,10 +47,16 @@ public class OrganizerMenuFragment extends Fragment {
     private Button backToEventPageButton;
     private Button generateQRCode;
     private ImageView QRImage;
+    private ImageView posterImageView;
     private QRcodeGenerator qrCodeGenerator;
     private int replacementSize;
     private WaitingList waitingList;
     private int maxParticipant;
+    private Button removePosterButton;
+    private Button uploadPosterButton;
+    private ActivityResultLauncher<Intent> pickImageLauncher;
+    private Event currentEvent;
+    private Button CancelNonSignUp;
     /**
      * empty constructor*/
     public OrganizerMenuFragment() {
@@ -74,10 +88,19 @@ public class OrganizerMenuFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Log.d("Organizer Menu Fragment", "Launched Fragment");
         super.onCreate(savedInstanceState);
         // Retrieve eventId from arguments
         if (getArguments() != null) {
             eventId = getArguments().getString("eventId");
+            Log.d("Organizer Menu Fragment", "Found Event ID: " + eventId);
+        }
+        if (eventId == null || eventId.isEmpty()) {
+            Log.d("Organizer Menu Fragment", "Couldnt Find Event ID");
+            Toast.makeText(getContext(), "Event ID is missing", Toast.LENGTH_SHORT).show();
+            Log.e("OrganizerMenuFragment", "Event ID is null or empty.");
+            getParentFragmentManager().popBackStack(); // Exit the fragment
+            return;
         }
 
 
@@ -86,35 +109,103 @@ public class OrganizerMenuFragment extends Fragment {
 
 
         //hardcoded waitinglist participant
-        int maxParticipants = 3;
+        //int maxParticipants = 3;
         // Initialize the WaitingList instance as a placeholder
-        waitingList = new WaitingList(eventId);
+        Event.findEventById(eventId, event -> {
+            if (event != null) {
+                Log.d("Organizer Menu Fragment", "Loading Waiting List");
+                currentEvent = event;
+                waitingList = new WaitingList(eventId); // Initialize waitingList
+                waitingList.setMaxParticipants(event.getMaxParticipants());
+                Log.d("Organizer Menu Fragment", "Waiting list event ID: " + waitingList.getEventId());
+                Log.d("Organizer Menu Fragment", "Waiting list max: " + waitingList.getMaxParticipants());
+
+                // Update to Firebase only if waitingList is initialized
+                waitingList.updateToFirebase().addOnSuccessListener(aVoid -> {
+                    // Data updated successfully
+                }).addOnFailureListener(e -> {
+                    Log.e("OrganizerMenuFragment", "Failed to update waiting list to Firebase", e);
+                });
+
+                waitingList.loadFromFirebase().addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(getContext(), "Waiting list loaded successfully.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(getContext(), "Failed to load waiting list from Firebase.", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            } else {
+                Log.d("Organizer Menu Fragment", "Waiting list not made");
+                Toast.makeText(getContext(), "Event not found.", Toast.LENGTH_SHORT).show();
+                getParentFragmentManager().popBackStack();
+            }
+        }, e -> {
+            Log.d("Organizer Menu Fragment", "Error Waiting list not made");
+            Toast.makeText(getContext(), "Error fetching event data.", Toast.LENGTH_SHORT).show();
+            Log.e("OrganizerMenuFragment", "Error fetching event", e);
+            getParentFragmentManager().popBackStack();
+        });
+
+
+        // waitingList = new WaitingList(eventId);
         //hardcode
-        waitingList.setMaxParticipants(maxParticipants);
+        //waitingList.setMaxParticipants(maxParticipants);
 
         //just for testing
+        pickImageLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result ->{
+                    if(result.getResultCode()== Activity.RESULT_OK){
+                        Intent data = result.getData();
+                        if(data != null && data.getData() != null){
+                            Uri selectedImageUri = data.getData();
+                            uploadPoster(selectedImageUri);
+                        }
+                    }
+                }
+        );
+
         // For testing purposes, add hardcoded participant IDs
-        waitingList.getWaitingParticipantIds().add("participant1");
-        waitingList.getWaitingParticipantIds().add("participant2");
-        waitingList.getWaitingParticipantIds().add("participant3");
-        waitingList.getWaitingParticipantIds().add("participant4");
-        waitingList.getWaitingParticipantIds().add("participant5");
-        waitingList.getWaitingParticipantIds().add("participant6");
+//        waitingList.getWaitingParticipantIds().add("participant1");
+//        waitingList.getWaitingParticipantIds().add("participant2");
+//        waitingList.getWaitingParticipantIds().add("participant3");
+//        waitingList.getWaitingParticipantIds().add("participant4");
+//        waitingList.getWaitingParticipantIds().add("participant5");
+//        waitingList.getWaitingParticipantIds().add("participant6");
+
+//        if (waitingList != null) {
+//            waitingList.updateToFirebase().addOnSuccessListener(aVoid -> {
+//                // Data updated successfully
+//            }).addOnFailureListener(e -> {
+//                Log.e("OrganizerMenuFragment", "Failed to update waiting list to Firebase", e);
+//            });
+//
+//            waitingList.loadFromFirebase().addOnCompleteListener(task -> {
+//                if (task.isSuccessful()) {
+//                    Toast.makeText(getContext(), "Waiting list loaded successfully.", Toast.LENGTH_SHORT).show();
+//                } else {
+//                    Toast.makeText(getContext(), "Failed to load waiting list from Firebase.", Toast.LENGTH_SHORT).show();
+//                }
+//            });
+//        } else {
+//            Log.e("OrganizerMenuFragment", "WaitingList is null. Cannot update or load.");
+//        }
+
 
         //load and update from firebase operations
-        waitingList.updateToFirebase().addOnSuccessListener(aVoid -> {
-            // Data updated successfully
-        }).addOnFailureListener(e -> {
-            // Handle error
-        });
+//        waitingList.updateToFirebase().addOnSuccessListener(aVoid -> {
+//            // Data updated successfully
+//        }).addOnFailureListener(e -> {
+//            // Handle error
+//        });
 
-        waitingList.loadFromFirebase().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                Toast.makeText(getContext(), "Waiting list loaded successfully.", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(getContext(), "Failed to load waiting list from Firebase.", Toast.LENGTH_SHORT).show();
-            }
-        });
+//        waitingList.loadFromFirebase().addOnCompleteListener(task -> {
+//            if (task.isSuccessful()) {
+//                Toast.makeText(getContext(), "Waiting list loaded successfully.", Toast.LENGTH_SHORT).show();
+//            } else {
+//                Toast.makeText(getContext(), "Failed to load waiting list from Firebase.", Toast.LENGTH_SHORT).show();
+//            }
+//        });
     }
     /**
      * binding the UI component to the actual java var
@@ -138,6 +229,12 @@ public class OrganizerMenuFragment extends Fragment {
 
         generateQRCode = rootView.findViewById(R.id.generate_qr_code);
         QRImage = rootView.findViewById(R.id.QR_image);
+        CancelNonSignUp = rootView.findViewById(R.id.cancel_entrant);
+        removePosterButton = rootView.findViewById(R.id.button_remove_poster);
+        uploadPosterButton = rootView.findViewById(R.id.button_upload_poster);
+        posterImageView = rootView.findViewById(R.id.poster_image_view);
+
+
 
 
         // Set up listeners
@@ -150,6 +247,11 @@ public class OrganizerMenuFragment extends Fragment {
         backToEventPageButton.setOnClickListener(v -> navigateBackToEventPage());
 
         generateQRCode.setOnClickListener(v -> generateAndDisplayQRCode(eventId));
+        CancelNonSignUp.setOnClickListener(v->cancelEntrant());
+        uploadPosterButton.setOnClickListener(v->launchImagePicker());
+        removePosterButton.setOnClickListener(v->removePoster());
+
+        displayCurrentPoster();
 
         return rootView;
     }
@@ -307,6 +409,125 @@ public class OrganizerMenuFragment extends Fragment {
                 .commit();
 
     }
+    //poster stuff
+    private void launchImagePicker() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        pickImageLauncher.launch(intent);
+    }
+
+    private void uploadPoster(Uri imageUri) {
+        if (currentEvent == null) {
+            Toast.makeText(getContext(), "Event not loaded.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Upload the custom poster
+        currentEvent.uploadCustomPoster(imageUri)
+                .addOnSuccessListener(aVoid -> {
+                    displayCurrentPoster(); // Display the updated poster
+                    Toast.makeText(getContext(), "Custom poster uploaded successfully.", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "Failed to upload custom poster.", Toast.LENGTH_SHORT).show();
+                    Log.e("OrganizerMenuFragment", "Error uploading poster", e);
+                });
+    }
+    private void displayCurrentPoster() {
+        if (currentEvent == null) {
+            posterImageView.setImageResource(R.drawable.placeholder_image_foreground);
+            return;
+        }
+
+        String posterUrl = currentEvent.getImageUrl();
+        if (posterUrl == null || posterUrl.isEmpty()) {
+            posterImageView.setImageResource(R.drawable.placeholder_image_foreground);
+        } else {
+            Picasso.get()
+                    .load(posterUrl)
+                    .placeholder(R.drawable.placeholder_image_foreground)
+                    .error(R.drawable.error_image_foreground)
+                    .into(posterImageView);
+        }
+    }
+    private void removePoster() {
+        if (currentEvent == null) {
+            Toast.makeText(getContext(), "Event not loaded.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Remove the custom poster and switch to default
+        currentEvent.deleteSelectedPosterFromFirebase(currentEvent.getImageUrl())
+                .addOnSuccessListener(aVoid -> {
+                    currentEvent.uploadDefaultPoster(currentEvent.getEventTitle())
+                            .addOnSuccessListener(defaultPoster -> {
+                                displayCurrentPoster(); // Display the default poster
+                                Toast.makeText(getContext(), "Custom poster removed. Default poster is now active.", Toast.LENGTH_SHORT).show();
+                            }) .addOnFailureListener(e -> {
+                                Toast.makeText(getContext(), "Failed to reset poster to default.", Toast.LENGTH_SHORT).show();
+                                Log.e("OrganizerMenuFragment", "Error resetting poster to default", e);
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "Failed to remove custom poster.", Toast.LENGTH_SHORT).show();
+                    Log.e("OrganizerMenuFragment", "Error removing poster", e);
+                });
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //cancel entrant didnot signup
+    //make up a click listener, retrive the accepted list, remove them and add to the cancelled
+    private void cancelEntrant() {
+        if (waitingList == null) {
+            Toast.makeText(getContext(), "Waiting list not loaded.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+
+        List<String> acceptedParticipants = waitingList.getAcceptedParticipantIds();
+        if (acceptedParticipants.isEmpty()) {
+            Toast.makeText(getContext(), "No non-signed-up participants to cancel.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+
+        // Move all accepted participants to the canceled list
+        waitingList.getCanceledParticipantIds().addAll(acceptedParticipants);
+
+
+        // Clear the accepted participants list
+        acceptedParticipants.clear();
+
+
+        // Update Firebase
+        waitingList.updateToFirebase().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                Toast.makeText(getContext(), "Non-signed-up participants canceled successfully.", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getContext(), "Failed to update Firebase.", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
+
 
 
 

@@ -110,7 +110,7 @@ public class OragnizerEventFragment  extends Fragment{
             usersEventListView.setOnItemClickListener((parent, view, position, id) -> {
                 Event selectedEvent = organizerEvents.get(position);
                // EventViewFragment eventViewFragment = EventViewFragment.newInstance(selectedEvent.getEventId(), currentUserId);
-                OrganizerEventDetailFragment eventDetailView = OrganizerEventDetailFragment.newInstance(selectedEvent.getEventId(), currentUserId);
+                OrganizerEventDetailFragment eventDetailView = OrganizerEventDetailFragment.newInstance(selectedEvent.getEventId());
                 getParentFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container, eventDetailView)
                         .addToBackStack(null) // Ensures returning to OragnizerEventFragment

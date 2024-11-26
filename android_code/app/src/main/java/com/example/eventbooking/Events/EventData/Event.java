@@ -1,42 +1,24 @@
 package com.example.eventbooking.Events.EventData;
 
 import android.net.Uri;
-import android.os.UserManager;
-import android.provider.ContactsContract;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-
-import com.example.eventbooking.Location;
-
-import java.io.File;
-import java.util.HashMap;
-import java.util.List;
-
-import com.example.eventbooking.Role;
-import com.example.eventbooking.User;
 
 import com.example.eventbooking.waitinglist.WaitingList;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.gms.tasks.Tasks;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -62,7 +44,7 @@ public class Event {
     private List<String> canceledParticipantIds;
     private List<String> signedUpParticipantIds;
     private List<String> enrolledParticipantIds;
-    private List<String> declinedParticipantIds;
+    private List<String> declinedParticipantIds = new ArrayList<>();
     private WaitingList waitingList;
     private String organizerId;
     private FirebaseFirestore db;
@@ -82,41 +64,12 @@ public class Event {
         this.canceledParticipantIds = new ArrayList<>();
         this.signedUpParticipantIds = new ArrayList<>();
         this.enrolledParticipantIds = new ArrayList<>();
-        this.declinedParticipantIds = new ArrayList<>();
-
     }
 
     public Event(int eventID) {
         storage = FirebaseStorage.getInstance();
         db = FirebaseFirestore.getInstance();
         this.waitingList=new WaitingList();
-    }
-
-    /**
-     * Secondary constructor
-     *
-     * @param db
-     */
-    public Event(FirebaseFirestore db) {
-        this.db = db;
-        this.waitingList= new WaitingList();
-        //waiting list constructor will handle these 4 list
-        this.waitingparticipantIds = new ArrayList<>();
-        this.acceptedParticipantIds = new ArrayList<>();
-        this.canceledParticipantIds = new ArrayList<>();
-        this.signedUpParticipantIds = new ArrayList<>();
-        this.enrolledParticipantIds = new ArrayList<>();
-        this.declinedParticipantIds = new ArrayList<>();
-    }
-    public Event(FirebaseFirestore db, FirebaseStorage storage) {
-        this.db = db;
-        this.storage = storage;
-        this.waitingparticipantIds = new ArrayList<>();
-        this.acceptedParticipantIds = new ArrayList<>();
-        this.canceledParticipantIds = new ArrayList<>();
-        this.signedUpParticipantIds = new ArrayList<>();
-        this.enrolledParticipantIds = new ArrayList<>();
-        this.declinedParticipantIds = new ArrayList<>();
     }
     /**
      * Constructs an Event with specific parameters.
@@ -335,82 +288,48 @@ public class Event {
      *
      * @return A task representing the asynchronous save operation.
      */
+
     public Task<Void> saveEventDataToFirestore() {
-        if (eventId == null) {
-            return getNewEventID().continueWithTask(newEventIDTask -> {
-                if (!newEventIDTask.isSuccessful() || newEventIDTask.getResult() == null) {
-                    throw new Exception("Failed to generate new Event ID");
-                }
-                String newEventID = newEventIDTask.getResult();
-                this.eventId = newEventID;
-
-                Map<String, Object> eventData = new HashMap<>();
-                eventData.put("eventId", newEventID);
-                populateEventData(eventData);
-
-                return db.collection("Events").document(newEventID).set(eventData);
-            });
-        } else {
-            Map<String, Object> eventData = new HashMap<>();
-            eventData.put("eventId", eventId);
-            populateEventData(eventData);
-
-            return db.collection("Events").document(eventId).set(eventData);
+        Map<String, Object> eventData = new HashMap<>();
+        String new_eventID = eventId;
+        if(eventId == null){
+            new_eventID = getNewEventID();
+            eventData.put("eventId", new_eventID);
+            this.eventId = new_eventID;
         }
-    }
-
-
-//    public Task<Void> saveEventDataToFirestore() {
-////        Log.d("Event", "Saving Event to Firestore");
-//        Map<String, Object> eventData = new HashMap<>();
-//
-//        Task<Void> saveTask;
-//
-//        if (eventId == null) {
-////            Log.d("Event", "EventID null");
-//            // Generate a new Event ID and then save the data
-//            saveTask = getNewEventID()
-//                    .continueWithTask(newEventIDTask -> {
-//                        if (!newEventIDTask.isSuccessful() || newEventIDTask.getResult() == null) {
-//                            throw new Exception("Failed to generate new Event ID");
-//                        }
-//                        String new_eventID = newEventIDTask.getResult();
-////                        Log.d("Event", "New EventID: " + new_eventID);
-//                        eventData.put("eventId", new_eventID);
-//                        this.eventId = new_eventID;
-//
-//                        // Populate remaining fields
-//                        populateEventData(eventData);
-//
-//                        // Save the data to Firestore
-//                        return db.collection("Events").document(new_eventID).set(eventData);
-//                    });
-//        } else {
-//            Log.d("Event", "EventID: " + eventId);
-//            eventData.put("eventId", eventId);
-//            populateEventData(eventData);
-//            saveTask = db.collection("Events").document(eventId).set(eventData);
-//        }
-//
-//        return saveTask
-//                .addOnSuccessListener(aVoid -> Log.d("Event", "Event data successfully saved to Firestore."))
-//                .addOnFailureListener(e -> Log.e("Event", "Error saving event data to Firestore", e));
-//    }
-
-
-    private void populateEventData(Map<String, Object> eventData) {
+        else{
+            eventData.put("eventId", eventId);
+        }
+        if(canceledParticipantIds.contains("User1"))
+            Log.d("Saving Event", "User1 rejected");
+        Log.d("Event", "EventID: " + eventId);
         eventData.put("eventTitle", eventTitle);
         eventData.put("description", description);
         eventData.put("imageUrl", imageUrl);
         eventData.put("timestamp", timestamp);
+//        eventData.put("location", location != null ? location.toString() : null);
         eventData.put("location", address);
         eventData.put("maxParticipants", maxParticipants);
+//        eventData.put("waitingparticipantIds",waitingList.getWaitingParticipantIds());
+//        eventData.put("acceptedParticipantIds", waitingList.getAcceptedParticipantIds());
+//        eventData.put("canceledParticipantIds", waitingList.getCanceledParticipantIds());
+//        eventData.put("signedUpParticipantIds", waitingList.getSignedUpParticipantIds());
+        // temporary fix to get test data working
         eventData.put("waitingparticipantIds", waitingparticipantIds);
         eventData.put("acceptedParticipantIds", acceptedParticipantIds);
         eventData.put("canceledParticipantIds", canceledParticipantIds);
         eventData.put("signedUpParticipantIds", signedUpParticipantIds);
-        eventData.put("declinedParticipantIds", declinedParticipantIds);
+//        eventData.put("waitingList", waitingList.getEntrantIds());
         eventData.put("organizerId", organizerId);
+        // Save or update the event data in Firestore
+        return db.collection("Events").document(eventId)
+                .set(eventData)
+                .addOnSuccessListener(aVoid -> {
+                    System.out.println("Event data successfully saved to Firestore.");
+                })
+                .addOnFailureListener(e -> {
+                    System.out.println("Error saving event data to Firestore: " + e.getMessage());
+                });
     }
 
     /**
@@ -456,10 +375,10 @@ public class Event {
         return db.collection("Events").document(eventId)
                 .set(eventData)
                 .addOnSuccessListener(aVoid -> {
-//                    Log.d("Event", "Event data successfully updated in Firestore.");
+                    Log.d("Event", "Event data successfully updated in Firestore.");
                 })
                 .addOnFailureListener(e -> {
-//                    Log.e("Event", "Error updating event data in Firestore: " + e.getMessage());
+                    Log.e("Event", "Error updating event data in Firestore: " + e.getMessage());
                 });
     }
 
@@ -522,40 +441,24 @@ public class Event {
      * geenrate new event id
      * @return
      */
-//    public Task<String> getNewEventID() {
-//        return db.collection("Events").get()
-//                .continueWith(task -> {
-//                    if (task.isSuccessful() && task.getResult() != null) {
-//                        int newIdNumber = task.getResult().size() + 1;
-//                        return "eventID" + newIdNumber;
+    private String getNewEventID(){
+        final String[] eventIDString = {""};
+        db.collection("Events").get().addOnCompleteListener(new
+        OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    eventIDString[0] = String.valueOf((task.getResult().size()) +1);
+                }
 //                    } else {
-//                        String errorMessage = "Failed to fetch event count";
-//                        if (task.getException() != null) {
-//                            throw new Exception(errorMessage, task.getException());
-//                        } else {
-//                            throw new Exception(errorMessage);
-//                        }
+//                        Toast.makeTesxt(getContext(),"Error : " +
+//                                e.toString(),Toast.LENGHT_LONG).show;
 //                    }
-//                });
-//    }
-    public Task<String> getNewEventID() {
-        Task<QuerySnapshot> queryTask = db.collection("Events").get();
-        if (queryTask == null) {
-            return Tasks.forException(new NullPointerException("Firestore query returned null"));
-        }
-        return queryTask.continueWith(task -> {
-            if (!task.isSuccessful() || task.getResult() == null) {
-                throw task.getException() != null
-                        ? task.getException()
-                        : new Exception("Failed to fetch event count");
             }
-            int newIdNumber = task.getResult().size() + 1;
-            return "eventID" + newIdNumber;
         });
+        eventIDString[0] = "Event"+eventIDString[0];
+        return eventIDString[0];
     }
-
-
-
 
 
     /**
@@ -599,63 +502,5 @@ public class Event {
         return declinedParticipantIds;
     }
 
-    /**
-     * Manually setting the firestore
-     *
-     * @param mockFirestore
-     */
-    public void setFirestore(FirebaseFirestore mockFirestore) {
-        db = mockFirestore;
-    }
 
-
-    /**
-     * This function is more of a stop gap measure for the HomeFragment in displaying the Users Events
-     * A Event that relates to the User means that the User is in some list for the event
-     *
-     * @param userId
-     * @param onSuccess
-     * @param onFailure
-     */
-    public static void getUserEvents(String userId, OnSuccessListener<List<Event>> onSuccess, OnFailureListener onFailure) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        db.collection("Events")
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    List<Event> userEvents = new ArrayList<>();
-                    for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
-                        Event event = doc.toObject(Event.class);
-                        if (event != null &&
-                                (event.getAcceptedParticipantIds().contains(userId)
-                                        || event.getWaitingParticipantIds().contains(userId)
-                                        || event.getCanceledParticipantIds().contains(userId)
-                                        || event.getSignedUpParticipantIds().contains(userId))) {
-                            userEvents.add(event);
-                        }
-                    }
-                    onSuccess.onSuccess(userEvents);
-                })
-                .addOnFailureListener(onFailure);
-    }
-
-    //get organizer event
-    public static void getOragnizerEvents(String userId, OnSuccessListener<List<Event>> onSuccess, OnFailureListener onFailure) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        db.collection("Events")
-                .whereEqualTo("organizerId",userId)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    List<Event> userEvents = new ArrayList<>();
-                    for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
-                        Event event = doc.toObject(Event.class);
-                        if (event != null) {
-                            userEvents.add(event);
-                        }
-                    }
-                    onSuccess.onSuccess(userEvents);
-                })
-                .addOnFailureListener(onFailure);
-    }
 }

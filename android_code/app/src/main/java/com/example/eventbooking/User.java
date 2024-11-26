@@ -1,25 +1,22 @@
 package com.example.eventbooking;
 
-import static android.app.PendingIntent.getActivity;
-
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
 import android.util.Log;
+
 import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.firestore.SetOptions;
+
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,12 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
-import android.location.Location;
-import com.google.firebase.firestore.GeoPoint;
-import android.Manifest;
-import android.content.Context;
+
 
 /**
  * The User class where we are storing the data and is the main model for User.
@@ -50,7 +42,7 @@ public class User {
     private String deviceId;//changed from int to string here
     private String email;
     private String phoneNumber;
-    private GeoPoint geolocation;
+
     // profile picture
     private String profilePictureUrl;
     private String defaultprofilepictureurl;
@@ -66,7 +58,6 @@ public class User {
     //Firebase
     public StorageReference storageReference;
     FirebaseFirestore db;
-
 
     /**
      * This constructor is used to instantiate lists inside of the class so when calling them
@@ -144,13 +135,6 @@ public class User {
     }
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
-    }
-
-    public GeoPoint getGeolocation() {
-        return geolocation;
-    }
-    public void setGeolocation(GeoPoint geolocation) {
-        this.geolocation = geolocation;
     }
 
     public String getProfilePictureUrl() {
@@ -298,7 +282,10 @@ public class User {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
         byte[] byteArray = byteArrayOutputStream.toByteArray();
+
         // Upload image to Firebase Storage and save the URL
+
+
         return uploadDefaultImageToFirebaseStorage(byteArray);
     }
 
@@ -349,24 +336,19 @@ public class User {
         Log.d("User", "User ID: " + defaultprofilepictureurl);
         final String[] new_userID = {deviceId};
         if(deviceId == null){
-            Log.d("User", "User ID is null");
             getNewUserID(new OnUserIDGenerated() {
                 @Override
                 public void onUserIDGenerated(String userID) {
                     if (userID != null) {
-                        deviceId = userID;
-                        userData.put("eventId", deviceId);
-                        saveDataToFirestore(userData);
-//                        new_userID[0] = userID;
+                        new_userID[0] = userID;
                         Log.d("New User", userID);
                     } else {
                         // Handle the error if userID is null
                         Log.e("New User", "Failed to generate user ID.");
-                        Log.d("New User", "Failed to generate user ID");
                     }
                 }
             });
-            Log.d("User", "User ID generated to be: " + new_userID[0]);
+
             userData.put("deviceId", new_userID[0]);
             this.deviceId = new_userID[0];
         }
@@ -389,7 +371,6 @@ public class User {
         userData.put("notificationAsk", notificationAsk);
         userData.put("geolocationAsk", geolocationAsk);
         userData.put("roles", roles);
-        userData.put("geolocation", geolocation);
 
         // Save data under "Users" collection and return the Task
         return db.collection("Users").document(deviceId)
@@ -444,7 +425,6 @@ public class User {
         userData.put("facilityAssociated", facilityAssociated);
         userData.put("notificationAsk", notificationAsk);
         userData.put("geolocationAsk", geolocationAsk);
-        userData.put("geolocation", geolocation);
         userData.put("roles", roles);
 
         // Save data under "Users" collection and return the Task
@@ -613,31 +593,27 @@ public class User {
      * @param callback
      */
     public void getNewUserID(final OnUserIDGenerated callback) {
-        Log.d("User", "Generating new user ID");
         db.collection("Users").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
+                    // Calculate the new user ID by adding 1 to the current size
                     int newUserID = task.getResult().size() + 1;
+
+                    // Create the final user ID with deviceID prefix
                     String userID = "deviceID" + newUserID;
+
+                    // Pass the user ID to the callback
                     callback.onUserIDGenerated(userID);
+
+                    // Log the user ID
                     Log.d("New User", "Generated user ID: " + userID);
                 } else {
                     // Handle error if necessary
-                    Log.d("New User", "Error getting new user ID");
                     Log.e("Firebase", "Error getting documents: ", task.getException());
                     callback.onUserIDGenerated(null); // Notify callback about failure
                 }
             }
         });
     }
-
-
-
-
-
-
-
-
-
 }

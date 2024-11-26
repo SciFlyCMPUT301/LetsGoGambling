@@ -2,14 +2,12 @@ package com.example.eventbooking.Testing;
 
 import android.net.Uri;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.example.eventbooking.Events.EventData.Event;
-import com.example.eventbooking.Facility;
-import com.example.eventbooking.User;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.firestore.*;
-import com.google.firebase.storage.*;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
 import java.util.HashMap;

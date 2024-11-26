@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -37,9 +36,7 @@ public class ViewEventsFragment extends Fragment {
     private EventViewAdapter eventAdapter;
     private UserManager userManager;
     private ArrayList<Event> eventList;
-    private boolean testing = false;
     private ListView eventListView;
-    private Button addFacilityButton, backButton;
     private FirebaseFirestore db;
 
 
@@ -65,7 +62,6 @@ public class ViewEventsFragment extends Fragment {
 //        backButton = view.findViewById(R.id.button_back_home);
         eventList = new ArrayList<>();
         eventListView = view.findViewById(R.id.event_list);
-        addFacilityButton = view.findViewById(R.id.add_event_button);
         adminGoBack = view.findViewById(R.id.admin_go_back);
 
         db = FirebaseFirestore.getInstance();
@@ -78,7 +74,7 @@ public class ViewEventsFragment extends Fragment {
         eventListView.setOnItemClickListener((parent, view1, position, id) -> {
             Event selectedEvent = eventList.get(position);
             openEventDetailPage(selectedEvent);
-            });
+        });
 
         // Set click listener for admin go back button
         adminGoBack.setOnClickListener(v -> {

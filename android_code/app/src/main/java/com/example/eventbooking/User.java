@@ -298,10 +298,7 @@ public class User {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
         byte[] byteArray = byteArrayOutputStream.toByteArray();
-
         // Upload image to Firebase Storage and save the URL
-
-
         return uploadDefaultImageToFirebaseStorage(byteArray);
     }
 

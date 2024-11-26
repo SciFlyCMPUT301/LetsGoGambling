@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
@@ -18,10 +19,6 @@ import com.example.eventbooking.profile.ProfileFragment;
  * to the ProfileFragment or HomeFragment.
  */
 public class NotificationFragment extends Fragment {
-    // Constant for argument key if we want to pass an integer value to this fragment
-    private static final String ARG_INTEGER = "arg_integer";
-    // Variable to hold the received integer argument
-    private int receivedInteger;
     /**
      * Creates a new instance of NotificationFragment.
      *
@@ -46,7 +43,7 @@ public class NotificationFragment extends Fragment {
         super.onCreate(savedInstanceState);
         // Retrieve the integer from arguments
         if (getArguments() != null) {
-            receivedInteger = getArguments().getInt(ARG_INTEGER);
+           // receivedInteger = getArguments().getInt(ARG_INTEGER);
         }
     }
     /**
@@ -64,32 +61,26 @@ public class NotificationFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_notification, container, false);
-        // Retrieve the TextView that will display the integer value
-        TextView integerTextView = rootView.findViewById(R.id.notification_text);
-        // Set the text to display the received integer
-        integerTextView.setText("Integer: " + receivedInteger);
-        // Retrieve the TextView for the page title (currently unused)
-        TextView page_name = rootView.findViewById(R.id.notification_title);
-        // Set up the Profile button to navigate to ProfileFragment
 
         Button profileButton = rootView.findViewById(R.id.button_back_profile);
         profileButton.setOnClickListener(v -> {
-            // Navigate back to HomeFragment
             // Replace the current fragment with ProfileFragment
             getParentFragmentManager().beginTransaction()
                     .replace(R.id.fragment_container, new ProfileFragment())
                     .commit();
         });
 
+        ListView notificationList = rootView.findViewById(R.id.notification_list);
+
 
         // Set up the Back button to navigate to HomeFragment
-        Button backButton = rootView.findViewById(R.id.button_back_home);
-        backButton.setOnClickListener(v -> {
-            // Replace the current fragment with HomeFragment
-            getParentFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new HomeFragment())
-                    .commit();
-        });
+//        Button backButton = rootView.findViewById(R.id.button_back_home);
+//        backButton.setOnClickListener(v -> {
+//            // Replace the current fragment with HomeFragment
+//            getParentFragmentManager().beginTransaction()
+//                    .replace(R.id.fragment_container, new HomeFragment())
+//                    .commit();
+//        });
 // Return the root view to be displayed
         return rootView;
     }

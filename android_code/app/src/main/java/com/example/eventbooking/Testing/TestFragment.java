@@ -409,9 +409,7 @@ public class TestFragment extends Fragment {
 
         if (qrCodeBitmap != null) {
             QRCode.setImageBitmap(qrCodeBitmap);
-
             qrCodeGenerator.saveQRCode(qrCodeBitmap, event);
-
             Toast.makeText(getContext(), "QR code generated and saved.", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(getContext(), "Failed to generate QR code.", Toast.LENGTH_SHORT).show();

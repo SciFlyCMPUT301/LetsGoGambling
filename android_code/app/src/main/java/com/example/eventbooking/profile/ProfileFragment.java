@@ -93,15 +93,15 @@ public class ProfileFragment extends Fragment {
             setEditMode(true);
         }
 
-//        pickImageLauncher = registerForActivityResult(
-//                new ActivityResultContracts.StartActivityForResult(),
-//                result -> {
-//                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
-//                        selectedImageUri = result.getData().getData();
-//                        currentUser.uploadImage(selectedImageUri);
-//                        userImage.setImageURI(selectedImageUri);
-//                    }
-//                });
+        pickImageLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                        selectedImageUri = result.getData().getData();
+                        currentUser.uploadImage(selectedImageUri);
+                        userImage.setImageURI(selectedImageUri);
+                    }
+                });
 
         return view;
     }
@@ -162,9 +162,8 @@ public class ProfileFragment extends Fragment {
 //            String profileURL = currentUser.defaultProfilePictureUrl(currentUser.getUsername()).toString();
 //            currentUser.setdefaultProfilePictureUrl(profileURL);
 //            currentUser.setProfilePictureUrl(profileURL);
-
         }
-        isNewUser = false;
+
 
         currentUser.saveUserDataToFirestore().addOnSuccessListener(aVoid -> {
             Toast.makeText(getContext(), "Profile saved successfully.", Toast.LENGTH_SHORT).show();
@@ -182,7 +181,7 @@ public class ProfileFragment extends Fragment {
             goToHome();
 
         }).addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to save profile.", Toast.LENGTH_SHORT).show());
-
+        isNewUser = false;
     }
 
     private void toggleEditMode() {

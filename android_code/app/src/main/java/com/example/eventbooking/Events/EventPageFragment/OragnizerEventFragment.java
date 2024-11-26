@@ -27,6 +27,7 @@ import com.example.eventbooking.Home.HomeUserEventAdapter;
 import com.example.eventbooking.R;
 import com.example.eventbooking.User;
 import com.example.eventbooking.UserManager;
+import com.example.eventbooking.Events.EventView.OrganizerEventDetailFragment;
 import com.example.eventbooking.firebase.FirestoreAccess;
 import com.example.eventbooking.waitinglist.OrganizerMenuFragment;
 import com.example.eventbooking.waitinglist.WaitingList;
@@ -58,13 +59,22 @@ public class OragnizerEventFragment  extends Fragment{
      * @param userId
      * @return
      */
-    public static HomeFragment newInstance(String userId) {
-        HomeFragment fragment = new HomeFragment();
+//    public static HomeFragment newInstance(String userId) {
+//        HomeFragment fragment = new HomeFragment();
+//        Bundle args = new Bundle();
+//        args.putString("userId", userId);
+//        fragment.setArguments(args);
+//        return fragment;
+//    }
+    public static OragnizerEventFragment newInstance(String userId) {
+        OragnizerEventFragment fragment = new OragnizerEventFragment();
         Bundle args = new Bundle();
         args.putString("userId", userId);
         fragment.setArguments(args);
         return fragment;
     }
+
+
 
     /**
      * Inflates the fragment layout, initializes UI components, and sets up button click listeners for navigation.
@@ -79,46 +89,46 @@ public class OragnizerEventFragment  extends Fragment{
      *
      * @return
      */
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Log.d("Home Fragment", "Home Fragment Launch");
+        Log.d("HomeFragment", "Organizer Event Fragment Launch");
 
+        // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_home, container, false);
 
         ListView usersEventListView = rootView.findViewById(R.id.user_events_list);
         String currentUserId = UserManager.getInstance().getUserId();
 
-        Event.getOragnizerEvents(currentUserId, userEvents -> {
-            HomeUserEventAdapter adapter = new HomeUserEventAdapter(getContext(), userEvents, currentUserId);
+        // Fetch events for the organizer
+        Event.getOragnizerEvents(currentUserId, organizerEvents -> {
+            HomeUserEventAdapter adapter = new HomeUserEventAdapter(getContext(), organizerEvents, currentUserId);
             usersEventListView.setAdapter(adapter);
 
-            // Set item click listener
+            // Set item click listener to navigate to EventViewFragment
             usersEventListView.setOnItemClickListener((parent, view, position, id) -> {
-                Event selectedEvent = userEvents.get(position);
-                EventViewFragment eventViewFragment = EventViewFragment.newInstance(selectedEvent.getEventId(), currentUserId);
-
+                Event selectedEvent = organizerEvents.get(position);
+               // EventViewFragment eventViewFragment = EventViewFragment.newInstance(selectedEvent.getEventId(), currentUserId);
+                OrganizerEventDetailFragment eventDetailView = OrganizerEventDetailFragment.newInstance(selectedEvent.getEventId(), currentUserId);
                 getParentFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, eventViewFragment)
-                        .addToBackStack(null) // Ensures returning to HomeFragment
+                        .replace(R.id.fragment_container, eventDetailView)
+                        .addToBackStack(null) // Ensures returning to OragnizerEventFragment
                         .commit();
             });
         }, e -> {
-            Log.e("HomeFragment", "Failed to fetch events: " + e.getMessage());
+            Log.e("OragnizerEventFragment", "Failed to fetch events: " + e.getMessage());
         });
-
+        // Button to create a new event
         Button addEventButton = rootView.findViewById(R.id.btn_add_event);
         addEventButton.setVisibility(View.VISIBLE);
-        addEventButton.setOnClickListener(v->{
+        addEventButton.setOnClickListener(v -> {
             EventCreateFragment eventCreateFragment = new EventCreateFragment();
             getParentFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container,eventCreateFragment)
+                    .replace(R.id.fragment_container, eventCreateFragment)
                     .addToBackStack(null)
                     .commit();
         });
-
-
-
 
         return rootView;
     }

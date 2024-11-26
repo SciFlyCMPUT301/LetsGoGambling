@@ -1,5 +1,9 @@
 package com.example.eventbooking.Events.EventData;
 
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.net.Uri;
 import android.os.UserManager;
 import android.provider.ContactsContract;
@@ -10,6 +14,7 @@ import androidx.annotation.NonNull;
 
 import com.example.eventbooking.Location;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +37,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -39,6 +45,7 @@ import com.google.firebase.storage.UploadTask;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * The Event class represents an event in the system, encapsulating details such as title,
@@ -52,7 +59,8 @@ public class Event {
     private String description;
     private String imageUrl; // URL of the event image in Firebase Storage
     private long timestamp; // Event time in milliseconds
-//    private Location location;
+    private String eventPictureUrl;
+    private String defaultEventpictureurl;
 
     private String address;
     private String location;
@@ -63,6 +71,9 @@ public class Event {
     private List<String> signedUpParticipantIds;
     private List<String> enrolledParticipantIds;
     private List<String> declinedParticipantIds;
+   // private String defaultEventpictureurl;
+    //private String customImageUrl;
+
     private WaitingList waitingList;
     private String organizerId;
     private FirebaseFirestore db;
@@ -335,67 +346,67 @@ public class Event {
      *
      * @return A task representing the asynchronous save operation.
      */
-    public Task<Void> saveEventDataToFirestore() {
-        if (eventId == null) {
-            return getNewEventID().continueWithTask(newEventIDTask -> {
-                if (!newEventIDTask.isSuccessful() || newEventIDTask.getResult() == null) {
-                    throw new Exception("Failed to generate new Event ID");
-                }
-                String newEventID = newEventIDTask.getResult();
-                this.eventId = newEventID;
-
-                Map<String, Object> eventData = new HashMap<>();
-                eventData.put("eventId", newEventID);
-                populateEventData(eventData);
-
-                return db.collection("Events").document(newEventID).set(eventData);
-            });
-        } else {
-            Map<String, Object> eventData = new HashMap<>();
-            eventData.put("eventId", eventId);
-            populateEventData(eventData);
-
-            return db.collection("Events").document(eventId).set(eventData);
-        }
-    }
-
-
 //    public Task<Void> saveEventDataToFirestore() {
-////        Log.d("Event", "Saving Event to Firestore");
-//        Map<String, Object> eventData = new HashMap<>();
-//
-//        Task<Void> saveTask;
-//
 //        if (eventId == null) {
-////            Log.d("Event", "EventID null");
-//            // Generate a new Event ID and then save the data
-//            saveTask = getNewEventID()
-//                    .continueWithTask(newEventIDTask -> {
-//                        if (!newEventIDTask.isSuccessful() || newEventIDTask.getResult() == null) {
-//                            throw new Exception("Failed to generate new Event ID");
-//                        }
-//                        String new_eventID = newEventIDTask.getResult();
-////                        Log.d("Event", "New EventID: " + new_eventID);
-//                        eventData.put("eventId", new_eventID);
-//                        this.eventId = new_eventID;
+//            return getNewEventID().continueWithTask(newEventIDTask -> {
+//                if (!newEventIDTask.isSuccessful() || newEventIDTask.getResult() == null) {
+//                    throw new Exception("Failed to generate new Event ID");
+//                }
+//                String newEventID = newEventIDTask.getResult();
+//                this.eventId = newEventID;
 //
-//                        // Populate remaining fields
-//                        populateEventData(eventData);
+//                Map<String, Object> eventData = new HashMap<>();
+//                eventData.put("eventId", newEventID);
+//                populateEventData(eventData);
 //
-//                        // Save the data to Firestore
-//                        return db.collection("Events").document(new_eventID).set(eventData);
-//                    });
+//                return db.collection("Events").document(newEventID).set(eventData);
+//            });
 //        } else {
-//            Log.d("Event", "EventID: " + eventId);
+//            Map<String, Object> eventData = new HashMap<>();
 //            eventData.put("eventId", eventId);
 //            populateEventData(eventData);
-//            saveTask = db.collection("Events").document(eventId).set(eventData);
-//        }
 //
-//        return saveTask
-//                .addOnSuccessListener(aVoid -> Log.d("Event", "Event data successfully saved to Firestore."))
-//                .addOnFailureListener(e -> Log.e("Event", "Error saving event data to Firestore", e));
+//            return db.collection("Events").document(eventId).set(eventData);
+//        }
 //    }
+
+
+    public Task<Void> saveEventDataToFirestore() {
+        Log.d("Event", "Saving Event to Firestore");
+        Map<String, Object> eventData = new HashMap<>();
+
+        Task<Void> saveTask;
+
+        if (eventId == null) {
+            Log.d("Event", "EventID null");
+            // Generate a new Event ID and then save the data
+            saveTask = getNewEventID()
+                    .continueWithTask(newEventIDTask -> {
+                        if (!newEventIDTask.isSuccessful() || newEventIDTask.getResult() == null) {
+                            throw new Exception("Failed to generate new Event ID");
+                        }
+                        String new_eventID = newEventIDTask.getResult();
+                        Log.d("Event", "New EventID: " + new_eventID);
+                        eventData.put("eventId", new_eventID);
+                        this.eventId = new_eventID;
+
+                        // Populate remaining fields
+                        populateEventData(eventData);
+
+                        // Save the data to Firestore
+                        return db.collection("Events").document(new_eventID).set(eventData);
+                    });
+        } else {
+            Log.d("Event", "EventID: " + eventId);
+            eventData.put("eventId", eventId);
+            populateEventData(eventData);
+            saveTask = db.collection("Events").document(eventId).set(eventData);
+        }
+
+        return saveTask
+                .addOnSuccessListener(aVoid -> Log.d("Event", "Event data successfully saved to Firestore."))
+                .addOnFailureListener(e -> Log.e("Event", "Error saving event data to Firestore", e));
+    }
 
 
     private void populateEventData(Map<String, Object> eventData) {
@@ -411,6 +422,11 @@ public class Event {
         eventData.put("signedUpParticipantIds", signedUpParticipantIds);
         eventData.put("declinedParticipantIds", declinedParticipantIds);
         eventData.put("organizerId", organizerId);
+        //eventData.put("eventPictureUrl",eventPictureUrl);
+        //eventData.put("defaultEventpictureurl",defaultEventpictureurl);
+
+
+
     }
 
     /**
@@ -439,6 +455,8 @@ public class Event {
         this.acceptedParticipantIds = newAcceptedParticipantIds;
         this.canceledParticipantIds = newCanceledParticipantIds;
         this.signedUpParticipantIds = newSignedUpParticipantIds;
+
+
         // Prepare the updated event data map
         Map<String, Object> eventData = new HashMap<>();
         eventData.put("eventId", eventId);
@@ -451,6 +469,9 @@ public class Event {
         eventData.put("canceledParticipantIds", canceledParticipantIds);
         eventData.put("signedUpParticipantIds", signedUpParticipantIds);
         eventData.put("organizerId", organizerId);
+        eventData.put("imageUrl",imageUrl);
+
+        //eventData.put("customeImage",customImageUrl);
 
         // Save or update the event data in Firestore
         return db.collection("Events").document(eventId)
@@ -463,60 +484,60 @@ public class Event {
                 });
     }
 
-    /***
-     * upload the evnet poster to the firebase
-     * @param picture
-     */
-    public void uploadEventPosterToFirebase(String picture) {
-        if (eventId == null || eventId.isEmpty()) {
-            throw new IllegalArgumentException("Event ID must be set before uploading an event poster.");
-        }
-        if (picture == null || picture.isEmpty()) {
-            throw new IllegalArgumentException("Invalid picture path.");
-        }
-
-        StorageReference storageRef = storage.getReference();
-
-        // Create a unique filename for the picture
-        String fileName = "event_poster_" + System.currentTimeMillis() + ".jpg";
-        StorageReference posterRef = storageRef.child("Events/" + eventId + "/event_poster/" + fileName);
-
-        // Convert the picture path to a Uri
-        Uri fileUri = Uri.fromFile(new File(picture));
-
-        // Start the upload task
-        UploadTask uploadTask = posterRef.putFile(fileUri);
-        uploadTask.addOnSuccessListener(taskSnapshot -> {
-            // Get the download URL after the upload is successful
-            posterRef.getDownloadUrl().addOnSuccessListener(uri -> {
-                imageUrl = uri.toString();
-                System.out.println("Event Poster uploaded successfully: " + imageUrl);
-                Map<String, Object> updates = new HashMap<>();
-                updates.put("imageUrl", imageUrl);
-
-                db.collection("Events").document(eventId)
-                        .update(updates)
-                        .addOnSuccessListener(aVoid -> {
-                            System.out.println("Image URL successfully updated in Firestore.");
-                        })
-                        .addOnFailureListener(e -> {
-                            System.out.println("Error updating image URL in Firestore: " + e.getMessage());
-                        });
-            }).addOnFailureListener(exception -> {
-                throw new IllegalArgumentException("Failed to retrieve download URL from Firebase.", exception);
-            });
-        }).addOnFailureListener(exception -> {
-            throw new IllegalArgumentException("Failed to upload the event poster to Firebase.", exception);
-        });
-    }
+//    /***
+//     * upload the evnet poster to the firebase
+//     * @param picture
+//     */
+//    public void uploadEventPosterToFirebase(String picture) {
+//        if (eventId == null || eventId.isEmpty()) {
+//            throw new IllegalArgumentException("Event ID must be set before uploading an event poster.");
+//        }
+//        if (picture == null || picture.isEmpty()) {
+//            throw new IllegalArgumentException("Invalid picture path.");
+//        }
+//
+//        StorageReference storageRef = storage.getReference();
+//
+//        // Create a unique filename for the picture
+//        String fileName = "event_poster_" + System.currentTimeMillis() + ".jpg";
+//        StorageReference posterRef = storageRef.child("Events/" + eventId + "/event_poster/" + fileName);
+//
+//        // Convert the picture path to a Uri
+//        Uri fileUri = Uri.fromFile(new File(picture));
+//
+//        // Start the upload task
+//        UploadTask uploadTask = posterRef.putFile(fileUri);
+//        uploadTask.addOnSuccessListener(taskSnapshot -> {
+//            // Get the download URL after the upload is successful
+//            posterRef.getDownloadUrl().addOnSuccessListener(uri -> {
+//                imageUrl = uri.toString();
+//                System.out.println("Event Poster uploaded successfully: " + imageUrl);
+//                Map<String, Object> updates = new HashMap<>();
+//                updates.put("imageUrl", imageUrl);
+//
+//                db.collection("Events").document(eventId)
+//                        .update(updates)
+//                        .addOnSuccessListener(aVoid -> {
+//                            System.out.println("Image URL successfully updated in Firestore.");
+//                        })
+//                        .addOnFailureListener(e -> {
+//                            System.out.println("Error updating image URL in Firestore: " + e.getMessage());
+//                        });
+//            }).addOnFailureListener(exception -> {
+//                throw new IllegalArgumentException("Failed to retrieve download URL from Firebase.", exception);
+//            });
+//        }).addOnFailureListener(exception -> {
+//            throw new IllegalArgumentException("Failed to upload the event poster to Firebase.", exception);
+//        });
+//    }
 
     /**
      * update the event poster to firebase
      * @param newPoster
      */
-    public void updateEventPosterToFirebase(String newPoster) {
-        uploadEventPosterToFirebase(newPoster);
-    }
+//    public void updateEventPosterToFirebase(String newPoster) {
+//        uploadEventPosterToFirebase(newPoster);
+//    }
 
     /**
      * geenrate new event id
@@ -658,4 +679,139 @@ public class Event {
                 })
                 .addOnFailureListener(onFailure);
     }
+
+    //poster stuff
+    //generat edeafult poster
+    public Bitmap generateDefaultPoster(String eventTitle) {
+        String letter = (eventTitle == null || eventTitle.isEmpty()) ? "E" : String.valueOf(eventTitle.charAt(0)).toUpperCase();
+        int size = 300; // Larger size for poster
+        Bitmap bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        Paint paint = new Paint();
+        paint.setAntiAlias(true);
+        paint.setColor(Color.rgb((int) (Math.random() * 256), (int) (Math.random() * 256), (int) (Math.random() * 256)));
+        canvas.drawRect(0, 0, size, size, paint);
+        paint.setColor(Color.WHITE);
+        paint.setTextSize(100);
+        paint.setTextAlign(Paint.Align.CENTER);
+        float yPos = (canvas.getHeight() / 2) - ((paint.descent() + paint.ascent()) / 2);
+        canvas.drawText(letter, size / 2, yPos, paint);
+
+
+        return bitmap;
+    }
+    public Task<Void> uploadDefaultPoster(String eventTitle) {
+        Bitmap bitmap = generateDefaultPoster(eventTitle);
+
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+        byte[] byteArray = byteArrayOutputStream.toByteArray();
+
+
+        return uploadPosterToFirebaseStorage(byteArray, "default_posters");
+    }
+
+
+    public Task<Void> uploadPosterToFirebaseStorage(byte[] imageBytes, String folderName) {
+        String posterFileName = folderName + "/" + UUID.randomUUID().toString() + ".png";
+        StorageReference posterRef = storage.getReference().child(posterFileName);
+
+
+        return posterRef.putBytes(imageBytes)
+                .continueWithTask(task -> {
+                    if (!task.isSuccessful()) {
+                        throw task.getException();
+                    }
+                    return posterRef.getDownloadUrl();
+                })
+                .continueWithTask(task -> {
+                    if (!task.isSuccessful()) {
+                        throw task.getException();
+                    }
+                    Uri downloadUri = task.getResult();
+                    String downloadUrl = downloadUri.toString();
+                    this.imageUrl = downloadUrl;
+
+
+                    // Save the updated URL to Firestore
+                    Map<String, Object> updates = new HashMap<>();
+                    updates.put("imageUrl", downloadUrl);
+
+
+                    return db.collection("Events").document(eventId).update(updates);
+                });
+    }
+
+
+    public Task<Void> uploadCustomPoster(Uri imageUri) {
+        StorageReference posterRef = storage.getReference().child("event_posters/" + UUID.randomUUID().toString() + ".png");
+
+
+        return posterRef.putFile(imageUri)
+                .continueWithTask(task -> {
+                    if (!task.isSuccessful()) {
+                        throw task.getException();
+                    }
+                    return posterRef.getDownloadUrl();
+                })
+                .continueWithTask(downloadUriTask -> {
+                    if (!downloadUriTask.isSuccessful()) {
+                        throw downloadUriTask.getException();
+                    }
+                    this.imageUrl = downloadUriTask.getResult().toString();
+                    Map<String, Object> updates = new HashMap<>();
+                    updates.put("imageUrl", this.imageUrl);
+
+
+                    return db.collection("Events").document(eventId).update(updates);
+                })
+                .addOnSuccessListener(aVoid -> Log.d("Event", "Poster uploaded and URL updated successfully"))
+                .addOnFailureListener(e -> Log.e("Event", "Failed to upload poster or update URL", e));
+    }
+
+
+
+
+
+
+
+    // Update event poster
+    public void updateEventPoster(Uri newPosterUri) {
+        uploadCustomPoster(newPosterUri);
+    }
+
+
+    public Task<Void> deleteSelectedPosterFromFirebase(String posterUrl) {
+        StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl(posterUrl);
+
+
+        return storageRef.delete()
+                .continueWithTask(task -> {
+                    if (!task.isSuccessful()) {
+                        throw task.getException();
+                    }
+                    this.imageUrl = defaultEventpictureurl;
+                    return uploadDefaultPoster(eventTitle);
+                })
+                .addOnSuccessListener(aVoid -> Log.d("FirebaseStorage", "Poster deleted and reset to default successfully."))
+                .addOnFailureListener(e -> Log.e("FirebaseStorage", "Failed to delete or reset poster.", e));
+    }
+
+
+
+
+    /**
+     * Checks if the default URL is currently being used for the event poster.
+     *
+     * @return true if the default URL is the main one, false otherwise.
+     */
+    public boolean isDefaultPoster() {
+        return imageUrl != null && imageUrl.equals(defaultEventpictureurl);
+    }
+
+
+
 }
+
+

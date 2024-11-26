@@ -82,7 +82,6 @@ public class ViewUsersFragment extends Fragment {
                     .replace(R.id.fragment_container, new AdminFragment())
                     .commit();
         });
-
         // Set ListView item click listener
         usersListView.setOnItemClickListener((AdapterView<?> parent, View v, int position, long id) -> {
             User selectedUser = userList.get(position);

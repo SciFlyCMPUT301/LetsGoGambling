@@ -6,16 +6,20 @@ import com.example.eventbooking.Events.EventData.Event;
 import com.example.eventbooking.Facility;
 import com.example.eventbooking.Role;
 import com.example.eventbooking.User;
-import com.example.eventbooking.waitinglist.WaitingList;
 import com.google.android.gms.tasks.OnFailureListener;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
+
 
 public class SampleTable {
     public List<User> UserList = new ArrayList<>();
     public List<Facility> FacilityList = new ArrayList<>();
     public List<Event> EventList = new ArrayList<>();
+
 
     private int userUpdateCount;
     private int facilityUpdateCount;
@@ -160,7 +164,6 @@ public class SampleTable {
         }
     }
 
-
     public void saveDataToFirebase(Runnable onSuccess, OnFailureListener onFailure) {
         AtomicInteger pendingWrites = new AtomicInteger(UserList.size() + FacilityList.size() + EventList.size());
         AtomicInteger failures = new AtomicInteger(0);
@@ -200,6 +203,7 @@ public class SampleTable {
                         checkCompletion(pendingWrites, failures, onSuccess, onFailure);
                     });
         }
+
     }
 
     private void checkCompletion(AtomicInteger pendingWrites, AtomicInteger failures, Runnable onSuccess, OnFailureListener onFailure) {

@@ -13,9 +13,9 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.firestore.SetOptions;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+
 
 /**
  * The User class where we are storing the data and is the main model for User.
@@ -41,6 +42,7 @@ public class User {
     private String deviceId;//changed from int to string here
     private String email;
     private String phoneNumber;
+
     // profile picture
     private String profilePictureUrl;
     private String defaultprofilepictureurl;

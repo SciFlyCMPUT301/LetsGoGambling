@@ -2,30 +2,44 @@ package com.example.eventbooking.Testing;
 
 import android.net.Uri;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.example.eventbooking.Events.EventData.Event;
-import com.example.eventbooking.Facility;
-import com.example.eventbooking.User;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.firestore.*;
-import com.google.firebase.storage.*;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * The FirebaseTesting class provides methods to interact with Firebase services, including
+ * uploading images to Firebase Storage, storing metadata in Firestore, and loading data from Firestore.
+ * It also provides methods to test Firebase operations by loading and saving data for users, facilities, and events.
+ */
 public class FirebaseTesting {
+
     private static final String TAG = "FirebaseTesting";
     private FirebaseFirestore db;
     private FirebaseStorage storage;
 
+    /**
+     * Constructor that initializes Firebase Firestore and Firebase Storage instances.
+     */
     public FirebaseTesting() {
         db = FirebaseFirestore.getInstance();
         storage = FirebaseStorage.getInstance();
     }
 
-    // Method to upload an image to Firebase Storage and store its metadata in Firestore
+    /**
+     * Uploads an image to Firebase Storage and stores its metadata (link, usage location, and description) in Firestore.
+     *
+     * @param localImagePath Path to the image file on the local storage
+     * @param usageLocation A description of where the image will be used
+     * @param description A detailed description of the image
+     * @throws IllegalArgumentException if the image path is invalid or empty
+     */
     public void uploadImage(String localImagePath, String usageLocation, String description) {
         if (localImagePath == null || localImagePath.isEmpty()) {
             throw new IllegalArgumentException("Invalid image path.");
@@ -69,7 +83,10 @@ public class FirebaseTesting {
         });
     }
 
-    // Method to load images from Firestore and display them
+    /**
+     * Loads image data from Firestore and logs the image details (link, usage location, and description).
+     * This can be extended to display images using a UI component such as an ImageView.
+     */
     public void loadImages() {
         db.collection("Images").get()
                 .addOnCompleteListener(task -> {
@@ -79,14 +96,10 @@ public class FirebaseTesting {
                             String usageLocation = document.getString("usageLocation");
                             String description = document.getString("description");
 
-                            // Here, you can use the link to display the image in your app
+                            // Log the image details (you could display the image in your app here)
                             Log.d(TAG, "Image: " + link);
                             Log.d(TAG, "Usage Location: " + usageLocation);
                             Log.d(TAG, "Description: " + description);
-
-                            // For example, you can use an ImageView and a library like Glide or Picasso
-                            // ImageView imageView = findViewById(R.id.imageView);
-                            // Glide.with(context).load(link).into(imageView);
                         }
                     } else {
                         Log.e(TAG, "Error getting images from Firestore", task.getException());
@@ -94,7 +107,10 @@ public class FirebaseTesting {
                 });
     }
 
-    // Method to demonstrate loading and storing data
+    /**
+     * A method that demonstrates loading and saving data (users, facilities, events) in Firebase.
+     * This is intended for testing Firebase operations.
+     */
     public void testFirebaseOperations() {
         // Create a SampleTable instance and generate data
         SampleTable sampleTable = new SampleTable();
@@ -111,7 +127,9 @@ public class FirebaseTesting {
         loadEventsFromFirebase();
     }
 
-    // Method to load users from Firebase
+    /**
+     * Loads user data from the "Users" collection in Firestore and logs the user details (username, email).
+     */
     public void loadUsersFromFirebase() {
         db.collection("Users").get()
                 .addOnCompleteListener(task -> {
@@ -119,7 +137,7 @@ public class FirebaseTesting {
                         for (QueryDocumentSnapshot document : task.getResult()) {
                             String username = document.getString("username");
                             String email = document.getString("email");
-                            // Retrieve other fields as needed
+                            // Log user details
                             Log.d(TAG, "User: " + username + ", Email: " + email);
                         }
                     } else {
@@ -128,7 +146,9 @@ public class FirebaseTesting {
                 });
     }
 
-    // Method to load facilities from Firebase
+    /**
+     * Loads facility data from the "Facilities" collection in Firestore and logs the facility details (name, address).
+     */
     public void loadFacilitiesFromFirebase() {
         db.collection("facilities").get()
                 .addOnCompleteListener(task -> {
@@ -136,6 +156,7 @@ public class FirebaseTesting {
                         for (QueryDocumentSnapshot document : task.getResult()) {
                             String name = document.getString("name");
                             String address = document.getString("address");
+                            // Log facility details
                             Log.d(TAG, "Facility: " + name + ", Address: " + address);
                         }
                     } else {
@@ -144,7 +165,9 @@ public class FirebaseTesting {
                 });
     }
 
-    // Method to load events from Firebase
+    /**
+     * Loads event data from the "Events" collection in Firestore and logs the event details (eventId, eventTitle).
+     */
     public void loadEventsFromFirebase() {
         db.collection("Events").get()
                 .addOnCompleteListener(task -> {
@@ -152,6 +175,7 @@ public class FirebaseTesting {
                         for (QueryDocumentSnapshot document : task.getResult()) {
                             String eventId = document.getString("eventId");
                             String eventTitle = document.getString("eventTitle");
+                            // Log event details
                             Log.d(TAG, "Event: " + eventId + ", Title: " + eventTitle);
                         }
                     } else {

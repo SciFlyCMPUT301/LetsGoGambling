@@ -4,7 +4,7 @@
     android:padding="10dp">
 
     <ImageView
-        android:id="@+id/image_view"
+        android:id="@+id/qrcode_view"
         android:layout_width="110dp"
         android:layout_height="110dp"
         android:layout_marginRight="10dp"
@@ -14,23 +14,23 @@
         android:id="@+id/infoSection"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/image_view"
+        android:layout_toRightOf="@+id/qrcode_view"
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/collection"
+            android:id="@+id/qrcode_event"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-            android:text="Collection"
+            android:text="Event"
             android:textSize="18sp" />
 
         <TextView
-            android:id="@+id/source_id"
+            android:id="@+id/qrcode_event_id"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-            android:text="Source ID"
+            android:text="Event ID"
             android:textSize="15sp" />
     </LinearLayout>
 </RelativeLayout>

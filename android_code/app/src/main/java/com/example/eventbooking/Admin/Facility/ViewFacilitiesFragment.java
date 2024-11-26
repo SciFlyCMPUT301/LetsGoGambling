@@ -8,18 +8,15 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 
 import com.example.eventbooking.Admin.AdminFragment;
-import com.example.eventbooking.Admin.Users.EditUserFragment;
-import com.example.eventbooking.Admin.Users.UserViewAdapter;
 import com.example.eventbooking.Facility;
 import com.example.eventbooking.R;
-import com.example.eventbooking.User;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -29,12 +26,12 @@ import java.util.ArrayList;
  * This fragment loads facility data from Firestore and allows the user to view or edit facility details.
  */
 public class ViewFacilitiesFragment extends Fragment {
-    private Button adminGoBack;
+    private Button adminGoBack, removeButton;
     private FirebaseFirestore db;
     private ListView facilitiesListView;
     private FacilityViewAdapter facilityAdapter;
     private ArrayList<Facility> facilityList;
-    private Button addUFacility;
+    private Facility selectedFacility = null;
 
     /**
      * Inflates the fragment's layout and initializes components.
@@ -56,11 +53,9 @@ public class ViewFacilitiesFragment extends Fragment {
         facilitiesListView = view.findViewById(R.id.facility_list);
         facilityAdapter = new FacilityViewAdapter(getContext(), facilityList);
         facilitiesListView.setAdapter(facilityAdapter);
-        addUFacility = view.findViewById(R.id.add_facility_button);
         adminGoBack = view.findViewById(R.id.admin_go_back);
+        removeButton = view.findViewById(R.id.remove_facility_button);
 
-        adminGoBack = view.findViewById(R.id.admin_go_back);
-        addUFacility = view.findViewById(R.id.add_facility_button);
         loadFacilitiesFromFirestore();
 
 
@@ -71,11 +66,22 @@ public class ViewFacilitiesFragment extends Fragment {
                     .commit();
         });
 
-
+        // Set item click listener for ListView
         facilitiesListView.setOnItemClickListener((AdapterView<?> parent, View v, int position, long id) -> {
-            Facility selectedFacility = facilityList.get(position);
-            openFacilityDetailsFragment(selectedFacility);
+            // Store the selected facility
+            selectedFacility = facilityList.get(position);
+            Toast.makeText(getContext(), "Selected: " + selectedFacility.getName(), Toast.LENGTH_SHORT).show();
         });
+
+        // Handle Remove Button Click
+        removeButton.setOnClickListener(v -> {
+            if (selectedFacility != null) {
+                removeFacility(selectedFacility);
+            } else {
+                Toast.makeText(getContext(), "Please select a facility to remove.", Toast.LENGTH_SHORT).show();
+            }
+        });
+
         return view;
     }
 
@@ -98,25 +104,22 @@ public class ViewFacilitiesFragment extends Fragment {
     }
 
     /**
-     *  Opens the EditFacilityFragment for the selected facility to view or edit details.
+     * Removes the selected facility from Firestore and updates the ListView.
      *
-     * @param selectedFacility
+     * @param facility The selected facility to be removed.
      */
-    private void openFacilityDetailsFragment(Facility selectedFacility) {
-        FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
-        EditFacilityFragment fragment = new EditFacilityFragment();
-
-        Bundle bundle = new Bundle();
-        bundle.putString("facilityId", selectedFacility.getFacilityID());
-        Log.d("Loading Facility", "Document ID: "+ selectedFacility.getFacilityID());
-
-        fragment.setArguments(bundle);
-
-        transaction.replace(R.id.fragment_container, fragment);
-        transaction.addToBackStack(null);
-        transaction.commit();
+    private void removeFacility(Facility facility) {
+        db.collection("Facilities").document(facility.getFacilityID()).delete()
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(getContext(), "Facility removed successfully.", Toast.LENGTH_SHORT).show();
+                    // Remove the facility from the list and update the adapter
+                    facilityList.remove(facility);
+                    facilityAdapter.notifyDataSetChanged();
+                    selectedFacility = null; // Clear the selected facility
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "Failed to remove facility: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.e("ViewFacilitiesFragment", "Error removing facility", e);
+                });
     }
-
-
-
 }

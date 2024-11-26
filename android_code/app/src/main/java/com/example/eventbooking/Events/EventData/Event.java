@@ -1,40 +1,24 @@
 package com.example.eventbooking.Events.EventData;
 
 import android.net.Uri;
-import android.os.UserManager;
-import android.provider.ContactsContract;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-
-import com.example.eventbooking.Location;
-
-import java.io.File;
-import java.util.HashMap;
-import java.util.List;
-
-import com.example.eventbooking.Role;
-import com.example.eventbooking.User;
 
 import com.example.eventbooking.waitinglist.WaitingList;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 

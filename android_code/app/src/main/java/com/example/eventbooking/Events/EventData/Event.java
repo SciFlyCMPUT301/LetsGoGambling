@@ -1,5 +1,7 @@
 package com.example.eventbooking.Events.EventData;
 
+import static android.app.PendingIntent.getActivity;
+
 import android.net.Uri;
 import android.os.UserManager;
 import android.provider.ContactsContract;
@@ -14,6 +16,8 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 
+import com.example.eventbooking.MainActivity;
+import com.example.eventbooking.QRCode.QRcodeGenerator;
 import com.example.eventbooking.Role;
 import com.example.eventbooking.User;
 
@@ -67,6 +71,7 @@ public class Event {
     private String organizerId;
     private FirebaseFirestore db;
     private FirebaseStorage storage;
+    private String QRcodeHash;
     /**
      * Default constructor that initializes Firebase Firestore and Storage instances, as well as
      * participant lists.
@@ -237,6 +242,14 @@ public class Event {
      * @param location */
     public void setLocation(String location) {
         this.location = location;
+    }
+
+    public String getQRcodeHash() {
+        return QRcodeHash;
+    }
+
+    public void setQRcodeHash(String QRcodeHash) {
+        this.QRcodeHash = QRcodeHash;
     }
 
     /**
@@ -411,6 +424,11 @@ public class Event {
         eventData.put("signedUpParticipantIds", signedUpParticipantIds);
         eventData.put("declinedParticipantIds", declinedParticipantIds);
         eventData.put("organizerId", organizerId);
+        String eventUrl = "eventbooking://eventDetail?eventID=" + eventId;
+        QRcodeGenerator qrCodeGenerator = new QRcodeGenerator();
+        String QRHash = qrCodeGenerator.createQRCodeHash(eventUrl);
+        this.QRcodeHash = QRHash;
+        eventData.put("qrcodehash", QRHash);
     }
 
     /**
@@ -451,6 +469,11 @@ public class Event {
         eventData.put("canceledParticipantIds", canceledParticipantIds);
         eventData.put("signedUpParticipantIds", signedUpParticipantIds);
         eventData.put("organizerId", organizerId);
+        String eventUrl = "eventbooking://eventDetail?eventID=" + eventId;
+        QRcodeGenerator qrCodeGenerator = new QRcodeGenerator();
+        String QRHash = qrCodeGenerator.createQRCodeHash(eventUrl);
+        this.QRcodeHash = QRHash;
+        eventData.put("qrcodehash", QRHash);
 
         // Save or update the event data in Firestore
         return db.collection("Events").document(eventId)

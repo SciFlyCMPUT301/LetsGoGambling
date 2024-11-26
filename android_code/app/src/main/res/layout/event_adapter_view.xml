@@ -1,24 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
     android:paddingTop="10dp"
     android:paddingBottom="10dp">
 
+    <!-- Event Poster Image -->
     <ImageView
-        android:id="@+id/image"
+        android:id="@+id/event_poster"
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:layout_marginRight="10dp"
-        android:contentDescription="Facility Image" />
+        android:layout_alignParentStart="true"
+        android:layout_marginEnd="10dp"
+        android:contentDescription="Event Poster"
+        android:src="@drawable/ic_event_poster_placeholder" />
 
+    <!-- Event Information Section -->
     <LinearLayout
         android:id="@+id/infoSection"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/image"
-        android:orientation="vertical">
+        android:layout_toEndOf="@id/event_poster"
+        android:orientation="vertical"
+        android:paddingStart="10dp">
 
         <TextView
             android:id="@+id/event_name"
@@ -26,7 +31,8 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
             android:text="Event name"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/event_id"
@@ -49,8 +55,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="List Status" />
+
     </LinearLayout>
-
-
 
 </RelativeLayout>

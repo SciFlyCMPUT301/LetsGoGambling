@@ -545,10 +545,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-
     private void moveToFragment(Fragment movingFragment){
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, movingFragment)
                 .commit();
     }
+
 }

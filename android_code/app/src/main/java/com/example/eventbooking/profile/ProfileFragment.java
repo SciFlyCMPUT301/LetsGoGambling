@@ -75,29 +75,33 @@ public class ProfileFragment extends Fragment {
             deviceId = getArguments().getString("deviceId", UserManager.getInstance().getUserId());
         }
 
+        Log.d("Profile Fragment", "New User: " + isNewUser);
+
         initializeUI(view);
         if(isNewUser)
             hideUIButtons();
 
         // Load user data
         if (!isNewUser) {
+            Log.d("Profile Fragment", "Loading User Data");
             currentUser = UserManager.getInstance().getCurrentUser();
             onProfileLoaded(currentUser);
             setEditMode(false);
         } else {
+            Log.d("Profile Fragment", "Getting New User");
             currentUser = UserManager.getInstance().getCurrentUser();
             setEditMode(true);
         }
 
-        pickImageLauncher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
-                        selectedImageUri = result.getData().getData();
-                        currentUser.uploadImage(selectedImageUri);
-                        userImage.setImageURI(selectedImageUri);
-                    }
-                });
+//        pickImageLauncher = registerForActivityResult(
+//                new ActivityResultContracts.StartActivityForResult(),
+//                result -> {
+//                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+//                        selectedImageUri = result.getData().getData();
+//                        currentUser.uploadImage(selectedImageUri);
+//                        userImage.setImageURI(selectedImageUri);
+//                    }
+//                });
 
         return view;
     }
@@ -136,6 +140,7 @@ public class ProfileFragment extends Fragment {
             geolocationSwitch.setChecked(user.isGeolocationAsk());
 
             String profilePictureUrl = user.getProfilePictureUrl();
+            Log.d("Profile Fragment", "Loading User Photo: " + profilePictureUrl);
             if (profilePictureUrl != null && !profilePictureUrl.isEmpty()) {
                 Picasso.get().load(profilePictureUrl).into(userImage);
             }
@@ -143,15 +148,23 @@ public class ProfileFragment extends Fragment {
     }
 
     private void saveUserProfile() {
+
         currentUser.setUsername(editName.getText().toString().trim());
         currentUser.setEmail(editEmail.getText().toString().trim());
         currentUser.setPhoneNumber(editPhone.getText().toString().trim());
         currentUser.setNotificationAsk(notificationsSwitch.isChecked());
         currentUser.setGeolocationAsk(geolocationSwitch.isChecked());
         if(isNewUser){
-            Log.d("Profile Fragment", "Setting new User");
-            UserManager.getInstance().setCurrentUser(currentUser);
+            currentUser.defaultProfilePictureUrl(currentUser.getUsername()).addOnSuccessListener(aVoid -> {
+                Log.d("Profile Fragment", "Setting new User");
+                UserManager.getInstance().setCurrentUser(currentUser);
+            }).addOnFailureListener(e -> Log.d("User Manager", "Failed to Update Geopoint"));
+//            String profileURL = currentUser.defaultProfilePictureUrl(currentUser.getUsername()).toString();
+//            currentUser.setdefaultProfilePictureUrl(profileURL);
+//            currentUser.setProfilePictureUrl(profileURL);
+
         }
+        isNewUser = false;
 
         currentUser.saveUserDataToFirestore().addOnSuccessListener(aVoid -> {
             Toast.makeText(getContext(), "Profile saved successfully.", Toast.LENGTH_SHORT).show();

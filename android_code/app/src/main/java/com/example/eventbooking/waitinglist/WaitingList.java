@@ -212,50 +212,29 @@ public class WaitingList {
         }
     }
 
-    /**
-     * Cancels a participant's participation, removing them from any lists they are on.
-     * This can be called when the result haven't drawn, in the event page user choose to leave waitinglist
-     * or when user wish to decline the invitation
-     * @param participantId The ID of the participant to cancel.
-     * @return A message indicating the result of the cancellation.
-     */
-    public boolean cancelParticipation(String participantId) {
-        //flag to indicate the result
-        boolean removed = false;
-        //result haven't drawn, user leave waiting list by click "leave" in event page
-        if (waitingParticipantIds.remove(participantId)) {
-            removed = true;
-        }
-        //decline invitation
-        if (acceptedParticipantIds.remove(participantId)) {
-            removed = true;
-        }
-        //if any list choose to remove the current user, add user to the canceled list
-
-        if (removed) {
-            canceledParticipantIds.add(participantId);
-            return true;
-        } else {
-            return false;
-        }
-    }
 
     /**
      * Draws a replacement from the waiting list when a participant cancels after signing up.
-     * @param repalcementSize how many replacement the organizer want to draw, should not exceed the current avaliable space
      * @return The ID of the participant who has been moved from waiting to selected, or null if none.
      */
-    public List<String> drawReplacement(int repalcementSize) {
+     public List<String> drawReplacement(int replacementSize) {
         // Calculate the number of available spots
-        int avaliableSpots = maxParticipants - signedUpParticipantIds.size();
+        int availableSpots = maxParticipants - signedUpParticipantIds.size();
 
-        if (avaliableSpots <= 0 || waitingParticipantIds.isEmpty()) {
-            return new ArrayList<>(); // No spots available or no participants to replace
+        // If no spots are available or waiting list is empty, return an empty list
+        if (availableSpots <= 0 || waitingParticipantIds.isEmpty()) {
+            return new ArrayList<>();
         }
 
-        // Determine how many replacements to draw
-        int replacementsToDraw = Math.min(avaliableSpots, waitingParticipantIds.size());
-        //drawing result
+        // Determine the actual number of replacements to draw based on constraints
+        int replacementsToDraw = Math.min(replacementSize, Math.min(availableSpots, waitingParticipantIds.size()));
+
+        // If replacementsToDraw is zero (e.g., due to constraints), return an empty list
+        if (replacementsToDraw <= 0) {
+            return new ArrayList<>();
+        }
+
+        // Draw participants and return the list of replacements
         return sampleParticipants(replacementsToDraw);
     }
 

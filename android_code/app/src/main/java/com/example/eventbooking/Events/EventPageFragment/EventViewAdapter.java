@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -14,6 +15,7 @@ import androidx.annotation.NonNull;
 import com.example.eventbooking.Events.EventData.Event;
 import com.example.eventbooking.Facility;
 import com.example.eventbooking.R;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,6 +75,7 @@ public class EventViewAdapter extends ArrayAdapter<Event> {
         TextView username = (TextView) view.findViewById(R.id.event_name);
         TextView dateJoined = (TextView) view.findViewById(R.id.date_joined);
         TextView listStatus = (TextView) view.findViewById(R.id.user_list_status);
+        ImageView eventPoster = view.findViewById(R.id.event_poster);
 
 
         deviceID.setText(event.getEventId());
@@ -96,6 +99,18 @@ public class EventViewAdapter extends ArrayAdapter<Event> {
 
         // Set the list status text
         listStatus.setText(status);
+
+        String posterUrl = event.getImageUrl();
+        if (posterUrl != null && !posterUrl.isEmpty()) {
+            Picasso.get()
+                    .load(posterUrl)
+                    .placeholder(R.drawable.ic_event_poster_placeholder) // Placeholder while loading
+                    .error(R.drawable.ic_event_poster_placeholder) // Error image if loading fails
+                    .into(eventPoster); // ImageView to load the image into
+        } else {
+            // Set a placeholder image if no URL is provided
+            eventPoster.setImageResource(R.drawable.ic_event_poster_placeholder);
+        }
 
 
 //        //get the image associated with this property

@@ -1,7 +1,6 @@
 package com.example.eventbooking.Admin.Users;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -69,24 +68,20 @@ public class EditUserFragment extends Fragment {
         organizerSwitch = view.findViewById(R.id.organizer_switch);
         adminSwitch = view.findViewById(R.id.admin_switch);
 
-        // Retrieve arguments to check if editing an existing user or creating a new one
         Bundle args = getArguments();
         if (args != null) {
             documentId = args.getString("deviceId");
             isNewUser = args.getBoolean("isNewUser", false);
-            Log.d("Edit User Fragment", "Document ID: " + documentId);
 
             if (!isNewUser) {
-                // Load existing user data
                 usernameTextView.setText(args.getString("username", "N/A"));
-                deviceIdTextView.setText(args.getString("deviceID", "N/A"));
+                deviceIdTextView.setText(args.getString("deviceId", "N/A"));
                 emailTextView.setText(args.getString("email", "N/A"));
                 phoneNumberTextView.setText(args.getString("phoneNumber", "N/A"));
                 profilePictureUrlTextView.setText(args.getString("profilePictureUrl", "N/A"));
                 locationTextView.setText(args.getString("location", "N/A"));
                 dateJoinedTextView.setText(args.getString("dateJoined", "N/A"));
 
-                // Get roles as an ArrayList and display as a comma-separated string
                 ArrayList<String> roles = args.getStringArrayList("roles");
                 if (roles != null && !roles.isEmpty()) {
                     roleTextView.setText(String.join(", ", roles));
@@ -94,19 +89,18 @@ public class EditUserFragment extends Fragment {
                     roleTextView.setText("N/A");
                 }
 
-                // Set switches based on roles
-                entrantSwitch.setChecked(roles != null && roles.contains("entrant"));
-                adminSwitch.setChecked(roles != null && roles.contains("admin"));
-                organizerSwitch.setChecked(roles != null && roles.contains("organizer"));
+                // Check roles using utility method
+                entrantSwitch.setChecked(hasRole(roles, "entrant"));
+                adminSwitch.setChecked(hasRole(roles, "admin"));
+                organizerSwitch.setChecked(hasRole(roles, "organizer"));
 
-                deleteButton.setVisibility(View.VISIBLE); // Show delete button for existing users
+                deleteButton.setVisibility(View.VISIBLE);
             } else {
-                deleteButton.setVisibility(View.GONE); // Hide delete button for new users
+                deleteButton.setVisibility(View.GONE);
             }
         }
 
         deleteButton.setOnClickListener(v -> {
-            Log.d("Edit User", "Document ID: " + documentId);
             if (documentId != null) {
                 deleteUser(documentId);
             }
@@ -117,7 +111,9 @@ public class EditUserFragment extends Fragment {
         return view;
     }
 
-
+    private boolean hasRole(ArrayList<String> roles, String role) {
+        return roles != null && roles.contains(role);
+    }
 
     /**
      * Deletes the user's document from Firebase Firestore.

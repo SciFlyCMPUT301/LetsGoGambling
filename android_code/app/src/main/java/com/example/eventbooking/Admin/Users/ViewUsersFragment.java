@@ -89,18 +89,24 @@ public class ViewUsersFragment extends Fragment {
         FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
         EditUserFragment fragment = new EditUserFragment();
         Bundle bundle = new Bundle();
+
+        // Pass user details to EditUserFragment
         bundle.putString("deviceId", selectedUser.getDeviceID());
         bundle.putString("username", selectedUser.getUsername());
         bundle.putString("email", selectedUser.getEmail());
         bundle.putString("phoneNumber", selectedUser.getPhoneNumber());
-        bundle.putString("location", selectedUser.getAddress());
+        bundle.putString("location", selectedUser.getLocation());
         bundle.putString("profilePictureUrl", selectedUser.getProfilePictureUrl());
+        if (selectedUser.getRoles() != null) {
+            bundle.putStringArrayList("roles", new ArrayList<>(selectedUser.getRoles()));
+        }
+
         fragment.setArguments(bundle);
-        // Replace current fragment with EditUserFragment and add to back stack
         transaction.replace(R.id.fragment_container, fragment);
         transaction.addToBackStack(null);
         transaction.commit();
     }
+
     /**
      * Loads users from Firestore and updates the ListView adapter.
      * Logs the device ID of each loaded user and shows an error message on failure.

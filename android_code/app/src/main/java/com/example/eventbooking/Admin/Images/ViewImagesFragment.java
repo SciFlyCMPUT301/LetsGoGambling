@@ -132,17 +132,70 @@ public class ViewImagesFragment extends Fragment {
         String documentId = imageData.get("documentId");
 
         if (collection != null && documentId != null) {
-            db.collection(collection).document(documentId).delete()
-                    .addOnSuccessListener(aVoid -> {
-                        Toast.makeText(getContext(), "Image removed successfully.", Toast.LENGTH_SHORT).show();
-                        imageList.remove(imageData);
-                        imageAdapter.notifyDataSetChanged();
-                        selectedImageData = null;
-                    })
-                    .addOnFailureListener(e -> {
-                        Log.e("ViewImagesFragment", "Error removing image: " + e.getMessage());
-                        Toast.makeText(getContext(), "Failed to remove image: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    });
+            if (collection.equals("Users")) {
+                // Fetch the defaultProfilePictureUrl and update profilePictureUrl
+                db.collection("Users").document(documentId).get()
+                        .addOnSuccessListener(documentSnapshot -> {
+                            String defaultProfilePictureUrl = documentSnapshot.getString("defaultProfilePictureUrl");
+                            if (defaultProfilePictureUrl != null && !defaultProfilePictureUrl.isEmpty()) {
+                                Map<String, Object> updates = new HashMap<>();
+                                updates.put("profilePictureUrl", defaultProfilePictureUrl); // Set to defaultProfilePictureUrl
+
+                                db.collection("Users").document(documentId).update(updates)
+                                        .addOnSuccessListener(aVoid -> {
+                                            Toast.makeText(getContext(), "Profile picture reset to default.", Toast.LENGTH_SHORT).show();
+
+                                            // Update the local list
+                                            imageList.remove(imageData);
+                                            imageAdapter.notifyDataSetChanged();
+                                            selectedImageData = null;
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Log.e("ViewImagesFragment", "Error updating profilePictureUrl: " + e.getMessage());
+                                            Toast.makeText(getContext(), "Failed to reset profile picture: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                        });
+                            } else {
+                                Toast.makeText(getContext(), "Default profile picture URL not found.", Toast.LENGTH_SHORT).show();
+                            }
+                        })
+                        .addOnFailureListener(e -> {
+                            Log.e("ViewImagesFragment", "Error fetching defaultProfilePictureUrl: " + e.getMessage());
+                            Toast.makeText(getContext(), "Failed to fetch user data.", Toast.LENGTH_SHORT).show();
+                        });
+            }
+            else if (collection.equals("Events")) {
+                // Fetch the defaultEventPosterURL and update imageUrl
+                db.collection("Events").document(documentId).get()
+                        .addOnSuccessListener(documentSnapshot -> {
+                            String defaultEventPosterURL = documentSnapshot.getString("defaultEventPosterURL");
+                            if (defaultEventPosterURL != null && !defaultEventPosterURL.isEmpty()) {
+                                Map<String, Object> updates = new HashMap<>();
+                                updates.put("imageUrl", defaultEventPosterURL); // Set to defaultEventPosterURL
+
+                                db.collection("Events").document(documentId).update(updates)
+                                        .addOnSuccessListener(aVoid -> {
+                                            Toast.makeText(getContext(), "Event poster reset to default.", Toast.LENGTH_SHORT).show();
+
+                                            // Update the local list
+                                            imageList.remove(imageData);
+                                            imageAdapter.notifyDataSetChanged();
+                                            selectedImageData = null;
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Log.e("ViewImagesFragment", "Error updating imageUrl: " + e.getMessage());
+                                            Toast.makeText(getContext(), "Failed to reset event poster: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                        });
+                            } else {
+                                Toast.makeText(getContext(), "Default event poster URL not found.", Toast.LENGTH_SHORT).show();
+                            }
+                        })
+                        .addOnFailureListener(e -> {
+                            Log.e("ViewImagesFragment", "Error fetching defaultEventPosterURL: " + e.getMessage());
+                            Toast.makeText(getContext(), "Failed to fetch event data.", Toast.LENGTH_SHORT).show();
+                        });
+            } else {
+                Toast.makeText(getContext(), "Invalid collection.", Toast.LENGTH_SHORT).show();
+            }
         } else {
             Toast.makeText(getContext(), "Invalid image data.", Toast.LENGTH_SHORT).show();
         }

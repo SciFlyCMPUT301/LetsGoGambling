@@ -34,6 +34,7 @@ public class ImageAdapter extends ArrayAdapter<Map<String, String>> {
 
         ImageView imageView = convertView.findViewById(R.id.image_view);
         TextView sourceTextView = convertView.findViewById(R.id.source_id);
+        TextView nameTextView = convertView.findViewById(R.id.source_name);
         TextView collectionTextView = convertView.findViewById(R.id.collection);
 
         // Load the image URL into the ImageView using Picasso
@@ -41,6 +42,7 @@ public class ImageAdapter extends ArrayAdapter<Map<String, String>> {
 
         // Set the source and collection information
         sourceTextView.setText(imageData.get("source"));
+        nameTextView.setText(imageData.get("documentId"));
         collectionTextView.setText(imageData.get("collection"));
 
         return convertView;

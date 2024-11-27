@@ -86,7 +86,7 @@ public class ViewImagesFragment extends Fragment {
                         if (imageUrl != null && !imageUrl.isEmpty()) {
                             Map<String, String> data = new HashMap<>();
                             data.put("imageUrl", imageUrl);
-                            data.put("source", "User: " + user.getString("deviceId"));
+                            data.put("source", "User: " + user.getString("username"));
                             data.put("documentId", user.getId());
                             data.put("collection", "Users");
                             imageList.add(data);

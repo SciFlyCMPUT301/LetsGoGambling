@@ -1,0 +1,58 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24"
+    android:tint="#000000"> <!-- Black for QR-like color -->
+
+    <!-- Outer Alignment Squares -->
+    <group>
+        <!-- Top-Left Block -->
+        <path
+            android:fillColor="@android:color/black"
+            android:pathData="M0,0h5v5h-5z M1,1h3v3h-3z" />
+
+        <!-- Top-Right Block -->
+        <path
+            android:fillColor="@android:color/black"
+            android:pathData="M19,0h5v5h-5z M20,1h3v3h-3z" />
+
+        <!-- Bottom-Left Block -->
+        <path
+            android:fillColor="@android:color/black"
+            android:pathData="M0,19h5v5h-5z M1,20h3v3h-3z" />
+    </group>
+
+    <!-- Inner Grid Squares -->
+    <group>
+        <!-- Top Section -->
+        <path
+            android:fillColor="@android:color/black"
+            android:pathData="M6,2h1v1h-1z M8,1h1v1h-1z M10,3h1v1h-1z M12,0h1v1h-1z M14,2h1v1h-1z" />
+
+        <!-- Middle Section -->
+        <path
+            android:fillColor="@android:color/black"
+            android:pathData="M6,8h1v1h-1z M7,7h1v1h-1z M9,6h1v1h-1z M11,9h1v1h-1z M13,8h1v1h-1z" />
+
+        <!-- Dense Grid at Center -->
+        <path
+            android:fillColor="@android:color/black"
+            android:pathData="M8,11h1v1h-1z M9,10h1v1h-1z M10,12h1v1h-1z M11,11h1v1h-1z M12,10h1v1h-1z M13,12h1v1h-1z" />
+
+        <!-- Bottom Section -->
+        <path
+            android:fillColor="@android:color/black"
+            android:pathData="M6,16h1v1h-1z M8,14h1v1h-1z M10,17h1v1h-1z M12,15h1v1h-1z M14,16h1v1h-1z" />
+    </group>
+
+    <!-- Random Noise Squares for Realism -->
+    <group>
+        <path
+            android:fillColor="@android:color/black"
+            android:pathData="M3,7h1v1h-1z M5,10h1v1h-1z M18,8h1v1h-1z M15,4h1v1h-1z M17,14h1v1h-1z" />
+        <path
+            android:fillColor="@android:color/black"
+            android:pathData="M2,12h1v1h-1z M7,19h1v1h-1z M9,2h1v1h-1z M13,13h1v1h-1z M16,6h1v1h-1z" />
+    </group>
+</vector>

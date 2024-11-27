@@ -1,47 +1,62 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="10dp">
+    android:padding="16dp"
+    android:background="@android:color/white">
 
+    <!-- Event Title -->
+    <TextView
+        android:id="@+id/event_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="24dp"
+        android:text="Eveny Title"
+        android:textColor="@android:color/black"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+    <!-- QR Code Image -->
     <ImageView
         android:id="@+id/qrcode_image_view"
-        android:layout_width="110dp"
-        android:layout_height="110dp"
-        android:layout_marginRight="10dp"
-        android:contentDescription="Images" />
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_below="@id/event_title"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:contentDescription="QR Code"
+        android:background="@android:color/white"
+        android:src="@drawable/qr_code_placeholder"
+        android:padding="8dp" />
 
-    <LinearLayout
-        android:id="@+id/infoSection"
+    <!-- QR Data Button -->
+    <Button
+        android:id="@+id/qrcode_event_id"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/qrcode_image_view"
-        android:orientation="vertical">
+        android:layout_height="150dp"
+        android:layout_below="@id/qrcode_image_view"
+        android:layout_marginTop="24dp"
+        android:layout_marginHorizontal="24dp"
+        android:background="@android:color/white"
+        android:padding="16dp"
+        android:shadowColor="@android:color/darker_gray"
+        android:text="QR Data"
+        android:textColor="@android:color/black"
+        android:textSize="16sp" />
 
-        <TextView
-            android:id="@+id/qrcode_event_id"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:text="Event ID"
-            android:textSize="18sp" />
+    <!-- QR Hash Button -->
+    <Button
+        android:id="@+id/hashed_qrcode_event"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:layout_below="@id/qrcode_event_id"
+        android:layout_marginTop="16dp"
+        android:layout_marginHorizontal="24dp"
+        android:background="@android:color/white"
+        android:padding="16dp"
+        android:shadowColor="@android:color/darker_gray"
+        android:text="QR Hash"
+        android:textColor="@android:color/black"
+        android:textSize="16sp" />
 
-        <TextView
-            android:id="@+id/qrcode_event_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:text="Event Title"
-            android:textSize="18sp" />
-
-        <TextView
-            android:id="@+id/hashed_qrcode_event"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:text="Hashed QRcode"
-            android:textSize="18sp" />
-
-
-
-    </LinearLayout>
 </RelativeLayout>

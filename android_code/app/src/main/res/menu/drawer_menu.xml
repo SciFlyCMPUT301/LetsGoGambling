@@ -1,25 +1,58 @@
-<?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- User Profile Section -->
+
+    <!-- Organizer Menu -->
     <item
         android:id="@+id/nav_organizer_menu"
         android:icon="@drawable/ic_organizer_foreground"
-        android:title="Organizer Menu" />
+        android:title="Organizer Menu">
+        <menu>
+            <item
+                android:id="@+id/nav_view_accepted"
+                android:icon="@drawable/ic_waiting_list_foreground"
+                android:title="View Accepted List" />
+            <item
+                android:id="@+id/nav_view_canceled"
+                android:icon="@drawable/ic_waiting_list_foreground"
+                android:title="View Canceled List" />
+            <item
+                android:id="@+id/nav_view_signed"
+                android:icon="@drawable/ic_waiting_list_foreground"
+                android:title="View Signed List" />
+            <item
+                android:id="@+id/nav_view_waiting"
+                android:icon="@drawable/ic_waiting_list_foreground"
+                android:title="View Waiting List" />
+        </menu>
+    </item>
+
+    <!-- Events Menu -->
     <item
-        android:id="@+id/nav_view_accepted"
-        android:icon="@drawable/ic_waiting_list_foreground"
-        android:title="View Accepted List" />
-    <item
-        android:id="@+id/nav_view_canceled"
-        android:icon="@drawable/ic_waiting_list_foreground"
-        android:title="View Canceled List" />
-    <item
-        android:id="@+id/nav_view_signed"
-        android:icon="@drawable/ic_waiting_list_foreground"
-        android:title="View Signed List" />
-    <item
-        android:id="@+id/nav_view_waiting"
-        android:icon="@drawable/ic_waiting_list_foreground"
-        android:title="View Waiting List" />
+        android:id="@+id/nav_event_menu"
+        android:icon="@drawable/ic_events_foreground"
+        android:title="Events">
+        <menu>
+            <item
+                android:id="@+id/nav_event"
+                android:icon="@drawable/ic_events_foreground"
+                android:title="View Events" />
+            <item
+                android:id="@+id/nav_event_create"
+                android:icon="@drawable/ic_event_create_foreground"
+                android:title="Create Event" />
+            <item
+                android:id="@+id/nav_scanned_event"
+                android:icon="@drawable/ic_scanned_event_foreground"
+                android:title="Scanned Event" />
+            <item
+                android:id="@+id/nav_event_code_generate"
+                android:icon="@drawable/ic_admin_foreground"
+                android:title="Generate QR Code" />
+        </menu>
+    </item>
+
+    <!-- Other Menu Items -->
     <item
         android:id="@+id/nav_profile"
         android:icon="@drawable/ic_profile_foreground"
@@ -37,14 +70,6 @@
         android:icon="@drawable/ic_home_foreground"
         android:title="Home" />
     <item
-        android:id="@+id/nav_event"
-        android:icon="@drawable/ic_events_foreground"
-        android:title="Event" />
-    <item
-        android:id="@+id/nav_event_create"
-        android:icon="@drawable/ic_event_create_foreground"
-        android:title="Create Event" />
-    <item
         android:id="@+id/nav_admin"
         android:icon="@drawable/ic_admin_foreground"
         android:title="Admin" />
@@ -52,13 +77,4 @@
         android:id="@+id/nav_camera"
         android:icon="@drawable/ic_camera_foreground"
         android:title="Camera" />
-    <item
-        android:id="@+id/nav_scanned_event"
-        android:icon="@drawable/ic_scanned_event_foreground"
-        android:title="Scanned Event" />
-    <item
-        android:id="@+id/nav_event_code_generate"
-        android:icon="@drawable/ic_admin_foreground"
-        android:title="Generate QR Code" />
-
 </menu>

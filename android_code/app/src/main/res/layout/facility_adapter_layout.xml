@@ -6,18 +6,10 @@
     android:paddingTop="10dp"
     android:paddingBottom="10dp">
 
-    <ImageView
-        android:id="@+id/image"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_marginRight="10dp"
-        android:contentDescription="Facility Image" />
-
     <LinearLayout
         android:id="@+id/infoSection"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/image"
         android:orientation="vertical">
 
         <TextView
@@ -25,6 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
+            android:layout_marginStart="16dp"
             android:text="Facility name"
             android:textSize="18sp" />
 
@@ -33,6 +26,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
+            android:layout_marginStart="16dp"
             android:text="Facility ID"
             android:textSize="15sp" />
 
@@ -41,10 +35,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
+            android:layout_marginStart="16dp"
             android:text="Join Date"
             android:textSize="15sp" />
     </LinearLayout>
-
-
 
 </RelativeLayout>

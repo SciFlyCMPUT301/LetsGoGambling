@@ -43,11 +43,6 @@ public class EditEventFragment extends Fragment {
     private ArrayAdapter<String> participantsAdapter;
 
     private FirebaseFirestore db;
-    private List<String> selectedList = null;
-    private List<String> updatedWaitingList;
-    private List<String> updatedAcceptedList;
-    private List<String> updatedCanceledList;
-    private List<String> updatedSignedUpList;
 
     /**
      *Constructor for the EditEventFragment class.

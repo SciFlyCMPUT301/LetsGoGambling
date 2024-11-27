@@ -31,32 +31,24 @@ public class QRcodeViewAdapter extends ArrayAdapter<Event> {
             convertView = LayoutInflater.from(context).inflate(R.layout.qrcode_adapter_layout, parent, false);
         }
 
-        // Get the current QR code (Event object) from the list
         Event qrcode = qrcodeList.get(position);
 
-        // Initialize views
         ImageView qrCodeImageView = convertView.findViewById(R.id.qrcode_image_view);
         TextView eventIDTextView = convertView.findViewById(R.id.qrcode_event_id);
         TextView eventTitleTextView = convertView.findViewById(R.id.qrcode_event_title);
         TextView hashedqrcodeTextView = convertView.findViewById(R.id.hashed_qrcode_event);
 
-        // Set event details in the respective TextViews
+        // Bind data
         eventIDTextView.setText(qrcode.getEventId());
         eventTitleTextView.setText(qrcode.getEventTitle());
         hashedqrcodeTextView.setText(qrcode.getQRcodeHash());
 
-        // Generate the QR code if the hash is present
-        String qrCodeHash = qrcode.getQRcodeHash();
-        if (qrCodeHash != null && !qrCodeHash.isEmpty()) {
-            QRcodeGenerator qrCodeGenerator = new QRcodeGenerator();
-            Bitmap qrBitmap = qrCodeGenerator.generateQRCode(qrCodeHash);
-            if (qrBitmap != null) {
-                qrCodeImageView.setImageBitmap(qrBitmap);
-            } else {
-                qrCodeImageView.setImageResource(R.drawable.placeholder_image_foreground); // Fallback image
-            }
+        // Generate and set the QR code bitmap
+        Bitmap qrCodeBitmap = new QRcodeGenerator(context).generateQRCode(qrcode.getQRcodeHash());
+        if (qrCodeBitmap != null) {
+            qrCodeImageView.setImageBitmap(qrCodeBitmap);
         } else {
-            qrCodeImageView.setImageResource(R.drawable.placeholder_image_foreground); // Fallback image
+            qrCodeImageView.setImageResource(R.drawable.placeholder_image_foreground); // Placeholder if QR code fails
         }
 
         return convertView;

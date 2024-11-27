@@ -1,91 +1,105 @@
-<!-- fragment_event_create.xml -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:orientation="vertical"
     android:layout_height="match_parent"
-    android:gravity="center">
-
-    <ImageView
-        android:id="@+id/event_poster_image"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:scaleType="centerCrop" />
-
-    <EditText
-        android:id="@+id/event_create_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Event Create Page"
-        android:textSize="18sp" />
-
-    <Button
-        android:id="@+id/button_back_home"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Back to Home" />
-
-
-    <EditText
-        android:id="@+id/event_description"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Description"
-        android:inputType="textMultiLine"
-        android:layout_marginBottom="8dp" />
-    <EditText
-        android:id="@+id/event_image_url"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Image URL"
-        android:inputType="textUri"
-        android:layout_marginBottom="8dp" />
-    <EditText
-        android:id="@+id/event_location"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Location"
-        android:inputType="textPostalAddress"
-        android:layout_marginBottom="8dp" />
-    <EditText
-        android:id="@+id/max_participants"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Max Participants"
-        android:inputType="number"
-        android:layout_marginBottom="16dp" />
-
-    <EditText
-        android:id="@+id/waiting_list_limit"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Waiting List Limit"
-        android:inputType="number"
-        android:layout_marginBottom="16dp" />
-    <Button
-        android:id="@+id/button_create_event"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Create Event"
-        android:layout_marginBottom="16dp" />
-
-    <Button
-        android:id="@+id/button_upload_poster"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="upload poster"
-        android:layout_marginBottom="16dp" />
-    <Button
-        android:id="@+id/button_delete_poster"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="delete poster"
-        android:layout_marginBottom="16dp" />
+    android:layout_marginTop="40dp"
+    android:padding="16dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:gravity="center"
         android:padding="16dp">
+        <Button
+            android:id="@+id/button_back_home"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Back to Home"
+            android:layout_gravity="start"
+            android:layout_marginBottom="16dp"
+            android:backgroundTint="@android:color/holo_purple" />
+
+
+        <!-- Title Section -->
+        <EditText
+            android:id="@+id/event_create_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Title"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginBottom="16dp" />
+
+        <!-- ImageView for Poster -->
+        <ImageView
+            android:id="@+id/event_poster_image"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:scaleType="centerCrop"
+            android:background="@android:color/darker_gray"
+            android:contentDescription="Event Poster"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Form Fields -->
+        <EditText
+            android:id="@+id/event_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Event Name"
+            android:inputType="text"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/event_image_url"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Image URL"
+            android:inputType="textUri"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/event_date_time"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Date,Time"
+            android:inputType="datetime"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/event_location"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Location"
+            android:inputType="textPostalAddress"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/max_participants"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Max Participants"
+            android:inputType="number"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/waiting_list_limit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Waiting List Limit"
+            android:inputType="number"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/event_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Description"
+            android:inputType="textMultiLine"
+            android:layout_marginBottom="16dp" />
+
+        <!-- QR Code Image -->
         <ImageView
             android:id="@+id/qr_image_view"
             android:layout_width="wrap_content"
@@ -94,8 +108,65 @@
             android:contentDescription="QR Code Image"
             android:scaleType="centerCrop"
             android:layout_marginTop="16dp" />
+
+        <!-- Action Buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginTop="16dp">
+
+            <Button
+                android:id="@+id/button_upload_poster"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Upload Poster"
+                android:layout_marginBottom="8dp" />
+
+            <Button
+                android:id="@+id/button_delete_poster"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Delete Poster"
+                android:visibility="gone"
+                android:layout_marginBottom="16dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginTop="8dp">
+
+                <Button
+                    android:id="@+id/button_cancel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Cancel"
+                    android:layout_marginEnd="16dp"
+                    android:backgroundTint="@android:color/holo_red_light" />
+
+                <Button
+                    android:id="@+id/button_create_event"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Create Event"
+                    android:visibility="gone"
+                    android:backgroundTint="@android:color/holo_blue_light" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Poster Image Placeholder in Organizer Menu -->
+       <!-- <TextView
+            android:id="@+id/organizer_poster_placeholder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Poster Placeholder for Organizer"
+            android:gravity="center"
+            android:background="@android:color/darker_gray"
+            android:padding="16dp"
+            android:layout_marginTop="16dp" />-->
+
     </LinearLayout>
-
-
-
-</LinearLayout>
+</ScrollView>

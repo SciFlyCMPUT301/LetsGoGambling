@@ -6,7 +6,7 @@
 
     <!-- Event Title -->
     <TextView
-        android:id="@+id/event_title"
+        android:id="@+id/qrcode_event_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"

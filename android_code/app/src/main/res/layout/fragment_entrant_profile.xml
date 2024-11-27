@@ -33,8 +33,7 @@
                 android:layout_marginStart="16dp"
                 android:text="Entrant profile"
                 android:textSize="20sp"
-                android:textStyle="bold"
-                android:layout_marginRight="50dp"/>
+                android:textStyle="bold" />
             <Button
                 android:id="@+id/button_notification"
                 android:layout_width="wrap_content"

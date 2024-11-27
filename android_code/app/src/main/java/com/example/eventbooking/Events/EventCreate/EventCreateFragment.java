@@ -41,6 +41,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.picasso.Picasso;
+import com.example.eventbooking.waitinglist.OrganizerMenuFragment;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -63,8 +64,9 @@ public class EventCreateFragment extends Fragment {
     private FirebaseFirestore db;
     private ImageView QRCode;
     private ImageView posterImageView;
-    private Button uploadPosterButton;
-    private Button deletePosterButton;
+
+    //private Button uploadPosterButton;
+    //private Button deletePosterButton;
     private static final int PICK_IMAGE_REQUEST = 1;
     private Event currentEvent;
     private ActivityResultLauncher<Intent> pickImageLauncher;
@@ -121,27 +123,28 @@ public class EventCreateFragment extends Fragment {
         editTextDescription = rootView.findViewById(R.id.event_description);
         editTextLocation = rootView.findViewById(R.id.event_location);
         editMaxParticipants = rootView.findViewById(R.id.max_participants);
+        posterImageView = rootView.findViewById(R.id.event_poster_image);
         //remainder here , add the limit number to set up maximum entrant in witinglist
         editTextImageUrl = rootView.findViewById(R.id.event_image_url);
         createEventButton= rootView.findViewById(R.id.button_create_event);
         QRCode = rootView.findViewById(R.id.qr_image_view);
         //button of the posters
-        deletePosterButton = rootView.findViewById(R.id.button_delete_poster);
-        uploadPosterButton = rootView.findViewById(R.id.button_upload_poster);
-        pickImageLauncher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (result.getResultCode() == getActivity().RESULT_OK && result.getData() != null) {
-                        Uri selectedImageUri = result.getData().getData();
-                        if (selectedImageUri != null) {
-                            uploadCustomPoster(selectedImageUri);
-                        } else {
-                            Toast.makeText(getContext(), "Failed to select image.", Toast.LENGTH_SHORT).show();
-                        }
-                    } else {
-                        Toast.makeText(getContext(), "Image selection cancelled.", Toast.LENGTH_SHORT).show();
-                    }
-                });
+        //deletePosterButton = rootView.findViewById(R.id.button_delete_poster);
+        //uploadPosterButton = rootView.findViewById(R.id.button_upload_poster);
+//        pickImageLauncher = registerForActivityResult(
+//                new ActivityResultContracts.StartActivityForResult(),
+//                result -> {
+//                    if (result.getResultCode() == getActivity().RESULT_OK && result.getData() != null) {
+//                        Uri selectedImageUri = result.getData().getData();
+//                        if (selectedImageUri != null) {
+//                            uploadCustomPoster(selectedImageUri);
+//                        } else {
+//                            Toast.makeText(getContext(), "Failed to select image.", Toast.LENGTH_SHORT).show();
+//                        }
+//                    } else {
+//                        Toast.makeText(getContext(), "Image selection cancelled.", Toast.LENGTH_SHORT).show();
+//                    }
+//                });
 
 
 
@@ -159,13 +162,13 @@ public class EventCreateFragment extends Fragment {
         createEventButton.setOnClickListener(v->{
             createEvent();
         });
-        uploadPosterButton.setOnClickListener(v->{
-            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-            pickImageLauncher.launch(intent);
-
-
-        });
-        deletePosterButton.setOnClickListener(v->deletePoster());
+//        uploadPosterButton.setOnClickListener(v->{
+//            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+//            pickImageLauncher.launch(intent);
+//
+//
+//        });
+//        deletePosterButton.setOnClickListener(v->deletePoster());
 
 
         return rootView;
@@ -187,7 +190,7 @@ public class EventCreateFragment extends Fragment {
 
         //error handling
         if(TextUtils.isEmpty(title)||TextUtils.isEmpty(description)||TextUtils.isEmpty(locationStr)
-        ||TextUtils.isEmpty(maxParticipantsStr)){
+                ||TextUtils.isEmpty(maxParticipantsStr)){
             Toast.makeText(getContext(),"Please fill all the required fields", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -261,6 +264,8 @@ public class EventCreateFragment extends Fragment {
             currentEvent.uploadDefaultPoster(title)
                     .addOnSuccessListener(aVoid -> {
                         Log.d("EventCreateFragment", "Default poster uploaded successfully.");
+
+                        displayCurrentPoster();
                     })
                     .addOnFailureListener(e -> {
                         Log.e("EventCreateFragment", "Failed to upload default poster.", e);
@@ -279,57 +284,6 @@ public class EventCreateFragment extends Fragment {
 
 
     }
-    private void uploadCustomPoster(Uri imageUri) {
-        if (currentEvent == null) {
-            Toast.makeText(getContext(), "Please create the event first.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        currentEvent.uploadCustomPoster(imageUri)
-                .addOnSuccessListener(aVoid -> {
-                    // Update the UI with the uploaded custom poster
-                    Picasso.get().load(currentEvent.getImageUrl())
-                            .placeholder(R.drawable.placeholder_image_foreground)
-                            .error(R.drawable.error_image_foreground)
-                            .into(posterImageView);
-                    Toast.makeText(getContext(), "Custom poster uploaded successfully.", Toast.LENGTH_SHORT).show();
-                })
-                .addOnFailureListener(e -> {
-                    Log.e("EventCreateFragment", "Failed to upload custom poster.", e);
-                    Toast.makeText(getContext(), "Failed to upload custom poster.", Toast.LENGTH_SHORT).show();
-                });
-    }
-
-    private void deletePoster() {
-        if (currentEvent == null) {
-            Toast.makeText(getContext(), "Please create the event first.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        currentEvent.deleteSelectedPosterFromFirebase(currentEvent.getImageUrl())
-                .addOnSuccessListener(aVoid -> {
-                    currentEvent.uploadDefaultPoster(currentEvent.getEventTitle())
-                            .addOnSuccessListener(uploaded -> {
-                                Picasso.get().load(currentEvent.getImageUrl())
-                                        .placeholder(R.drawable.placeholder_image_foreground)
-                                        .error(R.drawable.error_image_foreground)
-                                        .into(posterImageView);
-                                Toast.makeText(getContext(), "Poster reset to default successfully.", Toast.LENGTH_SHORT).show();
-                            }).addOnFailureListener(e -> {
-                                Log.e("EventCreateFragment", "Failed to reset poster to default.", e);
-                                Toast.makeText(getContext(), "Failed to reset poster to default.", Toast.LENGTH_SHORT).show();
-                            });
-                })
-                .addOnFailureListener(e -> {
-                    Log.e("EventCreateFragment", "Failed to delete poster.", e);
-                    Toast.makeText(getContext(), "Failed to delete poster.", Toast.LENGTH_SHORT).show();
-                });
-    }
-
-
-
-
-
-
 
 
     /**
@@ -360,6 +314,24 @@ public class EventCreateFragment extends Fragment {
             Toast.makeText(getContext(), "QR code generated and saved.", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(getContext(), "Failed to generate QR code.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void displayCurrentPoster() {
+        if (currentEvent == null) {
+            posterImageView.setImageResource(R.drawable.placeholder_image_foreground);
+            return;
+        }
+
+        String posterUrl = currentEvent.getImageUrl();
+        if (posterUrl == null || posterUrl.isEmpty()) {
+            posterImageView.setImageResource(R.drawable.placeholder_image_foreground);
+        } else {
+            Picasso.get()
+                    .load(posterUrl)
+                    .placeholder(R.drawable.placeholder_image_foreground)
+                    .error(R.drawable.error_image_foreground)
+                    .into(posterImageView);
         }
     }
 

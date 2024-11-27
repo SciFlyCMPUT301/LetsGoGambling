@@ -1,36 +1,30 @@
 package com.example.eventbooking.Admin;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.example.eventbooking.Admin.Event.ViewEventsFragment;
 import com.example.eventbooking.Admin.Facility.ViewFacilitiesFragment;
 import com.example.eventbooking.Admin.Images.ViewImagesFragment;
+import com.example.eventbooking.Admin.QRcode.ViewQRcodeFragment;
 import com.example.eventbooking.Admin.Users.ViewUsersFragment;
-import com.example.eventbooking.Events.EventCreate.EventCreateFragment;
-import com.example.eventbooking.Events.EventData.Event;
-import com.example.eventbooking.Events.EventPageFragment.EventFragment;
 import com.example.eventbooking.Home.HomeFragment;
 import com.example.eventbooking.R;
-import com.example.eventbooking.profile.ProfileFragment;
-
-import android.widget.Button;
-import android.widget.Toast;
-
-import androidx.annotation.Nullable;
-import androidx.fragment.app.FragmentTransaction;
 /**
  * AdminFragment serves as the main interface for the admin to navigate between different sections,
  * such as viewing users, events, facilities, and images.
  */
 public class AdminFragment extends Fragment {
-    private Button viewUsersButton, viewEventsButton, viewFacilitiesButton, viewImagesButton;
+    private Button viewUsersButton, viewEventsButton, viewFacilitiesButton, viewImagesButton, viewQRcodeButton;
     private Button backHomeButton;
     /**
      * Inflates the fragment's layout and initializes components.
@@ -50,6 +44,7 @@ public class AdminFragment extends Fragment {
         viewEventsButton = view.findViewById(R.id.events_button);
         viewFacilitiesButton = view.findViewById(R.id.facilities_button);
         viewImagesButton = view.findViewById(R.id.images_button);
+        viewQRcodeButton = view.findViewById(R.id.qrcode_button);
         backHomeButton = view.findViewById(R.id.home_button);
 
         //for now hiding it because not dealing with images
@@ -60,10 +55,13 @@ public class AdminFragment extends Fragment {
         ViewUsersFragment usersFragment = new ViewUsersFragment();
         ViewEventsFragment eventsFragment = new ViewEventsFragment();
         ViewFacilitiesFragment facilitiesFragment = new ViewFacilitiesFragment();
+        ViewQRcodeFragment qrcodeFragment = new ViewQRcodeFragment();
+
         //set up on clicklistener
         viewUsersButton.setOnClickListener(v -> replaceFragment(usersFragment));
         viewEventsButton.setOnClickListener(v -> replaceFragment(eventsFragment));
         viewFacilitiesButton.setOnClickListener(v -> replaceFragment(facilitiesFragment));
+        viewQRcodeButton.setOnClickListener(v -> replaceFragment(qrcodeFragment));
         //for now hiding it because not dealing with images, it doesnt work
         viewImagesButton.setOnClickListener(v -> replaceFragment(new ViewImagesFragment()));
         backHomeButton.setOnClickListener(v -> replaceFragment(new HomeFragment()));

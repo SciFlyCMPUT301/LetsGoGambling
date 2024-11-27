@@ -102,7 +102,7 @@ public class OragnizerEventFragment  extends Fragment{
         String currentUserId = UserManager.getInstance().getUserId();
 
         // Fetch events for the organizer
-        Event.getOragnizerEvents(currentUserId, organizerEvents -> {
+        Event.getOrganizerEvents(currentUserId, organizerEvents -> {
             HomeUserEventAdapter adapter = new HomeUserEventAdapter(getContext(), organizerEvents, currentUserId);
             usersEventListView.setAdapter(adapter);
 

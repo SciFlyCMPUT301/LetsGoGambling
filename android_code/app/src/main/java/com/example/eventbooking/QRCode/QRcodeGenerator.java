@@ -7,11 +7,17 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Map;
 
 import com.journeyapps.barcodescanner.BarcodeEncoder;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.common.BitMatrix;
+
+import org.json.JSONObject;
+
 /**
  * QRcodeGenerator is a utility class for generating and saving QR codes.
  * It uses the zxing library to generate QR codes in Bitmap format and provides methods
@@ -26,6 +32,10 @@ public class QRcodeGenerator {
      */
     public QRcodeGenerator(Context context) {
         this.context = context;
+    }
+
+    public QRcodeGenerator() {
+
     }
 
 
@@ -68,5 +78,24 @@ public class QRcodeGenerator {
         } catch (IOException e) {
             e.printStackTrace(); // Handle I/O errors
         }
+    }
+
+    public String createQRCodeHash(String textToHash){
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hashBytes = digest.digest(textToHash.getBytes());
+
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hashBytes) {
+                hexString.append(String.format("%02x", b));
+            }
+
+            return hexString.toString(); // Return the hex string representation of the hash
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return null; // Return null if an error occurs during hashing
+        }
+
+
     }
 }

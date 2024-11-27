@@ -1,115 +1,123 @@
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
-    android:layout_marginTop="65dp"
-    android:layout_marginBottom="50dp">>
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="16dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <!-- Header with back arrow and title -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:padding="16dp">
+            android:gravity="center_vertical"
+            android:paddingBottom="16dp">
 
-            <Button
-                android:id="@+id/button_edit_profile"
-                android:layout_width="0dp"
+            <ImageButton
+                android:id="@+id/button_back"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Edit"
-                android:padding="16dp"
-                android:layout_gravity="center"/>
+                android:src="@drawable/ic_back_arrow"
+                android:contentDescription="Back"
+                android:background="?attr/selectableItemBackgroundBorderless" />
+
+            <TextView
+                android:id="@+id/text_entrant_profile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="Entrant profile"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+            <Button
+                android:id="@+id/button_notification"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Notification"
+                android:padding="4dp"
+                android:textSize="12sp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_margin="8dp"
+                android:backgroundTint="@color/purple"/>
+
         </LinearLayout>
 
+        <!-- Profile icon and username -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="16dp">
-
-            <Button
-                android:id="@+id/button_upload_photo"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Upload Photo"
-                android:padding="16dp"
-                android:layout_gravity="left"/>
-
-            <Button
-                android:id="@+id/button_remove_photo"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Remove Photo"
-                android:padding="16dp"
-                android:layout_gravity="right"/>
-        </LinearLayout>
-
-        <!-- Section for user profile image -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="16dp">
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:paddingBottom="16dp">
 
             <ImageView
                 android:id="@+id/user_image"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
-                android:layout_gravity="center"
-                android:contentDescription="Profile Image" />
-        </LinearLayout>
-
-        <!-- Section for user profile details -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+                android:src="@drawable/ic_profile"
+                android:contentDescription="Profile Icon"
+                android:layout_marginBottom="8dp" />
 
             <TextView
                 android:id="@+id/profile_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Profile Page"
-                android:textSize="24sp"
-                android:layout_gravity="center_horizontal"
-                android:paddingBottom="16dp" />
+                android:text="Username"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <Button
+                android:id="@+id/button_edit_profile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Edit Profile"
+                android:backgroundTint="@color/purple"
+                android:textSize="14sp"
+                android:padding="8dp" />
+        </LinearLayout>
+
+        <!-- Input fields -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="16dp">
 
             <EditText
                 android:id="@+id/edit_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Name"
+                android:hint="Full Name"
                 android:inputType="textPersonName"
-                android:enabled="false"
-                android:padding="20dp"/>
+                android:background="@drawable/edit_text_outline"
+                android:padding="12dp"
+                android:layout_marginBottom="16dp" />
 
             <EditText
                 android:id="@+id/edit_email"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Email"
+                android:hint="abc@gmail.com"
                 android:inputType="textEmailAddress"
-                android:enabled="false"
-                android:padding="20dp"/>
+                android:background="@drawable/edit_text_outline"
+                android:padding="12dp"
+                android:layout_marginBottom="16dp" />
 
             <EditText
                 android:id="@+id/edit_phone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Phone (Optional)"
+                android:hint="Phone Number"
                 android:inputType="phone"
-                android:enabled="false"
-                android:padding="20dp"/>
-
+                android:background="@drawable/edit_text_outline"
+                android:padding="12dp"
+                android:layout_marginBottom="16dp" />
             <Switch
                 android:id="@+id/notifications_switch"
                 android:layout_width="wrap_content"
@@ -127,22 +135,71 @@
                 android:checked="true"
                 android:enabled="false"
                 android:padding="20dp"/>
+        </LinearLayout>
+
+        <!-- Existing buttons section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:paddingBottom="16dp">
 
             <Button
-                android:id="@+id/button_save_profile"
-                android:layout_width="match_parent"
+                android:id="@+id/button_upload_photo"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Save"
-                android:enabled="false" />
+                android:text="Upload Photo"
+                android:backgroundTint="@color/purple"
+                android:layout_marginEnd="8dp"
+                android:padding="12dp" />
+
+            <Button
+                android:id="@+id/button_remove_photo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Remove Photo"
+                android:backgroundTint="@color/purple"
+                android:layout_marginEnd="8dp"
+                android:padding="12dp" />
 
             <Button
                 android:id="@+id/button_back_home"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Back to Home"
-                android:layout_gravity="center" />
+                android:backgroundTint="@color/purple"
+                android:padding="12dp" />
+        </LinearLayout>
 
+        <!-- Save and Cancel buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <!--<Button
+                android:id="@+id/button_cancel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="CANCEL"
+                android:backgroundTint="@color/white"
+                android:textColor="@color/black"
+                android:padding="12dp"
+                android:layout_marginEnd="8dp" />-->
+
+            <Button
+                android:id="@+id/button_save_profile"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="SAVE"
+                android:backgroundTint="@color/purple"
+                android:textColor="@color/white"
+                android:padding="12dp"
+                android:layout_marginStart="8dp" />
         </LinearLayout>
     </LinearLayout>
-
 </ScrollView>

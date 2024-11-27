@@ -120,7 +120,8 @@ public class ProfileFragment extends Fragment {
         userImage = view.findViewById(R.id.user_image);
         removeImageButton = view.findViewById(R.id.button_remove_photo);
         notification_button = view.findViewById(R.id.button_notification);
-
+        uploadButton.setVisibility(View.GONE);
+        removeImageButton.setVisibility(View.GONE);
 
         saveButton.setOnClickListener(v -> saveUserProfile());
         backButton.setOnClickListener(v -> goToHome());
@@ -190,6 +191,14 @@ public class ProfileFragment extends Fragment {
     }
 
     private void setEditMode(boolean enable) {
+        if(!isNewUser && enable){
+            uploadButton.setVisibility(View.VISIBLE);
+            removeImageButton.setVisibility(View.VISIBLE);
+        }
+        if(!isNewUser && !enable){
+            uploadButton.setVisibility(View.GONE);
+            removeImageButton.setVisibility(View.GONE);
+        }
         editName.setEnabled(enable);
         editEmail.setEnabled(enable);
         editPhone.setEnabled(enable);

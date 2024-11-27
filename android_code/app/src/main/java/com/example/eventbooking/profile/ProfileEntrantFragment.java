@@ -371,58 +371,58 @@ public class ProfileEntrantFragment extends Fragment {
             StorageReference imageRef = currentUser.storageReference.child(imageFileName);
 
             imageRef.putBytes(imageBytes).addOnSuccessListener(taskSnapshot ->
-                    imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
-                        String downloadUrl = uri.toString();
-                        currentUser.setProfilePictureUrl(downloadUrl);
-                        currentUser.setdefaultProfilePictureUrl(downloadUrl);
+                            imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                                String downloadUrl = uri.toString();
+                                currentUser.setProfilePictureUrl(downloadUrl);
+                                currentUser.setdefaultProfilePictureUrl(downloadUrl);
 
-                        // Save user data to Firestore
-                        currentUser.saveUserDataToFirestore().addOnSuccessListener(aVoid -> {
-                            Toast.makeText(getContext(), "Profile saved successfully.", Toast.LENGTH_SHORT).show();
-                            setEditMode(false);
+                                // Save user data to Firestore
+                                currentUser.saveUserDataToFirestore().addOnSuccessListener(aVoid -> {
+                                    Toast.makeText(getContext(), "Profile saved successfully.", Toast.LENGTH_SHORT).show();
+                                    setEditMode(false);
 
-                            // Update profile image in UI
-                            if (downloadUrl != null && !downloadUrl.isEmpty()) {
-                                Picasso.get().load(downloadUrl)
-                                        .placeholder(R.drawable.placeholder_image_foreground)
-                                        .error(R.drawable.error_image_foreground)
-                                        .into(userImage);
-                            }
+                                    // Update profile image in UI
+                                    if (downloadUrl != null && !downloadUrl.isEmpty()) {
+                                        Picasso.get().load(downloadUrl)
+                                                .placeholder(R.drawable.placeholder_image_foreground)
+                                                .error(R.drawable.error_image_foreground)
+                                                .into(userImage);
+                                    }
 
-                            // Update UI elements visibility
-                            editButton.setVisibility(View.VISIBLE);
-                            backButton.setVisibility(View.VISIBLE);
-                            NavigationView sidebar = getActivity().findViewById(R.id.nav_view);
-                            sidebar.setVisibility(View.VISIBLE);
-                            Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
-                            toolbar.setVisibility(View.VISIBLE);
-                            View nav = getActivity().findViewById(R.id.bottom_navigation);
-                            nav.setVisibility(View.VISIBLE);
+                                    // Update UI elements visibility
+                                    editButton.setVisibility(View.VISIBLE);
+                                    backButton.setVisibility(View.VISIBLE);
+                                    NavigationView sidebar = getActivity().findViewById(R.id.nav_view);
+                                    sidebar.setVisibility(View.VISIBLE);
+                                    Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
+                                    toolbar.setVisibility(View.VISIBLE);
+                                    View nav = getActivity().findViewById(R.id.bottom_navigation);
+                                    nav.setVisibility(View.VISIBLE);
 
-                            if(eventIDFromQR == null){
-                                Log.d("ProfileEntrant", "Nothing found");
-                                getParentFragmentManager().beginTransaction()
-                                        .replace(R.id.fragment_container, HomeFragment.newInstance(getDeviceID()))
-                                        .commit();
-                            } else {
-                                Log.d("ProfileEntrant", "Found QR link: " + eventIDFromQR);
-                                getParentFragmentManager().beginTransaction()
-                                        .replace(R.id.fragment_container, EventViewFragment.newInstance(eventIDFromQR, deviceId))
+                                    if(eventIDFromQR == null){
+                                        Log.d("ProfileEntrant", "Nothing found");
+                                        getParentFragmentManager().beginTransaction()
+                                                .replace(R.id.fragment_container, HomeFragment.newInstance(getDeviceID()))
+                                                .commit();
+                                    } else {
+                                        Log.d("ProfileEntrant", "Found QR link: " + eventIDFromQR);
+                                        getParentFragmentManager().beginTransaction()
+                                                .replace(R.id.fragment_container, EventViewFragment.newInstance(eventIDFromQR, deviceId))
 //                      .replace(R.id.fragment_container, EventViewFragment.newInstance(eventIdFromQR, deviceId))
-                                        .addToBackStack(null)
-                                        .commit();
+                                                .addToBackStack(null)
+                                                .commit();
 //                getParentFragmentManager().beginTransaction()
 //                        .replace(R.id.fragment_container, ScannedFragment.newInstance(eventIDFromQR))
 //                        .commit();
-                            }
-                        }).addOnFailureListener(e -> {
-                            Toast.makeText(getContext(), "Failed to save profile.", Toast.LENGTH_SHORT).show();
-                            Log.e("ProfileEntrantFragment", "Error saving profile", e);
-                        });
-                    }).addOnFailureListener(e -> {
-                        Log.e("Firebase", "Failed to retrieve download URL", e);
-                        Toast.makeText(getContext(), "Failed to upload profile picture.", Toast.LENGTH_SHORT).show();
-                    })
+                                    }
+                                }).addOnFailureListener(e -> {
+                                    Toast.makeText(getContext(), "Failed to save profile.", Toast.LENGTH_SHORT).show();
+                                    Log.e("ProfileEntrantFragment", "Error saving profile", e);
+                                });
+                            }).addOnFailureListener(e -> {
+                                Log.e("Firebase", "Failed to retrieve download URL", e);
+                                Toast.makeText(getContext(), "Failed to upload profile picture.", Toast.LENGTH_SHORT).show();
+                            })
             ).addOnFailureListener(e -> {
                 Log.e("Firebase", "Image upload failed", e);
                 Toast.makeText(getContext(), "Failed to upload profile picture.", Toast.LENGTH_SHORT).show();

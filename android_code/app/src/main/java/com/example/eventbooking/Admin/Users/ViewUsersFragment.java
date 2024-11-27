@@ -15,17 +15,12 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.eventbooking.Admin.AdminFragment;
-import com.example.eventbooking.Admin.Images.EditImageFragment;
-import com.example.eventbooking.Admin.Images.ImageAdapter;
-import com.example.eventbooking.Admin.Images.ImageClass;
-import com.example.eventbooking.Home.HomeFragment;
 import com.example.eventbooking.R;
 import com.example.eventbooking.User;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * ViewUsersFragment is a Fragment that displays a list of users from Firestore.
@@ -33,11 +28,10 @@ import java.util.List;
  */
 public class ViewUsersFragment extends Fragment {
     private FirebaseFirestore db;
-//    private ArrayList<String> documentIds = new ArrayList<>();
+    //    private ArrayList<String> documentIds = new ArrayList<>();
     private ListView usersListView;
     private UserViewAdapter userAdapter;
     private ArrayList<User> userList;
-    private Button addUser;
     private Button adminGoBack;
 
     /**
@@ -62,7 +56,6 @@ public class ViewUsersFragment extends Fragment {
         userAdapter = new UserViewAdapter(getContext(), userList);
         usersListView.setAdapter(userAdapter);
         // Initialize buttons for adding users and navigating back
-        addUser = view.findViewById(R.id.add_user_button);
         adminGoBack = view.findViewById(R.id.admin_go_back);
         // Load images from Firebase
 //        loadImagesFromFirebase();
@@ -71,11 +64,6 @@ public class ViewUsersFragment extends Fragment {
         // Load Users
         loadUsersFromFirestore();
 
-
-        addUser.setOnClickListener(v -> {
-            // Open EditUserFragment with empty fields for a new user
-            openNewUserFragment();
-        });
         adminGoBack.setOnClickListener(v -> {
             // Navigate back to HomeFragment
             getParentFragmentManager().beginTransaction()
@@ -91,20 +79,6 @@ public class ViewUsersFragment extends Fragment {
 
         return view;
     }
-    /**
-     * Opens a new EditUserFragment with empty fields to add a new user.
-     */
-    private void openNewUserFragment() {
-        EditUserFragment fragment = new EditUserFragment();
-        Bundle bundle = new Bundle();
-        bundle.putBoolean("isNewUser", true); // Pass flag for new user
-        fragment.setArguments(bundle);
-
-        FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragment_container, fragment);
-        transaction.addToBackStack(null);
-        transaction.commit();
-    }
 
     /**
      * Opens the EditUserFragment with details of the selected user for viewing or editing.
@@ -115,32 +89,24 @@ public class ViewUsersFragment extends Fragment {
         FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
         EditUserFragment fragment = new EditUserFragment();
         Bundle bundle = new Bundle();
+
+        // Pass user details to EditUserFragment
         bundle.putString("deviceId", selectedUser.getDeviceID());
-        Log.d("Loading User", "Document ID: "+ selectedUser.getDeviceID());
         bundle.putString("username", selectedUser.getUsername());
         bundle.putString("email", selectedUser.getEmail());
         bundle.putString("phoneNumber", selectedUser.getPhoneNumber());
-        bundle.putString("location", selectedUser.getAddress());
+        bundle.putString("location", selectedUser.getLocation());
         bundle.putString("profilePictureUrl", selectedUser.getProfilePictureUrl());
-        bundle.putBoolean("isNewUser", false);
-        if(selectedUser.hasRole("admin"))
-            bundle.putBoolean("admin", true);
-        else
-            bundle.putBoolean("admin", false);
-        if(selectedUser.hasRole("entrant"))
-            bundle.putBoolean("entrant", true);
-        else
-            bundle.putBoolean("entrant", false);
-        if(selectedUser.hasRole("organizer"))
-            bundle.putBoolean("organizer", true);
-        else
-            bundle.putBoolean("organizer", false);
+        if (selectedUser.getRoles() != null) {
+            bundle.putStringArrayList("roles", new ArrayList<>(selectedUser.getRoles()));
+        }
+
         fragment.setArguments(bundle);
-        // Replace current fragment with EditUserFragment and add to back stack
         transaction.replace(R.id.fragment_container, fragment);
         transaction.addToBackStack(null);
         transaction.commit();
     }
+
     /**
      * Loads users from Firestore and updates the ListView adapter.
      * Logs the device ID of each loaded user and shows an error message on failure.

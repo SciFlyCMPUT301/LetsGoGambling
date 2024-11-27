@@ -32,5 +32,13 @@
             android:layout_marginBottom="10dp"
             android:text="Source ID"
             android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/source_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:text="Source name"
+            android:textSize="15sp" />
     </LinearLayout>
 </RelativeLayout>

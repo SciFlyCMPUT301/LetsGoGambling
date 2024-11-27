@@ -24,7 +24,8 @@
             android:text="Notifications"
             android:textSize="18sp"
             android:textColor="#000000"
-            android:fontFamily="sans-serif-medium" />
+            android:fontFamily="sans-serif-medium"
+            />
     </LinearLayout>
     <Button
         android:id="@+id/button_back_profile"
@@ -33,7 +34,8 @@
         android:text="Profile"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginEnd="8dp"/>
+        android:layout_marginEnd="8dp"
+        android:backgroundTint="@color/purple"/>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -66,7 +68,8 @@
             android:id="@+id/button_back_home"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Back to Home" />
+            android:text="Back to Home"
+            android:backgroundTint="@color/purple"/>
     </LinearLayout>
 
 

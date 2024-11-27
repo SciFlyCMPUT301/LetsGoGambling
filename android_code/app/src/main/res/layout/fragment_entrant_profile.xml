@@ -44,7 +44,7 @@
             android:paddingBottom="16dp">
 
             <ImageView
-                android:id="@+id/profile_icon"
+                android:id="@+id/user_image"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:src="@drawable/ic_profile"
@@ -52,7 +52,7 @@
                 android:layout_marginBottom="8dp" />
 
             <TextView
-                android:id="@+id/text_username"
+                android:id="@+id/profile_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Username"
@@ -152,7 +152,7 @@
                 android:padding="12dp" />
 
             <Button
-                android:id="@+id/button_back_to_home"
+                android:id="@+id/button_back_home"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Back to Home"
@@ -167,7 +167,7 @@
             android:orientation="horizontal"
             android:gravity="center">
 
-            <Button
+            <!--<Button
                 android:id="@+id/button_cancel"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -176,7 +176,7 @@
                 android:backgroundTint="@color/white"
                 android:textColor="@color/black"
                 android:padding="12dp"
-                android:layout_marginEnd="8dp" />
+                android:layout_marginEnd="8dp" />-->
 
             <Button
                 android:id="@+id/button_save_profile"

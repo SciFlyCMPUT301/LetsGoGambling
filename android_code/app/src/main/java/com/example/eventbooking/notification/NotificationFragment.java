@@ -74,13 +74,13 @@ public class NotificationFragment extends Fragment {
 
 
         // Set up the Back button to navigate to HomeFragment
-//        Button backButton = rootView.findViewById(R.id.button_back_home);
-//        backButton.setOnClickListener(v -> {
-//            // Replace the current fragment with HomeFragment
-//            getParentFragmentManager().beginTransaction()
-//                    .replace(R.id.fragment_container, new HomeFragment())
-//                    .commit();
-//        });
+        Button backButton = rootView.findViewById(R.id.button_back_home);
+        backButton.setOnClickListener(v -> {
+           // Replace the current fragment with HomeFragment
+           getParentFragmentManager().beginTransaction()
+                   .replace(R.id.fragment_container, new HomeFragment())
+                  .commit();
+      });
 // Return the root view to be displayed
         return rootView;
     }

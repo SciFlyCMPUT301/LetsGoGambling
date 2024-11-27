@@ -33,6 +33,14 @@
             android:text="Event Title"
             android:textSize="18sp" />
 
+        <TextView
+            android:id="@+id/hashed_qrcode_event"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:text="Hashed QRcode"
+            android:textSize="18sp" />
+
 
 
     </LinearLayout>

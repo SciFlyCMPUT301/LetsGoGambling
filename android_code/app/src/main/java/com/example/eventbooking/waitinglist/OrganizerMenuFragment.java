@@ -120,13 +120,6 @@ public class OrganizerMenuFragment extends Fragment {
                 Log.d("Organizer Menu Fragment", "Waiting list event ID: " + waitingList.getEventId());
                 Log.d("Organizer Menu Fragment", "Waiting list max: " + waitingList.getMaxParticipants());
 
-                // Update to Firebase only if waitingList is initialized
-                waitingList.updateToFirebase().addOnSuccessListener(aVoid -> {
-                    // Data updated successfully
-                }).addOnFailureListener(e -> {
-                    Log.e("OrganizerMenuFragment", "Failed to update waiting list to Firebase", e);
-                });
-
                 waitingList.loadFromFirebase().addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         Toast.makeText(getContext(), "Waiting list loaded successfully.", Toast.LENGTH_SHORT).show();
@@ -134,6 +127,9 @@ public class OrganizerMenuFragment extends Fragment {
                         Toast.makeText(getContext(), "Failed to load waiting list from Firebase.", Toast.LENGTH_SHORT).show();
                     }
                 });
+
+
+
             } else {
                 Log.d("Organizer Menu Fragment", "Waiting list not made");
                 Toast.makeText(getContext(), "Event not found.", Toast.LENGTH_SHORT).show();
@@ -147,9 +143,6 @@ public class OrganizerMenuFragment extends Fragment {
         });
 
 
-        // waitingList = new WaitingList(eventId);
-        //hardcode
-        //waitingList.setMaxParticipants(maxParticipants);
 
         //just for testing
         pickImageLauncher = registerForActivityResult(
@@ -165,47 +158,7 @@ public class OrganizerMenuFragment extends Fragment {
                 }
         );
 
-        // For testing purposes, add hardcoded participant IDs
-//        waitingList.getWaitingParticipantIds().add("participant1");
-//        waitingList.getWaitingParticipantIds().add("participant2");
-//        waitingList.getWaitingParticipantIds().add("participant3");
-//        waitingList.getWaitingParticipantIds().add("participant4");
-//        waitingList.getWaitingParticipantIds().add("participant5");
-//        waitingList.getWaitingParticipantIds().add("participant6");
 
-//        if (waitingList != null) {
-//            waitingList.updateToFirebase().addOnSuccessListener(aVoid -> {
-//                // Data updated successfully
-//            }).addOnFailureListener(e -> {
-//                Log.e("OrganizerMenuFragment", "Failed to update waiting list to Firebase", e);
-//            });
-//
-//            waitingList.loadFromFirebase().addOnCompleteListener(task -> {
-//                if (task.isSuccessful()) {
-//                    Toast.makeText(getContext(), "Waiting list loaded successfully.", Toast.LENGTH_SHORT).show();
-//                } else {
-//                    Toast.makeText(getContext(), "Failed to load waiting list from Firebase.", Toast.LENGTH_SHORT).show();
-//                }
-//            });
-//        } else {
-//            Log.e("OrganizerMenuFragment", "WaitingList is null. Cannot update or load.");
-//        }
-
-
-        //load and update from firebase operations
-//        waitingList.updateToFirebase().addOnSuccessListener(aVoid -> {
-//            // Data updated successfully
-//        }).addOnFailureListener(e -> {
-//            // Handle error
-//        });
-
-//        waitingList.loadFromFirebase().addOnCompleteListener(task -> {
-//            if (task.isSuccessful()) {
-//                Toast.makeText(getContext(), "Waiting list loaded successfully.", Toast.LENGTH_SHORT).show();
-//            } else {
-//                Toast.makeText(getContext(), "Failed to load waiting list from Firebase.", Toast.LENGTH_SHORT).show();
-//            }
-//        });
     }
     /**
      * binding the UI component to the actual java var
@@ -243,7 +196,8 @@ public class OrganizerMenuFragment extends Fragment {
         viewSignedListButton.setOnClickListener(v -> navigateToViewSignedList());
         viewAcceptedListButton.setOnClickListener(v->navigateToViewAcceptedList());
         sampleAttendeesButton.setOnClickListener(v -> sampleAttendees());
-        drawReplacementButton.setOnClickListener(v -> drawReplacement(replacementSize));
+        //drawReplacementButton.setOnClickListener(v -> drawReplacement(replacementSize));
+        drawReplacementButton.setOnClickListener(v -> promptReplacementSize());
         backToEventPageButton.setOnClickListener(v -> navigateBackToEventPage());
 
         generateQRCode.setOnClickListener(v -> generateAndDisplayQRCode(eventId));
@@ -313,6 +267,7 @@ public class OrganizerMenuFragment extends Fragment {
         List<String> selectedParticipants = waitingList.sampleParticipants(maxParticipants);
         //update the result into firebase and output message
         if (!selectedParticipants.isEmpty()) {
+            sampleAttendeesButton.setEnabled(false);
             Toast.makeText(getContext(), "Sampled attendees: " + selectedParticipants, Toast.LENGTH_SHORT).show();
             waitingList.updateToFirebase().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
@@ -344,16 +299,33 @@ public class OrganizerMenuFragment extends Fragment {
         builder.setPositiveButton("OK", (dialog, which) -> {
             String replacementSizeStr = input.getText().toString().trim();
             if (!replacementSizeStr.isEmpty()) {
-                int replacementSize = Integer.parseInt(replacementSizeStr);
-                drawReplacement(replacementSize);
+                try {
+                    int replacementSize = Integer.parseInt(replacementSizeStr);
+
+                    // Validate replacement size
+                    int availableSpots = waitingList.getMaxParticipants() - waitingList.getSignedUpParticipantIds().size();
+                    if (replacementSize <= 0) {
+                        Toast.makeText(getContext(), "Replacement size must be greater than 0.", Toast.LENGTH_SHORT).show();
+                    } else if (replacementSize > availableSpots) {
+                        Toast.makeText(getContext(), "Replacement size exceeds available spots. Max: " + availableSpots, Toast.LENGTH_SHORT).show();
+                    } else if (replacementSize > waitingList.getWaitingParticipantIds().size()) {
+                        Toast.makeText(getContext(), "Not enough participants in the waiting list. Max: " + waitingList.getWaitingParticipantIds().size(), Toast.LENGTH_SHORT).show();
+                    } else {
+                        drawReplacement(replacementSize); // Pass validated size to drawReplacement
+                    }
+                } catch (NumberFormatException e) {
+                    Toast.makeText(getContext(), "Please enter a valid number.", Toast.LENGTH_SHORT).show();
+                }
             } else {
                 Toast.makeText(getContext(), "Replacement size cannot be empty.", Toast.LENGTH_SHORT).show();
             }
         });
+
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
 
         builder.show();
     }
+
     /**
      * function to trigger the draw replacement defined in waiting list
      * output message to organizer about the operation result */
@@ -368,7 +340,7 @@ public class OrganizerMenuFragment extends Fragment {
             waitingList.updateToFirebase().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
                     Toast.makeText(getContext(), "Replacement attendees updated to Firebase.", Toast.LENGTH_SHORT).show();
-                    navigateToViewWaitingList();
+                    navigateToViewAcceptedList();
                 } else {
                     Toast.makeText(getContext(), "Failed to update Firebase with replacement attendees.", Toast.LENGTH_SHORT).show();
                 }
@@ -472,23 +444,6 @@ public class OrganizerMenuFragment extends Fragment {
                     Log.e("OrganizerMenuFragment", "Error removing poster", e);
                 });
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

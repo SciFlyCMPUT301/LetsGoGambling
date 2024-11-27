@@ -14,9 +14,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.eventbooking.Admin.AdminFragment;
 import com.example.eventbooking.Events.EventData.Event;
-import com.example.eventbooking.Events.EventPageFragment.EventViewAdapter;
 import com.example.eventbooking.R;
-import com.example.eventbooking.UserManager;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -34,11 +32,8 @@ import java.util.ArrayList;
 public class ViewEventsFragment extends Fragment {
     private Button adminGoBack;
     private EventViewAdapter eventAdapter;
-    private UserManager userManager;
     private ArrayList<Event> eventList;
-    private boolean testing = false;
     private ListView eventListView;
-    private Button addFacilityButton, backButton;
     private FirebaseFirestore db;
 
 
@@ -69,8 +64,10 @@ public class ViewEventsFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
 
         // Set up adapter for ListView
-        eventAdapter = new EventViewAdapter(getContext(), eventList, false);
+        eventAdapter = new EventViewAdapter(getContext(), eventList);
         eventListView.setAdapter(eventAdapter);
+
+
         loadEventsFromFirebase();
         // Set click listener for list items to open event details
         eventListView.setOnItemClickListener((parent, view1, position, id) -> {

@@ -1,33 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
     android:paddingTop="10dp"
     android:paddingBottom="10dp">
 
+    <!-- Event Poster Image -->
+    <ImageView
+        android:id="@+id/event_poster"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_alignParentStart="true"
+        android:layout_marginEnd="10dp"
+        android:contentDescription="Event Poster"
+        android:src="@drawable/ic_event_poster_placeholder" />
+
+    <!-- Event Information Section -->
     <LinearLayout
         android:id="@+id/infoSection"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_toEndOf="@id/event_poster"
+        android:orientation="vertical"
+        android:paddingStart="10dp">
 
         <TextView
-            android:id="@+id/facility_name"
+            android:id="@+id/event_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-            android:layout_marginStart="16dp"
-            android:text="Facility name"
-            android:textSize="18sp" />
+            android:text="Event name"
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/facility_id"
+            android:id="@+id/event_id"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-            android:layout_marginStart="16dp"
-            android:text="Facility ID"
+            android:text="Event ID"
             android:textSize="15sp" />
 
         <TextView
@@ -35,9 +47,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-            android:layout_marginStart="16dp"
             android:text="Join Date"
             android:textSize="15sp" />
+
     </LinearLayout>
 
 </RelativeLayout>

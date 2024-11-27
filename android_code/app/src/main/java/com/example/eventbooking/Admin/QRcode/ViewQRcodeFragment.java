@@ -82,9 +82,12 @@ public class ViewQRcodeFragment extends Fragment {
                             for (DocumentSnapshot document : snapshot.getDocuments()) {
                                 Event event = document.toObject(Event.class);
                                 if (event != null) {
-                                    event.setEventId(document.getId()); // Set eventId from document ID
+                                    Log.d("QR code Admin", "Event found and getting ID");
+//                                    event.setEventId(document.getId()); // Set eventId from document ID
                                     //qrcodeList.add(event);
                                     // Only add events with non-null and non-empty qrcodehash
+                                    Log.d("QR code Admin", "EventID: " + event.getEventId());
+                                    Log.d("QR code Admin", "Hash: " + event.getQRcodeHash());
                                     if (event.getQRcodeHash() != null && !event.getQRcodeHash().isEmpty()) {
                                         qrcodeList.add(event);
                                     }

@@ -63,8 +63,8 @@ public class Event {
     private String description;
     private String imageUrl; // URL of the event image in Firebase Storage
     private long timestamp; // Event time in milliseconds
-    private String eventPictureUrl;
-    private String defaultEventpictureurl;
+    private String eventPosterURL;
+    private String defaultEventPosterURL;
 
     private String address;
     private String location;
@@ -82,7 +82,7 @@ public class Event {
     private String organizerId;
     private FirebaseFirestore db;
     private FirebaseStorage storage;
-    private String QRcodeHash;
+    private String qrcodehash;
     /**
      * Default constructor that initializes Firebase Firestore and Storage instances, as well as
      * participant lists.
@@ -256,25 +256,24 @@ public class Event {
     }
 
     public String getQRcodeHash() {
-        return QRcodeHash;
+        return qrcodehash;
     }
-
     public void setQRcodeHash(String QRcodeHash) {
-        this.QRcodeHash = QRcodeHash;
+        this.qrcodehash = QRcodeHash;
     }
 
     public String getDefaultEventpictureurl() {
-        return defaultEventpictureurl;
+        return defaultEventPosterURL;
     }
     public void setDefaultEventpictureurl(String defaultEventpictureurl) {
-        this.defaultEventpictureurl = defaultEventpictureurl;
+        this.defaultEventPosterURL = defaultEventpictureurl;
     }
 
     public String getEventPictureUrl() {
-        return eventPictureUrl;
+        return eventPosterURL;
     }
     public void setEventPictureUrl(String eventPictureUrl) {
-        this.eventPictureUrl = eventPictureUrl;
+        this.eventPosterURL = eventPictureUrl;
     }
 
     /**
@@ -479,14 +478,14 @@ public class Event {
         eventData.put("signedUpParticipantIds", signedUpParticipantIds);
         eventData.put("declinedParticipantIds", declinedParticipantIds);
         eventData.put("organizerId", organizerId);
-        eventData.put("eventPosterURL", eventPictureUrl);
-        eventData.put("defaultEventPosterURL", defaultEventpictureurl);
+        eventData.put("eventPosterURL", eventPosterURL);
+        eventData.put("defaultEventPosterURL", defaultEventPosterURL);
         //eventData.put("eventPictureUrl",eventPictureUrl);
         //eventData.put("defaultEventpictureurl",defaultEventpictureurl);
         String eventUrl = "eventbooking://eventDetail?eventID=" + eventId;
         QRcodeGenerator qrCodeGenerator = new QRcodeGenerator();
         String QRHash = qrCodeGenerator.createQRCodeHash(eventUrl);
-        this.QRcodeHash = QRHash;
+        this.qrcodehash = QRHash;
         eventData.put("qrcodehash", QRHash);
     }
 
@@ -859,7 +858,7 @@ public class Event {
                     if (!task.isSuccessful()) {
                         throw task.getException();
                     }
-                    this.imageUrl = defaultEventpictureurl;
+                    this.imageUrl = defaultEventPosterURL;
                     return uploadDefaultPoster(eventTitle);
                 })
                 .addOnSuccessListener(aVoid -> Log.d("FirebaseStorage", "Poster deleted and reset to default successfully."))
@@ -875,7 +874,7 @@ public class Event {
      * @return true if the default URL is the main one, false otherwise.
      */
     public boolean isDefaultPoster() {
-        return imageUrl != null && imageUrl.equals(defaultEventpictureurl);
+        return imageUrl != null && imageUrl.equals(defaultEventPosterURL);
     }
 
 

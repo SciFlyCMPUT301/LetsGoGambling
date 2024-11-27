@@ -11,41 +11,27 @@ import android.widget.TextView;
 import androidx.fragment.app.Fragment;
 
 import com.example.eventbooking.Events.EventCreate.EventCreateFragment;
+import com.example.eventbooking.Events.EventData.Event;
+import com.example.eventbooking.Events.EventView.EventViewFragment;
 import com.example.eventbooking.Home.HomeFragment;
+import com.example.eventbooking.Notification;
 import com.example.eventbooking.R;
+import com.example.eventbooking.UserManager;
 import com.example.eventbooking.profile.ProfileFragment;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * A fragment that displays a notification with an integer value and provides buttons to navigate
  * to the ProfileFragment or HomeFragment.
  */
 public class NotificationFragment extends Fragment {
-    /**
-     * Creates a new instance of NotificationFragment.
-     *
-     * @return A new instance of NotificationFragment.
-     */
 
-    public static NotificationFragment newInstance() {
-        NotificationFragment fragment = new NotificationFragment();
-//        Bundle args = new Bundle();
-//        args.putInt(ARG_INTEGER, integer);
-//        fragment.setArguments(args);
-        return fragment;
-    }
-    /**
-     * Called when the fragment is created. Retrieves the integer argument passed to the fragment.
-     *
-     * @param savedInstanceState The saved state of the fragment (not used here).
-     */
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        // Retrieve the integer from arguments
-        if (getArguments() != null) {
-           // receivedInteger = getArguments().getInt(ARG_INTEGER);
-        }
-    }
     /**
      * Inflates the fragment layout and sets up the view components.
      *
@@ -70,7 +56,30 @@ public class NotificationFragment extends Fragment {
                     .commit();
         });
 
-        ListView notificationList = rootView.findViewById(R.id.notification_list);
+        ListView notificationListView = rootView.findViewById(R.id.notification_list);
+        NotificationManager nm = new NotificationManager(FirebaseFirestore.getInstance());
+        String currentUserId = UserManager.getInstance().getUserId();
+
+        nm.getUserNotifications(currentUserId).addOnSuccessListener(queryDocumentSnapshots -> {
+            List<Notification> notifications = new ArrayList<>();
+            for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
+                notifications.add(doc.toObject(Notification.class));
+            }
+
+            NotificationArrayAdapter adapter = new NotificationArrayAdapter(getContext(), notifications);
+            notificationListView.setAdapter(adapter);
+
+            notificationListView.setOnItemClickListener((parent, view, position, id) -> {
+                Notification selectedNotification = notifications.get(position);
+                EventViewFragment eventViewFragment = EventViewFragment.newInstance(selectedNotification.getEventId(), currentUserId);
+
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, eventViewFragment)
+                        .addToBackStack(null) // Ensures returning to HomeFragment
+                        .commit();
+            });
+        });
+
 
 
         // Set up the Back button to navigate to HomeFragment
@@ -80,8 +89,8 @@ public class NotificationFragment extends Fragment {
            getParentFragmentManager().beginTransaction()
                    .replace(R.id.fragment_container, new HomeFragment())
                   .commit();
-      });
-// Return the root view to be displayed
+        });
+        // Return the root view to be displayed
         return rootView;
     }
 }

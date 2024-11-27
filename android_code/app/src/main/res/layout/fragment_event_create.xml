@@ -122,7 +122,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Upload Poster"
-                android:layout_marginBottom="8dp" />
+                android:layout_marginBottom="8dp"
+                android:visibility="gone"/>
 
             <Button
                 android:id="@+id/button_delete_poster"
@@ -151,22 +152,11 @@
                     android:id="@+id/button_create_event"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Create Event"
-                    android:visibility="gone"
+                    android:text="Save"
                     android:backgroundTint="@android:color/holo_blue_light" />
             </LinearLayout>
         </LinearLayout>
 
-        <!-- Poster Image Placeholder in Organizer Menu -->
-       <!-- <TextView
-            android:id="@+id/organizer_poster_placeholder"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Poster Placeholder for Organizer"
-            android:gravity="center"
-            android:background="@android:color/darker_gray"
-            android:padding="16dp"
-            android:layout_marginTop="16dp" />-->
 
     </LinearLayout>
 </ScrollView>

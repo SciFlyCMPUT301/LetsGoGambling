@@ -29,7 +29,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="Admin Page"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:backgroundTint="@color/purple"/>
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

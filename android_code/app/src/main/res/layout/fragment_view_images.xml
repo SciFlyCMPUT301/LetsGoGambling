@@ -29,13 +29,15 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="Admin Page"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:backgroundTint="@color/purple"/>
 
         <Button
             android:id="@+id/remove_image_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="Remove"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:backgroundTint="@color/purple"/>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

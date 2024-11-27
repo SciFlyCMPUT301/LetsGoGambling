@@ -3,14 +3,15 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:layout_marginTop="45dp">
 
     <!-- Title -->
     <TextView
         android:id="@+id/text_waiting_list_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Waiting List"
+        android:text="Accepted List"
         android:textSize="20sp"
         android:textStyle="bold"
         android:paddingBottom="8dp" />
@@ -19,14 +20,16 @@
         android:id="@+id/back_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Back to Menu"/>
+        android:text="Back to Menu"
+        android:backgroundTint="@color/purple"/>
 
     <ListView
         android:id="@+id/accepted_list_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:divider="@android:color/darker_gray"
-        android:dividerHeight="1dp" />
+        android:dividerHeight="1dp"
+        android:text="Accepted List"/>
 
 
 

@@ -13,82 +13,133 @@
         android:layout_height="wrap_content"
         android:text="Event Title"
         android:textStyle="bold"
-        android:textSize="20sp" />
+        android:textSize="20sp"
+        android:layout_marginBottom="20dp" />
+
+    <!-- Buttons with solid purple colors from dark to light -->
 
     <Button
         android:id="@+id/waitingListButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:backgroundTint="#491B1B"
-        android:text="view WaitingList" />
+        android:text="View Waiting List"
+        android:backgroundTint="#4B0082"
+    android:textColor="#FFFFFF"
+    android:layout_marginBottom="10dp"
+    android:cornerRadius="10dp" />
 
     <Button
         android:id="@+id/sampleAttendeesButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:backgroundTint="#A86868"
-        android:text="Draw winners" />
+        android:text="Draw Winners"
+        android:backgroundTint="#6A0DAD"
+    android:textColor="#FFFFFF"
+    android:layout_marginBottom="10dp"
+    android:cornerRadius="10dp" />
 
     <Button
         android:id="@+id/accptedParticipantButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:backgroundTint="#6F3B3B"
-        android:text="View selected participant" />
+        android:text="View Selected Participant"
+        android:backgroundTint="#8A2BE2"
+    android:textColor="#FFFFFF"
+    android:layout_marginBottom="10dp"
+    android:cornerRadius="10dp" />
 
     <Button
         android:id="@+id/canceledParticipantButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="View canceled participant" />
+        android:text="View Canceled Participant"
+        android:backgroundTint="#9D00FF"
+    android:textColor="#FFFFFF"
+    android:layout_marginBottom="10dp"
+    android:cornerRadius="10dp" />
 
     <Button
         android:id="@+id/SignedParticipantButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="View signed up participant" />
+        android:text="View Signed Up Participant"
+        android:backgroundTint="#A71AFF"
+    android:textColor="#FFFFFF"
+    android:layout_marginBottom="10dp"
+    android:cornerRadius="10dp" />
 
     <Button
         android:id="@+id/DrawReplacementButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="draw replacement" />
+        android:text="Draw Replacement"
+        android:backgroundTint="#B133FF"
+    android:textColor="#FFFFFF"
+    android:layout_marginBottom="10dp"
+    android:cornerRadius="10dp" />
 
     <Button
         android:id="@+id/generate_qr_code"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Show QR Code" />
+        android:text="Show QR Code"
+        android:backgroundTint="#BA4DFF"
+    android:textColor="#FFFFFF"
+    android:layout_marginBottom="10dp"
+    android:cornerRadius="10dp" />
 
     <Button
         android:id="@+id/BackToEventButton"
         android:layout_width="match_parent"
         android:layout_height="58dp"
-        android:text="back to event" />
+        android:text="Back to Event"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#C466FF"
+        android:layout_marginBottom="10dp"
+        android:cornerRadius="10dp" />
+
     <Button
         android:id="@+id/cancel_entrant"
         android:layout_width="match_parent"
         android:layout_height="58dp"
-        android:text="cancel entrant didnot sign up" />
+        android:text="Cancel Entrant (Did not sign up)"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#CE80FF"
+    android:layout_marginButtom="10dp"
+    android:cornerRadius="10dp" />
+
     <Button
         android:id="@+id/button_remove_poster"
         android:layout_width="match_parent"
         android:layout_height="58dp"
-        android:text="remove custom poster" />
+        android:text="Remove Custom Poster"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#D899FF"
+    android:layout_marginTop="10dp"
+    android:cornerRadius="10dp" />
+
     <Button
         android:id="@+id/button_upload_poster"
         android:layout_width="match_parent"
         android:layout_height="58dp"
-        android:text="upload custom poster" />
+        android:text="Upload Custom Poster"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#E2B3FF"
+    android:layout_marginTop="10dp"
+    android:cornerRadius="10dp" />
+
+    <!-- Image Views -->
     <ImageView
         android:id="@+id/poster_image_view"
-        android:layout_width="wrap_content"
-        android:layout_height="200dp"/>
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_marginTop="20dp"
+        android:scaleType="centerCrop"
+        android:layout_marginBottom="20dp"/>
+
     <ImageView
         android:id="@+id/QR_image"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
-
-
-
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"/>
 </LinearLayout>

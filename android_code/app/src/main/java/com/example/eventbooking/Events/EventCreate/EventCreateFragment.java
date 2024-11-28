@@ -67,7 +67,7 @@ public class EventCreateFragment extends Fragment {
     private ImageView QRCode;
     private ImageView posterImageView;
     private Switch geolocationSwitch;
-    private boolean isGeolocationRequired = false;
+    private boolean isGeolocationRequired;
 
     private static final int PICK_IMAGE_REQUEST = 1;
     private Event currentEvent;
@@ -132,13 +132,10 @@ public class EventCreateFragment extends Fragment {
         QRCode = rootView.findViewById(R.id.qr_image_view);
         geolocationSwitch = rootView.findViewById(R.id.geolocation_switch);
         geolocationSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            isGeolocationRequired = isChecked;
-            if(isChecked){
-                Toast.makeText(getContext(),"Geolocation requirement enabled.", Toast.LENGTH_SHORT).show();
-            }else{
-                Toast.makeText(getContext(),"Geolocation requiremt diabled",Toast.LENGTH_SHORT).show();
-            }
+            isGeolocationRequired = isChecked; // This sets the variable based on the Switch state
+            Log.d("EventCreateFragment", "Geolocation switch set to: " + isChecked);
         });
+
 
 
 
@@ -215,8 +212,8 @@ public class EventCreateFragment extends Fragment {
         String eventId = newEventRef.getId();
         Event event = new Event(eventId, title, description,imageUrl,System.currentTimeMillis(),locationStr,maxParticipants,currentUser.getDeviceID());
         currentEvent = event;
+        event.setGeolocationRequired(geolocationSwitch.isChecked());
 
-        event.setGeolocationRequired(isGeolocationRequired);
 
 
 

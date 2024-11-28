@@ -57,7 +57,8 @@
             android:layout_height="wrap_content"
             android:hint="Image URL"
             android:inputType="textUri"
-            android:layout_marginBottom="8dp" />
+            android:layout_marginBottom="8dp"
+            android:visibility="gone"/>
 
         <EditText
             android:id="@+id/event_date_time"
@@ -97,7 +98,15 @@
             android:layout_height="wrap_content"
             android:hint="Description"
             android:inputType="textMultiLine"
-            android:layout_marginBottom="16dp" />
+            android:layout_marginBottom="10dp" />
+        <Switch
+            android:id="@+id/geolocation_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Enable Goelocation"
+            android:checked="true"
+            android:enabled="false"
+            android:padding="20dp"/>
 
         <!-- QR Code Image -->
         <ImageView

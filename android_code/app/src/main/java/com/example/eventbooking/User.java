@@ -355,7 +355,7 @@ public class User {
                 public void onUserIDGenerated(String userID) {
                     if (userID != null) {
                         deviceId = userID;
-                        userData.put("eventId", deviceId);
+                        userData.put("deviceId", deviceId);
                         saveDataToFirestore(userData);
 //                        new_userID[0] = userID;
                         Log.d("New User", userID);
@@ -412,7 +412,7 @@ public class User {
                 public void onUserIDGenerated(String userID) {
                     if (userID != null) {
                         deviceId = userID;
-                        userData.put("eventId", deviceId);
+                        userData.put("deviceId", deviceId);
                         Log.d("User", "User ID: " + deviceId);
                         saveDataToFirestore(userData);  // Save data after ID is set
                         callback.onUserIDGenerated(deviceId);
@@ -423,7 +423,7 @@ public class User {
                 }
             });
         } else {
-            userData.put("eventId", deviceId);
+            userData.put("deviceId", deviceId);
             saveDataToFirestore(userData);  // Save data if ID is already set
             callback.onUserIDGenerated(deviceId);  // Notify callback with the ID
         }

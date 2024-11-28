@@ -267,6 +267,10 @@ public class UserManager {
     public void setGeolocation(GeoPoint newPoint){
         this.geoLocation = newPoint;
     }
+    public GeoPoint getGeolocation(){
+        return geoLocation;
+    }
+
 
     public void updateGeolocation() {
         currentUser.setGeolocation(geoLocation);

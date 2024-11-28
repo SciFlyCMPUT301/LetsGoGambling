@@ -2,6 +2,8 @@ package com.example.eventbooking.QRCode;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.util.Log;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -9,6 +11,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Calendar;
 import java.util.Map;
 
 import com.journeyapps.barcodescanner.BarcodeEncoder;
@@ -98,4 +101,35 @@ public class QRcodeGenerator {
 
 
     }
+
+
+    public static Bitmap generateAndSendBackQRCode(String eventId){
+        Log.d("QR Code Generator", "Generate and Save: " + eventId);
+        QRcodeGenerator temp = new QRcodeGenerator();
+        // URL to be encoded into the QR code (example URL with eventId)
+        String hashInput = eventId + Calendar.getInstance().getTime();
+        String qrCodeHash = temp.createQRCodeHash(hashInput);
+        String eventUrl = "eventbooking://eventDetail?eventID=" + eventId + "?hash=" + qrCodeHash;
+//        String eventUrl = "eventbooking://eventDetail?eventID=" + event;
+
+        // Generate QR code using the QRcodeGenerator class
+        Log.d("QR Code Generator", "Generate and Save URL: " + eventUrl);
+        Bitmap qrCodeBitmap = temp.generateQRCode(eventUrl);
+
+        if (qrCodeBitmap != null) {
+            Log.d("QR Code Generator", "Got Bit Map");
+            return qrCodeBitmap;
+//            QRCode.setImageBitmap(qrCodeBitmap);
+//            qrCodeGenerator.saveQRCode(qrCodeBitmap, selectedEvent.getEventId());
+
+        } else {
+            return null;
+        }
+
+    }
+
+
+
+
+
 }

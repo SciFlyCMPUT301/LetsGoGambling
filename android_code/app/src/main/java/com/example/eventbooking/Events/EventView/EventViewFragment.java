@@ -28,7 +28,7 @@ public class EventViewFragment extends Fragment {
 
     private String eventId;
     private String deviceId = "deviceID1";
-//    private String userId = "User1";
+    //    private String userId = "User1";
     private Event event;
     private ImageView eventPosterImage;
     private TextView eventTitleText, eventDescriptionText;
@@ -237,10 +237,6 @@ public class EventViewFragment extends Fragment {
                 .addToBackStack(null)
                 .commit();
     }
-
-
-
-
 
 
     /**

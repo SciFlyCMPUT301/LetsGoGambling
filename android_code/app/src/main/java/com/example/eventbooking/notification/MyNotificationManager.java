@@ -65,7 +65,7 @@ public class MyNotificationManager {
                 NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
 
                 Log.d("NotificationManager", "notification title: "+notif.getTitle());
-                notificationManager.notify(1, builder.build()); // `1` is the notification ID
+                notificationManager.notify(notif.getNotificationId().hashCode(), builder.build());
             }
         });
     }

@@ -1,54 +1,23 @@
 package com.example.eventbooking.Events.EventPageFragment;
-import com.example.eventbooking.Admin.Facility.FacilityViewAdapter;
-import com.example.eventbooking.Events.EventData.Event;
+
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Switch;
-import android.widget.TextView;
-import android.widget.Toast;
 
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 
 import com.example.eventbooking.Events.EventCreate.EventCreateFragment;
-import com.example.eventbooking.Events.EventView.EventViewFragment;
-import com.example.eventbooking.Facility;
-import com.example.eventbooking.Home.HomeFragment;
+import com.example.eventbooking.Events.EventData.Event;
+import com.example.eventbooking.Events.EventView.OrganizerEventDetailFragment;
+import com.example.eventbooking.Facility.FacilityCreateFragment;
+import com.example.eventbooking.Facility.ViewFacilityFragment;
 import com.example.eventbooking.Home.HomeUserEventAdapter;
 import com.example.eventbooking.R;
-import com.example.eventbooking.User;
 import com.example.eventbooking.UserManager;
-import com.example.eventbooking.Events.EventView.OrganizerEventDetailFragment;
-import com.example.eventbooking.firebase.FirestoreAccess;
-import com.example.eventbooking.waitinglist.OrganizerMenuFragment;
-import com.example.eventbooking.waitinglist.WaitingList;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.android.gms.tasks.TaskCompletionSource;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.example.eventbooking.waitinglist.OrganizerMenuFragment;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 public class OragnizerEventFragment  extends Fragment{
     private int someInteger = 42; // Example integer to pass
     private String userId;
@@ -121,7 +90,28 @@ public class OragnizerEventFragment  extends Fragment{
         });
         // Button to create a new event
         Button addEventButton = rootView.findViewById(R.id.btn_add_event);
+        Button addFacilityButton = rootView.findViewById(R.id.btn_add_facility);
+        Button viewFacilityButton = rootView.findViewById(R.id.btn_view_facility);
+        addFacilityButton.setVisibility(View.VISIBLE);
         addEventButton.setVisibility(View.VISIBLE);
+        viewFacilityButton.setVisibility(View.VISIBLE);
+
+        viewFacilityButton.setOnClickListener(v -> {
+            ViewFacilityFragment viewFacilityFragment = new ViewFacilityFragment();
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, viewFacilityFragment)
+                    .addToBackStack(null)
+                    .commit();
+        });
+
+        addFacilityButton.setOnClickListener(v -> {
+            FacilityCreateFragment facilityCreateFragment = new FacilityCreateFragment();
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, facilityCreateFragment)
+                    .addToBackStack(null)
+                    .commit();
+        });
+
         addEventButton.setOnClickListener(v -> {
             EventCreateFragment eventCreateFragment = new EventCreateFragment();
             getParentFragmentManager().beginTransaction()
@@ -132,8 +122,5 @@ public class OragnizerEventFragment  extends Fragment{
 
         return rootView;
     }
-
-
-
 
 }

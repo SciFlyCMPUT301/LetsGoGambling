@@ -10,12 +10,9 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
-import com.example.eventbooking.Events.EventData.Event;
-import com.example.eventbooking.Facility;
 import com.example.eventbooking.Notification;
 import com.example.eventbooking.R;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class NotificationArrayAdapter extends ArrayAdapter<Notification> {

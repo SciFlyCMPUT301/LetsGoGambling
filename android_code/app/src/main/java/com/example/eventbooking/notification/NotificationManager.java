@@ -1,5 +1,6 @@
 package com.example.eventbooking.notification;
 
+import com.example.eventbooking.Notification;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -15,5 +16,9 @@ public class NotificationManager {
     public Task<QuerySnapshot> getUserNotifications(String userId) {
         Query query = fb.collection("Notifications").whereEqualTo("userId", userId);
         return query.get();
+    }
+
+    public Task<Void> createNotification(Notification notification) {
+        return fb.collection("Notifications").document().set(notification);
     }
 }

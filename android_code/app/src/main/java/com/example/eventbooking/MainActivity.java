@@ -560,8 +560,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
 
     }
-
-    private boolean isGPSEnabled() {
+    //changed to public method to use inside join waitinglist
+    public boolean isGPSEnabled() {
         LocationManager locationManager = null;
         boolean isEnabled = false;
 
@@ -612,5 +612,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .replace(R.id.fragment_container, movingFragment)
                 .commit();
     }
+
+
+
 
 }

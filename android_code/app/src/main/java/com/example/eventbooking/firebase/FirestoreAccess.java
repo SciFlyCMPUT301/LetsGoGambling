@@ -7,6 +7,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -82,4 +83,26 @@ public class FirestoreAccess {
 //        return usersRef.document(user.getDeviceID()).set(userdata);
         return usersRef.document(user.getDeviceID()).set(user);
     }
+
+    /**
+     * Checks if an event exists with the given eventId and eventHash.
+     *
+     * @param eventId The ID of the event to search for.
+     * @param eventHash The event hash to check for.
+     * @return A Task containing a boolean result: true if event exists, false otherwise.
+     */
+    public Task<Boolean> checkEventExists(String eventId, String eventHash) {
+        return eventsRef.whereEqualTo(FieldPath.documentId(), eventId)  // Match by documentId
+                .whereEqualTo("qrcodehash", eventHash)  // Match by eventHash
+                .get()
+                .continueWith(task -> {
+                    if (task.isSuccessful() && task.getResult() != null && !task.getResult().isEmpty()) {
+                        // If query returns non-empty result, event exists
+                        return true;
+                    }
+                    // If no matching event is found
+                    return false;
+                });
+    }
+
 }

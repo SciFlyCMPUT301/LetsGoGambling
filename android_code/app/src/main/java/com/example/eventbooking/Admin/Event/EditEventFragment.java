@@ -1,5 +1,6 @@
 package com.example.eventbooking.Admin.Event;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -7,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -17,10 +19,12 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.eventbooking.Events.EventData.Event;
+import com.example.eventbooking.QRCode.QRcodeGenerator;
 import com.example.eventbooking.R;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -41,6 +45,8 @@ public class EditEventFragment extends Fragment {
     private ListView participantsListView;
     private Event selectedEvent;
     private ArrayAdapter<String> participantsAdapter;
+    private ImageView QRCode;
+    private QRcodeGenerator qrCodeGenerator;
 
     private FirebaseFirestore db;
 
@@ -76,6 +82,8 @@ public class EditEventFragment extends Fragment {
         eventLocationText = view.findViewById(R.id.view_text_event_location);
         organiserIDText = view.findViewById(R.id.view_organizer_text);
 
+        QRCode = view.findViewById(R.id.qrcode_image_view);
+
         removeEventButton = view.findViewById(R.id.button_remove_event);
         cancelButton = view.findViewById(R.id.button_cancel);
 
@@ -85,9 +93,12 @@ public class EditEventFragment extends Fragment {
         }
 
 
+
         cancelButton.setOnClickListener(v -> goBackToViewEvents());
 
         removeEventButton.setOnClickListener(v->removeEvent());
+
+        QRCode.setOnClickListener(v->navQRDetails());
         return view;
     }
 
@@ -96,13 +107,18 @@ public class EditEventFragment extends Fragment {
      * Populates the UI with details of the selected event, allowing for existing data to be displayed and modified.
      */
     private void populateEventDetails() {
+        Log.d("Edit Event Fragment", "Populate Fields");
+        Log.d("Edit Event Fragment", "Event ID: " + selectedEvent.getEventId());
         if (selectedEvent != null) {
             eventTitleText.setText(selectedEvent.getEventTitle());
             eventDescriptionText.setText(selectedEvent.getDescription());
             eventLocationText.setText(selectedEvent.getLocation());
             maxParticipantsText.setText(String.valueOf(selectedEvent.getMaxParticipants()));
             organiserIDText.setText(selectedEvent.getOrganizerId());
-
+            Log.d("Edit Event Fragment", selectedEvent.getEventId());
+            Bitmap qrCodeBitmap = qrCodeGenerator.generateAndSendBackQRCode(selectedEvent.getEventId());
+            Log.d("Edit Event Fragment", "Bitmap: " + qrCodeBitmap);
+            QRCode.setImageBitmap(qrCodeBitmap);
         }
     }
 
@@ -146,6 +162,22 @@ public class EditEventFragment extends Fragment {
                     Toast.makeText(getContext(), "Failed to delete event: ", Toast.LENGTH_SHORT).show();
                 });
     }
+
+    private void navQRDetails(){
+        QRCodeFragment detailFragment = new QRCodeFragment(selectedEvent);
+        getParentFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, detailFragment)
+                .addToBackStack(null)
+                .commit();
+    }
+
+
+
+    /**
+     * This function will get the QR code associated with the event to be scanned and displayed when scanned
+     * Once the QR code is generated then we display the QR code
+     */
+
 
 
 }

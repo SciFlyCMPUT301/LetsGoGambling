@@ -47,23 +47,14 @@
 
         <!-- Go Back Button -->
         <Button
-            android:id="@+id/admin_go_back"
+            android:id="@+id/go_back"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Admin Page"
+            android:text="Go Back"
             android:layout_weight="1"
             android:textColor="#FFFFFF"
             android:backgroundTint="@color/purple"/>
 
-        <!-- Remove Facility Button -->
-        <Button
-            android:id="@+id/remove_facility_button"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="Remove"
-            android:layout_weight="1"
-            android:textColor="#FFFFFF"
-            android:backgroundTint="#FF3B30"/>
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

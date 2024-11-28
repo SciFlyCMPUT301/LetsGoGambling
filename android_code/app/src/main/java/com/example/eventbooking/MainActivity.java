@@ -2,6 +2,8 @@ package com.example.eventbooking;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -50,6 +52,7 @@ import com.example.eventbooking.QRCode.QRCodeEventGenerate;
 import com.example.eventbooking.QRCode.QRcodeGenerator;
 import com.example.eventbooking.QRCode.ScannedFragment;
 import com.example.eventbooking.Testing.TestFragment;
+import com.example.eventbooking.firebase.FirestoreAccess;
 import com.example.eventbooking.notification.NotificationFragment;
 import com.example.eventbooking.profile.ProfileEntrantFragment;
 import com.example.eventbooking.profile.ProfileFragment;
@@ -140,6 +143,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+
         FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         UserManager.getInstance().setFusedLocationClient(fusedLocationClient);
         UserManager.getInstance().setContext(this);
@@ -194,6 +199,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             return insets;
         });
 
+        createNotificationChannel(this);
 //        FirebaseMessaging.getInstance().subscribeToTopic("test_topic").addOnCompleteListener(task -> {
 //            String msg = task.isSuccessful() ? "Subscribed" : "Subscription failed";
 //            Log.d(TAG, msg);
@@ -340,7 +346,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Log.d(TAG, "Incoming URL: " + url);
 
             eventIdFromQR = extractEventIdFromUrl(url);
+            String eventHash = extractEventHashFromUrl(url);
 
+            FirestoreAccess.getInstance().checkEventExists(eventIdFromQR, eventHash)
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            boolean exists = task.getResult();
+                            if(!exists){
+                                eventIdFromQR = null;
+                            }
+                            Log.d("Firestore", "Event exists: " + exists);
+                        } else {
+                            Log.e("Firestore", "Error checking event existence", task.getException());
+                        }
+                    });
             if (eventIdFromQR != null) {
                 Log.d(TAG, "Event ID from QR code: " + eventIdFromQR);
 
@@ -374,7 +393,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private String extractEventIdFromUrl(String url) {
         // Assuming the URL is in the format: eventbooking://eventDetail?eventID=12345
         String[] parts = url.split("eventID=");
-        if (parts.length > 1) {
+        String[] sub_parts = parts[1].split("hash=");
+        if (sub_parts.length > 1) {
+            return parts[0];
+        }
+        return null;
+    }
+
+    /**
+     * Getting the event hash from the QR code URL string
+     *
+     * @param url
+     * @return string
+     */
+    private String extractEventHashFromUrl(String url) {
+        // Assuming the URL is in the format: eventbooking://eventDetail?eventID=12345
+//        "eventbooking://eventDetail?eventID=12345?hash=" + qrCodeHash;
+        String[] parts = url.split("eventID=");
+        String[] sub_parts = parts[1].split("hash=");
+        if (sub_parts.length > 1) {
             return parts[1];
         }
         return null;
@@ -451,13 +488,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (toolbar != null) toolbar.setVisibility(View.GONE);
     }
 
-
     private void getCurrentLocation() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
                 if (isGPSEnabled()) {
-
                     LocationServices.getFusedLocationProviderClient(MainActivity.this)
                             .requestLocationUpdates(locationRequest, new LocationCallback() {
                                 @Override
@@ -551,6 +586,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }else {
                     turnOnGPS();
                 }
+            }
+        }
+    }
+
+    public void createNotificationChannel(Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            String channelId = "my_channel_id";
+            String channelName = "My Channel";
+            String channelDescription = "This is my notification channel";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+
+            NotificationChannel channel = new NotificationChannel(channelId, channelName, importance);
+            channel.setDescription(channelDescription);
+
+            NotificationManager manager = context.getSystemService(NotificationManager.class);
+            if (manager != null) {
+                manager.createNotificationChannel(channel);
             }
         }
     }

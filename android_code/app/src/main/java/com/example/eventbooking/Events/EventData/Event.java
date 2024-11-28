@@ -66,6 +66,7 @@ public class Event {
     private long timestamp; // Event time in milliseconds
     private String eventPosterURL;
     private String defaultEventPosterURL;
+    private boolean isGeolocationRequired;
 
     private String address;
     private String location;
@@ -213,6 +214,13 @@ public class Event {
 
 //    public Location getLocation() { return location; }
 //    public void setLocation(Location new_location) { this.location = new_location; }
+    public boolean isGeolocationRequired(){
+        return isGeolocationRequired;
+    }
+
+    public void setGeolocationRequired(boolean geolocationRequired){
+        isGeolocationRequired = geolocationRequired;
+    }
 
     /**
      * get address

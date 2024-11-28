@@ -105,7 +105,7 @@
             android:layout_height="wrap_content"
             android:text="Enable Geolocation"
             android:checked="true"
-            android:enabled="false"
+            android:enabled="true"
             android:padding="20dp"/>
 
         <!-- QR Code Image -->

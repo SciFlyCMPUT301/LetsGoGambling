@@ -35,6 +35,7 @@ import com.google.firebase.storage.StorageReference;
 
 import com.squareup.picasso.Picasso;
 
+import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
 
@@ -402,7 +403,10 @@ public class TestFragment extends Fragment {
     private void generateAndDisplayQRCode() {
         // URL to be encoded into the QR code (example URL with eventId)
         String event = eventIDForQR.getText().toString();
-        String eventUrl = "eventbooking://eventDetail?eventID=" + event;
+        String hashInput = event + Calendar.getInstance().getTime();
+        String qrCodeHash = qrCodeGenerator.createQRCodeHash(hashInput);
+        String eventUrl = "eventbooking://eventDetail?eventID=" + event + "?hash=" + qrCodeHash;
+//        String eventUrl = "eventbooking://eventDetail?eventID=" + event;
 
         // Generate QR code using the QRcodeGenerator class
         Bitmap qrCodeBitmap = qrCodeGenerator.generateQRCode(eventUrl);

@@ -50,6 +50,7 @@ import com.example.eventbooking.QRCode.QRCodeEventGenerate;
 import com.example.eventbooking.QRCode.QRcodeGenerator;
 import com.example.eventbooking.QRCode.ScannedFragment;
 import com.example.eventbooking.Testing.TestFragment;
+import com.example.eventbooking.firebase.FirestoreAccess;
 import com.example.eventbooking.notification.NotificationFragment;
 import com.example.eventbooking.profile.ProfileEntrantFragment;
 import com.example.eventbooking.profile.ProfileFragment;
@@ -139,6 +140,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Log.d("Main Activity", "Create Activity");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
 
         FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         UserManager.getInstance().setFusedLocationClient(fusedLocationClient);
@@ -340,7 +343,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Log.d(TAG, "Incoming URL: " + url);
 
             eventIdFromQR = extractEventIdFromUrl(url);
+            String eventHash = extractEventHashFromUrl(url);
 
+            FirestoreAccess.getInstance().checkEventExists(eventIdFromQR, eventHash)
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            boolean exists = task.getResult();
+                            if(!exists){
+                                eventIdFromQR = null;
+                            }
+                            Log.d("Firestore", "Event exists: " + exists);
+                        } else {
+                            Log.e("Firestore", "Error checking event existence", task.getException());
+                        }
+                    });
             if (eventIdFromQR != null) {
                 Log.d(TAG, "Event ID from QR code: " + eventIdFromQR);
 
@@ -374,7 +390,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private String extractEventIdFromUrl(String url) {
         // Assuming the URL is in the format: eventbooking://eventDetail?eventID=12345
         String[] parts = url.split("eventID=");
-        if (parts.length > 1) {
+        String[] sub_parts = parts[1].split("hash=");
+        if (sub_parts.length > 1) {
+            return parts[0];
+        }
+        return null;
+    }
+
+    /**
+     * Getting the event hash from the QR code URL string
+     *
+     * @param url
+     * @return string
+     */
+    private String extractEventHashFromUrl(String url) {
+        // Assuming the URL is in the format: eventbooking://eventDetail?eventID=12345
+//        "eventbooking://eventDetail?eventID=12345?hash=" + qrCodeHash;
+        String[] parts = url.split("eventID=");
+        String[] sub_parts = parts[1].split("hash=");
+        if (sub_parts.length > 1) {
             return parts[1];
         }
         return null;
@@ -451,13 +485,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (toolbar != null) toolbar.setVisibility(View.GONE);
     }
 
-
     private void getCurrentLocation() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
                 if (isGPSEnabled()) {
-
                     LocationServices.getFusedLocationProviderClient(MainActivity.this)
                             .requestLocationUpdates(locationRequest, new LocationCallback() {
                                 @Override

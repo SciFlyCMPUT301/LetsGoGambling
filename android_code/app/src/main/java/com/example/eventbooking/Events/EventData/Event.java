@@ -18,6 +18,7 @@ import com.example.eventbooking.Location;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
@@ -482,11 +483,11 @@ public class Event {
         eventData.put("defaultEventPosterURL", defaultEventPosterURL);
         //eventData.put("eventPictureUrl",eventPictureUrl);
         //eventData.put("defaultEventpictureurl",defaultEventpictureurl);
-        String eventUrl = "eventbooking://eventDetail?eventID=" + eventId;
         QRcodeGenerator qrCodeGenerator = new QRcodeGenerator();
-        String QRHash = qrCodeGenerator.createQRCodeHash(eventUrl);
-        this.qrcodehash = QRHash;
-        eventData.put("qrcodehash", QRHash);
+        String hashInput = eventId + Calendar.getInstance().getTime();
+        String qrCodeHash = qrCodeGenerator.createQRCodeHash(hashInput);
+        this.qrcodehash = qrCodeHash;
+        eventData.put("qrcodehash", qrCodeHash);
     }
 
     /**
@@ -875,6 +876,23 @@ public class Event {
      */
     public boolean isDefaultPoster() {
         return imageUrl != null && imageUrl.equals(defaultEventPosterURL);
+    }
+
+
+    public void getNewEventQRHash(){
+        QRcodeGenerator qrCodeGenerator = new QRcodeGenerator();
+        this.qrcodehash = qrCodeGenerator.createQRCodeHash(eventId);
+        saveEventDataToFirestore()
+                .addOnSuccessListener(aVoid -> {
+
+                    Log.d("Event", "Event successfully saved!");
+                })
+                .addOnFailureListener(e -> Log.e("Event", "Error saving event", e));
+
+    }
+
+    public void updateEventDataFromFirestore(){
+
     }
 
 

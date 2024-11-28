@@ -44,6 +44,7 @@ import com.squareup.picasso.Picasso;
 import com.example.eventbooking.waitinglist.OrganizerMenuFragment;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -275,7 +276,9 @@ public class EventCreateFragment extends Fragment {
         Log.d("Create Event Fragment", "Save Event");
         event.saveEventDataToFirestore()
                 .addOnSuccessListener(aVoid -> {
-                    generateAndDisplayQRCode(event.getEventId());
+//                    event
+                    QRCode.setImageBitmap(qrCodeGenerator.generateAndSendBackQRCode(event.getEventId()));
+//                    generateAndDisplayQRCode(event.getEventId());
                     Log.d("Event", "Event successfully saved!");
                 })
                 .addOnFailureListener(e -> Log.e("Event", "Error saving event", e));
@@ -301,7 +304,9 @@ public class EventCreateFragment extends Fragment {
     private void generateAndDisplayQRCode(String eventID) {
         // URL to be encoded into the QR code (example URL with eventId)
         String event = eventID;
-        String eventUrl = "eventbooking://eventDetail?eventID=" + event;
+        String hashInput = eventID + Calendar.getInstance().getTime();
+        String qrCodeHash = qrCodeGenerator.createQRCodeHash(hashInput);
+        String eventUrl = "eventbooking://eventDetail?eventID=" + eventID + "?hash=" + qrCodeHash;
 
         // Generate QR code using the QRcodeGenerator class
         Bitmap qrCodeBitmap = qrCodeGenerator.generateQRCode(eventUrl);

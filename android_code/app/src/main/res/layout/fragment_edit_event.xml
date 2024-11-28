@@ -17,8 +17,21 @@
             android:padding="16dp"
             android:layout_marginTop="80dp">
 
+            <ImageView
+                android:id="@+id/qrcode_image_view"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_below="@id/event_details_card"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="16dp"
+                android:contentDescription="QR Code"
+                android:background="@android:color/white"
+                android:src="@drawable/qr_code_placeholder"
+                android:padding="8dp" />
+
             <!-- Event Details Card -->
             <androidx.cardview.widget.CardView
+                android:id="@+id/event_details_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"

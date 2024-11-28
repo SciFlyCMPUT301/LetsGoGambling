@@ -31,6 +31,7 @@ import com.google.zxing.qrcode.QRCodeWriter;
 import com.example.eventbooking.Events.EventData.Event;
 import com.squareup.picasso.Picasso;
 
+import java.util.Calendar;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -358,7 +359,11 @@ public class OrganizerMenuFragment extends Fragment {
      */
     private void generateAndDisplayQRCode(String eventID) {
         // URL to be encoded into the QR code (example URL with eventId)
-        String eventUrl = "eventbooking://eventDetail?eventID=" + eventId;
+        String hashInput = eventID + Calendar.getInstance().getTime();
+        String qrCodeHash = qrCodeGenerator.createQRCodeHash(hashInput);
+        String eventUrl = "eventbooking://eventDetail?eventID=" + eventID + "?hash=" + qrCodeHash;
+
+//        String eventUrl = "eventbooking://eventDetail?eventID=" + eventId;
 
         // Generate QR code using the QRcodeGenerator class
         Bitmap qrCodeBitmap = qrCodeGenerator.generateQRCode(eventUrl);

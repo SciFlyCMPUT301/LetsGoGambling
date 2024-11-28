@@ -1,89 +1,196 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- res/layout/fragment_event_details.xml -->
-<ScrollView
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    android:fitsSystemWindows="true">
 
-    <LinearLayout
+    <!-- Scrollable content -->
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
-
-        <TextView
-            android:id="@+id/event_title_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="Event Title"
-            android:textColor="#222222"
-            android:textSize="20sp"
-            android:fontFamily="sans-serif-medium"
-            android:layout_marginBottom="8dp" />
-
-        <ImageView
-            android:id="@+id/event_poster_image"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:scaleType="centerCrop"
-            android:layout_marginBottom="16dp"
-            android:text="Event poster"/>
-
-
-        <TextView
-            android:id="@+id/text_event_date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Date: 16 November 2024"
-            android:textColor="#555555"
-            android:textSize="14sp"
-            android:fontFamily="sans-serif"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="4dp" />
-
-        <TextView
-            android:id="@+id/text_event_location"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Location: London"
-            android:textColor="#555555"
-            android:textSize="14sp"
-            android:fontFamily="sans-serif"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="16dp" />
-        <TextView
-            android:id="@+id/event_description_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Some description about the event"
-            android:textColor="#666666"
-            android:textSize="14sp"
-            android:fontFamily="sans-serif"
-            android:lineSpacingExtra="4dp"
-            android:layout_marginBottom="24dp" />
+        android:layout_height="match_parent">
 
         <LinearLayout
-            android:id="@+id/button_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_horizontal"
-            android:paddingTop="16dp">
-            <Button
-                android:id="@+id/register_button"
+            android:orientation="vertical">
+
+            <!-- Pinned Poster Section -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="200dp">
+
+                <ImageView
+                    android:id="@+id/event_poster_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:contentDescription="Event Poster"
+                    android:background="#F0F0F0" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="Poster Here"
+                    android:textColor="#888888"
+                    android:textSize="16sp"
+                    android:fontFamily="sans-serif" />
+            </FrameLayout>
+
+            <!-- Event Details -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:backgroundTint="@color/purple"
-                android:layout_marginBottom="16dp"
-                android:elevation="4dp"
-                android:padding="15dp"
-                android:text="Register"
-                android:textColor="#FFFFFF"
-                android:textSize="16sp"
-                android:fontFamily="sans-serif-medium" />
-        </LinearLayout>
+                android:orientation="vertical"
+                android:padding="16dp">
 
-    </LinearLayout>
-</ScrollView>
+                <!-- Event Title -->
+                <TextView
+                    android:id="@+id/event_title_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:text="Event Name"
+                    android:textColor="#222222"
+                    android:textSize="24sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:layout_marginBottom="16dp" />
+
+                <!-- Event Date -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_calendar"
+                        android:contentDescription="Calendar Icon"
+                        android:layout_marginEnd="8dp" />
+
+                    <TextView
+                        android:id="@+id/text_event_date"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Date and Time"
+                        android:textColor="#555555"
+                        android:textSize="14sp"
+                        android:fontFamily="sans-serif" />
+                </LinearLayout>
+
+                <!-- Event Location -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="16dp">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_location"
+                        android:contentDescription="Location Icon"
+                        android:layout_marginEnd="8dp" />
+
+                    <TextView
+                        android:id="@+id/text_event_location"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Location"
+                        android:textColor="#555555"
+                        android:textSize="14sp"
+                        android:fontFamily="sans-serif" />
+                </LinearLayout>
+
+                <!-- Organizer Details -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="16dp">
+
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:src="@drawable/ic_profile"
+                        android:contentDescription="Organizer Image"
+                        android:layout_marginEnd="8dp"
+                        android:scaleType="centerCrop" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/text_organizer_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Organizer Name"
+                            android:textSize="14sp"
+                            android:textColor="#333333"
+                            android:fontFamily="sans-serif-medium" />
+
+                        <TextView
+                            android:id="@+id/text_organizer_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Organizer"
+                            android:textSize="12sp"
+                            android:textColor="#666666"
+                            android:fontFamily="sans-serif" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Event Description -->
+                <TextView
+                    android:id="@+id/event_description_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/event_description"
+                    android:textColor="#666666"
+                    android:textSize="14sp"
+                    android:fontFamily="sans-serif"
+                    android:lineSpacingExtra="4dp"
+                    android:layout_marginBottom="24dp"
+                    android:padding="20dp"/>
+
+                <!-- Join Button -->
+                <LinearLayout
+                    android:id="@+id/button_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginTop="16dp">
+
+                    <!--<Button
+                        android:id="@+id/button_leave_event"
+                        android:layout_width="wrap_content"
+                        android:layout_height="48dp"
+                        android:layout_marginEnd="8dp"
+                        android:text="Leave"
+                        android:textColor="#FFFFFF"
+                        android:textSize="16sp"
+                        android:backgroundTint="#CCCCCC"
+                        android:fontFamily="sans-serif-medium" />-->
+
+                    <Button
+                        android:id="@+id/button_register_event"
+                        android:layout_width="wrap_content"
+                        android:layout_height="48dp"
+                        android:layout_weight="10"
+                        android:text="Join"
+                        android:textColor="#FFFFFF"
+                        android:textSize="20dp"
+                        android:backgroundTint="@color/purple"
+                        android:fontFamily="sans-serif-medium" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

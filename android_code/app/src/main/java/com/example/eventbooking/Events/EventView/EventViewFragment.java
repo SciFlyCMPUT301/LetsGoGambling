@@ -162,7 +162,7 @@ public class EventViewFragment extends Fragment {
                 !selectedEvent.getCanceledParticipantIds().contains(selectedUserId)) {
             Log.d("Event View Fragment", "Not In Any List");
             // If user is not in any list, add "Waitlist" button to add user to waiting list
-            addButton("Waitlist", v -> {
+            addButton("Join Waitlist", v -> {
                 selectedEvent.addWaitingParticipantIds(selectedUserId);
                 updateEventInFirestore(selectedEvent);
                 goBackToEventFragment();

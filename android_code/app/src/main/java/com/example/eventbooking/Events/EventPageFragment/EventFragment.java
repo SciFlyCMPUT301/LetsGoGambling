@@ -100,9 +100,9 @@ public class EventFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_event, container, false);
 
         // code here to get testing working
-        currentUser = getUserData();
-        UserManager tempUser = UserManager.getInstance();
-        tempUser.setCurrentUser(currentUser);
+//        currentUser = getUserData();
+//        UserManager tempUser = UserManager.getInstance();
+//        tempUser.setCurrentUser(currentUser);
 
         // Starting from here views
         backButton = view.findViewById(R.id.button_back_home);

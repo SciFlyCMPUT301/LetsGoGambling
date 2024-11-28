@@ -1,17 +1,13 @@
 package com.example.eventbooking;
 
-import static android.app.PendingIntent.getActivity;
-
 import android.content.Context;
 import android.location.Location;
 import android.util.Log;
 
 import com.example.eventbooking.Events.EventData.Event;
 import com.example.eventbooking.firebase.FirestoreAccess;
-import com.example.eventbooking.notification.MyNotificationManager;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -27,7 +23,7 @@ import java.util.List;
 public class UserManager {
     private static UserManager instance;
     private User currentUser;
-    private com.example.eventbooking.Facility userFacility;
+    private com.example.eventbooking.Facility.Facility userFacility;
     private List<Event> organizerEvents;
     private List<Event> userEvents;
     private List<Event> eventDatabase;
@@ -110,7 +106,7 @@ public class UserManager {
         FirestoreAccess.getInstance().getUserFacility(currentUser.getDeviceID()).addOnSuccessListener(queryDocumentSnapshots -> {
             if (!queryDocumentSnapshots.isEmpty()) {
                 DocumentSnapshot doc = queryDocumentSnapshots.getDocuments().get(0);
-                this.userFacility = doc.toObject(com.example.eventbooking.Facility.class);
+                this.userFacility = doc.toObject(com.example.eventbooking.Facility.Facility.class);
                 Log.d("UserManager", this.userFacility.toString());
                 findOrganizerEvents();
             }
@@ -149,7 +145,7 @@ public class UserManager {
      * getter of user facility
      * @return userFacility */
 
-    public com.example.eventbooking.Facility getUserFacility() {
+    public com.example.eventbooking.Facility.Facility getUserFacility() {
         return userFacility;
     }
     /**

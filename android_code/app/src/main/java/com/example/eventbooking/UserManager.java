@@ -1,8 +1,11 @@
 package com.example.eventbooking;
 
+import static java.security.AccessController.getContext;
+
 import android.content.Context;
 import android.location.Location;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.example.eventbooking.Events.EventData.Event;
 import com.example.eventbooking.firebase.FirestoreAccess;
@@ -245,6 +248,7 @@ public class UserManager {
         this.fusedLocationClient = client;
     }
 
+
     public void setContext (Context newContext){
         this.context = newContext;
     }
@@ -264,6 +268,7 @@ public class UserManager {
         }).addOnFailureListener(e -> Log.d("User Manager", "Failed to Update Geopoint"));
         UserManager.getInstance().setCurrentUser(currentUser);
     }
+
 
 
 

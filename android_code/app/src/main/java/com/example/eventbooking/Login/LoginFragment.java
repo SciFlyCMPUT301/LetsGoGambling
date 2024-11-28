@@ -1,6 +1,8 @@
 package com.example.eventbooking.Login;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
@@ -16,6 +18,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
 
+import androidx.core.app.ActivityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -32,12 +35,14 @@ import com.example.eventbooking.Role;
 import com.example.eventbooking.User;
 import com.example.eventbooking.UserManager;
 import com.example.eventbooking.firebase.FirestoreAccess;
+import com.example.eventbooking.notification.MyNotificationManager;
 import com.example.eventbooking.notification.NotificationFragment;
 import com.example.eventbooking.profile.ProfileEntrantFragment;
 import com.example.eventbooking.profile.ProfileFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 
 import java.util.ArrayList;
@@ -300,6 +305,17 @@ public class LoginFragment extends Fragment {
             UserManager.getInstance().updateGeolocation();
 //            user.updateGeolocation();
         }
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 1001);
+        }
+        new MyNotificationManager(FirebaseFirestore.getInstance()).notifyUserUnread(user.getDeviceID(), getContext());
         new Handler().postDelayed(() -> {
             if (eventIdFromQR != null) {
                 ((MainActivity) getActivity()).showNavigationUI();

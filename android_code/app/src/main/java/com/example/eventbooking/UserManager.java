@@ -1,30 +1,19 @@
 package com.example.eventbooking;
 
 import static android.app.PendingIntent.getActivity;
-import static java.security.AccessController.getContext;
 
 import android.content.Context;
-import android.content.pm.PackageManager;
-import android.location.Criteria;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.location.LocationProvider;
-import android.os.Message;
 import android.util.Log;
-import android.widget.Toast;
-
-import androidx.core.app.ActivityCompat;
 
 import com.example.eventbooking.Events.EventData.Event;
 import com.example.eventbooking.firebase.FirestoreAccess;
+import com.example.eventbooking.notification.MyNotificationManager;
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +27,7 @@ import java.util.List;
 public class UserManager {
     private static UserManager instance;
     private User currentUser;
-    private Facility userFacility;
+    private com.example.eventbooking.Facility userFacility;
     private List<Event> organizerEvents;
     private List<Event> userEvents;
     private List<Event> eventDatabase;
@@ -121,7 +110,7 @@ public class UserManager {
         FirestoreAccess.getInstance().getUserFacility(currentUser.getDeviceID()).addOnSuccessListener(queryDocumentSnapshots -> {
             if (!queryDocumentSnapshots.isEmpty()) {
                 DocumentSnapshot doc = queryDocumentSnapshots.getDocuments().get(0);
-                this.userFacility = doc.toObject(Facility.class);
+                this.userFacility = doc.toObject(com.example.eventbooking.Facility.class);
                 Log.d("UserManager", this.userFacility.toString());
                 findOrganizerEvents();
             }
@@ -160,7 +149,7 @@ public class UserManager {
      * getter of user facility
      * @return userFacility */
 
-    public Facility getUserFacility() {
+    public com.example.eventbooking.Facility getUserFacility() {
         return userFacility;
     }
     /**

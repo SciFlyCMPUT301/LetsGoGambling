@@ -22,12 +22,12 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import com.example.eventbooking.Notification;
 import com.example.eventbooking.QRCode.QRcodeGenerator;
 import com.example.eventbooking.R;
 import com.example.eventbooking.Events.EventPageFragment.EventFragment;
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.EncodeHintType;
-import com.google.zxing.qrcode.QRCodeWriter;
+import com.example.eventbooking.notification.MyNotificationManager;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.example.eventbooking.Events.EventData.Event;
 import com.squareup.picasso.Picasso;
 
@@ -58,6 +58,8 @@ public class OrganizerMenuFragment extends Fragment {
     private ActivityResultLauncher<Intent> pickImageLauncher;
     private Event currentEvent;
     private Button CancelNonSignUp;
+    private MyNotificationManager notificationManager;
+
     /**
      * empty constructor*/
     public OrganizerMenuFragment() {
@@ -159,6 +161,7 @@ public class OrganizerMenuFragment extends Fragment {
                 }
         );
 
+        notificationManager = new MyNotificationManager(FirebaseFirestore.getInstance());
 
     }
     /**
@@ -272,6 +275,14 @@ public class OrganizerMenuFragment extends Fragment {
             Toast.makeText(getContext(), "Sampled attendees: " + selectedParticipants, Toast.LENGTH_SHORT).show();
             waitingList.updateToFirebase().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
+
+                    String notifText = "You have been selected for an event! Please sign up here.";
+                    String notifTitle = "You were selected!";
+                    for (String user : selectedParticipants) {
+                        Notification notif = new Notification(eventId, notifText, notifTitle, user);
+                        notificationManager.createNotification(notif);
+                    }
+
                     Toast.makeText(getContext(), "Sampled attendees updated to Firebase.", Toast.LENGTH_SHORT).show();
                     navigateToViewAcceptedList(); //jump to the accepted fragment to let organizer see result
                 } else {
@@ -340,6 +351,14 @@ public class OrganizerMenuFragment extends Fragment {
             Toast.makeText(getContext(), "Replacements drawn: " + replacements, Toast.LENGTH_SHORT).show();
             waitingList.updateToFirebase().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
+
+                    String notifText = "You have been selected for an event! Please sign up here.";
+                    String notifTitle = "You were selected!";
+                    for (String user : replacements) {
+                        Notification notif = new Notification(eventId, notifText, notifTitle, user);
+                        notificationManager.createNotification(notif);
+                    }
+
                     Toast.makeText(getContext(), "Replacement attendees updated to Firebase.", Toast.LENGTH_SHORT).show();
                     navigateToViewAcceptedList();
                 } else {
@@ -479,6 +498,14 @@ public class OrganizerMenuFragment extends Fragment {
         // Update Firebase
         waitingList.updateToFirebase().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
+
+                String notifText = "You have been removed from the accepted participant list.";
+                String notifTitle = "Removed from event list";
+                for (String user : waitingList.getCanceledParticipantIds()) {
+                    Notification notif = new Notification(eventId, notifText, notifTitle, user);
+                    notificationManager.createNotification(notif);
+                }
+
                 Toast.makeText(getContext(), "Non-signed-up participants canceled successfully.", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(getContext(), "Failed to update Firebase.", Toast.LENGTH_SHORT).show();

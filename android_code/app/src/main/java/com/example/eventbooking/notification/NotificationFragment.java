@@ -6,22 +6,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 
-import com.example.eventbooking.Events.EventCreate.EventCreateFragment;
-import com.example.eventbooking.Events.EventData.Event;
 import com.example.eventbooking.Events.EventView.EventViewFragment;
 import com.example.eventbooking.Home.HomeFragment;
 import com.example.eventbooking.Notification;
 import com.example.eventbooking.R;
 import com.example.eventbooking.UserManager;
 import com.example.eventbooking.profile.ProfileFragment;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,9 +52,10 @@ public class NotificationFragment extends Fragment {
         });
 
         ListView notificationListView = rootView.findViewById(R.id.notification_list);
-        NotificationManager nm = new NotificationManager(FirebaseFirestore.getInstance());
+        MyNotificationManager nm = new MyNotificationManager(FirebaseFirestore.getInstance());
         String currentUserId = UserManager.getInstance().getUserId();
 
+        // get user's notifications and display them
         nm.getUserNotifications(currentUserId).addOnSuccessListener(queryDocumentSnapshots -> {
             List<Notification> notifications = new ArrayList<>();
             for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
@@ -69,8 +65,12 @@ public class NotificationFragment extends Fragment {
             NotificationArrayAdapter adapter = new NotificationArrayAdapter(getContext(), notifications);
             notificationListView.setAdapter(adapter);
 
+            // setup on clicks for each notif
             notificationListView.setOnItemClickListener((parent, view, position, id) -> {
                 Notification selectedNotification = notifications.get(position);
+                selectedNotification.setRead(true);
+                nm.updateNotification(selectedNotification);
+
                 EventViewFragment eventViewFragment = EventViewFragment.newInstance(selectedNotification.getEventId(), currentUserId);
 
                 getParentFragmentManager().beginTransaction()

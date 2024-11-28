@@ -2,6 +2,8 @@ package com.example.eventbooking;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -194,6 +196,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             return insets;
         });
 
+        createNotificationChannel(this);
 //        FirebaseMessaging.getInstance().subscribeToTopic("test_topic").addOnCompleteListener(task -> {
 //            String msg = task.isSuccessful() ? "Subscribed" : "Subscription failed";
 //            Log.d(TAG, msg);
@@ -551,6 +554,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }else {
                     turnOnGPS();
                 }
+            }
+        }
+    }
+
+    public void createNotificationChannel(Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            String channelId = "my_channel_id";
+            String channelName = "My Channel";
+            String channelDescription = "This is my notification channel";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+
+            NotificationChannel channel = new NotificationChannel(channelId, channelName, importance);
+            channel.setDescription(channelDescription);
+
+            NotificationManager manager = context.getSystemService(NotificationManager.class);
+            if (manager != null) {
+                manager.createNotificationChannel(channel);
             }
         }
     }

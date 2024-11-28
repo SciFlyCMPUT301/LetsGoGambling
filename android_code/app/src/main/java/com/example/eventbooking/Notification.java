@@ -1,12 +1,15 @@
 package com.example.eventbooking;
 
 public class Notification {
+    private String notificationId;
     private String userId;
     private String eventId;
 
     private String text;
     private String title;
     private boolean read;
+
+    public Notification() {}
 
     public Notification(String eventId, String text, String title, String userId) {
         this.eventId = eventId;
@@ -54,5 +57,13 @@ public class Notification {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public String getNotificationId() {
+        return notificationId;
+    }
+
+    public void setNotificationId(String notificationId) {
+        this.notificationId = notificationId;
     }
 }

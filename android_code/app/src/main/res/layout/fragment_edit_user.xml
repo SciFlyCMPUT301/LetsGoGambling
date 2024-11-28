@@ -120,7 +120,9 @@
                     android:layout_height="wrap_content"
                     android:text="Enable Notifications"
                     android:textSize="16sp"
-                    android:padding="12dp" />
+                    android:padding="12dp"
+                    android:checked="true"
+                    android:enabled="true"/>
 
                 <Switch
                     android:id="@+id/geolocationAsk"
@@ -128,7 +130,9 @@
                     android:layout_height="wrap_content"
                     android:text="Enable Geolocation"
                     android:textSize="16sp"
-                    android:padding="12dp" />
+                    android:padding="12dp"
+                    android:checked="true"
+                    android:enabled="true"/>
 
                 <LinearLayout
                     android:layout_width="match_parent"

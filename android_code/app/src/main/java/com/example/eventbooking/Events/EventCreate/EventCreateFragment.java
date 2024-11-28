@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -65,9 +66,9 @@ public class EventCreateFragment extends Fragment {
     private FirebaseFirestore db;
     private ImageView QRCode;
     private ImageView posterImageView;
+    private Switch geolocationSwitch;
+    private boolean isGeolocationRequired = false;
 
-    //private Button uploadPosterButton;
-    //private Button deletePosterButton;
     private static final int PICK_IMAGE_REQUEST = 1;
     private Event currentEvent;
     private ActivityResultLauncher<Intent> pickImageLauncher;
@@ -129,24 +130,15 @@ public class EventCreateFragment extends Fragment {
         editTextImageUrl = rootView.findViewById(R.id.event_image_url);
         createEventButton= rootView.findViewById(R.id.button_create_event);
         QRCode = rootView.findViewById(R.id.qr_image_view);
-        //button of the posters
-        //deletePosterButton = rootView.findViewById(R.id.button_delete_poster);
-        //uploadPosterButton = rootView.findViewById(R.id.button_upload_poster);
-//        pickImageLauncher = registerForActivityResult(
-//                new ActivityResultContracts.StartActivityForResult(),
-//                result -> {
-//                    if (result.getResultCode() == getActivity().RESULT_OK && result.getData() != null) {
-//                        Uri selectedImageUri = result.getData().getData();
-//                        if (selectedImageUri != null) {
-//                            uploadCustomPoster(selectedImageUri);
-//                        } else {
-//                            Toast.makeText(getContext(), "Failed to select image.", Toast.LENGTH_SHORT).show();
-//                        }
-//                    } else {
-//                        Toast.makeText(getContext(), "Image selection cancelled.", Toast.LENGTH_SHORT).show();
-//                    }
-//                });
-
+        geolocationSwitch = rootView.findViewById(R.id.geolocation_switch);
+        geolocationSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            isGeolocationRequired = isChecked;
+            if(isChecked){
+                Toast.makeText(getContext(),"Geolocation requirement enabled.", Toast.LENGTH_SHORT).show();
+            }else{
+                Toast.makeText(getContext(),"Geolocation requiremt diabled",Toast.LENGTH_SHORT).show();
+            }
+        });
 
 
 
@@ -163,13 +155,6 @@ public class EventCreateFragment extends Fragment {
         createEventButton.setOnClickListener(v->{
             createEvent();
         });
-//        uploadPosterButton.setOnClickListener(v->{
-//            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-//            pickImageLauncher.launch(intent);
-//
-//
-//        });
-//        deletePosterButton.setOnClickListener(v->deletePoster());
 
 
         return rootView;
@@ -230,6 +215,9 @@ public class EventCreateFragment extends Fragment {
         String eventId = newEventRef.getId();
         Event event = new Event(eventId, title, description,imageUrl,System.currentTimeMillis(),locationStr,maxParticipants,currentUser.getDeviceID());
         currentEvent = event;
+
+        event.setGeolocationRequired(isGeolocationRequired);
+
 
 
         WaitingList waitingList = new WaitingList(eventId);

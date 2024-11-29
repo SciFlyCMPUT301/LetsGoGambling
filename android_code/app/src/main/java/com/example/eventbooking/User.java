@@ -65,7 +65,9 @@ public class User {
     private List<String> roles;
     //Firebase
     public StorageReference storageReference;
-    FirebaseFirestore db;
+//    FirebaseFirestore db;
+    private FirebaseFirestore db;
+    private FirebaseStorage storage;
 
 
     /**
@@ -79,10 +81,17 @@ public class User {
         this.db = FirebaseFirestore.getInstance();
     }
 
+    public User(FirebaseFirestore db, FirebaseStorage storage) {
+        this.db = db;
+        this.storage = storage;
+        this.roles = new ArrayList<>();
+    }
+
     // Constructor for testing that allows injecting mock dependencies
     public User(StorageReference storageReference, FirebaseFirestore db) {
         this.storageReference = storageReference;
         this.db = db;
+        this.roles = new ArrayList<>();
     }
 
     /**

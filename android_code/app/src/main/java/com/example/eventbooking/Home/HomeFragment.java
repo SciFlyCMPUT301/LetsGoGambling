@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.SearchView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -30,6 +32,8 @@ import com.example.eventbooking.profile.ProfileFragment;
 import com.example.eventbooking.Events.EventData.Event;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 // For now let the home page be where all users end up after sign up or device recognized
 
@@ -41,6 +45,10 @@ import java.util.ArrayList;
 public class HomeFragment extends Fragment {
     private int someInteger = 42; // Example integer to pass
     private String userId;
+    private SearchView searchView;
+    private Spinner filterSpinner;
+    private List<Event> allEvents;
+    private HomeUserEventAdapter adapter;
 
     /**
      * Creates a new instance of HomeFragment with the provided user ID.
@@ -76,11 +84,14 @@ public class HomeFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_home, container, false);
 
         ListView usersEventListView = rootView.findViewById(R.id.user_events_list);
+        searchView = rootView.findViewById(R.id.search_bar);
+        filterSpinner = rootView.findViewById(R.id.filter_spinner);
         String currentUserId = UserManager.getInstance().getUserId();
 
         Event.getUserEvents(currentUserId, userEvents -> {
             if (isAdded() && getActivity() instanceof MainActivity) {
-                HomeUserEventAdapter adapter = new HomeUserEventAdapter(getContext(), userEvents, currentUserId);
+                allEvents = new ArrayList<>(userEvents);
+                adapter = new HomeUserEventAdapter(getContext(), userEvents, currentUserId);
                 usersEventListView.setAdapter(adapter);
 
                 // Set item click listener
@@ -139,6 +150,57 @@ public class HomeFragment extends Fragment {
 
 
         return rootView;
+    }
+
+
+    private void setupSearchFilter() {
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                filterEvents(query, filterSpinner.getSelectedItem().toString());
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                filterEvents(newText, filterSpinner.getSelectedItem().toString());
+                return true;
+            }
+        });
+
+        filterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                filterEvents(searchView.getQuery().toString(), parent.getItemAtPosition(position).toString());
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Do nothing
+            }
+        });
+    }
+
+    private void filterEvents(String query, String filter) {
+        if (query.isEmpty()) {
+            adapter.updateEvents(allEvents);
+            return;
+        }
+
+        List<Event> filteredEvents = allEvents.stream().filter(event -> {
+            switch (filter.toLowerCase()) {
+                case "title":
+                    return event.getEventTitle().toLowerCase().contains(query.toLowerCase());
+                case "description":
+                    return event.getDescription().toLowerCase().contains(query.toLowerCase());
+                case "location":
+                    return event.getLocation().toLowerCase().contains(query.toLowerCase());
+                default:
+                    return false;
+            }
+        }).collect(Collectors.toList());
+
+        adapter.updateEvents(filteredEvents);
     }
 }
 

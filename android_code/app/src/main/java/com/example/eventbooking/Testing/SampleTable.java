@@ -3,13 +3,16 @@ package com.example.eventbooking.Testing;
 import android.util.Log;
 
 import com.example.eventbooking.Events.EventData.Event;
-import com.example.eventbooking.Facility;
+import com.example.eventbooking.Facility.Facility;
 import com.example.eventbooking.Role;
 import com.example.eventbooking.User;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.firebase.firestore.GeoPoint;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**

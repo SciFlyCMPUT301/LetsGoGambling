@@ -15,7 +15,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.eventbooking.Admin.AdminFragment;
-import com.example.eventbooking.Facility;
+import com.example.eventbooking.Facility.Facility;
 import com.example.eventbooking.R;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;

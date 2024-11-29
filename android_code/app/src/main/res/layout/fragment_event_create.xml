@@ -103,7 +103,7 @@
             android:id="@+id/geolocation_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Enable Goelocation"
+            android:text="Enable Geolocation"
             android:checked="true"
             android:enabled="false"
             android:padding="20dp"/>
@@ -147,7 +147,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center"
-                android:layout_marginTop="8dp">
+                android:layout_marginTop="5dp">
 
                 <Button
                     android:id="@+id/button_cancel"

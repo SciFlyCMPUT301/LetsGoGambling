@@ -1,5 +1,7 @@
 package com.example.eventbooking.Testing;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -13,16 +15,13 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.app.ProgressDialog;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.eventbooking.Events.EventData.Event;
-import com.example.eventbooking.Events.EventView.EventViewFragment;
-import com.example.eventbooking.Facility;
-import com.example.eventbooking.Facility;
+import com.example.eventbooking.Facility.Facility;
 import com.example.eventbooking.Home.HomeFragment;
 import com.example.eventbooking.QRCode.QRcodeGenerator;
 import com.example.eventbooking.R;
@@ -32,14 +31,11 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.WriteBatch;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-
 import com.squareup.picasso.Picasso;
 
 import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
-
-import android.app.Activity;
 
 /**
  * The TestFragment class is a Fragment used for testing and managing data related to users,

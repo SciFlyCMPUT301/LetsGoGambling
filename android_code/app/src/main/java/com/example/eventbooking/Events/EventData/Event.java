@@ -429,7 +429,7 @@ public class Event {
 
 
     public Task<Void> saveEventDataToFirestore() {
-        Log.d("Event", "Saving Event to Firestore");
+//        Log.d("Event", "Saving Event to Firestore");
         Map<String, Object> eventData = new HashMap<>();
 
         Task<Void> saveTask;
@@ -454,15 +454,21 @@ public class Event {
                         return db.collection("Events").document(new_eventID).set(eventData);
                     });
         } else {
-            Log.d("Event", "EventID: " + eventId);
+//            Log.d("Event", "EventID: " + eventId);
             eventData.put("eventId", eventId);
             populateEventData(eventData);
             saveTask = db.collection("Events").document(eventId).set(eventData);
         }
 
         return saveTask
-                .addOnSuccessListener(aVoid -> Log.d("Event", "Event data successfully saved to Firestore."))
-                .addOnFailureListener(e -> Log.e("Event", "Error saving event data to Firestore", e));
+                .addOnSuccessListener(
+                        aVoid -> {
+                            // Log.d("Event", "Event data successfully saved to Firestore.");
+                        }
+                )
+                .addOnFailureListener(e -> {
+                    // Log.e("Event", "Error saving event data to Firestore", e);
+                });
     }
 
 
@@ -510,6 +516,7 @@ public class Event {
         this.eventTitle = newTitle;
         this.description = newDescription;
         this.location = newLocation;
+        this.address = newLocation;
         this.maxParticipants = newMaxParticipants;
         this.organizerId = newOrganizerId;
         this.waitingparticipantIds = newWaitingparticipantIds;

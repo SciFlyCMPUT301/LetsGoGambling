@@ -106,28 +106,33 @@ public class UserManager {
      * Queries and gets the user's facility if it exists
      */
     private void findUserFacility() {
-        FirestoreAccess.getInstance().getUserFacility(currentUser.getDeviceID()).addOnSuccessListener(queryDocumentSnapshots -> {
-            if (!queryDocumentSnapshots.isEmpty()) {
-                DocumentSnapshot doc = queryDocumentSnapshots.getDocuments().get(0);
-                this.userFacility = doc.toObject(com.example.eventbooking.Facility.Facility.class);
-                Log.d("UserManager", this.userFacility.toString());
-                findOrganizerEvents();
-            }
-        });
+        if(!UniversalProgramValues.getInstance().getTestingMode()){
+            FirestoreAccess.getInstance().getUserFacility(currentUser.getDeviceID()).addOnSuccessListener(queryDocumentSnapshots -> {
+                if (!queryDocumentSnapshots.isEmpty()) {
+                    DocumentSnapshot doc = queryDocumentSnapshots.getDocuments().get(0);
+                    this.userFacility = doc.toObject(com.example.eventbooking.Facility.Facility.class);
+                    Log.d("UserManager", this.userFacility.toString());
+                    findOrganizerEvents();
+                }
+            });
+        }
+
     }
 
     /**
      * Queries and gets all events the user is an organizer of, if any
      */
     private void findOrganizerEvents() {
-        FirestoreAccess.getInstance().getOrganizerEvents(currentUser.getDeviceID()).addOnSuccessListener(queryDocumentSnapshots -> {
-           if (!queryDocumentSnapshots.isEmpty()) {
-               for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                   organizerEvents.add(document.toObject(Event.class));
-                   Log.d("UserManager", organizerEvents.toString());
-               }
-           }
-        });
+        if(!UniversalProgramValues.getInstance().getTestingMode()) {
+            FirestoreAccess.getInstance().getOrganizerEvents(currentUser.getDeviceID()).addOnSuccessListener(queryDocumentSnapshots -> {
+                if (!queryDocumentSnapshots.isEmpty()) {
+                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                        organizerEvents.add(document.toObject(Event.class));
+                        Log.d("UserManager", organizerEvents.toString());
+                    }
+                }
+            });
+        }
     }
 
     /**

@@ -22,7 +22,7 @@ public class EventViewAdapter extends ArrayAdapter<Event> {
     private Context context;
     private List<Event> eventList;
 
-    public EventViewAdapter(@NonNull Context context, ArrayList<Event> eventList) {
+    public EventViewAdapter(@NonNull Context context, List <Event> eventList) {
         super(context, R.layout.event_adapter_layout, eventList);
         this.context = context;
         this.eventList = eventList;
@@ -56,5 +56,11 @@ public class EventViewAdapter extends ArrayAdapter<Event> {
         }
 
         return view;
+    }
+
+    public void updateEvents(List<Event> events) {
+        clear();
+        addAll(events);
+        notifyDataSetChanged();
     }
 }

@@ -13,6 +13,7 @@ import com.example.eventbooking.Events.EventView.EventViewFragment;
 import com.example.eventbooking.Home.HomeFragment;
 import com.example.eventbooking.Notification;
 import com.example.eventbooking.R;
+import com.example.eventbooking.UniversalProgramValues;
 import com.example.eventbooking.UserManager;
 import com.example.eventbooking.profile.ProfileFragment;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -52,33 +53,38 @@ public class NotificationFragment extends Fragment {
         });
 
         ListView notificationListView = rootView.findViewById(R.id.notification_list);
-        MyNotificationManager nm = new MyNotificationManager(FirebaseFirestore.getInstance());
         String currentUserId = UserManager.getInstance().getUserId();
+        if(!UniversalProgramValues.getInstance().getTestingMode())
+        {
+            MyNotificationManager nm = new MyNotificationManager(FirebaseFirestore.getInstance());
 
-        // get user's notifications and display them
-        nm.getUserNotifications(currentUserId).addOnSuccessListener(queryDocumentSnapshots -> {
-            List<Notification> notifications = new ArrayList<>();
-            for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
-                notifications.add(doc.toObject(Notification.class));
-            }
 
-            NotificationArrayAdapter adapter = new NotificationArrayAdapter(getContext(), notifications);
-            notificationListView.setAdapter(adapter);
+            // get user's notifications and display them
+            nm.getUserNotifications(currentUserId).addOnSuccessListener(queryDocumentSnapshots -> {
+                List<Notification> notifications = new ArrayList<>();
+                for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
+                    notifications.add(doc.toObject(Notification.class));
+                }
 
-            // setup on clicks for each notif
-            notificationListView.setOnItemClickListener((parent, view, position, id) -> {
-                Notification selectedNotification = notifications.get(position);
-                selectedNotification.setRead(true);
-                nm.updateNotification(selectedNotification);
+                NotificationArrayAdapter adapter = new NotificationArrayAdapter(getContext(), notifications);
+                notificationListView.setAdapter(adapter);
 
-                EventViewFragment eventViewFragment = EventViewFragment.newInstance(selectedNotification.getEventId(), currentUserId);
+                // setup on clicks for each notif
+                notificationListView.setOnItemClickListener((parent, view, position, id) -> {
+                    Notification selectedNotification = notifications.get(position);
+                    selectedNotification.setRead(true);
+                    nm.updateNotification(selectedNotification);
 
-                getParentFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, eventViewFragment)
-                        .addToBackStack(null) // Ensures returning to HomeFragment
-                        .commit();
+                    EventViewFragment eventViewFragment = EventViewFragment.newInstance(selectedNotification.getEventId(), currentUserId);
+
+                    getParentFragmentManager().beginTransaction()
+                            .replace(R.id.fragment_container, eventViewFragment)
+                            .addToBackStack(null) // Ensures returning to HomeFragment
+                            .commit();
+                });
             });
-        });
+        }
+
 
 
 

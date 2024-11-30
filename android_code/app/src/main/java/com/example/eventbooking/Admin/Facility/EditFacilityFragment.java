@@ -22,6 +22,23 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
+/**
+ * The EditFacilityFragment class provides an interface for editing, updating,
+ * and deleting facilities in the application. It interacts with Firebase Firestore
+ * to perform CRUD operations on facility data and handles user input to modify
+ * facility attributes.
+ *
+ * <p>Features include:</p>
+ * <ul>
+ *     <li>Editing existing facility details</li>
+ *     <li>Adding new facilities</li>
+ *     <li>Deleting facilities from Firestore</li>
+ *     <li>Displaying associated events for the facility</li>
+ * </ul>
+ *
+ * This fragment also navigates to other fragments, such as the facility list view,
+ * upon completing operations.
+ */
 
 public class EditFacilityFragment extends Fragment {
 
@@ -39,8 +56,11 @@ public class EditFacilityFragment extends Fragment {
 
 
     /**
-     *Constructor for the EditFacilityFragment class.
-     * @param selectedFacility
+     * Constructor for the EditFacilityFragment.
+     * Initializes the fragment with the selected facility data for editing.
+     *
+     * @param selectedFacility The facility object selected by the user for editing.
+     *                         If null, the fragment is set to create a new facility.
      */
     public EditFacilityFragment(Facility selectedFacility) {
         this.facility = selectedFacility;
@@ -81,6 +101,11 @@ public class EditFacilityFragment extends Fragment {
 
         return view;
     }
+    /**
+     * Initializes the UI components for the fragment.
+     *
+     * @param view The root view of the fragment, used to find and bind UI elements.
+     */
 
 
     private void initateUI(View view){
@@ -161,6 +186,10 @@ public class EditFacilityFragment extends Fragment {
                 });
 //        getActivity().onBackPressed();
     }
+    /**
+     * Navigates back to the list of facilities by replacing the current fragment
+     * with the {@link ViewFacilitiesFragment}. Adds the transaction to the back stack.
+     */
 
     private void backToFacilityListView(){
         FragmentTransaction transaction = getParentFragmentManager().beginTransaction();

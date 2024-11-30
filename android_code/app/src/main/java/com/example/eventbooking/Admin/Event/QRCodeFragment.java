@@ -26,6 +26,12 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+/**
+ * Fragment for displaying and managing QR codes associated with a specific event.
+ * <p>
+ * This fragment allows the administrator to view the QR code details of an event, generate a new QR code,
+ * and navigate back to the event edit screen. It uses a custom QR code generator to display or update QR codes.
+ */
 
 public class QRCodeFragment extends Fragment {
     private FirebaseFirestore db;
@@ -38,34 +44,45 @@ public class QRCodeFragment extends Fragment {
     private ImageView QRcode;
     private QRcodeGenerator qrCodeGenerator;
 
-
+    /**
+     * Constructor for QRCodeFragment.
+     *
+     * @param selectedEvent The event for which the QR code details will be displayed.
+     */
 
     public QRCodeFragment(Event selectedEvent) {
         this.choosenEvent = selectedEvent;
     }
-
-
-
-
+    /**
+     * Called to create the fragment's view hierarchy.
+     *
+     * @param inflater  The LayoutInflater object that can be used to inflate any views in the fragment.
+     * @param container If non-null, this is the parent view to which the fragment's UI should be attached.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state.
+     * @return The root view for the fragment's UI.
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        // Inflate the layout for the QR code details fragment
         View view = inflater.inflate(R.layout.fragment_event_qr_code_details, container, false);
-
+        // Initialize Firebase Firestore instance
         db = FirebaseFirestore.getInstance();
+        // Initialize UI components
         eventGoBack = view.findViewById(R.id.admin_go_back_event);
         removeButton = view.findViewById(R.id.remove_qrcode);
         QRcode  = view.findViewById(R.id.qrcode_image_view);
+        // Display the QR code for the chosen event
         QRcode.setImageBitmap(qrCodeGenerator.generateAndSendBackQRCode(choosenEvent.getEventId()));
         // Load QR codes from Firebase
-
+        // Initialize TextViews for displaying event details
         TextView eventIDTextView = view.findViewById(R.id.qrcode_event_id);
         TextView hashedqrcodeTextView = view.findViewById(R.id.hashed_qrcode_event);
 
-        // Bind data
+        // Bind event data to UI components
         eventIDTextView.setText(choosenEvent.getEventId());
         hashedqrcodeTextView.setText(choosenEvent.getQRcodeHash());
-
+        // Set up the "Go Back" button to navigate to the event edit screen
         eventGoBack.setOnClickListener(v -> {
             EditEventFragment detailFragment = new EditEventFragment(choosenEvent);
             getParentFragmentManager().beginTransaction()
@@ -75,8 +92,9 @@ public class QRCodeFragment extends Fragment {
         });
 
 
-        // Handle Remove Button Click
+        // Handle "Remove" button click to regenerate the QR code
         removeButton.setOnClickListener(v -> {
+            // Generate a new QR code hash for the event and update the UI
                 choosenEvent.getNewEventQRHash();
                 QRcode.setImageBitmap(qrCodeGenerator.generateAndSendBackQRCode(choosenEvent.getEventId()));
                 hashedqrcodeTextView.setText(choosenEvent.getQRcodeHash());

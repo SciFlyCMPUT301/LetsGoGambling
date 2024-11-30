@@ -20,8 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 /**
  * UserViewAdapter is a custom ArrayAdapter to display a list of User objects
- * in a ListView. Each list item displays the user's device ID, username, and
- * date joined.
+ * in a ListView. Each list item displays the user's device ID, username, date joined,
+ * and profile picture (if available).
  */
 public class UserViewAdapter extends ArrayAdapter<User> {
 
@@ -36,15 +36,15 @@ public class UserViewAdapter extends ArrayAdapter<User> {
      */
     //constructor, call on creation
     public UserViewAdapter(@NonNull Context context, ArrayList<User> userList) {
-        super(context, R.layout.user_adapter_layout, userList);
+        super(context, R.layout.user_adapter_layout, userList);// user adapter layout is used for each list item
         this.context = context;
         this.userList = userList;
     }
     /**
-     * Provides a view for each user in the list.
-     *
+     * Provides a view for each user in the list. This method inflates the layout
+     * and binds data (device ID, username, date joined, profile picture) to the views.
      * @param position    The position of the item within the adapter's data set.
-     * @param convertView The old view to reuse, if possible.
+     * @param convertView The old view to reuse, if possible (this is not used in this case).
      * @param parent      The parent view that this view will eventually be attached to.
      * @return The View corresponding to the data at the specified position.
      */
@@ -56,8 +56,8 @@ public class UserViewAdapter extends ArrayAdapter<User> {
         User user = userList.get(position);
 
         //get the inflater and inflate the XML layout for each item
-        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
-        View view = inflater.inflate(R.layout.user_adapter_layout, null);
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);// The context used to access system services and inflate layouts
+        View view = inflater.inflate(R.layout.user_adapter_layout, null); // The list of users to be displayed in the ListView
 
         ImageView userImage = (ImageView) view.findViewById(R.id.user_image);
         TextView deviceID = (TextView) view.findViewById(R.id.device_id);
@@ -65,9 +65,12 @@ public class UserViewAdapter extends ArrayAdapter<User> {
         TextView dateJoined = (TextView) view.findViewById(R.id.date_joined);
         deviceID.setText(user.getDeviceID());
         username.setText(user.getUsername());
+// For now, displaying a placeholder text "Today" for the date joined.
+// In a real app, this could be dynamically set to the actual date the user joined.
         dateJoined.setText("Today");
 
-//        //get the image associated with this property
+// Using Picasso to load the user's profile picture from the provided URL.
+// Picasso handles caching and efficient image loading.
         String profilePictureUrl = user.getProfilePictureUrl();
         if (profilePictureUrl != null && !profilePictureUrl.isEmpty()) {
             Picasso.get()

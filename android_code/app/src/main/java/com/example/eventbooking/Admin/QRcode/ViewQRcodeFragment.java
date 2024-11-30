@@ -22,6 +22,10 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+/**
+ * Fragment for viewing and managing QR codes associated with events.
+ * This fragment allows admins to view QR codes, select an event, and remove its associated QR code.
+ */
 
 public class ViewQRcodeFragment extends Fragment {
     private FirebaseFirestore db;
@@ -30,6 +34,15 @@ public class ViewQRcodeFragment extends Fragment {
     private ArrayList<Event> qrcodeList;
     private ListView qrcodeListView;
     private Event selectedQRcode = null;
+    /**
+     * Called to create the fragment's view and initialize UI components.
+     * Also loads QR codes from Firestore and sets up listeners for button actions.
+     *
+     * @param inflater           The LayoutInflater object to inflate views.
+     * @param container          The parent view group.
+     * @param savedInstanceState The previous saved instance state.
+     * @return The view for the fragment.
+     */
 
     @Nullable
     @Override
@@ -72,7 +85,10 @@ public class ViewQRcodeFragment extends Fragment {
         });
         return view;
     }
-
+    /**
+     * Loads QR codes from Firebase Firestore's "Events" collection.
+     * Filters events with non-empty QR code hash and updates the list.
+     */
     private void loadQRcodeFromFirebase() {
         db.collection("Events").get()
                 .addOnCompleteListener(task -> {
@@ -100,7 +116,12 @@ public class ViewQRcodeFragment extends Fragment {
                     }
                 });
     }
-
+    /**
+     * Removes the QR code associated with the selected event from Firestore.
+     * The QR code is removed by setting the "qrcodehash" field to null.
+     *
+     * @param qrcode The event object representing the QR code to be removed.
+     */
     private void removeQRcode(Event qrcode) {
         if (qrcode.getEventId() == null || qrcode.getEventId().isEmpty()) {
             Toast.makeText(getContext(), "Invalid QR Code. Cannot delete.", Toast.LENGTH_SHORT).show();

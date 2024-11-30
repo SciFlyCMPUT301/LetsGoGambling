@@ -67,7 +67,8 @@ public class EditUserFragment extends Fragment {
         entrantSwitch = view.findViewById(R.id.entrant_switch);
         organizerSwitch = view.findViewById(R.id.organizer_switch);
         adminSwitch = view.findViewById(R.id.admin_switch);
-
+        // "deviceId" represents the unique identifier of the user.
+        // "isNewUser" indicates whether this is a new user being created or an existing user being edited.
         Bundle args = getArguments();
         if (args != null) {
             documentId = args.getString("deviceId");
@@ -117,11 +118,11 @@ public class EditUserFragment extends Fragment {
 
     /**
      * Deletes the user's document from Firebase Firestore.
-     * Displays a success message on successful deletion and navigates back.
+     * This operation removes the user's data from the "Users" collection.
+     * A success message is shown on successful deletion, and the user is navigated back.
      *
-     * @param documentId The document ID of the user in Firestore.
+     * @param documentId The document ID of the user in Firestore, which uniquely identifies the user to delete.
      */
-
     // change this so it deletes it from firebase
     private void deleteUser(String documentId) {
         db.collection("Users").document(documentId).delete()

@@ -34,16 +34,13 @@ public class ViewFacilitiesFragment extends Fragment {
     private Facility selectedFacility = null;
 
     /**
-     * Inflates the fragment's layout and initializes components.
-     * @param inflater The LayoutInflater object that can be used to inflate
-     * any views in the fragment,
-     * @param container If non-null, this is the parent view that the fragment's
-     * UI should be attached to.  The fragment should not add the view itself,
-     * but this can be used to generate the LayoutParams of the view.
-     * @param savedInstanceState If non-null, this fragment is being re-constructed
-     * from a previous saved state as given here.
+     * Inflates the fragment's layout, initializes UI components, and sets up event listeners.
+     * Retrieves the list of facilities from Firestore and binds them to the ListView.
      *
-     * @return
+     * @param inflater The LayoutInflater object for inflating the layout.
+     * @param container The parent ViewGroup (if any) for the fragment's UI.
+     * @param savedInstanceState The saved instance state (if any) for restoring fragment state.
+     * @return The root View of the fragment's layout.
      */
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_view_facility, container, false);
@@ -55,6 +52,7 @@ public class ViewFacilitiesFragment extends Fragment {
         facilitiesListView.setAdapter(facilityAdapter);
         adminGoBack = view.findViewById(R.id.admin_go_back);
         removeButton = view.findViewById(R.id.remove_facility_button);
+
 
         loadFacilitiesFromFirestore();
 
@@ -86,7 +84,9 @@ public class ViewFacilitiesFragment extends Fragment {
     }
 
     /**
-     * Loads the list of facilities from Firestore and updates the ListView.
+     * Fetches the list of facilities from Firestore's "Facilities" collection.
+     * Maps each document to a `Facility` object and updates the ListView adapter.
+     * Logs the number of facilities loaded or errors during retrieval.
      */
     private void loadFacilitiesFromFirestore() {
         db.collection("Facilities").get().addOnCompleteListener(task -> {
@@ -104,7 +104,9 @@ public class ViewFacilitiesFragment extends Fragment {
     }
 
     /**
-     * Removes the selected facility from Firestore and updates the ListView.
+     * Removes the selected facility from Firestore's "Facilities" collection.
+     * On success, updates the UI by removing the facility from the list and clearing the selection.
+     * Displays success or failure messages as toasts.
      *
      * @param facility The selected facility to be removed.
      */

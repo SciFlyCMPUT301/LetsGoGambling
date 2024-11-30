@@ -20,19 +20,22 @@ import com.example.eventbooking.Admin.Users.ViewUsersFragment;
 import com.example.eventbooking.Home.HomeFragment;
 import com.example.eventbooking.R;
 /**
- * AdminFragment serves as the main interface for the admin to navigate between different sections,
- * such as viewing users, events, facilities, and images.
+ * AdminFragment serves as the main navigation interface for the admin to manage and view different sections
+ * such as users, events, facilities, QR codes, and images. The fragment allows the admin to easily switch between
+ * different management screens.
  */
 public class AdminFragment extends Fragment {
     private Button viewUsersButton, viewEventsButton, viewFacilitiesButton, viewImagesButton, viewQRcodeButton;
     private Button backHomeButton;
     /**
-     * Inflates the fragment's layout and initializes components.
+     * Inflates the fragment's layout, initializes the navigation buttons, and sets up the click listeners.
+     * Each button, when clicked, replaces the current fragment with a corresponding fragment (users, events, facilities, etc.).
+     * The 'View Images' button is currently hidden due to unimplemented functionality.
      *
-     * @param inflater           LayoutInflater used to inflate the layout
-     * @param container          ViewGroup container in which the fragment is placed
-     * @param savedInstanceState Bundle containing saved state data (if any)
-     * @return the root View for the fragment's layout
+     * @param inflater           LayoutInflater used to inflate the layout.
+     * @param container          ViewGroup container in which the fragment is placed.
+     * @param savedInstanceState Bundle containing saved state data (if any).
+     * @return the root View for the fragment's layout.
      */
     @Nullable
     @Override
@@ -40,12 +43,12 @@ public class AdminFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_admin, container, false);
 
         // Initialize buttons
-        viewUsersButton = view.findViewById(R.id.users_button);
-        viewEventsButton = view.findViewById(R.id.events_button);
-        viewFacilitiesButton = view.findViewById(R.id.facilities_button);
-        viewImagesButton = view.findViewById(R.id.images_button);
-        viewQRcodeButton = view.findViewById(R.id.qrcode_button);
-        backHomeButton = view.findViewById(R.id.home_button);
+        viewUsersButton = view.findViewById(R.id.users_button); // Button to navigate to the ViewUsersFragment.
+        viewEventsButton = view.findViewById(R.id.events_button);// Button to navigate to the ViewEventsFragment.
+        viewFacilitiesButton = view.findViewById(R.id.facilities_button); // Button to navigate to the ViewFacilitiesFragment.
+        viewImagesButton = view.findViewById(R.id.images_button);// Button to navigate to the ViewImagesFragment (currently hidden).
+        viewQRcodeButton = view.findViewById(R.id.qrcode_button); // Button to navigate to the ViewQRcodeFragment.
+        backHomeButton = view.findViewById(R.id.home_button);// Button to navigate back to the HomeFragment.
 
         //for now hiding it because not dealing with images
 //        viewImagesButton = view.findViewById(R.id.viewImagesButton);
@@ -73,13 +76,18 @@ public class AdminFragment extends Fragment {
 
     /**
      * Replaces the current fragment with the specified fragment and adds it to the back stack.
-     * Displays a success message on successful replacement, otherwise shows an error message.
+     * Displays a success message ("Fragment launched successfully!") upon successful fragment replacement.
+     * If the fragment replacement fails (e.g., due to an invalid context or manager), an error message is shown.
+     * This method ensures that the previous fragments are kept in the back stack for easy navigation back.
      *
-     * @param fragment the Fragment to display in the fragment container
+     * @param fragment The Fragment to display in the fragment container.
      */
     private void replaceFragment(Fragment fragment) {
         Toast.makeText(getContext(), "Fragment launched successfully!", Toast.LENGTH_SHORT).show();
         // Replace the current fragment with the specified fragment if manager and context are valid
+        // Ensure the FragmentManager and context are not null before attempting to replace the fragment.
+        // This avoids potential NullPointerExceptions in case the fragment is not properly attached.
+
         if (getParentFragmentManager() != null && getContext() != null) {
             FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
             transaction.replace(R.id.fragment_container, fragment);

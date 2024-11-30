@@ -16,12 +16,13 @@
             android:id="@+id/toolbar"
             android:layout_width="0dp"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:title="Event Booking"
             app:titleTextColor="@android:color/white" />
+<!--            android:background="?attr/colorPrimary"-->
+
 
         <!-- Fragment container -->
         <FrameLayout
@@ -45,11 +46,17 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- Navigation Drawer -->
+<!--    <com.google.android.material.navigation.NavigationView-->
+<!--        android:id="@+id/nav_view"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:layout_gravity="start"-->
+<!--        app:headerLayout="@layout/navigation_header"-->
+<!--        app:menu="@menu/side_menu_standard" />-->
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/nav_view"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        app:headerLayout="@layout/navigation_header"
-        app:menu="@menu/side_menu" />
+        app:headerLayout="@layout/navigation_header" />
 </androidx.drawerlayout.widget.DrawerLayout>

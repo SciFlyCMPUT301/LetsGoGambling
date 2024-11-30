@@ -7,6 +7,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.os.UserManager;
 import android.provider.ContactsContract;
 import android.util.Log;
@@ -58,7 +60,7 @@ import java.util.UUID;
  * canceled). This class provides methods for managing event data and interacting with Firebase
  * services for storage, retrieval, and updates.
  */
-public class Event {
+public class Event implements Parcelable {
     private String eventId;
     private String eventTitle;
     private String description;
@@ -296,18 +298,30 @@ public class Event {
         return acceptedParticipantIds;
     }
     public void addAcceptedParticipantId(String participantId){acceptedParticipantIds.add(participantId);}
+    public void setAcceptedParticipantIds(List <String> acceptedList){
+        this.acceptedParticipantIds = new ArrayList<>(acceptedList);
+    }
     public List<String> getCanceledParticipantIds() {
         return canceledParticipantIds;
     }
     public void addCanceledParticipantIds(String participantId){canceledParticipantIds.add(participantId);}
+    public void setCanceledParticipantIds(List <String> canceledList){
+        this.canceledParticipantIds = new ArrayList<>(canceledList);
+    }
     public List<String> getSignedUpParticipantIds() {
         return signedUpParticipantIds;
     }
     public void addSignedUpParticipantIds(String participantId){signedUpParticipantIds.add(participantId);}
+    public void setSignedUpParticipantIds(List <String> signedUpList){
+        this.signedUpParticipantIds = new ArrayList<>(signedUpList);
+    }
     public List<String> getWaitingParticipantIds() {
         return waitingparticipantIds;
     }
     public void addWaitingParticipantIds(String participantId){waitingparticipantIds.add(participantId);}
+    public void setWaitingParticipantIds(List <String> waitingList){
+        this.waitingparticipantIds = new ArrayList<>(waitingList);
+    }
     public void removeWaitingParticipantId(String participantId){
         if(waitingparticipantIds.contains(participantId)){
             waitingparticipantIds.remove(participantId);
@@ -440,7 +454,7 @@ public class Event {
 
 
     public Task<Void> saveEventDataToFirestore() {
-        Log.d("Event", "Saving Event to Firestore");
+//        Log.d("Event", "Saving Event to Firestore");
         Map<String, Object> eventData = new HashMap<>();
 
         Task<Void> saveTask;
@@ -465,15 +479,21 @@ public class Event {
                         return db.collection("Events").document(new_eventID).set(eventData);
                     });
         } else {
-            Log.d("Event", "EventID: " + eventId);
+//            Log.d("Event", "EventID: " + eventId);
             eventData.put("eventId", eventId);
             populateEventData(eventData);
             saveTask = db.collection("Events").document(eventId).set(eventData);
         }
 
         return saveTask
-                .addOnSuccessListener(aVoid -> Log.d("Event", "Event data successfully saved to Firestore."))
-                .addOnFailureListener(e -> Log.e("Event", "Error saving event data to Firestore", e));
+                .addOnSuccessListener(
+                        aVoid -> {
+                            // Log.d("Event", "Event data successfully saved to Firestore.");
+                        }
+                )
+                .addOnFailureListener(e -> {
+                    // Log.e("Event", "Error saving event data to Firestore", e);
+                });
     }
 
 
@@ -522,6 +542,7 @@ public class Event {
         this.eventTitle = newTitle;
         this.description = newDescription;
         this.location = newLocation;
+        this.address = newLocation;
         this.maxParticipants = newMaxParticipants;
         this.organizerId = newOrganizerId;
         this.waitingparticipantIds = newWaitingparticipantIds;
@@ -903,12 +924,66 @@ public class Event {
 
     }
 
-    public void updateEventDataFromFirestore(){
-
+    protected Event(Parcel in) {
+        eventId = in.readString();
+        eventTitle = in.readString();
+        description = in.readString();
+        imageUrl = in.readString();
+        timestamp = in.readLong();
+        eventPosterURL = in.readString();
+        defaultEventPosterURL = in.readString();
+        address = in.readString();
+        location = in.readString();
+        maxParticipants = in.readInt();
+        waitingparticipantIds = in.createStringArrayList();
+        acceptedParticipantIds = in.createStringArrayList();
+        canceledParticipantIds = in.createStringArrayList();
+        signedUpParticipantIds = in.createStringArrayList();
+        enrolledParticipantIds = in.createStringArrayList();
+        declinedParticipantIds = in.createStringArrayList();
+        waitingList = in.readParcelable(WaitingList.class.getClassLoader());
+        organizerId = in.readString();
+        qrcodehash = in.readString();
     }
 
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(eventId);
+        dest.writeString(eventTitle);
+        dest.writeString(description);
+        dest.writeString(imageUrl);
+        dest.writeLong(timestamp);
+        dest.writeString(eventPosterURL);
+        dest.writeString(defaultEventPosterURL);
+        dest.writeString(address);
+        dest.writeString(location);
+        dest.writeInt(maxParticipants);
+        dest.writeStringList(waitingparticipantIds);
+        dest.writeStringList(acceptedParticipantIds);
+        dest.writeStringList(canceledParticipantIds);
+        dest.writeStringList(signedUpParticipantIds);
+        dest.writeStringList(enrolledParticipantIds);
+        dest.writeStringList(declinedParticipantIds);
+        dest.writeString(organizerId);
+        dest.writeString(qrcodehash);
+    }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
 
+    public static final Creator<Event> CREATOR = new Creator<Event>() {
+        @Override
+        public Event createFromParcel(Parcel in) {
+            return new Event(in);
+        }
+
+        @Override
+        public Event[] newArray(int size) {
+            return new Event[size];
+        }
+    };
 }
 
 

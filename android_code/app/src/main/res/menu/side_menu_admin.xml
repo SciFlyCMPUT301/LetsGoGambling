@@ -1,0 +1,24 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_profile"
+        android:icon="@drawable/ic_profile_foreground"
+        android:title="My Profile" />
+    <item
+        android:id="@+id/nav_notifications"
+        android:icon="@drawable/ic_notification_foreground"
+        android:title="Notifications" />
+    <item
+        android:id="@+id/nav_event_menu"
+        android:icon="@drawable/ic_events_foreground"
+        android:title="Events"/>
+    <item
+        android:id="@+id/nav_sign_out"
+        android:icon="@drawable/ic_sign_out_foreground"
+        android:title="Sign Out"
+        />
+    <item
+        android:id="@+id/nav_admin"
+        android:icon="@drawable/ic_admin_foreground"
+        android:title="Admin Panel"
+        />
+</menu>

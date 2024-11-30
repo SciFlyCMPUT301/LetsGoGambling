@@ -13,4 +13,10 @@
         <item>Declined List</item>
         <item>Cancelled List</item>
     </string-array>
+
+    <string-array name="filter_options">
+        <item>Title</item>
+        <item>Description</item>
+        <item>Location</item>
+    </string-array>
 </resources>

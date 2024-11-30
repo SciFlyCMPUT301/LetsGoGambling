@@ -65,7 +65,9 @@ public class User {
     private List<String> roles;
     //Firebase
     public StorageReference storageReference;
-    FirebaseFirestore db;
+//    FirebaseFirestore db;
+    private FirebaseFirestore db;
+    private FirebaseStorage storage;
 
 
     /**
@@ -79,10 +81,17 @@ public class User {
         this.db = FirebaseFirestore.getInstance();
     }
 
+    public User(FirebaseFirestore db, FirebaseStorage storage) {
+        this.db = db;
+        this.storage = storage;
+        this.roles = new ArrayList<>();
+    }
+
     // Constructor for testing that allows injecting mock dependencies
     public User(StorageReference storageReference, FirebaseFirestore db) {
         this.storageReference = storageReference;
         this.db = db;
+        this.roles = new ArrayList<>();
     }
 
     /**
@@ -557,31 +566,38 @@ public class User {
 
 
     public void deleteSelectedImageFromFirebase(String imageUrl) {
+
         // Get a reference to the image in Firebase Storage
-        StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl(imageUrl);
+        if(!UniversalProgramValues.getInstance().getTestingMode()){
+            StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl(imageUrl);
 
-        // Delete the image from Firebase Storage
-        storageRef.delete()
-                .addOnSuccessListener(aVoid -> {
-                    // Successfully deleted the image
-                    Log.d("FirebaseStorage", "Selected image deleted successfully.");
+            // Delete the image from Firebase Storage
+            storageRef.delete()
+                    .addOnSuccessListener(aVoid -> {
+                        // Successfully deleted the image
+                        Log.d("FirebaseStorage", "Selected image deleted successfully.");
 
-                    // Update the user's profile picture URL to the default
-                    this.profilePictureUrl = defaultprofilepictureurl;
+                        // Update the user's profile picture URL to the default
+                        this.profilePictureUrl = defaultprofilepictureurl;
 
-                    // Save the updated user data to Firestore
-                    saveUserDataToFirestore()
-                            .addOnSuccessListener(saveVoid -> {
-                                Log.d("Firestore", "Profile picture URL reset to default successfully.");
-                            })
-                            .addOnFailureListener(e -> {
-                                Log.e("Firestore", "Failed to update profile picture URL", e);
-                            });
-                })
-                .addOnFailureListener(e -> {
-                    // Failed to delete the image from Firebase Storage
-                    Log.e("FirebaseStorage", "Failed to delete selected image", e);
-                });
+                        // Save the updated user data to Firestore
+                        saveUserDataToFirestore()
+                                .addOnSuccessListener(saveVoid -> {
+                                    Log.d("Firestore", "Profile picture URL reset to default successfully.");
+                                })
+                                .addOnFailureListener(e -> {
+                                    Log.e("Firestore", "Failed to update profile picture URL", e);
+                                });
+                    })
+                    .addOnFailureListener(e -> {
+                        // Failed to delete the image from Firebase Storage
+                        Log.e("FirebaseStorage", "Failed to delete selected image", e);
+                    });
+        }
+        else{
+            UniversalProgramValues.getInstance().setDeleteFirebaseImage(imageUrl);
+        }
+
     }
 
     /**

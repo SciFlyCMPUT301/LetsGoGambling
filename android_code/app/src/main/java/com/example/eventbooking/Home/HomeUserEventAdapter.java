@@ -75,4 +75,10 @@ public class HomeUserEventAdapter extends ArrayAdapter<Event> {
 
         return view;
     }
+
+    public void updateEvents(List<Event> events) {
+        clear();
+        addAll(events);
+        notifyDataSetChanged();
+    }
 }

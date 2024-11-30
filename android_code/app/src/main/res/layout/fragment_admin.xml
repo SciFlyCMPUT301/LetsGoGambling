@@ -19,9 +19,9 @@
             android:layout_width="0dp"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             app:title="Admin Profile"
             app:titleTextColor="@android:color/white" />
 
@@ -31,11 +31,11 @@
             android:id="@+id/home_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="160dp"
             android:layout_marginTop="428dp"
             android:backgroundTint="@color/purple"
             android:text="Home"
             android:textColor="@android:color/white"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/toolbar" />
 
@@ -44,8 +44,9 @@
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:src="@drawable/ic_profile_foreground"
-            tools:layout_editor_absoluteX="155dp"
-            tools:layout_editor_absoluteY="64dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/toolbar"
             tools:ignore="MissingConstraints" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -118,11 +119,11 @@
 
             <!-- QRcode Button -->
             <Button
-                android:id="@+id/qrcode_button"
+                android:id="@+id/test_page_button"
                 android:layout_width="300dp"
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
-                android:text="QRCODE"
+                android:text="Test Page"
                 android:backgroundTint="@color/purple"
                 android:textColor="@android:color/white"
                 android:drawableEnd="@drawable/ic_arrow_right"

@@ -20,6 +20,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.example.eventbooking.Admin.AdminFragment;
 import com.example.eventbooking.Events.EventData.Event;
 import com.example.eventbooking.Facility.Facility;
 import com.example.eventbooking.Home.HomeFragment;
@@ -124,7 +125,7 @@ public class TestFragment extends Fragment {
         btnSelectImage.setOnClickListener(v -> openFileChooser());
         btnUploadImage.setOnClickListener(v -> uploadImage());
         btnDelete.setOnClickListener(v -> deleteAllData());
-        btnBackHome.setOnClickListener(v -> backToHome());
+        btnBackHome.setOnClickListener(v -> backToAdmin());
         generateQRCode.setOnClickListener(v -> generateAndDisplayQRCode());
         btnMapEvent.setOnClickListener(v -> goToMap());
         return view;
@@ -416,9 +417,9 @@ public class TestFragment extends Fragment {
         }
     }
 
-    private void backToHome(){
+    private void backToAdmin(){
         FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragment_container, new HomeFragment());
+        transaction.replace(R.id.fragment_container, new AdminFragment());
         transaction.addToBackStack(null);
         transaction.commit();
     }

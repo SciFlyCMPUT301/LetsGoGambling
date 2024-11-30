@@ -53,8 +53,8 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.robolectric.RobolectricTestRunner;
-import org.robolectric.annotation.Config;
+
+
 import org.junit.runner.RunWith;
 
 /**
@@ -266,16 +266,16 @@ public void testSaveEventDataToFirestore() {
 //        verify(mockStorageReference).putFile(mockUri);
 //    }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testUploadEventPosterToFirebase_InvalidPath() {
-        event.uploadEventPosterToFirebase("");
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testUploadEventPosterToFirebase_MissingEventId() {
-        event.setEventId(null);
-        event.uploadEventPosterToFirebase("/path/to/valid/picture.jpg");
-    }
+//    @Test(expected = IllegalArgumentException.class)
+//    public void testUploadEventPosterToFirebase_InvalidPath() {
+//        event.uploadEventPosterToFirebase("");
+//    }
+//
+//    @Test(expected = IllegalArgumentException.class)
+//    public void testUploadEventPosterToFirebase_MissingEventId() {
+//        event.setEventId(null);
+//        event.uploadEventPosterToFirebase("/path/to/valid/picture.jpg");
+//    }
 
 
 

@@ -18,6 +18,7 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -106,6 +107,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static final String TAG = "MainActivity";
     private String eventIdFromQR = null;
     public static boolean isLoggedIn = false;
+    public static boolean testMode = false;
 //    private ActivityMainBinding binding;
 
 
@@ -142,6 +144,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Log.d("Main Activity", "Create Activity");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+//        Bundle bundle = getIntent().getExtras();
+//        if (bundle != null) {
+//            testMode = bundle.getBoolean("testingMode");
+//        }
+        testMode = UniversalProgramValues.getInstance().getTestingMode();
 
 
 
@@ -171,6 +178,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        loadStandardSidePanel();
 
         // Set up ActionBarDrawerToggle
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,
@@ -180,12 +188,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
 
-
+        // Not sure if needing to comment this out or not, needed?
         //For location:
-        locationRequest = LocationRequest.create();
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationRequest.setInterval(5000);
-        locationRequest.setFastestInterval(2000);
+//        locationRequest = LocationRequest.create();
+//        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+//        locationRequest.setInterval(5000);
+//        locationRequest.setFastestInterval(2000);
         getCurrentLocation();
 
 
@@ -224,18 +232,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             } else if (itemId == R.id.nav_profile) {
                 moveToFragment(profileFragment);
                 return true;
-            } else if (itemId == R.id.nav_events) {
-                moveToFragment(eventFragment);
-                return true;
             }else if (itemId == R.id.nav_test) {
                 moveToFragment(testFragment);
                 return true;
             }
             else if (itemId == R.id.nav_organizer){
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.fragment_container, organizerFragment)
-                        .commit();
+                moveToFragment(organizerFragment);
                 return true;
             }
         }
@@ -284,8 +286,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 moveToFragment(loginFragment);
             } else if (itemId == R.id.nav_home) {
                 moveToFragment(homeFragment);
-            } else if (itemId == R.id.nav_event) {
-                moveToFragment(eventFragment);
             } else if (itemId == R.id.nav_event_create) {
                 moveToFragment(eventCreateFragment);
             } else if (itemId == R.id.nav_camera) {
@@ -424,14 +424,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      */
     private void showLoginFragment(String eventIdFromQR) {
         // Show LoginFragment first
+//        if(!testMode){
+            Log.d("Main Activity", "No Test Show Login Fragment");
+            LoginFragment loginArgs = LoginFragment.newInstance(eventIdFromQR);
+            moveToFragment(loginArgs);
+//        }
+//        else{
+//            Log.d("Main Activity", "No Test Show Login Fragment");
+//            LoginFragment loginArgs = LoginFragment.newInstance(true, "testDeviceID", eventIdFromQR);
+//            moveToFragment(loginArgs);
+//        }
         Log.d("MainActivity Login Move", "Event ID: " + eventIdFromQR);
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        Bundle bundle = new Bundle();
-        bundle.putString("eventIdFromQR", eventIdFromQR);
-        loginFragment.setArguments(bundle);
-        fragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, loginFragment)
-                .commit();
+
+
+//        FragmentManager fragmentManager = getSupportFragmentManager();
+//        Bundle bundle = new Bundle();
+//        bundle.putString("eventIdFromQR", eventIdFromQR);
+//        loginFragment.setArguments(bundle);
+//        fragmentManager.beginTransaction()
+//                .replace(R.id.fragment_container, loginFragment)
+//                .commit();
     }
 
     /**
@@ -608,11 +620,29 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void moveToFragment(Fragment movingFragment){
+        drawerLayout.closeDrawer(GravityCompat.START);
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, movingFragment)
                 .commit();
     }
 
+    public void loadAdminSidePanel(){
+        Menu menu = navigationView.getMenu();
+        menu.clear();  // Clear existing items
+        navigationView.inflateMenu(R.menu.side_menu_admin);
+    }
+
+    public void loadStandardSidePanel(){
+        Menu menu = navigationView.getMenu();
+        menu.clear();  // Clear existing items
+        navigationView.inflateMenu(R.menu.side_menu_standard);
+    }
+
+    public void loadTestSidePanel(){
+        Menu menu = navigationView.getMenu();
+        menu.clear();  // Clear existing items
+        navigationView.inflateMenu(R.menu.side_menu_testing);
+    }
 
 
 

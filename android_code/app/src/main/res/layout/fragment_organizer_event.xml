@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -43,6 +41,32 @@
         android:dividerHeight="1dp" />
 
 
+    <!-- Button to add an event (invisible by default) -->
+    <Button
+        android:id="@+id/btn_add_event"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add Event"
+        android:layout_gravity="center"
+        android:visibility="invisible"/>
+
+    <!-- Button to add a facility (invisible by default) -->
+    <Button
+        android:id="@+id/btn_add_facility"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add Facility"
+        android:layout_gravity="center"
+        android:visibility="invisible"/>
+
+    <!-- Button to view facilities (invisible by default) -->
+    <Button
+        android:id="@+id/btn_view_facility"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="View Facilities"
+        android:layout_gravity="center"
+        android:visibility="invisible"/>
 
 </LinearLayout>
 

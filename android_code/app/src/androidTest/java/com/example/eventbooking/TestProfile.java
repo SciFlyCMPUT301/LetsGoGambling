@@ -9,6 +9,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.core.app.ActivityScenario;
 
+import com.example.eventbooking.MainActivity;
 import com.example.eventbooking.profile.ProfileFragment;
 import com.example.eventbooking.User;
 import com.example.eventbooking.UserManager;

@@ -124,7 +124,7 @@
                 android:layout_height="wrap_content"
                 android:text="Enable Notifications"
                 android:checked="true"
-                android:enabled="false"
+                android:enabled="true"
                 android:padding="20dp"/>
 
             <Switch
@@ -133,7 +133,7 @@
                 android:layout_height="wrap_content"
                 android:text="Enable Goelocation"
                 android:checked="true"
-                android:enabled="false"
+                android:enabled="true"
                 android:padding="20dp"/>
         </LinearLayout>
 

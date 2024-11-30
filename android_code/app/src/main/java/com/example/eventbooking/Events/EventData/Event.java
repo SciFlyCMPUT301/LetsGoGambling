@@ -68,6 +68,7 @@ public class Event implements Parcelable {
     private long timestamp; // Event time in milliseconds
     private String eventPosterURL;
     private String defaultEventPosterURL;
+    private boolean geolocationRequired;
 
     private String address;
     private String location;
@@ -215,6 +216,16 @@ public class Event implements Parcelable {
 
 //    public Location getLocation() { return location; }
 //    public void setLocation(Location new_location) { this.location = new_location; }
+// Ensure the field name matches the key in Firestore
+
+
+    public boolean isGeolocationRequired() {
+        return geolocationRequired;
+    }
+    public void setGeolocationRequired(boolean geolocationRequired) {
+        this.geolocationRequired = geolocationRequired;
+    }
+
 
     /**
      * get address
@@ -501,6 +512,7 @@ public class Event implements Parcelable {
         eventData.put("organizerId", organizerId);
         eventData.put("eventPosterURL", eventPosterURL);
         eventData.put("defaultEventPosterURL", defaultEventPosterURL);
+        eventData.put("geolocationRequired", geolocationRequired);
         //eventData.put("eventPictureUrl",eventPictureUrl);
         //eventData.put("defaultEventpictureurl",defaultEventpictureurl);
         QRcodeGenerator qrCodeGenerator = new QRcodeGenerator();

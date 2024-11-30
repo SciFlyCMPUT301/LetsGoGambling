@@ -18,7 +18,7 @@
             android:text="Back to Home"
             android:layout_gravity="start"
             android:layout_marginBottom="16dp"
-            android:backgroundTint="@android:color/holo_purple" />
+            android:backgroundTint="@color/purple" />
 
 
         <!-- Title Section -->
@@ -105,7 +105,7 @@
             android:layout_height="wrap_content"
             android:text="Enable Geolocation"
             android:checked="true"
-            android:enabled="false"
+            android:enabled="true"
             android:padding="20dp"/>
 
         <!-- QR Code Image -->
@@ -162,7 +162,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Save"
-                    android:backgroundTint="@android:color/holo_blue_light" />
+                    android:backgroundTint="@color/purple" />
             </LinearLayout>
         </LinearLayout>
 

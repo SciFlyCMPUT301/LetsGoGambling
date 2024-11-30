@@ -15,10 +15,13 @@ import androidx.fragment.app.Fragment;
 
 import com.example.eventbooking.Events.EventData.Event;
 import com.example.eventbooking.Events.EventPageFragment.EventFragment;
+import com.example.eventbooking.MainActivity;
 import com.example.eventbooking.Home.HomeFragment;
 import com.example.eventbooking.R;
 import com.example.eventbooking.UniversalProgramValues;
 import com.example.eventbooking.UserManager;
+import com.example.eventbooking.profile.ProfileEntrantFragment;
+import com.example.eventbooking.profile.ProfileFragment;
 
 /**
  * EventViewFragment is a fragment that displays details of an event.
@@ -185,10 +188,15 @@ public class EventViewFragment extends Fragment {
             Log.d("Event View Fragment", "Not In Any List");
             // If user is not in any list, add "Waitlist" button to add user to waiting list
             addButton("Join Waitlist", v -> {
-                selectedEvent.addWaitingParticipantIds(selectedUserId);
-                if(!UniversalProgramValues.getInstance().getTestingMode())
-                    updateEventInFirestore(selectedEvent);
-                goBackToEventFragment();
+                if(selectedEvent.isGeolocationRequired()){
+                    if(!UniversalProgramValues.getInstance().getTestingMode())
+                        showGeolocationWarningDialog(selectedEvent, selectedUserId);
+                }else{
+                    selectedEvent.addWaitingParticipantIds(selectedUserId);
+                    if(!UniversalProgramValues.getInstance().getTestingMode())
+                        updateEventInFirestore(selectedEvent);
+                    goBackToEventFragment();
+                }
             });
         }
 
@@ -221,6 +229,40 @@ public class EventViewFragment extends Fragment {
             });
         }
     }
+
+    private boolean isGPSEnabled() {
+        MainActivity mainActivity = (MainActivity) getActivity();
+        return mainActivity != null && mainActivity.isGPSEnabled();
+    }
+
+
+    private void showGeolocationWarningDialog(Event selectedEvent, String selectedUserId) {
+        new android.app.AlertDialog.Builder(requireContext())
+                .setTitle("Geolocation Requirement")
+                .setMessage("This event requires geolocation to join the waiting list. If enabled, you'll be added to the waiting list.")
+                .setPositiveButton("OK", (dialog, which) -> {
+                    if (isGPSEnabled()) {
+                        // If GPS is enabled, directly join the waiting list
+                        selectedEvent.addWaitingParticipantIds(selectedUserId);
+                        updateEventInFirestore(selectedEvent);
+                        goBackToEventFragment();
+                    } else {
+                        // Redirect to the profile if GPS is not enabled
+                        navigateToProfile();
+                    }
+                })
+                .setNegativeButton("Cancel", (dialog, which) ->
+                        Toast.makeText(getContext(), "Geolocation is required to join the waiting list.", Toast.LENGTH_SHORT).show())
+                .show();
+    }
+
+    private void navigateToProfile() {
+        getActivity().getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, new ProfileEntrantFragment())
+                .addToBackStack(null)
+                .commit();
+    }
+
 
     /**
      * Goes back to the EventFragment.

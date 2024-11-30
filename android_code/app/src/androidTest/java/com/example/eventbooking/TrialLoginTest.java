@@ -147,6 +147,7 @@ public class TrialLoginTest {
 //        FirebaseFirestore db = FirebaseFirestore.getInstance();
 //        DocumentReference userRef = db.collection("Users").document("testingDeviceID100");
 //        userRef.delete();
+        UniversalProgramValues.getInstance().resetInstance();
 
     }
 
@@ -239,9 +240,19 @@ public class TrialLoginTest {
         onView(withText("Join Waitlist"))
                 .perform(ViewActions.click());
 
+        try {
+            Thread.sleep(1000); // Pause for 3 seconds
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        onView(withId(R.id.search_bar))
+                .check(matches(isDisplayed()));
+
 //        FirebaseFirestore db = FirebaseFirestore.getInstance();
 //        DocumentReference userRef = db.collection("Users").document("testingDeviceID100");
 //        userRef.delete();
+        UniversalProgramValues.getInstance().resetInstance();
     }
 
     @Test
@@ -268,6 +279,7 @@ public class TrialLoginTest {
         // Assert that Test Mode UI is visible
         onView(withId(R.id.test_mode_layout))
                 .check(matches(isDisplayed()));
+        UniversalProgramValues.getInstance().resetInstance();
     }
 
     @Test
@@ -346,9 +358,26 @@ public class TrialLoginTest {
 
         onView(withId(R.id.event_title_text))
                 .check(matches(isDisplayed()));
+
+        onView(withText("Join Waitlist"))
+                .check(ViewAssertions.matches(isDisplayed()));
+
+        onView(withText("Join Waitlist"))
+                .perform(ViewActions.click());
+
+        try {
+            Thread.sleep(1000); // Pause for 3 seconds
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        onView(withId(R.id.search_bar))
+                .check(matches(isDisplayed()));
+
 //        FirebaseFirestore db = FirebaseFirestore.getInstance();
 //        DocumentReference userRef = db.collection("Users").document("testingDeviceID100");
 //        userRef.delete();
+        UniversalProgramValues.getInstance().resetInstance();
 
     }
 
@@ -407,5 +436,6 @@ public class TrialLoginTest {
 //        FirebaseFirestore db = FirebaseFirestore.getInstance();
 //        DocumentReference userRef = db.collection("Users").document("testingDeviceID100");
 //        userRef.delete();
+        UniversalProgramValues.getInstance().resetInstance();
     }
 }

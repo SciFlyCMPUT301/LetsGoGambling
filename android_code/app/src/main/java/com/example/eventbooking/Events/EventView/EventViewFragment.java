@@ -188,8 +188,8 @@ public class EventViewFragment extends Fragment {
             Log.d("Event View Fragment", "Not In Any List");
             // If user is not in any list, add "Waitlist" button to add user to waiting list
             addButton("Join Waitlist", v -> {
-                if(selectedEvent.isGeolocationRequired()){
-                    if(!UniversalProgramValues.getInstance().getTestingMode())
+                if (selectedEvent.isGeolocationRequired()) {
+                    if (!UniversalProgramValues.getInstance().getTestingMode())
                         showGeolocationWarningDialog(selectedEvent, selectedUserId);
                 }else{
                     selectedEvent.addWaitingParticipantIds(selectedUserId);

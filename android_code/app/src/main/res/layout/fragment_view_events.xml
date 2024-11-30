@@ -1,54 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fillViewport="true">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:layout_marginTop="65dp">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
+        android:orientation="horizontal"
         android:layout_height="wrap_content"
-        android:layout_marginTop="65dp">
+        android:gravity="center">
 
-        <!-- SearchView for searching events -->
         <SearchView
             android:id="@+id/search_bar"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_weight="1"
             android:queryHint="Search events..."
             android:iconifiedByDefault="false" />
 
-        <!-- ListView for displaying events -->
-        <ListView
-            android:id="@+id/event_list"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintTop_toBottomOf="@id/search_bar"
-            app:layout_constraintBottom_toTopOf="@+id/button_container"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
-
-        <!-- Button container with a horizontal layout -->
-        <LinearLayout
-            android:id="@+id/button_container"
-            android:layout_width="match_parent"
+        <Spinner
+            android:id="@+id/filter_spinner"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:padding="16dp">
+            android:layout_marginTop="16dp"
+            android:layout_gravity="end"
+            android:entries="@array/filter_options" />
+    </LinearLayout>
+    <!-- ListView to display user events -->
 
-            <!-- Button to navigate to the admin page -->
-            <Button
-                android:id="@+id/admin_go_back"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="Admin Page"
-                android:layout_weight="1" />
+    <ListView
+        android:id="@+id/event_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:divider="@android:color/darker_gray"
+        android:dividerHeight="1dp" />
 
-        </LinearLayout>
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</androidx.core.widget.NestedScrollView>
+    <!-- Button container with a horizontal layout -->
+    <LinearLayout
+        android:id="@+id/button_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:padding="16dp">
+
+        <!-- Button to navigate to the admin page -->
+        <Button
+            android:id="@+id/admin_go_back"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Admin Page"
+            android:layout_weight="1" />
+
+    </LinearLayout>
+
+
+
+</LinearLayout>
+

@@ -241,6 +241,32 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 return true;
             }
         }
+        else if(itemId == R.id.standard_nav_profile ||
+                itemId == R.id.standard_nav_notifications ||
+                itemId == R.id.standard_nav_event_menu ||
+                itemId == R.id.standard_nav_sign_out ||
+                itemId == R.id.standard_nav_admin){
+
+            if (itemId == R.id.standard_nav_notifications) {
+                moveToFragment(notificationFragment);
+                return true;
+            } else if (itemId == R.id.standard_nav_profile) {
+                moveToFragment(profileFragment);
+                return true;
+            }else if (itemId == R.id.standard_nav_event_menu) {
+                moveToFragment(homeFragment);
+                return true;
+            }
+            else if (itemId == R.id.standard_nav_admin){
+                moveToFragment(adminFragment);
+                return true;
+            }
+
+
+        }
+
+
+
         /**
          * Drawer side bar navigation
          */

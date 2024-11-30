@@ -761,6 +761,31 @@ public class Event implements Parcelable {
                 .addOnFailureListener(onFailure);
     }
 
+    /**
+     * This function is more of a stop gap measure for the AdminEvent Fragment in displaying the Users Events
+     * All events in firebase
+     *
+     * @param onSuccess
+     * @param onFailure
+     */
+    public static void getAllEvents(OnSuccessListener<List<Event>> onSuccess, OnFailureListener onFailure) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        db.collection("Events")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    List<Event> userEvents = new ArrayList<>();
+                    for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
+                        Event event = doc.toObject(Event.class);
+                        if (event != null) {
+                            userEvents.add(event);
+                        }
+                    }
+                    onSuccess.onSuccess(userEvents);
+                })
+                .addOnFailureListener(onFailure);
+    }
+
     //get organizer event
     public static void getOrganizerEvents(String userId, OnSuccessListener<List<Event>> onSuccess, OnFailureListener onFailure) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();

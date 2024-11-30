@@ -236,6 +236,70 @@ public class TestHomeFragment {
                 .check(matches(isDisplayed()));
     }
 
+    @Test
+    public void testNavigateToProfileBottom() {
+        UniversalProgramValues.getInstance().setExistingLogin(true);
+        UniversalProgramValues.getInstance().setTestingMode(true);
+        UniversalProgramValues.getInstance().setDeviceID("testingDeviceID100");
+        scenario.onActivity(activity -> {
+            LoginFragment loadingFragment = new LoginFragment();
+            activity.getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, loadingFragment)
+                    .commitNow(); // Ensure fragment is attached immediately
+        });
+
+        Espresso.onIdle();
+
+        onView(withId(R.id.button_normal)).perform(click());
+        try {
+            Thread.sleep(4000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        onView(withId(R.id.search_bar))
+                .check(matches(isDisplayed()));
+
+        onView(withContentDescription("Open Navigation Drawer"))
+                .perform(click());
+
+        onView(withId(R.id.nav_profile_bottom))
+                .perform(click());
+
+        onView(withId(R.id.edit_name)).check(matches(isDisplayed()));
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        onView(withId(R.id.button_back_home))
+                .perform(scrollTo())
+                .check(matches(isDisplayed()));
+
+        onView(withId(R.id.button_back_home))
+                .perform(click());
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        onView(withId(R.id.search_bar))
+                .check(matches(isDisplayed()));
+
+        onView(withId(R.id.nav_profile_bottom))
+                .perform(click());
+
+        onView(withId(R.id.edit_name)).check(matches(isDisplayed()));
+
+        onView(withId(R.id.nav_home_bottom))
+                .perform(click());
+
+        onView(withId(R.id.search_bar))
+                .check(matches(isDisplayed()));
+    }
+
 
     @Test
     public void testNavigateToAdmin() {
@@ -349,6 +413,55 @@ public class TestHomeFragment {
 
         onView(withId(R.id.standard_nav_event_menu))
                 .perform(click());
+
+        onView(withId(R.id.search_bar))
+                .check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void testNavigateToOrganizer() {
+        UniversalProgramValues.getInstance().setExistingLogin(true);
+        UniversalProgramValues.getInstance().setTestingMode(true);
+        UniversalProgramValues.getInstance().setDeviceID("testingDeviceID100");
+        scenario.onActivity(activity -> {
+            LoginFragment loadingFragment = new LoginFragment();
+            activity.getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, loadingFragment)
+                    .commitNow(); // Ensure fragment is attached immediately
+        });
+
+        Espresso.onIdle();
+
+        onView(withId(R.id.button_normal)).perform(click());
+        try {
+            Thread.sleep(4000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        onView(withId(R.id.search_bar))
+                .check(matches(isDisplayed()));
+
+        onView(withContentDescription("Open Navigation Drawer"))
+                .perform(click());
+
+        onView(withId(R.id.nav_organizer_bottom))
+                .perform(click());
+
+        onView(withId(R.id.user_events_list)).check(matches(isDisplayed()));
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        onView(withId(R.id.nav_profile_bottom))
+                .perform(click());
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         onView(withId(R.id.search_bar))
                 .check(matches(isDisplayed()));

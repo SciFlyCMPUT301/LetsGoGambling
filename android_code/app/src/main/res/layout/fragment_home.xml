@@ -1,63 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fillViewport="true">
+    android:orientation="vertical"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:layout_marginTop="0dp">
+
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_marginTop="65dp">
+        android:gravity="center">
 
-        <!-- SearchView for searching events -->
         <SearchView
             android:id="@+id/search_bar"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:queryHint="Search events..."
-            android:iconifiedByDefault="false"
-            android:layout_marginTop="16dp"/>
+            android:iconifiedByDefault="false" />
 
-        <!-- ListView to display user events -->
-        <ListView
-            android:id="@+id/user_events_list"
-            android:layout_width="match_parent"
+        <Spinner
+            android:id="@+id/filter_spinner"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:divider="@android:color/darker_gray"
-            android:dividerHeight="1dp" />
-
-        <!-- Button to add an event (invisible by default) -->
-        <Button
-            android:id="@+id/btn_add_event"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Add Event"
-            android:layout_gravity="center"
-            android:visibility="invisible"/>
-
-        <!-- Button to add a facility (invisible by default) -->
-        <Button
-            android:id="@+id/btn_add_facility"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Add Facility"
-            android:layout_gravity="center"
-            android:visibility="invisible"/>
-
-        <!-- Button to view facilities (invisible by default) -->
-        <Button
-            android:id="@+id/btn_view_facility"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="View Facilities"
-            android:layout_gravity="center"
-            android:visibility="invisible"/>
-
+            android:layout_gravity="end"
+            android:entries="@array/filter_options" />
     </LinearLayout>
+    <!-- ListView to display user events -->
 
-</androidx.core.widget.NestedScrollView>
+    <ListView
+        android:id="@+id/user_events_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:divider="@android:color/darker_gray"
+        android:dividerHeight="1dp" />
+
+
+
+</LinearLayout>
+
+

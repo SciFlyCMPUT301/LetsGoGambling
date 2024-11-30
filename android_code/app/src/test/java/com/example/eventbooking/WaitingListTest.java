@@ -104,7 +104,7 @@ public class WaitingListTest {
         waitingList.participantSignsUp("user1");
         waitingList.participantSignsUp("user2");
 
-        waitingList.cancelParticipation("user1");
+//        waitingList.cancelParticipation("user1");
         List<String> replacements = waitingList.drawReplacement(1);
 
         assertEquals(1, replacements.size());

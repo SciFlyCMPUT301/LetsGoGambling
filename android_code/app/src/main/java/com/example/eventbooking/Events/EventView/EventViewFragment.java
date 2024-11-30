@@ -16,7 +16,9 @@ import androidx.fragment.app.Fragment;
 import com.example.eventbooking.Events.EventData.Event;
 import com.example.eventbooking.Events.EventPageFragment.EventFragment;
 import com.example.eventbooking.MainActivity;
+import com.example.eventbooking.Home.HomeFragment;
 import com.example.eventbooking.R;
+import com.example.eventbooking.UniversalProgramValues;
 import com.example.eventbooking.UserManager;
 import com.example.eventbooking.profile.ProfileEntrantFragment;
 import com.example.eventbooking.profile.ProfileFragment;
@@ -27,12 +29,14 @@ import com.example.eventbooking.profile.ProfileFragment;
 public class EventViewFragment extends Fragment {
 
     private String eventId;
-    private String deviceId = "deviceID1";
-    //    private String userId = "User1";
-    private Event event;
+    private String deviceId = null;
+//    private String userId = "User1";
+    private Event selectedEvent;
     private ImageView eventPosterImage;
     private TextView eventTitleText, eventDescriptionText;
     private LinearLayout buttonContainer;
+    private Boolean testMode = false;
+    private String returnToFragment = null;
 
     /**
      * Creates a new instance of EventViewFragment.
@@ -40,12 +44,22 @@ public class EventViewFragment extends Fragment {
      * @param deviceID
      * @return
      */
-
     public static EventViewFragment newInstance(String eventID, String deviceID) {
         EventViewFragment fragment = new EventViewFragment();
         Bundle args = new Bundle();
         args.putString("eventId", eventID);
         args.putString("deviceId", deviceID);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+
+    public static EventViewFragment newInstance(Event selectedEvent, String deviceID) {
+        EventViewFragment fragment = new EventViewFragment();
+        Bundle args = new Bundle();
+        args.putParcelable("selectedEvent", selectedEvent);
+        args.putString("deviceId", deviceID);
+//        args.putString("returnFragment", returnFragment);
         fragment.setArguments(args);
         return fragment;
     }
@@ -59,40 +73,46 @@ public class EventViewFragment extends Fragment {
         eventTitleText = view.findViewById(R.id.event_title_text);
         eventDescriptionText = view.findViewById(R.id.event_description_text);
         buttonContainer = view.findViewById(R.id.button_container);
-
+        testMode = UniversalProgramValues.getInstance().getTestingMode();
         // Retrieve eventId and deviceId from arguments
         if (getArguments() != null) {
-            eventId = getArguments().getString("eventId");
-            deviceId = getArguments().getString("deviceId");
+            if(getArguments().getString("eventId") != null)
+                eventId = getArguments().getString("eventId");
+            if(getArguments().getString("deviceId") != null)
+                deviceId = getArguments().getString("deviceId");
+
             if(deviceId == null)
                 deviceId = UserManager.getInstance().getUserId();
-            String listchoice = getArguments().getString("listAdd");
+//            String listchoice = getArguments().getString("listAdd");
+
+//            if(getArguments().getString("returnFragment") != null){
+//                returnToFragment = getArguments().getString("returnFragment");
+//            }
 
             // Fetch event data based on eventId
-            Event.findEventById(eventId, event -> {
-                if (event != null) {
-//                     Update participant list based on listchoice
-                    if(listchoice != null) {
-                        if (listchoice.equals("Accepted"))
-                            event.addAcceptedParticipantId("User1");
-                        if (listchoice.equals("Waiting"))
-                            event.addWaitingParticipantIds("User1");
-                        if (listchoice.equals("Canceled"))
-                            event.addCanceledParticipantIds("User1");
-                        if (listchoice.equals("SignedUp"))
-                            event.addSignedUpParticipantIds("User1");
+            if(!testMode){
+                Event.findEventById(eventId, event -> {
+                    if (event != null) {
+                        selectedEvent = event;
+                        Log.e("eventId", "Event found with ID: " + selectedEvent.getEventId());
+                        displayEventDetails(selectedEvent);
+                        configureButtons(deviceId);
+                    } else {
+                        Toast.makeText(getContext(), "Event not found", Toast.LENGTH_SHORT).show();
+                        getActivity().getSupportFragmentManager().popBackStack();
                     }
-                    Log.e("eventId", "Event found with ID: " + event.getEventId());
-                    displayEventDetails(event);
-                    configureButtons(event, deviceId);
-                } else {
-                    Toast.makeText(getContext(), "Event not found", Toast.LENGTH_SHORT).show();
+                }, e -> {
+                    Toast.makeText(getContext(), "Error fetching event: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     getActivity().getSupportFragmentManager().popBackStack();
-                }
-            }, e -> {
-                Toast.makeText(getContext(), "Error fetching event: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                getActivity().getSupportFragmentManager().popBackStack();
-            });
+                });
+            }
+            else{
+//                selectedEvent = getArguments().getParcelable("selectedEvent");
+                selectedEvent = UniversalProgramValues.getInstance().getCurrentEvent();
+                displayEventDetails(selectedEvent);
+                configureButtons(deviceId);
+            }
+
         }
 
         return view;
@@ -119,10 +139,9 @@ public class EventViewFragment extends Fragment {
 
     /**
      * Configures buttons based on the user's list status in the event.
-     * @param selectedEvent
      * @param selectedUserId
      */
-    private void configureButtons(Event selectedEvent, String selectedUserId) {
+    private void configureButtons(String selectedUserId) {
         Log.d("Event View Fragment", "Button Add Start");
         // Clear existing buttons
         buttonContainer.removeAllViews();
@@ -135,14 +154,16 @@ public class EventViewFragment extends Fragment {
             // Add "Sign Up" button to move user to signed-up list
             addButton("Sign Up", v -> {
                 selectedEvent.signUpParticipant(selectedUserId);
-                updateEventInFirestore(selectedEvent);
+                if(!UniversalProgramValues.getInstance().getTestingMode())
+                    updateEventInFirestore(selectedEvent);
                 goBackToEventFragment();
             });
 
             // Add "Reject" button to move user to canceled list
             addButton("Reject", v -> {
                 selectedEvent.cancelParticipant(selectedUserId);
-                updateEventInFirestore(selectedEvent);
+                if(!UniversalProgramValues.getInstance().getTestingMode())
+                    updateEventInFirestore(selectedEvent);
                 goBackToEventFragment();
             });
 
@@ -155,7 +176,8 @@ public class EventViewFragment extends Fragment {
             Log.d("Event View Fragment", "Add WaitList");
             addButton("Leave Waitlist", v -> {
                 selectedEvent.removeWaitingParticipantId(selectedUserId);
-                updateEventInFirestore(selectedEvent);
+                if(!UniversalProgramValues.getInstance().getTestingMode())
+                    updateEventInFirestore(selectedEvent);
                 goBackToEventFragment();
             });
         }
@@ -165,15 +187,16 @@ public class EventViewFragment extends Fragment {
                 !selectedEvent.getCanceledParticipantIds().contains(selectedUserId)) {
             Log.d("Event View Fragment", "Not In Any List");
             // If user is not in any list, add "Waitlist" button to add user to waiting list
-            addButton("Waitlist", v -> {
-                if(selectedEvent.isGeolocationRequired()){
-                    showGeolocationWarningDialog(selectedEvent, selectedUserId);
+            addButton("Join Waitlist", v -> {
+                if (selectedEvent.isGeolocationRequired()) {
+                    if (!UniversalProgramValues.getInstance().getTestingMode())
+                        showGeolocationWarningDialog(selectedEvent, selectedUserId);
                 }else{
                     selectedEvent.addWaitingParticipantIds(selectedUserId);
-                    updateEventInFirestore(selectedEvent);
+                    if(!UniversalProgramValues.getInstance().getTestingMode())
+                        updateEventInFirestore(selectedEvent);
                     goBackToEventFragment();
                 }
-
             });
         }
 
@@ -198,11 +221,13 @@ public class EventViewFragment extends Fragment {
      * @param event
      */
     private void updateEventInFirestore(Event event) {
-        event.saveEventDataToFirestore().addOnSuccessListener(aVoid -> {
-            Toast.makeText(getContext(), "Event updated successfully", Toast.LENGTH_SHORT).show();
-        }).addOnFailureListener(e -> {
-            Toast.makeText(getContext(), "Failed to update event", Toast.LENGTH_SHORT).show();
-        });
+        if(!testMode){
+            event.saveEventDataToFirestore().addOnSuccessListener(aVoid -> {
+                Toast.makeText(getContext(), "Event updated successfully", Toast.LENGTH_SHORT).show();
+            }).addOnFailureListener(e -> {
+                Toast.makeText(getContext(), "Failed to update event", Toast.LENGTH_SHORT).show();
+            });
+        }
     }
 
     private boolean isGPSEnabled() {
@@ -244,7 +269,7 @@ public class EventViewFragment extends Fragment {
      */
     private void goBackToEventFragment(){
         getActivity().getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, new EventFragment())
+                .replace(R.id.fragment_container, new HomeFragment())
                 .addToBackStack(null)
                 .commit();
     }

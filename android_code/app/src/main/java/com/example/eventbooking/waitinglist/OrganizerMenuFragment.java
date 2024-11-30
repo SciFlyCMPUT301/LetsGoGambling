@@ -22,6 +22,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import com.example.eventbooking.Events.EventPageFragment.OragnizerEventFragment;
 import com.example.eventbooking.Notification;
 import com.example.eventbooking.QRCode.QRcodeGenerator;
 import com.example.eventbooking.R;
@@ -45,7 +46,7 @@ public class OrganizerMenuFragment extends Fragment {
     private Button viewAcceptedListButton;
     private Button viewSignedListButton;
     private Button drawReplacementButton;
-    private Button backToEventPageButton;
+    private Button backToButton;
     private Button generateQRCode;
     private ImageView QRImage;
     private ImageView posterImageView;
@@ -180,7 +181,7 @@ public class OrganizerMenuFragment extends Fragment {
         viewSignedListButton = rootView.findViewById(R.id.SignedParticipantButton);
         viewCanceledListButton = rootView.findViewById(R.id.canceledParticipantButton);
         drawReplacementButton = rootView.findViewById(R.id.DrawReplacementButton);
-        backToEventPageButton = rootView.findViewById(R.id.BackToEventButton);
+        backToButton = rootView.findViewById(R.id.BackToButton);
 
         viewAcceptedListButton=rootView.findViewById(R.id.accptedParticipantButton);
 
@@ -202,7 +203,7 @@ public class OrganizerMenuFragment extends Fragment {
         sampleAttendeesButton.setOnClickListener(v -> sampleAttendees());
         //drawReplacementButton.setOnClickListener(v -> drawReplacement(replacementSize));
         drawReplacementButton.setOnClickListener(v -> promptReplacementSize());
-        backToEventPageButton.setOnClickListener(v -> navigateBackToEventPage());
+        backToButton.setOnClickListener(v -> navigateBackToOrganizerPage());
 
         generateQRCode.setOnClickListener(v -> generateAndDisplayQRCode(eventId));
         CancelNonSignUp.setOnClickListener(v->cancelEntrant());
@@ -398,9 +399,9 @@ public class OrganizerMenuFragment extends Fragment {
         }
     }
 
-    private void navigateBackToEventPage(){
+    private void navigateBackToOrganizerPage(){
         getActivity().getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, new EventFragment())
+                .replace(R.id.fragment_container, new OragnizerEventFragment())
                 .addToBackStack(null)
                 .commit();
 

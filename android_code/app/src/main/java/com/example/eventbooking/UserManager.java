@@ -258,11 +258,18 @@ public class UserManager {
 
 
     public void updateGeolocation() {
+
         currentUser.setGeolocation(geoLocation);
         Log.d("User Manager", "Updated Geopoint to be: " + currentUser.getGeolocation());
-        currentUser.saveUserDataToFirestore().addOnSuccessListener(aVoid -> {
-        }).addOnFailureListener(e -> Log.d("User Manager", "Failed to Update Geopoint"));
+        if(!UniversalProgramValues.getInstance().getTestingMode()){
+            currentUser.saveUserDataToFirestore().addOnSuccessListener(aVoid -> {
+            }).addOnFailureListener(e -> Log.d("User Manager", "Failed to Update Geopoint"));
+        }
+        else{
+            UniversalProgramValues.getInstance().setCurrentUser(currentUser);
+        }
         UserManager.getInstance().setCurrentUser(currentUser);
+
     }
 
 

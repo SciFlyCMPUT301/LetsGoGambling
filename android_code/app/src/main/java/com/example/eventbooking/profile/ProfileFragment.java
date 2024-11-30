@@ -29,6 +29,7 @@ import com.example.eventbooking.Home.HomeFragment;
 import com.example.eventbooking.MainActivity;
 import com.example.eventbooking.R;
 import com.example.eventbooking.Role;
+import com.example.eventbooking.UniversalProgramValues;
 import com.example.eventbooking.User;
 import com.example.eventbooking.UserManager;
 import com.example.eventbooking.notification.NotificationFragment;
@@ -149,39 +150,60 @@ public class ProfileFragment extends Fragment {
     }
 
     private void saveUserProfile() {
-
+        Log.d("Profile Fragment", "eventID" + eventIDFromQR);
         currentUser.setUsername(editName.getText().toString().trim());
         currentUser.setEmail(editEmail.getText().toString().trim());
         currentUser.setPhoneNumber(editPhone.getText().toString().trim());
         currentUser.setNotificationAsk(notificationsSwitch.isChecked());
         currentUser.setGeolocationAsk(geolocationSwitch.isChecked());
         if(isNewUser){
-            currentUser.defaultProfilePictureUrl(currentUser.getUsername()).addOnSuccessListener(aVoid -> {
-                Log.d("Profile Fragment", "Setting new User");
+            if(!UniversalProgramValues.getInstance().getTestingMode()){
+                currentUser.defaultProfilePictureUrl(currentUser.getUsername()).addOnSuccessListener(aVoid -> {
+                    Log.d("Profile Fragment", "Setting new User");
+                    UserManager.getInstance().setCurrentUser(currentUser);
+                }).addOnFailureListener(e -> Log.d("User Manager", "Failed to Update Geopoint"));
+    //            String profileURL = currentUser.defaultProfilePictureUrl(currentUser.getUsername()).toString();
+    //            currentUser.setdefaultProfilePictureUrl(profileURL);
+    //            currentUser.setProfilePictureUrl(profileURL);
+            }
+            else{
+                currentUser.setProfilePictureUrl("NewDefaultTestURL");
+                currentUser.setdefaultProfilePictureUrl("NewDefaultTestURL");
                 UserManager.getInstance().setCurrentUser(currentUser);
-            }).addOnFailureListener(e -> Log.d("User Manager", "Failed to Update Geopoint"));
-//            String profileURL = currentUser.defaultProfilePictureUrl(currentUser.getUsername()).toString();
-//            currentUser.setdefaultProfilePictureUrl(profileURL);
-//            currentUser.setProfilePictureUrl(profileURL);
+            }
         }
 
-
-        currentUser.saveUserDataToFirestore().addOnSuccessListener(aVoid -> {
-            Toast.makeText(getContext(), "Profile saved successfully.", Toast.LENGTH_SHORT).show();
-            setEditMode(false);
-            if(isNewUser){
-                if(currentUser.isGeolocationAsk()){
+        if(!UniversalProgramValues.getInstance().getTestingMode()) {
+            currentUser.saveUserDataToFirestore().addOnSuccessListener(aVoid -> {
+                Toast.makeText(getContext(), "Profile saved successfully.", Toast.LENGTH_SHORT).show();
+                setEditMode(false);
+//                if (isNewUser) {
+//                    if (currentUser.isGeolocationAsk()) {
+//                        UserManager.getInstance().updateGeolocation();
+//                    }
+//
+//                }
+                if (currentUser.isGeolocationAsk()) {
                     UserManager.getInstance().updateGeolocation();
                 }
-
-            }
-            if(currentUser.isGeolocationAsk()){
-                UserManager.getInstance().updateGeolocation();
-            }
+                ((MainActivity) getActivity()).showNavigationUI();
+                if(eventIDFromQR == null)
+                    goToHome();
+                else
+                    goToEvent();
+            }).addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to save profile.", Toast.LENGTH_SHORT).show());
+        }
+        else{
+            UniversalProgramValues.getInstance().setCurrentUser(currentUser);
+            UserManager.getInstance().setCurrentUser(currentUser);
+            UserManager.getInstance().updateGeolocation();
             ((MainActivity) getActivity()).showNavigationUI();
-            goToHome();
-
-        }).addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to save profile.", Toast.LENGTH_SHORT).show());
+            Log.d("Profile Fragment", "Test Mode eventID: " + eventIDFromQR);
+            if(eventIDFromQR == null)
+                goToHome();
+            else
+                goToEvent();
+        }
         isNewUser = false;
     }
 
@@ -223,6 +245,7 @@ public class ProfileFragment extends Fragment {
     }
 
     private void goToHome() {
+        Log.d("Profile Fragment", "Navigating to HomeFragment");
         getParentFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, new HomeFragment())
                 .commit();
@@ -242,5 +265,24 @@ public class ProfileFragment extends Fragment {
         notification_button.setVisibility(View.GONE);
         backButton.setVisibility(View.GONE);
         ((MainActivity) getActivity()).hideNavigationUI();
+    }
+
+    private void goToEvent(){
+        Log.d("Profile Fragment", "Navigating to Event View Fragment");
+        if(UniversalProgramValues.getInstance().getTestingMode()){
+            EventViewFragment eventFragment = EventViewFragment.newInstance(
+                    UniversalProgramValues.getInstance().getCurrentEvent(),
+                    UniversalProgramValues.getInstance().getDeviceID());
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, eventFragment)
+                    .commit();
+        }
+        else{
+            EventViewFragment eventFragment = EventViewFragment.newInstance(eventIDFromQR, deviceId);
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, eventFragment)
+                    .commit();
+        }
+
     }
 }

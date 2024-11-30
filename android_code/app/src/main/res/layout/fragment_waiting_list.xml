@@ -86,10 +86,10 @@
             android:layout_marginBottom="10dp" />
 
         <Button
-            android:id="@+id/BackToEventButton"
+            android:id="@+id/BackToButton"
             android:layout_width="match_parent"
             android:layout_height="58dp"
-            android:text="Back to Event"
+            android:text="Back to Organizer Page"
             android:textColor="#FFFFFF"
             android:backgroundTint="#C466FF"
             android:layout_marginBottom="10dp" />

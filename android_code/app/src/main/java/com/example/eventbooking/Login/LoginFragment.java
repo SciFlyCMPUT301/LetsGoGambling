@@ -18,11 +18,13 @@ import android.widget.Toast;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
+import com.example.eventbooking.Events.EventData.Event;
 import com.example.eventbooking.Events.EventView.EventViewFragment;
 import com.example.eventbooking.Home.HomeFragment;
 import com.example.eventbooking.MainActivity;
 import com.example.eventbooking.R;
 import com.example.eventbooking.Role;
+import com.example.eventbooking.UniversalProgramValues;
 import com.example.eventbooking.User;
 import com.example.eventbooking.UserManager;
 import com.example.eventbooking.firebase.FirestoreAccess;
@@ -47,7 +49,6 @@ public class LoginFragment extends Fragment {
     public static boolean isLoggedIn = false;
     private boolean isTestMode = false;
     private boolean UITestMode = false;
-    private String testing_device_id;
     private String deviceId;
     private String eventIdFromQR;
 
@@ -67,45 +68,88 @@ public class LoginFragment extends Fragment {
         this.UITestMode = UITestModeOption;
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        Log.d("LoginOnCreate", "Before Argument");
-//        if (getArguments() != null) {
-        boolean testingMode = false;
-        String testingDeviceID = null;
-        if(getArguments() != null){
-            Log.d("Login Fragment", "arguments not null");
-
-            if(getArguments().getString("eventIdFromQR") != null) {
-                eventIdFromQR = getArguments().getString("eventIdFromQR");
-            }
-            if(getArguments().getBoolean("testingMode"))
-            {
-                testingMode = getArguments().getBoolean("testingMode");
-                Log.d("Login Fragment", "Testing Args" + testingMode);
-
-            }
-            if(getArguments().getString("testingDeviceID") != null)
-            {
-                testingDeviceID = getArguments().getString("testingDeviceID");
-
-                Log.d("Login Fragment", "Testing Args" + testingDeviceID);
-            }
-        }
-
-
-        if (testingMode && testingDeviceID != null) {
-            deviceId = testingDeviceID; // Use the testing device ID
-            Log.d("LoginFragment", "Testing Mode Enabled: Device ID set to " + deviceId);
-        } else {
-            // Normal mode: Retrieve the actual device ID
-            deviceId = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
-        }
-        Log.d("Login Fragment", "Device ID: " + deviceId);
-        Log.d("LoginOnCreate", "After Argument " + eventIdFromQR);
-//        }
+    /**
+     * Creates a new instance of HomeFragment with the provided eventID
+     * @param eventIdFromQR
+     * @return
+     */
+    public static LoginFragment newInstance(String eventIdFromQR) {
+        LoginFragment fragment = new LoginFragment();
+        Bundle args = new Bundle();
+        args.putString("eventID", eventIdFromQR);
+        fragment.setArguments(args);
+        return fragment;
     }
+
+//    /**
+//     * Creates a bundle that we can get testing information off of to allow easier UI testing
+//     * @param testMode
+//     * @param deviceID
+//     * @return
+//     */
+//    public static LoginFragment newInstance(Boolean testMode, String deviceID) {
+//        LoginFragment fragment = new LoginFragment();
+//        Bundle args = new Bundle();
+//        args.putBoolean("testMode", testMode);
+//        args.putString("deviceID", deviceID);
+//        fragment.setArguments(args);
+//        return fragment;
+//    }
+//    /**
+//     * Creates a bundle that we can get testing information off of to allow easier UI testing
+//     * @param testMode
+//     * @param deviceID
+//     * @return
+//     */
+//    public static LoginFragment newInstance(Boolean testMode, String deviceID, String eventIdFromQR) {
+//        LoginFragment fragment = new LoginFragment();
+//        Bundle args = new Bundle();
+//        args.putBoolean("testMode", testMode);
+//        args.putString("deviceID", deviceID);
+//        args.putString("eventID", eventIdFromQR);
+//        fragment.setArguments(args);
+//        return fragment;
+//    }
+
+//    @Override
+//    public void onCreate(Bundle savedInstanceState) {
+//        super.onCreate(savedInstanceState);
+//        Log.d("LoginOnCreate", "Before Argument");
+////        if (getArguments() != null) {
+//        boolean testingMode = false;
+//        String testingDeviceID = null;
+//        if(getArguments() != null){
+//            Log.d("Login Fragment", "arguments not null");
+//
+//            if(getArguments().getString("eventIdFromQR") != null) {
+//                eventIdFromQR = getArguments().getString("eventIdFromQR");
+//            }
+//            if(getArguments().getBoolean("testingMode"))
+//            {
+//                testingMode = getArguments().getBoolean("testingMode");
+//                Log.d("Login Fragment", "Testing Args" + testingMode);
+//
+//            }
+//            if(getArguments().getString("testingDeviceID") != null)
+//            {
+//                testingDeviceID = getArguments().getString("testingDeviceID");
+//
+//                Log.d("Login Fragment", "Testing Args" + testingDeviceID);
+//            }
+//        }
+//
+//
+//        if (testingMode && testingDeviceID != null) {
+//            deviceId = testingDeviceID; // Use the testing device ID
+//            Log.d("LoginFragment", "Testing Mode Enabled: Device ID set to " + deviceId);
+//        } else {
+//            // Normal mode: Retrieve the actual device ID
+//            deviceId = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+//        }
+//        Log.d("Login Fragment", "Device ID: " + deviceId);
+//        Log.d("LoginOnCreate", "After Argument " + eventIdFromQR);
+////        }
+//    }
 
     /**
      * Sets up the view for the login. Gets user from firestore and changes text accordingly.
@@ -124,6 +168,7 @@ public class LoginFragment extends Fragment {
      */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         Log.d("Login Fragment", "Login Fragment Launch");
         View rootView = inflater.inflate(R.layout.fragment_login, container, false);
 //        DrawerLayout drawerLayout = getActivity().findViewById(R.id.toolbar);
@@ -139,109 +184,24 @@ public class LoginFragment extends Fragment {
         setToDeviceID1.setOnClickListener(v -> setUserToDeviceID1());
 
         return rootView;
-
-
-//        String deviceId = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
-//
-//        // Test code here to fake the device ID
-//        final String tempval = "deviceID1";
-////        deviceId = tempval;
-//
-////        deviceIdText.setText(deviceId);
-////
-////        Log.d("Login", deviceId);
-//        deviceIdText.setText(tempval);
-//        Log.d("Login", tempval);
-//        FirestoreAccess fs = FirestoreAccess.getInstance();
-////        fs.getUser(deviceId).addOnSuccessListener(snapshot -> {
-//        fs.getUser(tempval).addOnSuccessListener(snapshot -> {
-//            Log.d("Login New User", "New User found");
-//            //nav.setVisibility(View.VISIBLE);
-//            if (!snapshot.exists()) { // if new user
-//                welcomeText.setText("Welcome new user");
-//                //testing
-////                User user = new User(deviceId, "Alex", "a@b.com", "9312-303", new HashSet<>());
-////                fs.addUser(user).addOnSuccessListener(result -> {
-////                    Log.d("Login", "added user successfully");
-////                });
-//                Handler handler = new Handler();
-//                handler.postDelayed(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        isLoggedIn = true;
-////                        drawerLayout.setVisibility(View.VISIBLE);
-//                        nav.setVisibility(View.VISIBLE);
-//                        sidebar.setVisibility(View.VISIBLE);
-//                        toolbar.setVisibility(View.VISIBLE);
-//                        if (eventIdFromQR != null) {
-//                            // If the user is new and QR code was scanned, go to ProfileCreation then ScannedFragment
-//                            Log.d("Login Fragment", "New User going to Profile Entrant QR code");
-//                            getParentFragmentManager().beginTransaction()
-//                                    .replace(R.id.fragment_container,
-//                                            ProfileEntrantFragment.newInstance
-//                                                    (true, eventIdFromQR, tempval)) // replace with create new user fragment
-//                                    .commit();
-//                        } else {
-//                            // If the user is new and no QR code scanned, just go to ProfileCreation
-//                            Log.d("Login Fragment", "New User going to Profile Entrant no QR code");
-//                            getParentFragmentManager().beginTransaction()
-//                                    .replace(R.id.fragment_container,
-//                                            ProfileEntrantFragment.newInstance
-//                                                    (true, null, tempval)) // replace with create new user fragment
-//                                    .commit();
-//                        }
-//                    }
-//                }, 3000);
-//            } else { // returning user
-//                User user = snapshot.toObject(User.class);
-//                Log.d("Login", "User profile " + user.getProfilePictureUrl());
-//                Log.d("Login", "Retrieved user "+user.getUsername());
-//                UserManager.getInstance().setCurrentUser(user);
-//
-//                Handler handler = new Handler();
-//                handler.postDelayed(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        isLoggedIn = true;
-////                        drawerLayout.setVisibility(View.VISIBLE);
-//                        nav.setVisibility(View.VISIBLE);
-//                        sidebar.setVisibility(View.VISIBLE);
-//                        toolbar.setVisibility(View.VISIBLE);
-//                        Log.d("Login", "EventID from QR code " + eventIdFromQR);
-//                        if (eventIdFromQR != null) {
-//
-//
-//                            getParentFragmentManager().beginTransaction()
-//                                    .replace(R.id.fragment_container, EventViewFragment.newInstance(eventIdFromQR, tempval))
-////                                    .replace(R.id.fragment_container, EventViewFragment.newInstance(eventIdFromQR, deviceId))
-//                                    .addToBackStack(null)
-//                                    .commit();
-//
-//
-////                            getParentFragmentManager().beginTransaction()
-////                                    .replace(R.id.fragment_container, ScannedFragment.newInstance(eventIdFromQR))
-////                                    .commit();
-//                        } else {
-////                            getParentFragmentManager().beginTransaction()
-////                                    .replace(R.id.fragment_container, HomeFragment.newInstance(deviceId))
-////                                    .commit();
-//                            getParentFragmentManager().beginTransaction()
-//                                    .replace(R.id.fragment_container, HomeFragment.newInstance(tempval))
-//                                    .commit();
-//
-//                        }
-//
-//                    }
-//                }, 3000);
-//            }
-//        });
-//
-//        return rootView;
     }
 
 
 
     private void initializeUI(View rootView) {
+        isTestMode = UniversalProgramValues.getInstance().getTestingMode();
+        if(isTestMode){
+            deviceId = UniversalProgramValues.getInstance().getDeviceID();
+        }
+        else{
+            deviceId = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+        }
+
+        if(getArguments() != null){
+            if(getArguments().getString("eventID") != null)
+                eventIdFromQR = getArguments().getString("eventID");
+        }
+
         Log.d("LoginFragment", "Initializing UI");
         testModeButton = rootView.findViewById(R.id.button_test_mode);
         normalButton = rootView.findViewById(R.id.button_normal);
@@ -275,39 +235,36 @@ public class LoginFragment extends Fragment {
 //        String newDeviceId = Settings.Secure.getString(getActivity().getContentResolver(), Settings.Secure.ANDROID_ID);
 
         String newDeviceId;
+//        if(UniversalProgramValues.getInstance().getTestingMode())
         newDeviceId = deviceId;
-        if(!UITestMode){
+//        if(!UITestMode){
 //            newDeviceId = Settings.Secure.getString(getActivity().getContentResolver(), Settings.Secure.ANDROID_ID);
 //            deviceIdText.setText(newDeviceId);
 //            deviceIdText.setText("1111111111111");
-        } else {
-            User passingUser = new User();
-//            newDeviceId = testing_device_id;
-            passingUser.setDeviceID(newDeviceId);
-            passingUser.setUsername("testUser");
-            passingUser.setEmail("testUser@example.com");
-            passingUser.setNotificationAsk(false);
-            passingUser.setGeolocationAsk(false);
-            List <String> addRoles = new ArrayList<>();
-            addRoles.add(Role.ENTRANT);
-            addRoles.add(Role.ORGANIZER);
-            addRoles.add(Role.ADMIN);
-            passingUser.setRoles(addRoles);
-            handleReturningUser(passingUser, newDeviceId);
-        }
+//        } else {
+
         deviceIdText.setText(newDeviceId);
 //        deviceIdText.setText(newDeviceId);
         Log.d("LoginFragment", "DeviceID: " + newDeviceId);
 //        deviceIdText.setText(newDeviceId);
-
-        FirestoreAccess.getInstance().getUser(newDeviceId).addOnSuccessListener(snapshot -> {
-            if (!snapshot.exists()) {
-                handleNewUser(newDeviceId);
-            } else {
-                User passingUser = snapshot.toObject(User.class);
-                handleReturningUser(passingUser, newDeviceId);
+        if(!UniversalProgramValues.getInstance().getTestingMode()) {
+            FirestoreAccess.getInstance().getUser(newDeviceId).addOnSuccessListener(snapshot -> {
+                if (!snapshot.exists()) {
+                    handleNewUser(newDeviceId);
+                } else {
+                    User passingUser = snapshot.toObject(User.class);
+                    handleReturningUser(passingUser, newDeviceId);
+                }
+            }).addOnFailureListener(e -> Log.d("LoginFragment", "Firestore access failed: " + e.getMessage()));
+        }else{
+            if(!UniversalProgramValues.getInstance().getExistingLogin()){
+                handleNewUser(UniversalProgramValues.getInstance().getDeviceID());
             }
-        }).addOnFailureListener(e -> Log.d("LoginFragment", "Firestore access failed: " + e.getMessage()));
+            else{
+                handleReturningUser(UniversalProgramValues.getInstance().getSingle_user(), UniversalProgramValues.getInstance().getDeviceID());
+            }
+
+        }
     }
 
     private void handleNewUser(String deviceId) {
@@ -342,12 +299,17 @@ public class LoginFragment extends Fragment {
     private void handleReturningUser(User user, String deviceId) {
         Log.d("LoginFragment", "Returning User: " + user.getUsername());
 
-        user.saveUserDataToFirestore();
+//        user.saveUserDataToFirestore();
         UserManager.getInstance().setCurrentUser(user);
         if(user.isGeolocationAsk()){
             UserManager.getInstance().updateGeolocation();
 //            user.updateGeolocation();
         }
+
+        if(user.hasRole(Role.ADMIN)){
+            ((MainActivity) getActivity()).loadAdminSidePanel();
+        }
+
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -358,7 +320,9 @@ public class LoginFragment extends Fragment {
             // for ActivityCompat#requestPermissions for more details.
             ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 1001);
         }
-        new MyNotificationManager(FirebaseFirestore.getInstance()).notifyUserUnread(user.getDeviceID(), getContext());
+        if(!UniversalProgramValues.getInstance().getTestingMode()){
+            new MyNotificationManager(FirebaseFirestore.getInstance()).notifyUserUnread(user.getDeviceID(), getContext());
+        }
         new Handler().postDelayed(() -> {
             if (eventIdFromQR != null) {
                 ((MainActivity) getActivity()).showNavigationUI();
@@ -407,10 +371,13 @@ public class LoginFragment extends Fragment {
     }
 
     private void setUserToDeviceID1() {
-        FirestoreAccess.getInstance().getUser("deviceID2").addOnSuccessListener(snapshot -> {
+        FirestoreAccess.getInstance().getUser("deviceID1").addOnSuccessListener(snapshot -> {
             if (snapshot.exists()) {
+                Log.d("Login Activity", "User Snapshot Exists");
                 User user = snapshot.toObject(User.class);
+                deviceId = user.getDeviceID();
                 UserManager.getInstance().setCurrentUser(user);
+                Log.d("Login Activity", "User Snapshot deviceID: " + user.getDeviceID());
                 handleReturningUser(user, user.getDeviceID());
             } else {
                 Toast.makeText(getActivity(), "Device ID not found", Toast.LENGTH_SHORT).show();
@@ -454,11 +421,5 @@ public class LoginFragment extends Fragment {
         }
     }
 
-
-    private FirestoreAccess firestoreAccess = FirestoreAccess.getInstance();
-
-    public void setFirestoreAccess(FirestoreAccess firestoreAccess) {
-        this.firestoreAccess = firestoreAccess;
-    }
 
 }

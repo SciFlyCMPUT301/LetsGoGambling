@@ -65,7 +65,7 @@ public class OragnizerEventFragment  extends Fragment{
         Log.d("HomeFragment", "Organizer Event Fragment Launch");
 
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_home, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_organizer_event, container, false);
 
         ListView usersEventListView = rootView.findViewById(R.id.user_events_list);
         String currentUserId = UserManager.getInstance().getUserId();

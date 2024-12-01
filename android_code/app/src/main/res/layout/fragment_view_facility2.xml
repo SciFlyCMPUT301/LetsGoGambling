@@ -5,7 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginTop="65dp">
+    android:layout_marginTop="65dp"
+    android:background="#F8F9FA">
 
     <!-- Facility View Title with Icon -->
     <LinearLayout
@@ -34,23 +35,129 @@
             android:id="@+id/facility_view_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Facilites"
+            android:text="Facilities"
             android:textSize="24sp"
             android:textColor="#333333"
             android:textAlignment="center" />
     </LinearLayout>
 
-    <!-- Facility List -->
-    <ListView
-        android:id="@+id/facility_list"
-        android:layout_width="0dp"
+    <!-- Scrollable Content Section -->
+    <ScrollView
+        android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@+id/title_container"
-        app:layout_constraintBottom_toTopOf="@+id/button_container"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:divider="@android:color/darker_gray"
-        android:dividerHeight="1dp" />
+        app:layout_constraintTop_toBottomOf="@id/title_container"
+        app:layout_constraintBottom_toTopOf="@id/button_container">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Facility Info Section -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/infoSection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:backgroundTint="#FFFFFF"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="8dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <EditText
+                        android:id="@+id/facility_edit_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
+                        android:hint="Facility Name"
+                        android:textSize="18sp"
+                        android:background="@drawable/rounded_edittext"
+                        android:padding="12dp" />
+
+                    <EditText
+                        android:id="@+id/facility_edit_facilityID"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
+                        android:hint="Facility ID"
+                        android:textSize="18sp"
+                        android:background="@drawable/rounded_edittext"
+                        android:padding="12dp" />
+
+                    <EditText
+                        android:id="@+id/facility_edit_location"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
+                        android:hint="Facility Location"
+                        android:textSize="18sp"
+                        android:background="@drawable/rounded_edittext"
+                        android:padding="12dp" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Event List Section -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:backgroundTint="#FFFFFF"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="8dp">
+            </androidx.cardview.widget.CardView>
+
+            <!-- Action Buttons -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:weightSum="3"
+                android:layout_marginTop="16dp">
+
+                <Button
+                    android:id="@+id/save_button_facility"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    android:text="Save"
+                    android:textAllCaps="false"
+                    android:backgroundTint="@color/purple"
+                    android:textColor="#FFFFFF"
+                    android:padding="12dp" />
+
+                <Button
+                    android:id="@+id/delete_button_facility"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    android:text="Delete"
+                    android:textAllCaps="false"
+                    android:backgroundTint="@color/purple"
+                    android:textColor="#FFFFFF"
+                    android:padding="12dp" />
+
+                <Button
+                    android:id="@+id/cancel_button_facility"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Cancel"
+                    android:textAllCaps="false"
+                    android:backgroundTint="@color/purple"
+                    android:textColor="#FFFFFF"
+                    android:padding="12dp" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
 
     <!-- Button Container -->
     <LinearLayout

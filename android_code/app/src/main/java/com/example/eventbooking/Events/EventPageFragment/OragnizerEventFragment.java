@@ -18,6 +18,11 @@ import com.example.eventbooking.Facility.ViewFacilityFragment;
 import com.example.eventbooking.Home.HomeUserEventAdapter;
 import com.example.eventbooking.R;
 import com.example.eventbooking.UserManager;
+/**
+ * The {@code OragnizerEventFragment} class represents a UI fragment for organizers to manage their events.
+ * It displays a list of events created by the organizer, provides navigation to event details,
+ * and includes options for creating events and facilities.
+ */
 public class OragnizerEventFragment  extends Fragment{
     private int someInteger = 42; // Example integer to pass
     private String userId;
@@ -35,6 +40,12 @@ public class OragnizerEventFragment  extends Fragment{
 //        fragment.setArguments(args);
 //        return fragment;
 //    }
+    /**
+     * Factory method to create a new instance of {@code OragnizerEventFragment} with a specified user ID.
+     *
+     * @param userId The ID of the current user.
+     * @return A new instance of {@code OragnizerEventFragment}.
+     */
     public static OragnizerEventFragment newInstance(String userId) {
         OragnizerEventFragment fragment = new OragnizerEventFragment();
         Bundle args = new Bundle();
@@ -95,7 +106,7 @@ public class OragnizerEventFragment  extends Fragment{
         addFacilityButton.setVisibility(View.VISIBLE);
         addEventButton.setVisibility(View.VISIBLE);
         viewFacilityButton.setVisibility(View.VISIBLE);
-
+        //set up click listeners
         viewFacilityButton.setOnClickListener(v -> {
             ViewFacilityFragment viewFacilityFragment = new ViewFacilityFragment();
             getParentFragmentManager().beginTransaction()

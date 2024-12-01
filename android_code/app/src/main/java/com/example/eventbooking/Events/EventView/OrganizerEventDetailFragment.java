@@ -98,8 +98,6 @@ public class OrganizerEventDetailFragment extends Fragment {
         eventDescriptionText.setText(event.getDescription());
         eventLocationText.setText(event.getLocation()); // Assuming a "location" field is available.
 
-        // Optionally load event poster image
-        // loadImageIntoView(event.getImageUrl(), eventPosterImage);
     }
 
     /**

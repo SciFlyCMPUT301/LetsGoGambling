@@ -249,24 +249,45 @@ public class UserManager {
 
 //    stuff.mit.edu/afs/sipb/project/android/docs/training/basics/location/currentlocation.html
 
-
+    /**
+     * Sets the {@code FusedLocationProviderClient} for accessing location services.
+     *
+     * @param client The {@code FusedLocationProviderClient} instance.
+     */
     public void setFusedLocationClient(FusedLocationProviderClient client) {
         this.fusedLocationClient = client;
     }
 
-
+    /**
+     * Sets the current context for the {@code UserManager}.
+     *
+     * @param newContext The {@code Context} to set.
+     */
     public void setContext (Context newContext){
         this.context = newContext;
     }
 
+    /**
+     * Sets the geolocation for the current user.
+     *
+     * @param newPoint The {@code GeoPoint} representing the user's geolocation.
+     */
     public void setGeolocation(GeoPoint newPoint){
         this.geoLocation = newPoint;
     }
+    /**
+     * Gets the geolocation of the current user.
+     *
+     * @return The {@code GeoPoint} representing the user's geolocation.
+     */
+
     public GeoPoint getGeolocation(){
         return geoLocation;
     }
 
-
+    /**
+     * Updates the geolocation of the current user and saves it to Firebase.
+     */
     public void updateGeolocation() {
 
         currentUser.setGeolocation(geoLocation);

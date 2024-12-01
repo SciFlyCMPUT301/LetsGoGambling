@@ -30,6 +30,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Fragment for viewing and managing images from Firestore collections.
+ * This fragment loads images from "Users" and "Events" collections, displays them in a list,
+ * and allows resetting image URLs to default values.
+ */
+
 public class ViewImagesFragment extends Fragment {
     private ListView imagesListView;
     private ImageAdapter imageAdapter;
@@ -41,7 +47,14 @@ public class ViewImagesFragment extends Fragment {
     private FirebaseFirestore db;
     private Map<String, String> selectedImageData = null;
     private ImageClass selectedImage;
-
+    /**
+     * Creates and initializes the fragment's view.
+     *
+     * @param inflater           LayoutInflater to inflate the fragment's view.
+     * @param container          Parent container for the fragment's UI.
+     * @param savedInstanceState State information from previous initialization, if any.
+     * @return The root view for the fragment.
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -93,7 +106,8 @@ public class ViewImagesFragment extends Fragment {
     }
 
     /**
-     * Fetch images directly from "Users" and "Events" collections.
+     * Loads images from Firestore "Users" and "Events" collections.
+     * Adds valid images to the list and notifies the adapter to display them.
      */
     private void loadImagesFromCollections() {
         imageList.clear();
@@ -142,8 +156,9 @@ public class ViewImagesFragment extends Fragment {
     }
 
     /**
-     * Removes the selected image metadata from Firestore.
+     * Resets the selected image's URL in Firestore to a default value.
      *
+     * @param imageData Metadata of the selected image, including its collection and document ID.
      */
     private void removeImage() {
         String collection = selectedImage.getCollection();
@@ -182,6 +197,7 @@ public class ViewImagesFragment extends Fragment {
             }
             else if (collection.equals("Events")) {
                 // Fetch the defaultEventPosterURL and update imageUrl
+                // Reset event's poster URL to default
                 db.collection("Events").document(documentId).get()
                         .addOnSuccessListener(documentSnapshot -> {
                             String defaultEventPosterURL = documentSnapshot.getString("defaultEventPosterURL");

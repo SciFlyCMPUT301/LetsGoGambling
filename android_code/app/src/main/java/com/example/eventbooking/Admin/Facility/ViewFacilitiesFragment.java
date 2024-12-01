@@ -15,8 +15,10 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.eventbooking.Admin.AdminFragment;
+import com.example.eventbooking.Events.EventData.Event;
 import com.example.eventbooking.Facility.Facility;
 import com.example.eventbooking.R;
+import com.example.eventbooking.UniversalProgramValues;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -44,18 +46,14 @@ public class ViewFacilitiesFragment extends Fragment {
      */
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_view_facility, container, false);
+        if(!UniversalProgramValues.getInstance().getTestingMode())
+            db = FirebaseFirestore.getInstance();
+//        facilityList = new ArrayList<>();
 
-        db = FirebaseFirestore.getInstance();
-        facilityList = new ArrayList<>();
-        facilitiesListView = view.findViewById(R.id.facility_list);
-        facilityAdapter = new FacilityViewAdapter(getContext(), facilityList);
-        facilitiesListView.setAdapter(facilityAdapter);
         adminGoBack = view.findViewById(R.id.admin_go_back);
         removeButton = view.findViewById(R.id.remove_facility_button);
 
-
-        loadFacilitiesFromFirestore();
-
+        loadFacilitiesFromFirestore(view);
 
         adminGoBack.setOnClickListener(v -> {
             // Navigate back to HomeFragment
@@ -66,6 +64,10 @@ public class ViewFacilitiesFragment extends Fragment {
 
         // Set item click listener for ListView
         facilitiesListView.setOnItemClickListener((AdapterView<?> parent, View v, int position, long id) -> {
+
+            // This below code is actually stupid and I think it makes no sense with respect to anything else
+            // Dont change how users use the app for one aspect when three others do not follow this schema
+
             // Store the selected facility
             selectedFacility = facilityList.get(position);
             Toast.makeText(getContext(), "Selected: " + selectedFacility.getName(), Toast.LENGTH_SHORT).show();
@@ -88,19 +90,30 @@ public class ViewFacilitiesFragment extends Fragment {
      * Maps each document to a `Facility` object and updates the ListView adapter.
      * Logs the number of facilities loaded or errors during retrieval.
      */
-    private void loadFacilitiesFromFirestore() {
-        db.collection("Facilities").get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                for (QueryDocumentSnapshot document : task.getResult()) {
-                    Facility facility = document.toObject(Facility.class);
-                    facilityList.add(facility);
+    private void loadFacilitiesFromFirestore(View view) {
+        facilityList = new ArrayList<>();
+        if(!UniversalProgramValues.getInstance().getTestingMode()) {
+            db.collection("Facilities").get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        Facility facility = document.toObject(Facility.class);
+                        facilityList.add(facility);
+                    }
+                    facilityAdapter.notifyDataSetChanged();
+                    Log.d("ViewUsersFragment", "Users loaded: " + facilityList.size());
+                } else {
+                    Log.e("FirestoreError", "Error getting documents: ", task.getException());
                 }
-                facilityAdapter.notifyDataSetChanged();
-                Log.d("ViewUsersFragment", "Users loaded: " + facilityList.size());
-            } else {
-                Log.e("FirestoreError", "Error getting documents: ", task.getException());
-            }
-        });
+            });
+        }
+        else{
+//            facilityList = new ArrayList<>();
+            facilityList.addAll(UniversalProgramValues.getInstance().getFacilityList());
+//            facilityAdapter.notifyDataSetChanged();
+        }
+        facilitiesListView = view.findViewById(R.id.facility_list);
+        facilityAdapter = new FacilityViewAdapter(getContext(), facilityList);
+        facilitiesListView.setAdapter(facilityAdapter);
     }
 
     /**
@@ -111,17 +124,24 @@ public class ViewFacilitiesFragment extends Fragment {
      * @param facility The selected facility to be removed.
      */
     private void removeFacility(Facility facility) {
-        db.collection("Facilities").document(facility.getFacilityID()).delete()
-                .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(getContext(), "Facility removed successfully.", Toast.LENGTH_SHORT).show();
-                    // Remove the facility from the list and update the adapter
-                    facilityList.remove(facility);
-                    facilityAdapter.notifyDataSetChanged();
-                    selectedFacility = null; // Clear the selected facility
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "Failed to remove facility: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    Log.e("ViewFacilitiesFragment", "Error removing facility", e);
-                });
+        if(!UniversalProgramValues.getInstance().getTestingMode()) {
+            db.collection("Facilities").document(facility.getFacilityID()).delete()
+                    .addOnSuccessListener(aVoid -> {
+                        Toast.makeText(getContext(), "Facility removed successfully.", Toast.LENGTH_SHORT).show();
+                        // Remove the facility from the list and update the adapter
+                        facilityList.remove(facility);
+                        facilityAdapter.notifyDataSetChanged();
+                        selectedFacility = null; // Clear the selected facility
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(getContext(), "Failed to remove facility: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Log.e("ViewFacilitiesFragment", "Error removing facility", e);
+                    });
+        }
+        else{
+            UniversalProgramValues.getInstance().removeSpecificFacility(facility.getFacilityID());
+            facilityAdapter.notifyDataSetChanged();
+            selectedFacility = null;
+        }
     }
 }

@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.example.eventbooking.Admin.Images.ImageClass;
 import com.example.eventbooking.Location;
 
 import java.io.ByteArrayOutputStream;
@@ -27,6 +28,7 @@ import java.util.List;
 import com.example.eventbooking.MainActivity;
 import com.example.eventbooking.QRCode.QRcodeGenerator;
 import com.example.eventbooking.Role;
+import com.example.eventbooking.UniversalProgramValues;
 import com.example.eventbooking.User;
 
 import com.example.eventbooking.waitinglist.WaitingList;
@@ -52,6 +54,7 @@ import com.google.firebase.storage.UploadTask;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -93,8 +96,11 @@ public class Event implements Parcelable {
      */
 
     public Event() {
-        storage = FirebaseStorage.getInstance();
-        db = FirebaseFirestore.getInstance();
+        if(!UniversalProgramValues.getInstance().getTestingMode()){
+            storage = FirebaseStorage.getInstance();
+            db = FirebaseFirestore.getInstance();
+        }
+
         this.waitingList= new WaitingList();
         //waiting list constructor will handle these 4 list
         this.waitingparticipantIds = new ArrayList<>();
@@ -110,6 +116,17 @@ public class Event implements Parcelable {
         storage = FirebaseStorage.getInstance();
         db = FirebaseFirestore.getInstance();
         this.waitingList=new WaitingList();
+    }
+
+    public Event(Boolean testMode){
+        this.waitingList= new WaitingList();
+        //waiting list constructor will handle these 4 list
+        this.waitingparticipantIds = new ArrayList<>();
+        this.acceptedParticipantIds = new ArrayList<>();
+        this.canceledParticipantIds = new ArrayList<>();
+        this.signedUpParticipantIds = new ArrayList<>();
+        this.enrolledParticipantIds = new ArrayList<>();
+        this.declinedParticipantIds = new ArrayList<>();
     }
 
     /**
@@ -515,11 +532,14 @@ public class Event implements Parcelable {
         eventData.put("geolocationRequired", geolocationRequired);
         //eventData.put("eventPictureUrl",eventPictureUrl);
         //eventData.put("defaultEventpictureurl",defaultEventpictureurl);
-        QRcodeGenerator qrCodeGenerator = new QRcodeGenerator();
-        String hashInput = eventId + Calendar.getInstance().getTime();
-        String qrCodeHash = qrCodeGenerator.createQRCodeHash(hashInput);
-        this.qrcodehash = qrCodeHash;
-        eventData.put("qrcodehash", qrCodeHash);
+        if(qrcodehash == null){
+            QRcodeGenerator qrCodeGenerator = new QRcodeGenerator();
+            String hashInput = eventId + Calendar.getInstance().getTime();
+            String qrCodeHash = qrCodeGenerator.createQRCodeHash(hashInput);
+            this.qrcodehash = qrCodeHash;
+        }
+
+        eventData.put("qrcodehash", qrcodehash);
     }
 
     /**
@@ -778,6 +798,7 @@ public class Event implements Parcelable {
                     for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
                         Event event = doc.toObject(Event.class);
                         if (event != null) {
+                            Log.d("Event", "Adding event");
                             userEvents.add(event);
                         }
                     }
@@ -826,6 +847,7 @@ public class Event implements Parcelable {
 
         return bitmap;
     }
+
     public Task<Void> uploadDefaultPoster(String eventTitle) {
         Bitmap bitmap = generateDefaultPoster(eventTitle);
 
@@ -896,12 +918,6 @@ public class Event implements Parcelable {
                 .addOnFailureListener(e -> Log.e("Event", "Failed to upload poster or update URL", e));
     }
 
-
-
-
-
-
-
     // Update event poster
     public void updateEventPoster(Uri newPosterUri) {
         uploadCustomPoster(newPosterUri);
@@ -940,12 +956,22 @@ public class Event implements Parcelable {
     public void getNewEventQRHash(){
         QRcodeGenerator qrCodeGenerator = new QRcodeGenerator();
         this.qrcodehash = qrCodeGenerator.createQRCodeHash(eventId);
-        saveEventDataToFirestore()
-                .addOnSuccessListener(aVoid -> {
+        if(!UniversalProgramValues.getInstance().getTestingMode()){
+            saveEventDataToFirestore()
+                    .addOnSuccessListener(aVoid -> {
 
-                    Log.d("Event", "Event successfully saved!");
-                })
-                .addOnFailureListener(e -> Log.e("Event", "Error saving event", e));
+                        Log.d("Event", "Event successfully saved!");
+                    })
+                    .addOnFailureListener(e -> Log.e("Event", "Error saving event", e));
+        }
+        else{
+            for(int i = 0; i < UniversalProgramValues.getInstance().getEventList().size(); i++){
+                if(Objects.equals(UniversalProgramValues.getInstance().getEventList().get(i).getEventId(), eventId)){
+                    UniversalProgramValues.getInstance().getEventList().get(i).setQRcodeHash(qrcodehash);
+                }
+            }
+
+        }
 
     }
 

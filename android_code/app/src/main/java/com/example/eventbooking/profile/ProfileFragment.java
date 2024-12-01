@@ -51,7 +51,7 @@ public class ProfileFragment extends Fragment {
     private boolean isEditing = false;
     private boolean isNewUser = false;
     private String deviceId;
-    private String eventIDFromQR = "";
+    private String eventIDFromQR;
 
     public static ProfileFragment newInstance(boolean isNewUser, String eventId, String deviceId) {
         ProfileFragment fragment = new ProfileFragment();
@@ -183,6 +183,7 @@ public class ProfileFragment extends Fragment {
 //                    }
 //
 //                }
+                UserManager.getInstance().setCurrentUser(currentUser);
                 if (currentUser.isGeolocationAsk()) {
                     UserManager.getInstance().updateGeolocation();
                 }
@@ -196,7 +197,9 @@ public class ProfileFragment extends Fragment {
         else{
             UniversalProgramValues.getInstance().setCurrentUser(currentUser);
             UserManager.getInstance().setCurrentUser(currentUser);
-            UserManager.getInstance().updateGeolocation();
+            if (currentUser.isGeolocationAsk()) {
+                UserManager.getInstance().updateGeolocation();
+            }
             ((MainActivity) getActivity()).showNavigationUI();
             Log.d("Profile Fragment", "Test Mode eventID: " + eventIDFromQR);
             if(eventIDFromQR == null)
@@ -216,28 +219,43 @@ public class ProfileFragment extends Fragment {
         if(!isNewUser && enable){
             uploadButton.setVisibility(View.VISIBLE);
             removeImageButton.setVisibility(View.VISIBLE);
+            saveButton.setVisibility(View.VISIBLE);
         }
         if(!isNewUser && !enable){
             uploadButton.setVisibility(View.GONE);
             removeImageButton.setVisibility(View.GONE);
+            saveButton.setVisibility(View.GONE);
         }
         editName.setEnabled(enable);
         editEmail.setEnabled(enable);
         editPhone.setEnabled(enable);
         notificationsSwitch.setEnabled(enable);
+        geolocationSwitch.setEnabled(enable);
         saveButton.setEnabled(enable);
         editButton.setText(enable ? "Cancel" : "Edit");
     }
 
     private void uploadPhoto() {
-        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        pickImageLauncher.launch(intent);
+        if(!UniversalProgramValues.getInstance().getTestingMode()){
+            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            pickImageLauncher.launch(intent);
+        }
+        else{
+//            currentUser.uploadImage(selectedImageUri);
+            String URI = UniversalProgramValues.getInstance().getUploadProfileURL();
+            selectedImageUri = Uri.parse(URI);
+            currentUser.setProfilePictureUrl(URI);
+//            profilePictureUrl = imageURL;
+            userImage.setImageURI(selectedImageUri);
+        }
+
     }
 
     private void removeImage() {
         if (!currentUser.isDefaultURLMain()) {
             currentUser.deleteSelectedImageFromFirebase(currentUser.getProfilePictureUrl());
             userImage.setImageResource(R.drawable.placeholder_image_foreground);
+            userImage.setImageURI(Uri.parse(currentUser.getdefaultProfilePictureUrl()));
             Toast.makeText(getContext(), "Profile image removed.", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(getContext(), "Default image is already set.", Toast.LENGTH_SHORT).show();

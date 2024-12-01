@@ -16,11 +16,13 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.example.eventbooking.Admin.AdminFragment;
 import com.example.eventbooking.R;
+import com.example.eventbooking.UniversalProgramValues;
 import com.example.eventbooking.User;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * ViewUsersFragment is a Fragment that displays a list of users fetched from Firestore.
@@ -51,7 +53,10 @@ public class ViewUsersFragment extends Fragment {
 
         // Initialize ListView
 //        imagesListView = view.findViewById(R.id.imagesListView);
-        db = FirebaseFirestore.getInstance();
+        if(!UniversalProgramValues.getInstance().getTestingMode()){
+            db = FirebaseFirestore.getInstance();
+        }
+
         userList = new ArrayList<>();
         // Set up ListView and adapter to display users
         usersListView = view.findViewById(R.id.user_list);
@@ -64,7 +69,10 @@ public class ViewUsersFragment extends Fragment {
 
 
         // Load Users
+
         loadUsersFromFirestore();
+
+
 
         adminGoBack.setOnClickListener(v -> {
             // Navigate back to HomeFragment
@@ -93,16 +101,15 @@ public class ViewUsersFragment extends Fragment {
         FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
         EditUserFragment fragment = new EditUserFragment();
         Bundle bundle = new Bundle();
-
-        // Pass user details to EditUserFragment
-        bundle.putString("deviceId", selectedUser.getDeviceID());
-        bundle.putString("username", selectedUser.getUsername());
-        bundle.putString("email", selectedUser.getEmail());
-        bundle.putString("phoneNumber", selectedUser.getPhoneNumber());
-        bundle.putString("location", selectedUser.getLocation());
-        bundle.putString("profilePictureUrl", selectedUser.getProfilePictureUrl());
-// The roles (entrant, organizer, admin) are passed to the EditUserFragment,
-// allowing the admin to modify user roles in the edit screen.
+        bundle.putParcelable("userData", selectedUser);
+//
+//        // Pass user details to EditUserFragment
+//        bundle.putString("deviceId", selectedUser.getDeviceID());
+//        bundle.putString("username", selectedUser.getUsername());
+//        bundle.putString("email", selectedUser.getEmail());
+//        bundle.putString("phoneNumber", selectedUser.getPhoneNumber());
+//        bundle.putString("location", selectedUser.getLocation());
+//        bundle.putString("profilePictureUrl", selectedUser.getProfilePictureUrl());
         if (selectedUser.getRoles() != null) {
             bundle.putStringArrayList("roles", new ArrayList<>(selectedUser.getRoles()));
         }
@@ -118,22 +125,36 @@ public class ViewUsersFragment extends Fragment {
      * Logs an error message using Log.e, which includes the exception message for debugging purposes.
      */
     private void loadUsersFromFirestore() {
-        db.collection("Users").get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                // Iterate through the documents and add each user to the list
-                for (QueryDocumentSnapshot document : task.getResult()) {
-                    User user = document.toObject(User.class);
-                    userList.add(user);
-                    Log.d("ViewUsersFragment", "User deviceId: " + user.getDeviceID());
+        if (!UniversalProgramValues.getInstance().getTestingMode()) {
+            db.collection("Users").get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    // Iterate through the documents and add each user to the list
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        User user = document.toObject(User.class);
+                        userList.add(user);
+                        Log.d("ViewUsersFragment", "User deviceId: " + user.getDeviceID());
+                    }
+                    // Notify adapter to refresh ListView
+                    userAdapter.notifyDataSetChanged();
+                    Log.d("ViewUsersFragment", "Users loaded: " + userList.size());
+                } else {
+                    Log.e("FirestoreError", "Error getting documents: ", task.getException());
                 }
-                // Notify adapter to refresh ListView
-                userAdapter.notifyDataSetChanged();
-                Log.d("ViewUsersFragment", "Users loaded: " + userList.size());
-            } else {
-                Log.e("FirestoreError", "Error getting documents: ", task.getException());
-            }
-        });
+            });
+        }
+        else{
+            userList.addAll(UniversalProgramValues.getInstance().getUserList());
+//            userList = UniversalProgramValues.getInstance().getUserList();
+            Log.d("ViewUsersFragment", "DeviceID: " + userList.get(1).getDeviceID());
+            Log.d("ViewUsersFragment", "DeviceID: " + userList.get(2).getUsername());
+            userAdapter.notifyDataSetChanged();
+            Log.d("ViewUsersFragment", "Users loaded: " + userList.size());
+        }
     }
+
+
+
+
 
 
 

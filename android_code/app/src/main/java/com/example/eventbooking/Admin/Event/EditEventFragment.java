@@ -18,9 +18,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.eventbooking.Admin.Users.ViewUsersFragment;
 import com.example.eventbooking.Events.EventData.Event;
 import com.example.eventbooking.QRCode.QRcodeGenerator;
 import com.example.eventbooking.R;
+import com.example.eventbooking.UniversalProgramValues;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -74,7 +76,9 @@ public class EditEventFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_edit_event, container, false);
-        db = FirebaseFirestore.getInstance();
+        if(!UniversalProgramValues.getInstance().getTestingMode()) {
+            db = FirebaseFirestore.getInstance();
+        }
         // Initialize views
         eventTitleText = view.findViewById(R.id.view_text_event_title);
         eventDescriptionText = view.findViewById(R.id.view_text_event_description);
@@ -138,29 +142,35 @@ public class EditEventFragment extends Fragment {
      * back to the previous screen upon successful deletion, or shows an error message if the deletion fails.
      */
     private void removeEvent() {
-        db.collection("Events").document(selectedEvent.getEventId()).delete()
-                .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(getContext(), "Event deleted successfully.", Toast.LENGTH_SHORT).show();
-                    db.collection("Facilities").get()
-                            .addOnSuccessListener(querySnapshot -> {
-                                for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
-                                    List<String> allEvents = (List<String>) doc.get("allEvents");
-                                    if (allEvents != null && allEvents.contains(selectedEvent.getEventId())) {
-                                        allEvents.remove(selectedEvent.getEventId());
-                                        db.collection("Facilities").document(doc.getId())
-                                                .update("allEvents", allEvents)
-                                                .addOnSuccessListener(aVoid2 -> Log.d("EditEventFragment", "Removed event ID from Facilities: " + doc.getId()))
-                                                .addOnFailureListener(e -> Log.e("EditEventFragment", "Failed to update Facilities: " + doc.getId(), e));
+        if(!UniversalProgramValues.getInstance().getTestingMode()) {
+            db.collection("Events").document(selectedEvent.getEventId()).delete()
+                    .addOnSuccessListener(aVoid -> {
+                        Toast.makeText(getContext(), "Event deleted successfully.", Toast.LENGTH_SHORT).show();
+                        db.collection("Facilities").get()
+                                .addOnSuccessListener(querySnapshot -> {
+                                    for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                                        List<String> allEvents = (List<String>) doc.get("allEvents");
+                                        if (allEvents != null && allEvents.contains(selectedEvent.getEventId())) {
+                                            allEvents.remove(selectedEvent.getEventId());
+                                            db.collection("Facilities").document(doc.getId())
+                                                    .update("allEvents", allEvents)
+                                                    .addOnSuccessListener(aVoid2 -> Log.d("EditEventFragment", "Removed event ID from Facilities: " + doc.getId()))
+                                                    .addOnFailureListener(e -> Log.e("EditEventFragment", "Failed to update Facilities: " + doc.getId(), e));
+                                        }
                                     }
-                                }
-                            })
-                            .addOnFailureListener(e -> Log.e("EditEventFragment", "Failed to query Facilities collection", e));
+                                })
+                                .addOnFailureListener(e -> Log.e("EditEventFragment", "Failed to query Facilities collection", e));
 
-                    getActivity().onBackPressed();
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "Failed to delete event: ", Toast.LENGTH_SHORT).show();
-                });
+                        moveFragment(new ViewEventsFragment());
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(getContext(), "Failed to delete event: ", Toast.LENGTH_SHORT).show();
+                    });
+        }
+        else{
+            UniversalProgramValues.getInstance().removeSpecificEvent(selectedEvent.getEventId());
+            moveFragment(new ViewEventsFragment());
+        }
     }
 
     private void navQRDetails(){
@@ -171,12 +181,14 @@ public class EditEventFragment extends Fragment {
                 .commit();
     }
 
+    private void moveFragment(Fragment movingFragment){
+        getParentFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, movingFragment)
+                .addToBackStack(null)
+                .commit();
+    }
 
 
-    /**
-     * This function will get the QR code associated with the event to be scanned and displayed when scanned
-     * Once the QR code is generated then we display the QR code
-     */
 
 
 

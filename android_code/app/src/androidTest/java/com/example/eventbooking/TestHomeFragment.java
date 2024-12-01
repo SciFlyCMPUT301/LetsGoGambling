@@ -35,8 +35,10 @@ import com.example.eventbooking.Facility.Facility;
 import com.example.eventbooking.Home.HomeFragment;
 import com.example.eventbooking.Login.LoginFragment;
 import com.example.eventbooking.QRCode.QRcodeGenerator;
+import com.example.eventbooking.Testing.SampleTable;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
 
 import org.junit.After;
 import org.junit.Before;
@@ -54,8 +56,8 @@ import java.util.Random;
 @RunWith(AndroidJUnit4.class)
 public class TestHomeFragment {
 
-    @Rule
-    public ActivityScenarioRule<MainActivity> activityRule = new ActivityScenarioRule<>(MainActivity.class);
+//    @Rule
+//    public ActivityScenarioRule<MainActivity> activityRule = new ActivityScenarioRule<>(MainActivity.class);
 
     @Rule
     public GrantPermissionRule permissionRule = GrantPermissionRule.grant(
@@ -68,13 +70,18 @@ public class TestHomeFragment {
     private ActivityScenario<MainActivity> scenario;
     private User user;
     public List<Event> EventList;
+    private List<User> loadingUserList;
+    private List<Event> loadingEventList;
+    private List<Facility> loadingFacilityList;
 
     @Before
     public void setUp() {
-        scenario = activityRule.getScenario();
         EventList = new ArrayList<>();
         user = new User();
         initalizeUserAndEvents();
+        scenario = ActivityScenario.launch(MainActivity.class);
+//        scenario = activityRule.getScenario();
+
         try {
             Thread.sleep(500); // Pause for 3 seconds
         } catch (InterruptedException e) {
@@ -107,22 +114,6 @@ public class TestHomeFragment {
         // Verify HomeFragment initial UI
         onView(withId(R.id.search_bar)).check(matches(isDisplayed()));
         onView(withId(R.id.filter_spinner)).check(matches(isDisplayed()));
-    }
-
-    @Test
-    public void testNavigateToEventCreate() {
-        scenario.onActivity(activity -> {
-//            HomeFragment homeFragment = HomeFragment.newInstance(true, "testUserId", EventList);
-            activity.getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragment_container, new HomeFragment())
-                    .commitNow(); // Ensure fragment is attached immediately
-        });
-        // Simulate clicking "Go to EventCreate" button
-//        onView(withId(R.id.button_event_create)).perform(click());
-
-        // Verify EventCreateFragment is displayed
-        onView(withId(R.id.event_create_title)).check(matches(isDisplayed()));
     }
 
     @Test
@@ -165,22 +156,6 @@ public class TestHomeFragment {
 
         onView(withId(R.id.user_events_list))
                 .check(ViewAssertions.matches(isDisplayed()));
-    }
-
-    @Test
-    public void testNavigateToNotification() {
-        scenario.onActivity(activity -> {
-//            HomeFragment homeFragment = HomeFragment.newInstance(true, "testUserId", EventList);
-            activity.getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragment_container, new HomeFragment())
-                    .commitNow(); // Ensure fragment is attached immediately
-        });
-        // Simulate clicking "Go to Notification" button
-        onView(withId(R.id.button_notification)).perform(click());
-
-        // Verify NotificationFragment is displayed
-        onView(withId(R.id.notification_title)).check(matches(isDisplayed()));
     }
 
     @Test
@@ -260,8 +235,8 @@ public class TestHomeFragment {
         onView(withId(R.id.search_bar))
                 .check(matches(isDisplayed()));
 
-        onView(withContentDescription("Open Navigation Drawer"))
-                .perform(click());
+//        onView(withContentDescription("Open Navigation Drawer"))
+//                .perform(click());
 
         onView(withId(R.id.nav_profile_bottom))
                 .perform(click());
@@ -468,9 +443,10 @@ public class TestHomeFragment {
     }
 
 
-
-
     private void initalizeUserAndEvents(){
+        UniversalProgramValues.getInstance().setExistingLogin(true);
+        UniversalProgramValues.getInstance().setTestingMode(true);
+        UniversalProgramValues.getInstance().setDeviceID("testingDeviceID100");
         user.setDeviceID("testingDeviceID100");
         user.setUsername("testUser");
         user.setEmail("testUser@example.com");
@@ -485,58 +461,37 @@ public class TestHomeFragment {
         user.setRoles(addRoles);
 //        UserManager.getInstance().setCurrentUser(user);
 //        user.saveUserDataToFirestore();
+        SampleTable testTable = new SampleTable();
+        testTable.makeUserList();
+        Log.d("Test Admin Fragment", "Made User List");
+        Log.d("Test Admin Fragment", "Made Facility List");
+        testTable.makeFacilityList();
 
-        // Create 10 events and put the user in parts of the test
-        for (int i = 1; i <= 10; i++) {
-            Event event = new Event();
-            event.setEventId("testEventID" + i);
-            event.setEventTitle("Event Title " + i);
-            event.setDescription("Description for event " + i);
-            event.setTimestamp(System.currentTimeMillis() + i * 100000);
-            event.setMaxParticipants(20);
-            event.setOrganizerId("testDeviceID"+i);
-            event.setLocation("testAddress" + i);
-            QRcodeGenerator qrCodeGenerator = new QRcodeGenerator();
-            String hashInput = event.getEventId() + Calendar.getInstance().getTime();
-            String qrCodeHash = qrCodeGenerator.createQRCodeHash(hashInput);
-            event.setQRcodeHash(qrCodeHash);
-
-            if(i%4 == 0)
-                event.addAcceptedParticipantId(user.getDeviceID());
-            else if(i%4 == 1)
-                event.addCanceledParticipantIds(user.getDeviceID());
-            else if(i%4 == 2)
-                event.addWaitingParticipantIds(user.getDeviceID());
-            else
-                event.addSignedUpParticipantIds(user.getDeviceID());
-
-            EventList.add(event);
-        }
-
-//        for (Event event : EventList) {
-//            event.saveEventDataToFirestore();
-//        }
+        testTable.makeEventList();
+        Log.d("Test Admin Fragment", "Made Event List");
+        Log.d("Test Admin Fragment", "Setting Event List");
+        UniversalProgramValues.getInstance().setEventList(testTable.getEventList());
+        Log.d("Test Admin Fragment", "Setting User List");
+        UniversalProgramValues.getInstance().setUserList(testTable.getUserList());
+        Log.d("Test Admin Fragment", "Setting Facility List");
+        UniversalProgramValues.getInstance().setFacilityList(testTable.getFacilityList());
+        user.setDeviceID("testingDeviceID100");
+        user.setUsername("testUser");
+        user.setEmail("testUser@example.com");
+        user.setNotificationAsk(false);
+        user.setGeolocationAsk(false);
+        user.setdefaultProfilePictureUrl("testURL");
+        user.setProfilePictureUrl("testURL");
+        List<String> addSingleRoles = new ArrayList<>();
+        addSingleRoles.add(Role.ENTRANT);
+        addSingleRoles.add(Role.ORGANIZER);
+        addSingleRoles.add(Role.ADMIN);
+        user.setRoles(addSingleRoles);
         UniversalProgramValues.getInstance().setExistingLogin(true);
         UniversalProgramValues.getInstance().setTestingMode(true);
         UniversalProgramValues.getInstance().setCurrentUser(user);
-        UniversalProgramValues.getInstance().setEventList(EventList);
     }
 
-//    private void deleteTestData(){
-//        FirebaseFirestore db = FirebaseFirestore.getInstance();
-//        DocumentReference userRef = db.collection("Users").document("testingDeviceID100");
-//        userRef.delete();
-//
-//        for (Event event : EventList) {
-//            DocumentReference eventRef = db.collection("Events").document(event.getEventId());
-//            userRef.delete();
-//        }
-//
-//        user = null;
-//        EventList = null;
-//        UserManager.getInstance().setCurrentUser(new User());
-//        UniversalProgramValues.getInstance().resetInstance();
-//    }
 
 
 

@@ -23,6 +23,7 @@ import com.example.eventbooking.Home.HomeUserEventAdapter;
 import com.example.eventbooking.MainActivity;
 import com.example.eventbooking.R;
 import com.example.eventbooking.UniversalProgramValues;
+import com.example.eventbooking.User;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -43,7 +44,7 @@ import java.util.stream.Collectors;
 public class ViewEventsFragment extends Fragment {
     private Button adminGoBack;
     private EventViewAdapter eventAdapter;
-//    private ArrayList<Event> eventList;
+    private ArrayList<Event> eventList;
     private ListView eventListView;
     private FirebaseFirestore db;
     private List<Event> allEvents;
@@ -74,29 +75,8 @@ public class ViewEventsFragment extends Fragment {
         // Initialize view components
         // Starting from here views
 //        backButton = view.findViewById(R.id.button_back_home);
+        eventList = new ArrayList<>();
         initalizeUI(rootview);
-
-
-        if(!UniversalProgramValues.getInstance().getTestingMode()){
-            Event.getAllEvents(allEvents -> {
-                if (isAdded() && getActivity() instanceof MainActivity) {
-                    viewEventList = new ArrayList<>(allEvents);
-                    eventAdapter = new EventViewAdapter(getContext(), allEvents);
-                    eventListView.setAdapter(eventAdapter);
-                    setupSearchFilter();
-                }
-            }, e -> {
-//                Log.e("HomeFragment", "Failed to fetch events: " + e.getMessage());
-            });
-        }
-
-        else{
-            viewEventList = new ArrayList<>(allEvents);
-            eventAdapter = new EventViewAdapter(getContext(), allEvents);
-            eventListView.setAdapter(eventAdapter);
-            setupSearchFilter();
-
-        }
 
         return rootview;
 
@@ -194,33 +174,81 @@ public class ViewEventsFragment extends Fragment {
 
     private void initalizeUI(View view){
         if(!UniversalProgramValues.getInstance().getTestingMode()){
+            eventListView = view.findViewById(R.id.event_list);
+            adminGoBack = view.findViewById(R.id.admin_go_back);
+            searchView = view.findViewById(R.id.search_bar);
+            filterSpinner = view.findViewById(R.id.filter_spinner);
             db = FirebaseFirestore.getInstance();
+            Event.getAllEvents(eventGetList -> {
+                if (isAdded() && getActivity() instanceof MainActivity) {
+                    for(int i=0; i < eventGetList.size(); i++){
+
+                        eventList.add(eventGetList.get(i));
+                        Log.d("View Events", "EventID: " + eventList.get(i).getEventId());
+                    }
+//                    eventList = new ArrayList<>(eventGetList);
+                    eventAdapter = new EventViewAdapter(getContext(), eventList);
+                    eventListView.setAdapter(eventAdapter);
+                    setupSearchFilter();
+                    eventListView.setOnItemClickListener((parent, view1, position, id) -> {
+                        Event selectedEvent = eventList.get(position);
+                        openEventDetailPage(selectedEvent);
+                    });
+
+                    // Set click listener for admin go back button
+                    adminGoBack.setOnClickListener(v -> {
+                        // Navigate back to HomeFragment
+                        getParentFragmentManager().beginTransaction()
+                                .replace(R.id.fragment_container, new AdminFragment())
+                                .commit();
+                    });
+                }
+            }, e -> {
+//                Log.e("HomeFragment", "Failed to fetch events: " + e.getMessage());
+            });
 //            loadEventsFromFirebase();
         }
         else{
-            allEvents = UniversalProgramValues.getInstance().getEventList();
+            eventListView = view.findViewById(R.id.event_list);
+            adminGoBack = view.findViewById(R.id.admin_go_back);
+            searchView = view.findViewById(R.id.search_bar);
+            filterSpinner = view.findViewById(R.id.filter_spinner);
+
+
+            allEvents = new ArrayList<>();
+            allEvents.addAll(UniversalProgramValues.getInstance().getEventList());
+            viewEventList = new ArrayList<>(allEvents);
+            eventAdapter = new EventViewAdapter(getContext(), allEvents);
+            eventListView.setAdapter(eventAdapter);
+
+
+
+//            userList = UniversalProgramValues.getInstance().getUserList();
+
+//            eventAdapter.notifyDataSetChanged();
+//            allEvents = UniversalProgramValues.getInstance().getEventList();
+            setupSearchFilter();
+            eventListView.setOnItemClickListener((parent, view1, position, id) -> {
+                Event selectedEvent = viewEventList.get(position);
+                openEventDetailPage(selectedEvent);
+            });
+
+            // Set click listener for admin go back button
+            adminGoBack.setOnClickListener(v -> {
+                // Navigate back to HomeFragment
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new AdminFragment())
+                        .commit();
+            });
         }
 
-        eventListView = view.findViewById(R.id.event_list);
-        adminGoBack = view.findViewById(R.id.admin_go_back);
-        searchView = view.findViewById(R.id.search_bar);
-        filterSpinner = view.findViewById(R.id.filter_spinner);
+
+
 
 
 //        loadEventsFromFirebase();
         // Set click listener for list items to open event details
-        eventListView.setOnItemClickListener((parent, view1, position, id) -> {
-            Event selectedEvent = viewEventList.get(position);
-            openEventDetailPage(selectedEvent);
-        });
 
-        // Set click listener for admin go back button
-        adminGoBack.setOnClickListener(v -> {
-            // Navigate back to HomeFragment
-            getParentFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new AdminFragment())
-                    .commit();
-        });
     }
 
 

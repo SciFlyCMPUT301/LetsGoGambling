@@ -11,14 +11,19 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.view.GravityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.example.eventbooking.R;
+import com.example.eventbooking.Role;
+import com.example.eventbooking.UniversalProgramValues;
 import com.example.eventbooking.User;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * EditUserFragment provides an interface for administrators to add, update, or delete
@@ -51,7 +56,8 @@ public class EditUserFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_edit_user, container, false);
-        db = FirebaseFirestore.getInstance();
+        if(!UniversalProgramValues.getInstance().getTestingMode())
+            db = FirebaseFirestore.getInstance();
 
         // Initialize Views
         usernameTextView = view.findViewById(R.id.user_view_username);
@@ -71,34 +77,31 @@ public class EditUserFragment extends Fragment {
         // "isNewUser" indicates whether this is a new user being created or an existing user being edited.
         Bundle args = getArguments();
         if (args != null) {
-            documentId = args.getString("deviceId");
-            isNewUser = args.getBoolean("isNewUser", false);
+            user = args.getParcelable("userData");
+            documentId = user.getDeviceID();
 
-            if (!isNewUser) {
-                usernameTextView.setText(args.getString("username", "N/A"));
-                deviceIdTextView.setText(args.getString("deviceId", "N/A"));
-                emailTextView.setText(args.getString("email", "N/A"));
-                phoneNumberTextView.setText(args.getString("phoneNumber", "N/A"));
-                profilePictureUrlTextView.setText(args.getString("profilePictureUrl", "N/A"));
-                locationTextView.setText(args.getString("location", "N/A"));
-                dateJoinedTextView.setText(args.getString("dateJoined", "N/A"));
+            usernameTextView.setText(user.getUsername());
+            deviceIdTextView.setText(user.getDeviceID());
+            emailTextView.setText(user.getEmail());
+            phoneNumberTextView.setText(user.getPhoneNumber());
+            profilePictureUrlTextView.setText(user.getProfilePictureUrl());
+            locationTextView.setText(user.getLocation());
+            dateJoinedTextView.setText("N/A");
 
-                ArrayList<String> roles = args.getStringArrayList("roles");
-                if (roles != null && !roles.isEmpty()) {
-                    roleTextView.setText(String.join(", ", roles));
-                } else {
-                    roleTextView.setText("N/A");
-                }
-
-                // Check roles using utility method
-                entrantSwitch.setChecked(hasRole(roles, "entrant"));
-                adminSwitch.setChecked(hasRole(roles, "admin"));
-                organizerSwitch.setChecked(hasRole(roles, "organizer"));
-
-                deleteButton.setVisibility(View.VISIBLE);
+            List<String> roles = user.getRoles();
+            if (roles != null && !roles.isEmpty()) {
+                roleTextView.setText(String.join(", ", roles));
             } else {
-                deleteButton.setVisibility(View.GONE);
+                roleTextView.setText("N/A");
             }
+
+            // Check roles using utility method
+            entrantSwitch.setChecked(user.hasRole(Role.ENTRANT));
+            adminSwitch.setChecked(user.hasRole(Role.ADMIN));
+            organizerSwitch.setChecked(user.hasRole(Role.ORGANIZER));
+
+            deleteButton.setVisibility(View.VISIBLE);
+
         }
 
         deleteButton.setOnClickListener(v -> {
@@ -107,7 +110,7 @@ public class EditUserFragment extends Fragment {
             }
         });
 
-        cancelButton.setOnClickListener(v -> getActivity().onBackPressed());
+        cancelButton.setOnClickListener(v -> moveFragment(new ViewUsersFragment()));
 
         return view;
     }
@@ -125,14 +128,27 @@ public class EditUserFragment extends Fragment {
      */
     // change this so it deletes it from firebase
     private void deleteUser(String documentId) {
-        db.collection("Users").document(documentId).delete()
-                .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(getContext(), "User deleted successfully.", Toast.LENGTH_SHORT).show();
-                    getActivity().onBackPressed(); // Navigate back after deletion
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "Failed to delete user: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                });
+        if(!UniversalProgramValues.getInstance().getTestingMode()) {
+            db.collection("Users").document(documentId).delete()
+                    .addOnSuccessListener(aVoid -> {
+                        Toast.makeText(getContext(), "User deleted successfully.", Toast.LENGTH_SHORT).show();
+                        moveFragment(new ViewUsersFragment());
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(getContext(), "Failed to delete user: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    });
 //        getActivity().onBackPressed();
+        }
+        else{
+            UniversalProgramValues.getInstance().removeSpecificUser(documentId);
+            moveFragment(new ViewUsersFragment());
+        }
+    }
+
+    private void moveFragment(Fragment movingFragment){
+        getParentFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, movingFragment)
+                .addToBackStack(null)
+                .commit();
     }
 }

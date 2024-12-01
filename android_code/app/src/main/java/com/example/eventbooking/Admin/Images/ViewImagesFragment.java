@@ -1,5 +1,6 @@
 package com.example.eventbooking.Admin.Images;
 
+import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,12 +16,18 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.eventbooking.Admin.AdminFragment;
+import com.example.eventbooking.Facility.Facility;
 import com.example.eventbooking.R;
+import com.example.eventbooking.UniversalProgramValues;
+import com.example.eventbooking.User;
+import com.example.eventbooking.Events.EventData.Event;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -32,10 +39,14 @@ import java.util.Map;
 public class ViewImagesFragment extends Fragment {
     private ListView imagesListView;
     private ImageAdapter imageAdapter;
-    private ArrayList<Map<String, String>> imageList; // Stores image data
+    // Dont ever do this, why????
+//    private ArrayList<Map<String, String>> imageList; // Stores image data
+    // Do this instead
+    private List<ImageClass> imageList;
     private Button adminGoBack, removeButton;
     private FirebaseFirestore db;
     private Map<String, String> selectedImageData = null;
+    private ImageClass selectedImage;
     /**
      * Creates and initializes the fragment's view.
      *
@@ -44,14 +55,14 @@ public class ViewImagesFragment extends Fragment {
      * @param savedInstanceState State information from previous initialization, if any.
      * @return The root view for the fragment.
      */
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_view_images, container, false);
 
         // Initialize Firestore and UI components
-        db = FirebaseFirestore.getInstance();
+        if(!UniversalProgramValues.getInstance().getTestingMode())
+            db = FirebaseFirestore.getInstance();
         imageList = new ArrayList<>();
         imagesListView = view.findViewById(R.id.image_list);
         imageAdapter = new ImageAdapter(getContext(), imageList);
@@ -60,18 +71,26 @@ public class ViewImagesFragment extends Fragment {
         removeButton = view.findViewById(R.id.remove_image_button);
 
         // Load images from Firestore collections
-        loadImagesFromCollections();
+        if(!UniversalProgramValues.getInstance().getTestingMode())
+            loadImagesFromCollections();
+        else{
+            loadTestDataset();
+        }
 
         // Handle ListView item clicks
         imagesListView.setOnItemClickListener((AdapterView<?> parent, View v, int position, long id) -> {
-            selectedImageData = (Map<String, String>) parent.getItemAtPosition(position);
+            // What is this????
+            selectedImage = imageList.get(position);
             Toast.makeText(getContext(), "Selected Image", Toast.LENGTH_SHORT).show();
         });
 
         // Handle Remove Button click
         removeButton.setOnClickListener(v -> {
-            if (selectedImageData != null) {
-                removeImage(selectedImageData);
+            if (selectedImage != null) {
+                if(!UniversalProgramValues.getInstance().getTestingMode())
+                    removeImage();
+                else
+                    removeImageUITest();
             } else {
                 Toast.makeText(getContext(), "Please select an image to remove.", Toast.LENGTH_SHORT).show();
             }
@@ -93,18 +112,18 @@ public class ViewImagesFragment extends Fragment {
     private void loadImagesFromCollections() {
         imageList.clear();
 
+
         // Fetch images from "Users" collection
         db.collection("Users").get()
                 .addOnSuccessListener(userSnapshots -> {
                     for (DocumentSnapshot user : userSnapshots.getDocuments()) {
                         String imageUrl = user.getString("profilePictureUrl");
                         if (imageUrl != null && !imageUrl.isEmpty()) {
-                            Map<String, String> data = new HashMap<>();
-                            data.put("imageUrl", imageUrl);
-                            data.put("source", "User: " + user.getString("username"));
-                            data.put("documentId", user.getId());
-                            data.put("collection", "Users");
-                            imageList.add(data);
+                            ImageClass image = new ImageClass(imageUrl,
+                                    "User: " + user.getString("username")
+                                    , user.getId()
+                                    , "Users");
+                            imageList.add(image);
                         }
                     }
 
@@ -114,12 +133,11 @@ public class ViewImagesFragment extends Fragment {
                                 for (DocumentSnapshot event : eventSnapshots.getDocuments()) {
                                     String imageUrl = event.getString("imageUrl");
                                     if (imageUrl != null && !imageUrl.isEmpty()) {
-                                        Map<String, String> data = new HashMap<>();
-                                        data.put("imageUrl", imageUrl);
-                                        data.put("source", "Event: " + event.getString("eventTitle"));
-                                        data.put("documentId", event.getId());
-                                        data.put("collection", "Events");
-                                        imageList.add(data);
+                                        ImageClass image = new ImageClass(imageUrl,
+                                                "Event: " + event.getString("eventTitle")
+                                                , event.getId()
+                                                , "Events");
+                                        imageList.add(image);
                                     }
                                 }
 
@@ -142,10 +160,9 @@ public class ViewImagesFragment extends Fragment {
      *
      * @param imageData Metadata of the selected image, including its collection and document ID.
      */
-    private void removeImage(Map<String, String> imageData) {
-        String collection = imageData.get("collection");
-        String documentId = imageData.get("documentId");
-
+    private void removeImage() {
+        String collection = selectedImage.getCollection();
+        String documentId = selectedImage.getDocumentId();
         if (collection != null && documentId != null) {
             if (collection.equals("Users")) {
                 // Fetch the defaultProfilePictureUrl and update profilePictureUrl
@@ -161,7 +178,7 @@ public class ViewImagesFragment extends Fragment {
                                             Toast.makeText(getContext(), "Profile picture reset to default.", Toast.LENGTH_SHORT).show();
 
                                             // Update the local list
-                                            imageList.remove(imageData);
+                                            imageList.remove(selectedImage);
                                             imageAdapter.notifyDataSetChanged();
                                             selectedImageData = null;
                                         })
@@ -193,7 +210,7 @@ public class ViewImagesFragment extends Fragment {
                                             Toast.makeText(getContext(), "Event poster reset to default.", Toast.LENGTH_SHORT).show();
 
                                             // Update the local list
-                                            imageList.remove(imageData);
+                                            imageList.remove(selectedImage);
                                             imageAdapter.notifyDataSetChanged();
                                             selectedImageData = null;
                                         })
@@ -216,4 +233,25 @@ public class ViewImagesFragment extends Fragment {
             Toast.makeText(getContext(), "Invalid image data.", Toast.LENGTH_SHORT).show();
         }
     }
+
+
+    /**
+     * Loading test data, only for testing the UI
+     */
+    private void loadTestDataset(){
+//        imageList = new ArrayList<>();
+        imageList.addAll(UniversalProgramValues.getInstance().getImageList());
+        imageAdapter.notifyDataSetChanged();
+
+    }
+
+    private void removeImageUITest(){
+        UniversalProgramValues.getInstance().removeSpecificImage(selectedImage.getImageUrl());
+        imageList.remove(selectedImage);
+        imageAdapter.notifyDataSetChanged();
+        selectedImageData = null;
+    }
+
+
+
 }

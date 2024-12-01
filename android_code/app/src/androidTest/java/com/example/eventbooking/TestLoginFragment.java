@@ -1,162 +1,272 @@
 package com.example.eventbooking;
 
-import static android.app.PendingIntent.getActivity;
-
-import androidx.core.app.ActivityCompat;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.espresso.Espresso;
-import androidx.test.espresso.IdlingRegistry;
-import androidx.test.espresso.UiController;
-import androidx.test.espresso.ViewAction;
+import androidx.test.espresso.IdlingResource;
+import androidx.test.espresso.action.ViewActions;
+import androidx.test.espresso.assertion.ViewAssertions;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
-
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.rule.ActivityTestRule;
+import androidx.test.rule.GrantPermissionRule;
+import androidx.test.uiautomator.UiDevice;
+import androidx.test.uiautomator.UiObject;
+import androidx.test.uiautomator.UiObjectNotFoundException;
+import androidx.test.uiautomator.UiSelector;
 
 import com.example.eventbooking.Events.EventData.Event;
-import com.example.eventbooking.Home.HomeFragment;
 import com.example.eventbooking.Login.LoginFragment;
-import com.example.eventbooking.firebase.FirestoreAccess;
-import com.example.eventbooking.User;
-import com.example.eventbooking.profile.ProfileFragment;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.android.gms.tasks.Tasks;
-import com.google.firebase.firestore.CollectionReference;
+import com.example.eventbooking.QRCode.QRcodeGenerator;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.GeoPoint;
-import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 
-import org.hamcrest.Matcher;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-import org.mockito.MockitoSession;
-import org.mockito.quality.Strictness;
-
 
 import static androidx.test.InstrumentationRegistry.getContext;
-import static androidx.test.espresso.Espresso.*;
+import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
-import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static androidx.test.espresso.action.ViewActions.typeText;
-import static androidx.test.espresso.matcher.ViewMatchers.*;
-import static androidx.test.espresso.assertion.ViewAssertions.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.provider.Settings;
 import android.util.Log;
-import android.view.View;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Calendar;
 import java.util.List;
 
 @RunWith(AndroidJUnit4.class)
 public class TestLoginFragment {
+//    @Rule
+//    public ActivityScenarioRule<MainActivity> activityRule = new ActivityScenarioRule<>(MainActivity.class);
 
-    @Rule
-    public ActivityScenarioRule<MainActivity> activityRule = new ActivityScenarioRule<>(MainActivity.class);
 
     private LoginFragment loginFragment;
     private User user;
-    private String currentDeviceID;
+    private ActivityScenario<MainActivity> scenario;
 
-    private Handler handler;
-
-    @Mock
-    private FirebaseFirestore mockFirestore;
-    @Mock
-    private CollectionReference mockCollection;
-    @Mock
-    private DocumentReference mockDocument;
-    @Mock
-    private FirebaseStorage mockStorage;
-    @Mock
-    private StorageReference mockStorageReference;
-
-    private FirestoreAccess mockFirestoreAccess;
-//    private MockitoSession mockitoSession;
-
+    @Rule
+    public GrantPermissionRule permissionRule = GrantPermissionRule.grant(
+            android.Manifest.permission.ACCESS_FINE_LOCATION,
+            android.Manifest.permission.ACCESS_NETWORK_STATE,
+            android.Manifest.permission.ACCESS_COARSE_LOCATION,
+            android.Manifest.permission.POST_NOTIFICATIONS
+    );
 
     @Before
     public void setUp() {
-
-//        MockitoAnnotations.initMocks(this);
-//        mockitoSession = Mockito.mockitoSession()
-//                .initMocks(this)
-//                .strictness(Strictness.LENIENT)
-//                .startMocking();
-        MockitoAnnotations.initMocks(this);
-        mockFirestore = mock(FirebaseFirestore.class);
-        mockCollection = mock(CollectionReference.class);
-        mockDocument = mock(DocumentReference.class);
-
-
-        // Mock Firestore and CollectionReference
-        when(mockFirestore.collection("Users")).thenReturn(mockCollection);
-        when(mockCollection.document(anyString())).thenReturn(mockDocument);
-
-        Task<Void> mockSetTask = mock(Task.class);
-
-        when(mockSetTask.addOnSuccessListener(any())).thenAnswer(invocation -> {
-            OnSuccessListener<Void> onSuccessListener = invocation.getArgument(0);
-            onSuccessListener.onSuccess(null); // Simulate successful Firestore write
-            return mockSetTask;
-        });
-
-        // Simulate addOnFailureListener behavior
-        when(mockSetTask.addOnFailureListener(any())).thenAnswer(invocation -> {
-            OnFailureListener onFailureListener = invocation.getArgument(0);
-            onFailureListener.onFailure(new Exception("Simulated Firestore failure")); // Simulate failure
-            return mockSetTask;
-        });
-
-        // Ensure mockDocument.set() returns the mocked Task
-        when(mockDocument.set(anyMap())).thenReturn(mockSetTask);
-
-        when(mockCollection.get()).thenAnswer(invocation -> {
-            Task<QuerySnapshot> mockQueryTask = mock(Task.class);
-            when(mockQueryTask.isSuccessful()).thenReturn(true);
-            QuerySnapshot mockSnapshot = mock(QuerySnapshot.class);
-            when(mockQueryTask.getResult()).thenReturn(mockSnapshot);
-            when(mockSnapshot.size()).thenReturn(100); // Simulate 100 existing documents
-            return mockQueryTask;
-        });
-
-        user = new User(mockStorageReference, mockFirestore);
-        user.setDeviceID("deviceID100");
-        onView(isRoot()).perform(waitFor(10000));
-        // Start the activity
-        ActivityScenario<MainActivity> scenario = activityRule.getScenario();
-        onView(isRoot()).perform(waitFor(5000));
+//        Bundle bundle = new Bundle();
+//        bundle.putBoolean("testingMode", true);  // Add a boolean
+//        bundle.putString("testingDeviceID", "testingDeviceID100");
+//        scenario = activityRule.getScenario();
         // Create an instance of LoginFragment
         loginFragment = new LoginFragment();
-//        user = new User();
-//        currentDeviceID = Settings.Secure.getString(getActivity().getContentResolver(), Settings.Secure.ANDROID_ID);
+        user = new User();
+//        initalizeUserAndEvents();
+//        scenario = ActivityScenario.launch(MainActivity.class);
 
         // Launch the fragment
+//        scenario.onActivity(activity -> {
+//            loginFragment = new LoginFragment();
+//            activity.getSupportFragmentManager()
+//                    .beginTransaction()
+//                    .replace(R.id.fragment_container, loginFragment)
+//                    .commitNow(); // Ensure fragment is attached immediately
+//        });
+
+    }
+
+
+
+
+    @Test
+    public void testNewUserWithoutEventID() throws UiObjectNotFoundException{
+        UniversalProgramValues.getInstance().setExistingLogin(false);
+        UniversalProgramValues.getInstance().setTestingMode(true);
+        UniversalProgramValues.getInstance().setDeviceID("testingDeviceID100");
+//        UniversalProgramValues.getInstance().setCurrentUser(user);
+//        scenario = activityRule.getScenario();
+        scenario = ActivityScenario.launch(MainActivity.class);
+        scenario.onActivity(activity -> {
+            LoginFragment loadingFragment = new LoginFragment();
+//            Bundle bundle = new Bundle();
+//            bundle.putBoolean("testingMode", true);
+//            bundle.putString("testingDeviceID", "testingDeviceID100");
+//            Log.d("Login Trial", "Putting data into bundle");
+//            loadingFragment.setArguments(bundle);
+            activity.getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, loadingFragment)
+                    .commitNow(); // Ensure fragment is attached immediately
+        });
+
+
+        // Wait for the fragment to load
+        Espresso.onIdle();
+
+
+
+
+        // Simulate clicking the Normal button
+        onView(withId(R.id.button_normal)).perform(click());
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        onView(withId(R.id.text_login_welcome))
+                .check(matches(withText("Welcome new user")));
+
+        try {
+            Thread.sleep(3000); // Pause for 3 seconds
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+
+        // Simulate entering a username
+        onView(withId(R.id.edit_name)).perform(typeText("new_user"));
+        onView(withId(R.id.edit_email)).perform(typeText("new_user@example.com"));
+//        onView(withId(R.id.edit_phone)).perform(typeText("new_user"));
+
+        // Simulate confirming the user as new and navigating to ProfileCreation
+        onView(withId(R.id.button_save_profile)).perform(click());
+        // Assert that the welcome text reflects a new user
+        try {
+            Thread.sleep(500); // Pause for 3 seconds
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        onView(withId(R.id.search_bar))
+                .check(matches(isDisplayed()));
+//        FirebaseFirestore db = FirebaseFirestore.getInstance();
+//        DocumentReference userRef = db.collection("Users").document("testingDeviceID100");
+//        userRef.delete();
+        UniversalProgramValues.getInstance().resetInstance();
+
+    }
+
+    @Test
+    public void testExistingUserWithEventID() {
+
+//            newDeviceId = testing_device_id;
+        user.setDeviceID("testingDeviceID100");
+        user.setUsername("testUser");
+        user.setEmail("testUser@example.com");
+        user.setNotificationAsk(false);
+        user.setGeolocationAsk(false);
+        List<String> addRoles = new ArrayList<>();
+        addRoles.add(Role.ENTRANT);
+        addRoles.add(Role.ORGANIZER);
+        addRoles.add(Role.ADMIN);
+        user.setRoles(addRoles);
+        Event event = new Event();
+        event.setEventId("event123");
+        event.setEventTitle("Event Title ");
+        event.setDescription("Description for event ");
+        event.setTimestamp(System.currentTimeMillis() + 100000);
+        event.setMaxParticipants(20);
+        event.setOrganizerId("testDeviceID10002");
+        event.setLocation("testAddress");
+        event.setSignedUpParticipantIds(new ArrayList<>());
+        event.setWaitingParticipantIds(new ArrayList<>());
+        event.setAcceptedParticipantIds(new ArrayList<>());
+        event.setCanceledParticipantIds(new ArrayList<>());
+        QRcodeGenerator qrCodeGenerator = new QRcodeGenerator();
+        String hashInput = event.getEventId() + Calendar.getInstance().getTime();
+        String qrCodeHash = qrCodeGenerator.createQRCodeHash(hashInput);
+        event.setQRcodeHash(qrCodeHash);
+        UniversalProgramValues.getInstance().setCurrentEvent(event);
+//        user.saveUserDataToFirestore();
+        // Simulate entering the LoginFragment with an event ID passed via arguments
+//        LoginFragment fragment = new LoginFragment();
+        UniversalProgramValues.getInstance().setTestingMode(true);
+        UniversalProgramValues.getInstance().setCurrentUser(user);
+        UniversalProgramValues.getInstance().setExistingLogin(true);
+        UniversalProgramValues.getInstance().setEventList(new ArrayList<>());
+//        scenario = activityRule.getScenario();
+        scenario = ActivityScenario.launch(MainActivity.class);
+        scenario.onActivity(activity -> {
+            LoginFragment loginArgs = LoginFragment.newInstance("event123");
+//            loginFragment = new LoginFragment();
+//            Bundle bundle = new Bundle();
+////            bundle.putBoolean("testingMode", true);
+////            bundle.putString("testingDeviceID", "testingDeviceID100");
+//            bundle.putString("eventIdFromQR", "event123");
+//            loginFragment.setArguments(bundle);
+            Log.d("Login Trial", "Putting data into bundle");
+            activity.getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, loginArgs)
+                    .commitNow(); // Ensure fragment is attached immediately
+        });
+
+        // Wait for the fragment to load
+        Espresso.onIdle();
+
+        // Simulate clicking the Normal button
+        onView(withId(R.id.button_normal)).perform(click());
+        try {
+            Thread.sleep(4000); // Pause for 3 seconds
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+
+//        // Simulate logging in with a predefined user document ID
+//        onView(withId(R.id.input_document_id)).perform(typeText("existing_user_id"));
+//        try {
+//            Thread.sleep(3000); // Pause for 3 seconds
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+        // Simulate navigating to EventViewFragment
+//        onView(withId(R.id.button_set_by_document_id)).perform(click());
+        // Assert that the welcome text reflects the user's name (mocked)
+//        onView(withId(R.id.text_login_welcome))
+//                .check(matches(withText("Welcome back, existing_user_id")));
+//        onView(withId(R.id.event_title_text))
+//                .check(matches(withText("Event Name")));
+        onView(withId(R.id.event_title_text))
+                .check(matches(isDisplayed()));
+
+        onView(withText("Join Waitlist"))
+                .check(ViewAssertions.matches(isDisplayed()));
+
+        onView(withText("Join Waitlist"))
+                .perform(ViewActions.click());
+
+        try {
+            Thread.sleep(1000); // Pause for 3 seconds
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        onView(withId(R.id.search_bar))
+                .check(matches(isDisplayed()));
+
+//        FirebaseFirestore db = FirebaseFirestore.getInstance();
+//        DocumentReference userRef = db.collection("Users").document("testingDeviceID100");
+//        userRef.delete();
+        UniversalProgramValues.getInstance().resetInstance();
+    }
+
+    @Test
+    public void testTestModeActivation() {
+        UniversalProgramValues.getInstance().setTestingMode(true);
+        UniversalProgramValues.getInstance().setExistingLogin(true);
+//        UniversalProgramValues.getInstance().setCurrentUser(user);
+        // Simulate entering the LoginFragment
+//        scenario = activityRule.getScenario();
+        scenario = ActivityScenario.launch(MainActivity.class);
         scenario.onActivity(activity -> {
             loginFragment = new LoginFragment();
             activity.getSupportFragmentManager()
@@ -165,235 +275,174 @@ public class TestLoginFragment {
                     .commitNow(); // Ensure fragment is attached immediately
         });
 
-        onView(isRoot()).perform(waitFor(10000));
+        // Wait for the fragment to load
+        Espresso.onIdle();
+
+        // Activate Test Mode
+        onView(withId(R.id.button_test_mode)).perform(click());
+
+        // Assert that Test Mode UI is visible
+        onView(withId(R.id.test_mode_layout))
+                .check(matches(isDisplayed()));
+        UniversalProgramValues.getInstance().resetInstance();
+    }
+
+    @Test
+    public void testNewUserWithEventID() throws UiObjectNotFoundException{
+        UniversalProgramValues.getInstance().setTestingMode(true);
+        UniversalProgramValues.getInstance().setExistingLogin(false);
+        UniversalProgramValues.getInstance().setEventList(new ArrayList<>());
+        Event event = new Event();
+        event.setEventId("event123");
+        event.setEventTitle("Event Title ");
+        event.setDescription("Description for event ");
+        event.setTimestamp(System.currentTimeMillis() + 100000);
+        event.setMaxParticipants(20);
+        event.setOrganizerId("testDeviceID10002");
+        event.setLocation("testAddress");
+        QRcodeGenerator qrCodeGenerator = new QRcodeGenerator();
+        String hashInput = event.getEventId() + Calendar.getInstance().getTime();
+        String qrCodeHash = qrCodeGenerator.createQRCodeHash(hashInput);
+        event.setQRcodeHash(qrCodeHash);
+        UniversalProgramValues.getInstance().setCurrentEvent(event);
+//        UniversalProgramValues.getInstance().setCurrentUser(user);
+//        scenario = activityRule.getScenario();
+        scenario = ActivityScenario.launch(MainActivity.class);
+        scenario.onActivity(activity -> {
+            LoginFragment loginArgs = LoginFragment.newInstance("event123");
+
+//            LoginFragment loadingFragment = new LoginFragment();
+//            Bundle bundle = new Bundle();
+//            bundle.putBoolean("testingMode", true);
+//            bundle.putString("testingDeviceID", "testingDeviceID100");
+//            bundle.putString("eventIdFromQR", "event123");
+//            Log.d("Login Trial", "Putting data into bundle");
+//            loadingFragment.setArguments(bundle);
+            activity.getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, loginArgs)
+                    .commitNow(); // Ensure fragment is attached immediately
+        });
+
 
         // Wait for the fragment to load
-//        onView(isRoot()).perform(waitFor(1000));
+        Espresso.onIdle();
+
+
+
+
+        // Simulate clicking the Normal button
+        onView(withId(R.id.button_normal)).perform(click());
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        onView(withId(R.id.text_login_welcome))
+                .check(matches(withText("Welcome new user")));
+
+        try {
+            Thread.sleep(3000); // Pause for 3 seconds
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+
+        // Simulate entering a username
+        onView(withId(R.id.edit_name)).perform(typeText("new_user"));
+        onView(withId(R.id.edit_email)).perform(typeText("new_user@example.com"));
+//        onView(withId(R.id.edit_phone)).perform(typeText("new_user"));
+
+        // Simulate confirming the user as new and navigating to ProfileCreation
+        onView(withId(R.id.button_save_profile)).perform(click());
+        // Assert that the welcome text reflects a new user
+        try {
+            Thread.sleep(5000); // Pause for 3 seconds
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        onView(withId(R.id.event_title_text))
+                .check(matches(isDisplayed()));
+
+        onView(withText("Join Waitlist"))
+                .check(ViewAssertions.matches(isDisplayed()));
+
+        onView(withText("Join Waitlist"))
+                .perform(ViewActions.click());
+
+        try {
+            Thread.sleep(1000); // Pause for 3 seconds
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        onView(withId(R.id.search_bar))
+                .check(matches(isDisplayed()));
+
+//        FirebaseFirestore db = FirebaseFirestore.getInstance();
+//        DocumentReference userRef = db.collection("Users").document("testingDeviceID100");
+//        userRef.delete();
+        UniversalProgramValues.getInstance().resetInstance();
+
     }
-
-    @After
-    public void tearDown() {
-
-        // Example: Reset Mockito mocks
-        Mockito.reset(mockFirestore, mockDocument, mockCollection);
-//        assertNotNull(mockFirestore);  // Example: ensure mockFirestore is not null
-//        assertNotNull(mockCollection); // Ensure mockCollection is not null
-//
-//        // Optionally verify that no unexpected interactions occurred
-//        verifyNoMoreInteractions(mockFirestore, mockCollection, mockDocument);
-        user = null;
-        mockFirestore = null;
-        mockCollection = null;
-        mockDocument = null;
-    }
-
-    // Helper method for waiting
-    public static ViewAction waitFor(final long millis) {
-        return new ViewAction() {
-            @Override
-            public Matcher<View> getConstraints() {
-                return isRoot();
-            }
-
-            @Override
-            public String getDescription() {
-                return "Wait for " + millis + " milliseconds.";
-            }
-
-            @Override
-            public void perform(final UiController uiController, final View view) {
-                uiController.loopMainThreadForAtLeast(millis);
-            }
-        };
-    }
-
-
-//    @Override
-//    public void onDestroyView() {
-//        super.onDestroyView();
-//        if (handler != null) {
-//            handler.removeCallbacksAndMessages(null); // Cancel all pending callbacks
-//        }
-//    }
-
-//    @Test
-//    public void testNewUserLogin() {
-//        // Simulate clicking on "Normal Mode" button
-//        onView(withId(R.id.button_normal)).perform(click());
-//
-////        MainActivity mockMainActivity = mock(MainActivity.class);
-////        doNothing().when(mockMainActivity).showNavigationUI();
-////        loginFragment.onAttach(mockMainActivity);
-//
-//        // Simulate the app flow for a new user
-//        simulateNewUserFlow();
-//
-//        // Verify that the profile creation fragment is displayed
-//        onView(withId(R.id.edit_name)).check(matches(isDisplayed()));
-////        verify(mockMainActivity).showNavigationUI();
-//    }
-//
-//    @Test
-//    public void testReturningUserLogin() {
-//        // Simulate clicking on "Normal Mode" button
-//        onView(withId(R.id.button_normal)).perform(click());
-//
-////        MainActivity mockMainActivity = mock(MainActivity.class);
-////        doNothing().when(mockMainActivity).showNavigationUI();
-////        loginFragment.onAttach(mockMainActivity);
-//
-//        // Simulate the app flow for a returning user
-//        simulateReturningUserFlow();
-//
-//        // Verify that the home fragment is displayed
-////        onView(withId(R.id.user_events_list)).check(matches(isDisplayed()));
-//    }
-//
-//    // Simulate new user behavior
-//    private void simulateNewUserFlow() {
-//
-//        onView(withId(R.id.text_login_welcome))
-//                .check(matches(withText("Welcome, ")));
-//        onView(withId(R.id.text_login_deviceid))
-//                .check(matches(withText("Welcome, ")));
-//        // Replace Firestore interaction with a delay to simulate async behavior
-//        onView(isRoot()).perform(waitFor(3000));
-//        // Replace fragment to simulate new user navigation
-//        loginFragment.getParentFragmentManager()
-//                .beginTransaction()
-//                .replace(R.id.fragment_container, new ProfileFragment())
-//                .commitAllowingStateLoss();
-//    }
-//
-//    // Simulate returning user behavior
-//    private void simulateReturningUserFlow() {
-////        MainActivity mockMainActivity = mock(MainActivity.class);
-////        doNothing().when(mockMainActivity).showNavigationUI();
-//        user.setDeviceID("deviceID100");
-//        UserManager.getInstance().setCurrentUser(user);
-////        loginFragment.onAttach(mockMainActivity);
-//        // Replace Firestore interaction with a delay to simulate async behavior
-//        onView(isRoot()).perform(waitFor(3000));
-//        // Replace fragment to simulate returning user navigation
-//        loginFragment.getParentFragmentManager()
-//                .beginTransaction()
-//                .replace(R.id.fragment_container, new HomeFragment())
-//                .commitAllowingStateLoss();
-//    }
-
 
     @Test
-    public void testNewUser() {
-        // Mock FirestoreAccess to simulate no user document
-        Task<DocumentSnapshot> mockTask = mock(Task.class);
-        when(mockTask.addOnSuccessListener(any())).thenAnswer(invocation -> {
-            OnSuccessListener<DocumentSnapshot> listener = invocation.getArgument(0);
-            DocumentSnapshot mockDocumentSnapshot = mock(DocumentSnapshot.class);
-            when(mockDocumentSnapshot.exists()).thenReturn(false); // Simulate new user
-            listener.onSuccess(mockDocumentSnapshot);
-            return mockTask;
+    public void testLoginWithoutEventID() {
+        User passingUser = new User();
+//            newDeviceId = testing_device_id;
+        passingUser.setDeviceID("testingDeviceID100");
+        passingUser.setUsername("testUser");
+        passingUser.setEmail("testUser@example.com");
+        passingUser.setNotificationAsk(false);
+        passingUser.setGeolocationAsk(false);
+        List<String> addRoles = new ArrayList<>();
+        addRoles.add(Role.ENTRANT);
+        addRoles.add(Role.ORGANIZER);
+        addRoles.add(Role.ADMIN);
+        passingUser.setRoles(addRoles);
+//        passingUser.saveUserDataToFirestore();
+
+
+        UniversalProgramValues.getInstance().setExistingLogin(true);
+        UniversalProgramValues.getInstance().setTestingMode(true);
+        UniversalProgramValues.getInstance().setCurrentUser(passingUser);
+        UniversalProgramValues.getInstance().setEventList(new ArrayList<>());
+        // Simulate entering the LoginFragment without an event ID
+//        scenario = activityRule.getScenario();
+        scenario = ActivityScenario.launch(MainActivity.class);
+        scenario.onActivity(activity -> {
+            loginFragment = new LoginFragment();
+            activity.getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, loginFragment)
+                    .commitNow(); // Ensure fragment is attached immediately
         });
-        when(mockFirestoreAccess.getUser(anyString())).thenReturn(mockTask);
 
+        // Wait for the fragment to load
+        Espresso.onIdle();
 
-        onView(isRoot()).perform(waitFor(1000));
-
-        // Click the "Normal Mode" button to trigger login flow
+        // Simulate clicking the Normal button
         onView(withId(R.id.button_normal)).perform(click());
-        onView(isRoot()).perform(waitFor(1000));
-        // Verify welcome text for new users
-        onView(withId(R.id.text_login_welcome)).check(matches(withText("Welcome new user")));
-        onView(isRoot()).perform(waitFor(4000));
-        // Verify navigation to ProfileFragment
-        onView(withId(R.id.edit_name)).check(matches(isDisplayed()));
+
+        // Simulate logging in as an existing user
+//        onView(withId(R.id.input_document_id)).perform(typeText("existing_user_id"));
+//
+//        // Simulate confirming user login
+//        onView(withId(R.id.button_set_by_document_id)).perform(click());
+        // Assert that the welcome text reflects an existing user login
+        onView(withId(R.id.text_login_welcome))
+                .check(matches(isDisplayed()));
+        try {
+            Thread.sleep(4000); // Pause for 3 seconds
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        onView(withId(R.id.search_bar))
+                .check(matches(isDisplayed()));
+//        FirebaseFirestore db = FirebaseFirestore.getInstance();
+//        DocumentReference userRef = db.collection("Users").document("testingDeviceID100");
+//        userRef.delete();
+        UniversalProgramValues.getInstance().resetInstance();
     }
-
-
-    @Test
-    public void testReturningUser() {
-        Task<DocumentSnapshot> mockTask = mock(Task.class);
-        when(mockTask.addOnSuccessListener(any())).thenAnswer(invocation -> {
-            OnSuccessListener<DocumentSnapshot> listener = invocation.getArgument(0);
-            DocumentSnapshot mockDocumentSnapshot = mock(DocumentSnapshot.class);
-            when(mockDocumentSnapshot.exists()).thenReturn(true);
-            User mockUser = new User();
-            mockUser.setDeviceID("testDeviceID");
-            mockUser.setUsername("ReturningUser");
-            mockUser.setEmail("user@example.com");
-            mockUser.setPhoneNumber("1234567890");
-            when(mockDocumentSnapshot.toObject(User.class)).thenReturn(mockUser);
-            listener.onSuccess(mockDocumentSnapshot);
-            return mockTask;
-        });
-        when(mockFirestoreAccess.getUser(anyString())).thenReturn(mockTask);
-
-
-        // Replace FirestoreAccess instance in LoginFragment
-        FirestoreAccess.setInstance(mockFirestoreAccess);
-        onView(isRoot()).perform(waitFor(1000));
-        // Click the "Normal Mode" button to trigger login flow
-        onView(withId(R.id.button_normal)).perform(click());
-        onView(isRoot()).perform(waitFor(1000));
-        // Verify welcome text for returning users
-        onView(withId(R.id.text_login_welcome)).check(matches(withText("Welcome, ReturningUser")));
-        onView(isRoot()).perform(waitFor(4000));
-        // Verify navigation to HomeFragment
-        onView(withId(R.id.user_events_list)).check(matches(isDisplayed()));
-    }
-
-
-    @Test
-    public void testQrCodeScannedOffline() {
-        // Mock FirestoreAccess to simulate no user document and set QR code event
-        String mockEventId = "mockEvent123";
-        FirestoreAccess mockFirestoreAccess = mock(FirestoreAccess.class);
-        when(mockFirestoreAccess.getUser(anyString())).thenReturn(Tasks.forResult(null));
-
-        // Replace FirestoreAccess instance in LoginFragment
-        FirestoreAccess.setInstance(mockFirestoreAccess);
-        onView(isRoot()).perform(waitFor(1000));
-        // Set up fragment arguments for QR code
-        Bundle args = new Bundle();
-        args.putString("eventIdFromQR", mockEventId);
-        loginFragment.setArguments(args);
-
-        // Click the "Normal Mode" button to trigger login flow
-        onView(withId(R.id.button_normal)).perform(click());
-        onView(isRoot()).perform(waitFor(4000));
-        // Verify navigation to ProfileFragment with QR code event ID
-        onView(withId(R.id.edit_name)).check(matches(isDisplayed()));
-        // Add additional checks for event ID usage in ProfileFragment if applicable
-    }
-
-
-
-
-    private void initializeDefaultUser() {
-        User defaultUser = new User();
-        defaultUser.setDeviceID("defaultDeviceID");
-        defaultUser.setUsername("DefaultUser");
-        defaultUser.setEmail("default@example.com");
-        defaultUser.setPhoneNumber("000-000-0000");
-        defaultUser.setGeolocationAsk(false); // Disable geolocation
-
-        // Set this user in the UserManager
-        UserManager.getInstance().setCurrentUser(defaultUser);
-
-        Log.d("LoginFragment", "Initialized default user with geolocation disabled.");
-    }
-
-
-//    private void requestGpsPermissionIfNeeded() {
-//        if (UserManager.getInstance().getCurrentUser().isGeolocationAsk()) {
-//            if (ActivityCompat.checkSelfPermission(getContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//                ActivityCompat.requestPermissions(getActivity(),
-//                        new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 1001);
-//            }
-//        }
-//    }
-
-
-
-
-
 }

@@ -4,13 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
+    android:background="@color/white"
+    android:layout_marginBottom="0dp">
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="16dp"
         android:padding="16dp"
+        android:id="@+id/admin_view_user_scrollview"
         android:background="@drawable/rounded_background">
 
         <LinearLayout

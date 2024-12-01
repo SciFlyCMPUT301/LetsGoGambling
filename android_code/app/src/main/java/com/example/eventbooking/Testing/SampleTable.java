@@ -2,16 +2,21 @@ package com.example.eventbooking.Testing;
 
 import android.util.Log;
 
+import com.example.eventbooking.Admin.Images.ImageClass;
 import com.example.eventbooking.Events.EventData.Event;
 import com.example.eventbooking.Facility.Facility;
+import com.example.eventbooking.QRCode.QRcodeGenerator;
 import com.example.eventbooking.Role;
+import com.example.eventbooking.UniversalProgramValues;
 import com.example.eventbooking.User;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.firebase.firestore.GeoPoint;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -25,6 +30,7 @@ public class SampleTable {
     public List<User> UserList = new ArrayList<>();
     public List<Facility> FacilityList = new ArrayList<>();
     public List<Event> EventList = new ArrayList<>();
+    public List<ImageClass> ImageList = new ArrayList<>();
 
     private int userUpdateCount;
     private int facilityUpdateCount;
@@ -80,9 +86,16 @@ public class SampleTable {
             user.addRole(Role.ORGANIZER);
             user.addRole(Role.ENTRANT);
             user.setLocation(getRandomLocation());
-            String profileURL = user.defaultProfilePictureUrl(user.getUsername()).toString();
-            user.setdefaultProfilePictureUrl(profileURL);
-            user.setProfilePictureUrl(profileURL);
+            if(!UniversalProgramValues.getInstance().getTestingMode()) {
+                String profileURL = user.defaultProfilePictureUrl(user.getUsername()).toString();
+                user.setdefaultProfilePictureUrl(profileURL);
+                user.setProfilePictureUrl(profileURL);
+            }
+            else{
+                user.setdefaultProfilePictureUrl("Testing Profile URL" + i);
+                user.setProfilePictureUrl("Testing Profile URL" + i);
+            }
+
 
             GeoPoint randomGeoPoint = generateRandomGeoPoint(baseLatitude, baseLongitude, radiusInDegrees);
             user.setGeolocation(randomGeoPoint);
@@ -99,9 +112,15 @@ public class SampleTable {
             user.addRole(Role.ORGANIZER);
             user.addRole(Role.ENTRANT);
             user.setLocation(getRandomLocation());
-            String profileURL = user.defaultProfilePictureUrl(user.getUsername()).toString();
-            user.setdefaultProfilePictureUrl(profileURL);
-            user.setProfilePictureUrl(profileURL);
+            if(!UniversalProgramValues.getInstance().getTestingMode()) {
+                String profileURL = user.defaultProfilePictureUrl(user.getUsername()).toString();
+                user.setdefaultProfilePictureUrl(profileURL);
+                user.setProfilePictureUrl(profileURL);
+            }
+            else{
+                user.setdefaultProfilePictureUrl("Testing Profile URL" + (i + 5));
+                user.setProfilePictureUrl("Testing Profile URL" + (i + 5));
+            }
             GeoPoint randomGeoPoint = generateRandomGeoPoint(baseLatitude, baseLongitude, radiusInDegrees);
             user.setGeolocation(randomGeoPoint);
             UserList.add(user);
@@ -116,9 +135,15 @@ public class SampleTable {
             user.setPhoneNumber("555-020" + (i + 15));
             user.addRole(Role.ENTRANT);
             user.setLocation(getRandomLocation());
-            String profileURL = user.defaultProfilePictureUrl(user.getUsername()).toString();
-            user.setdefaultProfilePictureUrl(profileURL);
-            user.setProfilePictureUrl(profileURL);
+            if(!UniversalProgramValues.getInstance().getTestingMode()) {
+                String profileURL = user.defaultProfilePictureUrl(user.getUsername()).toString();
+                user.setdefaultProfilePictureUrl(profileURL);
+                user.setProfilePictureUrl(profileURL);
+            }
+            else{
+                user.setdefaultProfilePictureUrl("Testing Default Profile URL" + (i + 15));
+                user.setProfilePictureUrl("Testing Profile URL" + (i + 15));
+            }
             GeoPoint randomGeoPoint = generateRandomGeoPoint(baseLatitude, baseLongitude, radiusInDegrees);
             user.setGeolocation(randomGeoPoint);
             UserList.add(user);
@@ -144,7 +169,7 @@ public class SampleTable {
             User organizer = organizers.get(i);
             Facility facility = new Facility();
             facility.setName("Facility" + (i + 1));
-            facility.setFacilityID("Facility" + (i + 1));
+            facility.setFacilityID("facilityID" + (i + 1));
             facility.setAddress("Address of Facility" + (i + 1));
             facility.setOrganizer(organizer.getDeviceID());
             FacilityList.add(facility);
@@ -187,6 +212,11 @@ public class SampleTable {
             event.setTimestamp(System.currentTimeMillis() + i * 100000);
             event.setMaxParticipants(20);
             event.setOrganizerId(organizer_list.get(i-1).getDeviceID());
+            event.setEventPictureUrl("Event Picture URL" + i);
+            QRcodeGenerator qrCodeGenerator = new QRcodeGenerator();
+            String hashInput = event.getEventId() + Calendar.getInstance().getTime();
+            String qrCodeHash = qrCodeGenerator.createQRCodeHash(hashInput);
+            event.setQRcodeHash(qrCodeHash);
 
             // Assign a facility to the event (if applicable)
             if (!FacilityList.isEmpty() && random.nextBoolean()) {
@@ -220,6 +250,35 @@ public class SampleTable {
 
             // Add the event to the EventList
             EventList.add(event);
+        }
+    }
+
+    /**
+     * Function to generate a bunch of images for UI testing
+     */
+    public void makeImageList(){
+        for(int i = 0; i < UserList.size(); i++){
+
+            ImageClass newImageDefault = new ImageClass(UserList.get(i).getdefaultProfilePictureUrl(),
+                    "User: " + UserList.get(i).getUsername(),
+                    UserList.get(i).getDeviceID(),
+                    "Users");
+            if(!Objects.equals(UserList.get(i).getProfilePictureUrl(), UserList.get(i).getdefaultProfilePictureUrl())){
+                ImageClass newImageProfile = new ImageClass(UserList.get(i).getProfilePictureUrl(),
+                        "User: " + UserList.get(i).getUsername(),
+                        UserList.get(i).getDeviceID(),
+                        "Users");
+                ImageList.add(newImageProfile);
+            }
+            ImageList.add(newImageDefault);
+        }
+
+        for(int i = 0; i < EventList.size(); i++){
+            ImageClass newImage = new ImageClass(EventList.get(i).getEventPictureUrl(),
+                    "Event: " + EventList.get(i).getEventTitle(),
+                    EventList.get(i).getEventId(),
+                    "Events");
+            ImageList.add(newImage);
         }
     }
 
@@ -316,6 +375,15 @@ public class SampleTable {
         return EventList;
     }
 
+    /**
+     * Returns the list of sample images.
+     *
+     * @return The list of imageclass.
+     */
+    public List<ImageClass> getImageList(){
+        return ImageList;
+    }
+
     // Methods to update specific users, facilities, or events
 
     /**
@@ -409,4 +477,13 @@ public class SampleTable {
         }
         return null;
     }
+
+
+    public void resetLists(){
+        UserList = new ArrayList<>();
+        EventList = new ArrayList<>();
+        FacilityList = new ArrayList<>();
+    }
+
+
 }

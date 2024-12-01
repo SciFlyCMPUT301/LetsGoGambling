@@ -2,13 +2,13 @@ package com.example.eventbooking;
 
 import android.util.Log;
 
+import com.example.eventbooking.Admin.Images.ImageClass;
 import com.example.eventbooking.Events.EventData.Event;
 import com.example.eventbooking.Facility.Facility;
-import com.example.eventbooking.QRCode.QRcodeGenerator;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
+import java.util.Objects;
 
 public class UniversalProgramValues {
     private static UniversalProgramValues instance;
@@ -18,9 +18,11 @@ public class UniversalProgramValues {
     private List<Event> eventList;
     private List<User> userList;
     private List<Facility> facilityList;
-    private Boolean testingMode = false;
+    private List<ImageClass> imageList;
+    private static Boolean testingMode = false;
     private String deviceID;
     private String deletePhotoURL;
+    private String uploadProfileURL;
     private Boolean deletedOnlyUploaded;
     private Boolean existingLogin;
     /**
@@ -28,8 +30,13 @@ public class UniversalProgramValues {
      * @return the instance of UserManager
      */
     public static synchronized UniversalProgramValues getInstance(){
+        Log.d("Universal Values", "Insance called");
+        Log.d("Universal Values", "Testing mode: " + testingMode);
         if(instance == null){
+            Log.d("Universal Values", "Insance Created");
+//            Log.d("Universal Values", "Testing mode: " + testingMode);
             instance = new UniversalProgramValues();
+            testingMode = false;
         }
         return instance;
     }
@@ -37,6 +44,7 @@ public class UniversalProgramValues {
 
 
     public void resetInstance(){
+        instance = null;
         single_user = null;
         single_event = null;
         single_facility = null;
@@ -60,6 +68,14 @@ public class UniversalProgramValues {
     }
     public void setDeviceID(String deviceID) {
         this.deviceID = deviceID;
+    }
+
+    public String getUploadProfileURL() {
+        return uploadProfileURL;
+    }
+
+    public void setUploadProfileURL(String uploadProfileURL) {
+        this.uploadProfileURL = uploadProfileURL;
     }
 
     /**
@@ -87,13 +103,13 @@ public class UniversalProgramValues {
     }
 
     public User userDup(User user){
-        User dup_user = new User();
+        User dup_user = new User(true);
         dup_user.setDeviceID(user.getDeviceID());
         dup_user.setUsername(user.getUsername());
         dup_user.setEmail(user.getEmail());
         dup_user.setPhoneNumber(user.getPhoneNumber());
         dup_user.setProfilePictureUrl(user.getProfilePictureUrl());
-        dup_user.setdefaultProfilePictureUrl(user.getProfilePictureUrl());
+        dup_user.setdefaultProfilePictureUrl(user.getdefaultProfilePictureUrl());
         dup_user.setLocation(user.getLocation());
         dup_user.setAddress(user.getAddress());
         dup_user.setAdminLevel(user.isAdminLevel());
@@ -108,7 +124,6 @@ public class UniversalProgramValues {
         return userList;
     }
 
-
     public void setCurrentEvent(Event event){
         if (event == null) {
             this.single_event = null;
@@ -119,6 +134,15 @@ public class UniversalProgramValues {
 
     public Event getCurrentEvent(){
         return single_event;
+    }
+
+    public void removeSpecificUser(String userID){
+        for(int i = 0; i < userList.size(); i++){
+            if(Objects.equals(userList.get(i).getDeviceID(), userID)){
+                userList.remove(i);
+                return;
+            }
+        }
     }
 
     public void setEventList(List <Event> importList){
@@ -149,6 +173,116 @@ public class UniversalProgramValues {
 
     public List<Event> getEventList(){
         return eventList;
+    }
+
+    public String getSpecificEventHash(String eventID){
+        for(int i = 0; i < eventList.size(); i++){
+            if(Objects.equals(eventList.get(i).getEventId(), eventID)){
+                return eventList.get(i).getQRcodeHash();
+            }
+        }
+        return null;
+    }
+
+    public void removeSpecificEvent(String eventID){
+        for(int i = 0; i < eventList.size(); i++){
+            if(Objects.equals(eventList.get(i).getEventId(), eventID)){
+                eventList.remove(i);
+                return;
+            }
+        }
+    }
+
+
+    public void setCurrentFacility(Facility facility){
+        if (facility == null) {
+            this.single_facility = null;
+            return;
+        }
+        this.single_facility = facilityDup(facility);
+    }
+
+    public Facility getCurrentFacility(){
+        return single_facility;
+    }
+
+    public void setFacilityList(List <Facility> importList){
+        facilityList = new ArrayList<>();
+        for(int i = 0; i<importList.size(); i++){
+            facilityList.add(facilityDup(importList.get(i)));
+        }
+    }
+
+    public Facility facilityDup(Facility facility){
+        Facility dup_facility = new Facility();
+        dup_facility.setFacilityID(facility.getFacilityID());
+        dup_facility.setAddress(facility.getAddress());
+        dup_facility.setName(facility.getName());
+        dup_facility.setOrganizer(facility.getOrganizer());
+        dup_facility.setAllEvents(facility.getAllEvents());
+        return dup_facility;
+    }
+
+    public List<Facility> getFacilityList(){
+        return facilityList;
+    }
+
+    public Boolean removeSpecificFacility(String facilityID){
+        for(int i = 0; i < facilityList.size(); i++){
+            if(Objects.equals(facilityList.get(i).getFacilityID(), facilityID)){
+                facilityList.remove(i);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Boolean doesFacilityExist(String facilityID){
+        for(int i = 0; i < facilityList.size(); i++){
+            if(Objects.equals(facilityList.get(i).getFacilityID(), facilityID)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    public void setImageList(List <ImageClass> importList){
+        imageList = new ArrayList<>();
+        for(int i = 0; i<importList.size(); i++){
+            imageList.add(imageDup(importList.get(i)));
+        }
+    }
+
+    public ImageClass imageDup(ImageClass image){
+        ImageClass dup_image = new ImageClass(image.getImageUrl(),
+                image.getSource(),
+                image.getDocumentId(),
+                image.getCollection());
+        return dup_image;
+    }
+
+    public List<ImageClass> getImageList(){
+        return imageList;
+    }
+
+    public Boolean removeSpecificImage(String imageURL){
+        for(int i = 0; i < imageList.size(); i++){
+            if(Objects.equals(imageList.get(i).getImageUrl(), imageURL)){
+                imageList.remove(i);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Boolean doesImageExist(String imageURL){
+        for(int i = 0; i < imageList.size(); i++){
+            if(Objects.equals(imageList.get(i).getImageUrl(), imageURL)){
+                return true;
+            }
+        }
+        return false;
     }
 
     public void setDeleteFirebaseImage(String imageUrl){

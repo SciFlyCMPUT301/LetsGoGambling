@@ -13,7 +13,6 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -50,6 +49,8 @@ dependencies {
     implementation("com.google.firebase:firebase-storage")
     implementation("com.squareup.picasso:picasso:2.8")
     implementation("com.google.firebase:firebase-messaging")
+//    implementation("org.osmdroid:osmdroid-android:6.1.9")
+//    implementation("com.google.protobuf:protobuf-javalite:4.29.0")
     //implementation(files("C:\\Users\\pilck\\AppData\\Local\\Android\\Sdk\\platforms\\android-35\\android.jar"))
     implementation(libs.appcompat)
     implementation(libs.material)
@@ -79,6 +80,11 @@ dependencies {
     testImplementation("org.mockito:mockito-android:2.28.2")
 //    testImplementation("com.linkedin.dexmaker:dexmaker-mockito:2.28.1")
 
+
+
+
+
+    //Trial section
 //    androidTestImplementation("org.mockito:mockito-core:5.4.0")
 //    androidTestImplementation("com.linkedin.dexmaker:dexmaker-mockito-inline:2.28.1")
 //    androidTestImplementation("androidx.test.espresso:espresso-intents:3.5.1")

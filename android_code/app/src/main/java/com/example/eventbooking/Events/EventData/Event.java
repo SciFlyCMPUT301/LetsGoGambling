@@ -798,6 +798,7 @@ public class Event implements Parcelable {
                     for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
                         Event event = doc.toObject(Event.class);
                         if (event != null) {
+                            Log.d("Event", "Adding event");
                             userEvents.add(event);
                         }
                     }

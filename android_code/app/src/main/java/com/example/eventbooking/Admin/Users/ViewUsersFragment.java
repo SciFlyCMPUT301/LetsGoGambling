@@ -143,11 +143,8 @@ public class ViewUsersFragment extends Fragment {
             });
         }
         else{
-            for(int i = 0; i < UniversalProgramValues.getInstance().getUserList().size(); i++){
-                User user = UniversalProgramValues.getInstance().getUserList().get(i);
-                userList.add(user);
-            }
-            userList = UniversalProgramValues.getInstance().getUserList();
+            userList.addAll(UniversalProgramValues.getInstance().getUserList());
+//            userList = UniversalProgramValues.getInstance().getUserList();
             Log.d("ViewUsersFragment", "DeviceID: " + userList.get(1).getDeviceID());
             Log.d("ViewUsersFragment", "DeviceID: " + userList.get(2).getUsername());
             userAdapter.notifyDataSetChanged();

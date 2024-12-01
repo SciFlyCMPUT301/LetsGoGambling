@@ -19,7 +19,7 @@ public class UniversalProgramValues {
     private List<User> userList;
     private List<Facility> facilityList;
     private List<ImageClass> imageList;
-    private static Boolean testingMode;
+    private static Boolean testingMode = false;
     private String deviceID;
     private String deletePhotoURL;
     private String uploadProfileURL;

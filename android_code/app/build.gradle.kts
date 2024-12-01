@@ -49,7 +49,7 @@ dependencies {
     implementation("com.google.firebase:firebase-storage")
     implementation("com.squareup.picasso:picasso:2.8")
     implementation("com.google.firebase:firebase-messaging")
-    implementation("org.osmdroid:osmdroid-android:6.1.9")
+//    implementation("org.osmdroid:osmdroid-android:6.1.9")
 //    implementation("com.google.protobuf:protobuf-javalite:4.29.0")
     //implementation(files("C:\\Users\\pilck\\AppData\\Local\\Android\\Sdk\\platforms\\android-35\\android.jar"))
     implementation(libs.appcompat)

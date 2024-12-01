@@ -27,7 +27,7 @@ import java.util.Map;
 public class FacilityCreateFragment extends Fragment {
 
     private EditText editFacilityName, editFacilityLocation, editFacilityId;
-    private Button createFacilityButton, backButton;
+    private Button createFacilityButton, backButton, cancelButton;
     private FirebaseFirestore db;
     private boolean roleAssigned = false, testingFlag;
 
@@ -42,11 +42,18 @@ public class FacilityCreateFragment extends Fragment {
         editFacilityLocation = view.findViewById(R.id.facility_location);
         editFacilityId = view.findViewById(R.id.facility_id);
         createFacilityButton = view.findViewById(R.id.button_create_facility);
+        cancelButton = view.findViewById(R.id.button_cancel);
         backButton = view.findViewById(R.id.button_back_home);
 
         // Handle "Create Facility" button click
         createFacilityButton.setOnClickListener(v -> {
             checkAndCreateFacility();// Call the create facility method
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, new HomeFragment())
+                    .commit(); // Navigate back to HomeFragment
+        });
+
+        cancelButton.setOnClickListener(v ->{
             getParentFragmentManager().beginTransaction()
                     .replace(R.id.fragment_container, new HomeFragment())
                     .commit(); // Navigate back to HomeFragment

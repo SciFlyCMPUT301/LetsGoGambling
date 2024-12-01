@@ -223,24 +223,50 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int itemId = item.getItemId();
-        if (itemId == R.id.nav_home || itemId == R.id.nav_profile ||
-        itemId == R.id.nav_events || itemId == R.id.nav_test || itemId== R.id.nav_organizer){
+        if (itemId == R.id.nav_home_bottom || itemId == R.id.nav_profile_bottom ||
+        itemId == R.id.nav_events || itemId == R.id.nav_test || itemId== R.id.nav_organizer_bottom){
             Log.d("Main Activity", "Navigation Item Bottom Bar");
-            if (itemId == R.id.nav_home) {
+            if (itemId == R.id.nav_home_bottom) {
                 moveToFragment(homeFragment);
                 return true;
-            } else if (itemId == R.id.nav_profile) {
+            } else if (itemId == R.id.nav_profile_bottom) {
                 moveToFragment(profileFragment);
                 return true;
             }else if (itemId == R.id.nav_test) {
                 moveToFragment(testFragment);
                 return true;
             }
-            else if (itemId == R.id.nav_organizer){
+            else if (itemId == R.id.nav_organizer_bottom){
                 moveToFragment(organizerFragment);
                 return true;
             }
         }
+        else if(itemId == R.id.standard_nav_profile ||
+                itemId == R.id.standard_nav_notifications ||
+                itemId == R.id.standard_nav_event_menu ||
+                itemId == R.id.standard_nav_sign_out ||
+                itemId == R.id.standard_nav_admin){
+
+            if (itemId == R.id.standard_nav_notifications) {
+                moveToFragment(notificationFragment);
+                return true;
+            } else if (itemId == R.id.standard_nav_profile) {
+                moveToFragment(profileFragment);
+                return true;
+            }else if (itemId == R.id.standard_nav_event_menu) {
+                moveToFragment(homeFragment);
+                return true;
+            }
+            else if (itemId == R.id.standard_nav_admin){
+                moveToFragment(adminFragment);
+                return true;
+            }
+
+
+        }
+
+
+
         /**
          * Drawer side bar navigation
          */

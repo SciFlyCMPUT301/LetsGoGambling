@@ -49,7 +49,6 @@ public class AdminFragment extends Fragment {
         viewEventsButton = view.findViewById(R.id.events_button);// Button to navigate to the ViewEventsFragment.
         viewFacilitiesButton = view.findViewById(R.id.facilities_button); // Button to navigate to the ViewFacilitiesFragment.
         viewImagesButton = view.findViewById(R.id.images_button);// Button to navigate to the ViewImagesFragment (currently hidden).
-        //viewQRcodeButton = view.findViewById(R.id.qrcode_button); // Button to navigate to the ViewQRcodeFragment.
         backHomeButton = view.findViewById(R.id.home_button);// Button to navigate back to the HomeFragment.
 
 

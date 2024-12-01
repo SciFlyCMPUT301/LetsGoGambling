@@ -142,7 +142,7 @@ public class HomeFragment extends Fragment {
             usersEventListView.setOnItemClickListener((parent, view, position, id) -> {
                 Event selectedEvent = eventList.get(position);
                 EventViewFragment eventViewFragment = EventViewFragment.newInstance(selectedEvent.getEventId(), testDeviceID);
-
+                UniversalProgramValues.getInstance().setCurrentEvent(selectedEvent);
                 getParentFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container, eventViewFragment)
                         .addToBackStack(null) // Ensures returning to HomeFragment
@@ -209,6 +209,7 @@ public class HomeFragment extends Fragment {
 
 
     private void initalizeUI(View rootView){
+        ((MainActivity) getActivity()).showNavigationUI();
         testMode = UniversalProgramValues.getInstance().getTestingMode();
         if(testMode){
             eventList = UniversalProgramValues.getInstance().getEventList();

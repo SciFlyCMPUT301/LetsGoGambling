@@ -23,24 +23,26 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
 
 /**
- * ViewUsersFragment is a Fragment that displays a list of users from Firestore.
- * This fragment allows the admin to add new users, view user details, or navigate back to the AdminFragment.
+ * ViewUsersFragment is a Fragment that displays a list of users fetched from Firestore.
+ * This fragment allows the admin to view user details, edit or delete users, and navigate back to the AdminFragment.
  */
 public class ViewUsersFragment extends Fragment {
-    private FirebaseFirestore db;
+    private FirebaseFirestore db; // Firestore instance for fetching user data.
     //    private ArrayList<String> documentIds = new ArrayList<>();
-    private ListView usersListView;
-    private UserViewAdapter userAdapter;
-    private ArrayList<User> userList;
-    private Button adminGoBack;
+    private ListView usersListView;// ListView to display users in the fragment.
+    private UserViewAdapter userAdapter;// Adapter to bind the user list to the ListView.
+    private ArrayList<User> userList; // List of User objects to be displayed in the ListView.
+    private Button adminGoBack; // Button for navigating back to the AdminFragment.
 
     /**
-     * Inflates the fragment's layout and initializes components.
+     * Inflates the fragment's layout, initializes the components, and sets up the user list.
+     * The method also handles the navigation back to the AdminFragment and listens for item clicks
+     * to open the details of a selected user.
      *
-     * @param inflater           LayoutInflater used to inflate the layout
-     * @param container          ViewGroup container in which the fragment is placed
-     * @param savedInstanceState Bundle containing saved state data (if any)
-     * @return the root View for the fragment's layout
+     * @param inflater           LayoutInflater used to inflate the layout.
+     * @param container          ViewGroup container in which the fragment is placed.
+     * @param savedInstanceState Bundle containing saved state data (if any).
+     * @return the root View for the fragment's layout.
      */
     @Nullable
     @Override
@@ -81,9 +83,11 @@ public class ViewUsersFragment extends Fragment {
     }
 
     /**
-     * Opens the EditUserFragment with details of the selected user for viewing or editing.
+     * Opens the EditUserFragment with the details of the selected user for viewing or editing.
+     * The method passes the user's information such as device ID, username, email, and roles
+     * to the EditUserFragment so that the admin can modify or view the user's details.
      *
-     * @param selectedUser the User object representing the selected user
+     * @param selectedUser The User object representing the selected user to be viewed or edited.
      */
     private void openUserDetailsFragment(User selectedUser) {
         FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
@@ -97,6 +101,8 @@ public class ViewUsersFragment extends Fragment {
         bundle.putString("phoneNumber", selectedUser.getPhoneNumber());
         bundle.putString("location", selectedUser.getLocation());
         bundle.putString("profilePictureUrl", selectedUser.getProfilePictureUrl());
+// The roles (entrant, organizer, admin) are passed to the EditUserFragment,
+// allowing the admin to modify user roles in the edit screen.
         if (selectedUser.getRoles() != null) {
             bundle.putStringArrayList("roles", new ArrayList<>(selectedUser.getRoles()));
         }
@@ -108,8 +114,8 @@ public class ViewUsersFragment extends Fragment {
     }
 
     /**
-     * Loads users from Firestore and updates the ListView adapter.
-     * Logs the device ID of each loaded user and shows an error message on failure.
+     * Handles error logging if the Firestore fetch operation fails.
+     * Logs an error message using Log.e, which includes the exception message for debugging purposes.
      */
     private void loadUsersFromFirestore() {
         db.collection("Users").get().addOnCompleteListener(task -> {

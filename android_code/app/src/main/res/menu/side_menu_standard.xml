@@ -1,18 +1,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/nav_profile"
+        android:id="@+id/standard_nav_profile"
         android:icon="@drawable/ic_profile_foreground"
         android:title="My Profile" />
     <item
-        android:id="@+id/nav_notifications"
+        android:id="@+id/standard_nav_notifications"
         android:icon="@drawable/ic_notification_foreground"
         android:title="Notifications" />
     <item
-        android:id="@+id/nav_event_menu"
+        android:id="@+id/standard_nav_event_menu"
         android:icon="@drawable/ic_events_foreground"
         android:title="Events"/>
     <item
-        android:id="@+id/nav_sign_out"
+        android:id="@+id/standard_nav_sign_out"
         android:icon="@drawable/ic_sign_out_foreground"
         android:title="Sign Out"
          />

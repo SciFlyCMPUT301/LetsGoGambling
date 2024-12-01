@@ -46,7 +46,7 @@ public class FacilityCreateFragment extends Fragment {
 
         // Handle "Create Facility" button click
         createFacilityButton.setOnClickListener(v -> {
-            createFacility(); // Call the create facility method
+            checkAndCreateFacility();// Call the create facility method
             getParentFragmentManager().beginTransaction()
                     .replace(R.id.fragment_container, new HomeFragment())
                     .commit(); // Navigate back to HomeFragment
@@ -61,6 +61,32 @@ public class FacilityCreateFragment extends Fragment {
         });
 
         return view;
+    }
+
+    private void checkAndCreateFacility() {
+        User currentUser = UserManager.getInstance().getCurrentUser();
+        if (currentUser == null) {
+            Toast.makeText(getContext(), "User not found", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String organizerId = currentUser.getDeviceID();
+
+        db.collection("Facilities")
+                .whereEqualTo("organizer", organizerId)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    if (!querySnapshot.isEmpty()) {
+                        // Facility already exists for this organizer
+                        Toast.makeText(getContext(), "You already have a facility. Delete it before creating a new one.", Toast.LENGTH_LONG).show();
+                    } else {
+                        // No facility exists; proceed with creation
+                        createFacility();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "Error checking existing facility: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
     }
 
     /**

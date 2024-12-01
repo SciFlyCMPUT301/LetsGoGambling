@@ -174,14 +174,17 @@ public class LoginFragment extends Fragment {
 //        DrawerLayout drawerLayout = getActivity().findViewById(R.id.toolbar);
 //        drawerLayout.setVisibility(View.GONE);
         ((MainActivity) getActivity()).hideNavigationUI();
-
+        Log.d("Login Fragment", "Hid Main Activity UI");
+        Log.d("Login Fragment", "Create View Testing: " + UniversalProgramValues.getInstance().getTestingMode());
 
         initializeUI(rootView);
+        Log.d("LoginFragment", "Initalized Login UI Main Create");
         testModeButton.setOnClickListener(v -> enterTestMode());
         normalButton.setOnClickListener(v -> startNormalMode());
         setByDocumentIdButton.setOnClickListener(v -> setUserByDocumentId());
         setByUsernameButton.setOnClickListener(v -> setUserByUsername());
         setToDeviceID1.setOnClickListener(v -> setUserToDeviceID1());
+        Log.d("LoginFragment", "Buttons Set up");
 
         return rootView;
     }
@@ -203,6 +206,7 @@ public class LoginFragment extends Fragment {
         }
 
         Log.d("LoginFragment", "Initializing UI");
+        Log.d("LoginFragment", "Is Testing: " + UniversalProgramValues.getInstance().getTestingMode());
         testModeButton = rootView.findViewById(R.id.button_test_mode);
         normalButton = rootView.findViewById(R.id.button_normal);
         testModeLayout = rootView.findViewById(R.id.test_mode_layout);
@@ -216,6 +220,7 @@ public class LoginFragment extends Fragment {
         welcomeText = rootView.findViewById(R.id.text_login_welcome);
         normalLoginLayout.setVisibility(View.GONE);
         testModeLayout.setVisibility(View.GONE);
+        Log.d("LoginFragment", "Initalized Login UI");
     }
 
     private void enterTestMode() {
@@ -297,7 +302,7 @@ public class LoginFragment extends Fragment {
     }
 
     private void handleReturningUser(User user, String deviceId) {
-        Log.d("LoginFragment", "Returning User: " + user.getUsername());
+//        Log.d("LoginFragment", "Returning User: " + user.getUsername());
 
 //        user.saveUserDataToFirestore();
         UserManager.getInstance().setCurrentUser(user);

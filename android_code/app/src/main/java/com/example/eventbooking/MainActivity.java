@@ -206,8 +206,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-
-        createNotificationChannel(this);
+        if(!UniversalProgramValues.getInstance().getTestingMode())
+            createNotificationChannel(this);
 //        FirebaseMessaging.getInstance().subscribeToTopic("test_topic").addOnCompleteListener(task -> {
 //            String msg = task.isSuccessful() ? "Subscribed" : "Subscription failed";
 //            Log.d(TAG, msg);

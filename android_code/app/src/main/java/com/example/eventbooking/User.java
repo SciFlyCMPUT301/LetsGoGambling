@@ -8,12 +8,19 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 
+import com.example.eventbooking.Admin.Images.ImageClass;
+import com.example.eventbooking.Events.EventData.Event;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.TaskCompletionSource;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -25,6 +32,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -41,7 +49,7 @@ import android.content.Context;
  *
  * @since   2024-11-04
  */
-public class User {
+public class User implements Parcelable{
     // Unsure if making this universal for the user upon creation of a new user or not
     // Once loaded do we keep this constantly? How is this saved in Firebase?
 
@@ -77,9 +85,19 @@ public class User {
     public User() {
         //init roles to avoid null pointer exception
         this.roles = new ArrayList<>();
-        this.storageReference = FirebaseStorage.getInstance().getReference();
-        this.db = FirebaseFirestore.getInstance();
+        if(!UniversalProgramValues.getInstance().getTestingMode()){
+            this.storageReference = FirebaseStorage.getInstance().getReference();
+            this.db = FirebaseFirestore.getInstance();
+        }
+
     }
+
+    public User(Boolean testing) {
+        //init roles to avoid null pointer exception
+        this.roles = new ArrayList<>();
+    }
+
+
 
     public User(FirebaseFirestore db, FirebaseStorage storage) {
         this.db = db;
@@ -564,14 +582,17 @@ public class User {
         uploadImage(newPictureUri);
     }
 
-
+    /**
+     * This will delete a given image from firebase storage (assuming that this is used when deleting
+     * the users uploaded profile picture
+     * @param imageUrl
+     */
     public void deleteSelectedImageFromFirebase(String imageUrl) {
-
         // Get a reference to the image in Firebase Storage
         if(!UniversalProgramValues.getInstance().getTestingMode()){
             StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl(imageUrl);
 
-            // Delete the image from Firebase Storage
+//             Delete the image from Firebase Storage
             storageRef.delete()
                     .addOnSuccessListener(aVoid -> {
                         // Successfully deleted the image
@@ -593,12 +614,18 @@ public class User {
                         // Failed to delete the image from Firebase Storage
                         Log.e("FirebaseStorage", "Failed to delete selected image", e);
                     });
+
         }
         else{
             UniversalProgramValues.getInstance().setDeleteFirebaseImage(imageUrl);
+            UniversalProgramValues.getInstance().getSingle_user().setProfilePictureUrl(
+                    UniversalProgramValues.getInstance().getSingle_user().getdefaultProfilePictureUrl());
+            this.profilePictureUrl = defaultprofilepictureurl;
+//            callback.onComplete(Task.forResult(true));
         }
 
     }
+
 
     /**
      * Checking to see if there is another URL for the user or not
@@ -647,6 +674,68 @@ public class User {
             }
         });
     }
+
+
+    /**
+     * Below code is to make User parcelable and I can pass this back and forth
+     *
+     *
+     */
+
+    // Parcelable constructor
+    protected User(Parcel in) {
+        username = in.readString();
+        deviceId = in.readString();
+        email = in.readString();
+        phoneNumber = in.readString();
+        geolocation = in.readParcelable(GeoPoint.class.getClassLoader());
+        profilePictureUrl = in.readString();
+        defaultprofilepictureurl = in.readString();
+        location = in.readString();
+        address = in.readString();
+        adminLevel = in.readByte() != 0;
+        facilityAssociated = in.readByte() != 0;
+        notificationAsk = in.readByte() != 0;
+        geolocationAsk = in.readByte() != 0;
+        testing = in.readByte() != 0;
+        roles = in.createStringArrayList();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(username);
+        dest.writeString(deviceId);
+        dest.writeString(email);
+        dest.writeString(phoneNumber);
+        dest.writeParcelable((Parcelable) geolocation, flags);
+        dest.writeString(profilePictureUrl);
+        dest.writeString(defaultprofilepictureurl);
+        dest.writeString(location);
+        dest.writeString(address);
+        dest.writeByte((byte) (adminLevel ? 1 : 0));
+        dest.writeByte((byte) (facilityAssociated ? 1 : 0));
+        dest.writeByte((byte) (notificationAsk ? 1 : 0));
+        dest.writeByte((byte) (geolocationAsk ? 1 : 0));
+        dest.writeByte((byte) (testing ? 1 : 0));
+        dest.writeStringList(roles);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<User> CREATOR = new Creator<User>() {
+        @Override
+        public User createFromParcel(Parcel in) {
+            return new User(in);
+        }
+
+        @Override
+        public User[] newArray(int size) {
+            return new User[size];
+        }
+    };
 
 
 

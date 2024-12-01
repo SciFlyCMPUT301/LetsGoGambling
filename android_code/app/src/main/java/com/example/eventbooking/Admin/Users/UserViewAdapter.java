@@ -35,7 +35,7 @@ public class UserViewAdapter extends ArrayAdapter<User> {
      * @param userList The list of User objects to display in the ListView.
      */
     //constructor, call on creation
-    public UserViewAdapter(@NonNull Context context, ArrayList<User> userList) {
+    public UserViewAdapter(@NonNull Context context, List<User> userList) {
         super(context, R.layout.user_adapter_layout, userList);
         this.context = context;
         this.userList = userList;

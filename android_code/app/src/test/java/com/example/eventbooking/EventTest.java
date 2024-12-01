@@ -300,7 +300,6 @@ public void testSaveEventDataToFirestore() {
 
         // Retrieve the captured data
         Map<String, Object> eventData = argumentCaptor.getValue();
-
         // Verify the captured data matches the expected values
         assertNotNull(eventData);
         assertEquals("Updated Event Title", eventData.get("eventTitle"));

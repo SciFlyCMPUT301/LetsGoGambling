@@ -21,6 +21,7 @@ import com.example.eventbooking.Admin.QRcode.QRcodeViewAdapter;
 import com.example.eventbooking.Events.EventData.Event;
 import com.example.eventbooking.QRCode.QRcodeGenerator;
 import com.example.eventbooking.R;
+import com.example.eventbooking.UniversalProgramValues;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -51,8 +52,8 @@ public class QRCodeFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_event_qr_code_details, container, false);
-
-        db = FirebaseFirestore.getInstance();
+        if(!UniversalProgramValues.getInstance().getTestingMode())
+            db = FirebaseFirestore.getInstance();
         eventGoBack = view.findViewById(R.id.admin_go_back_event);
         removeButton = view.findViewById(R.id.remove_qrcode);
         QRcode  = view.findViewById(R.id.qrcode_image_view);

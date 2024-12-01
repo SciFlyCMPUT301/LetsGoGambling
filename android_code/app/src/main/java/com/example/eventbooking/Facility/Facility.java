@@ -1,7 +1,10 @@
 package com.example.eventbooking.Facility;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
+import com.example.eventbooking.UniversalProgramValues;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
@@ -37,16 +40,22 @@ public class Facility {
      */
     public Facility() {
         // Initialize Firebase instances
-        this.db = FirebaseFirestore.getInstance();
-        this.facilitiesRef = db.collection("facilities");
+        if(!UniversalProgramValues.getInstance().getTestingMode()){
+            this.db = FirebaseFirestore.getInstance();
+            this.facilitiesRef = db.collection("facilities");
+        }
+
         // Initialize list to avoid NullPointerException
         this.allEvents = new ArrayList<>();
     }
 
+
     // Constructor for dependency injection (useful for testing)
     public Facility(FirebaseFirestore db, CollectionReference facilitiesRef) {
-        this.db = db;
-        this.facilitiesRef = facilitiesRef;
+        if(!UniversalProgramValues.getInstance().getTestingMode()){
+            this.db = FirebaseFirestore.getInstance();
+            this.facilitiesRef = facilitiesRef;
+        }
         this.allEvents = new ArrayList<>();
     }
 
@@ -192,23 +201,32 @@ public class Facility {
     public void associateEvent(String eventID, boolean genEvent) {
         // Check if the facility document exists
         if(genEvent){
+            Log.d("Facility", "Adding new Event");
             allEvents.add(eventID);
         }else {
+            Log.d("Facility", "Testing: " +UniversalProgramValues.getInstance().getTestingMode());
+            if(!UniversalProgramValues.getInstance().getTestingMode()){
+                db.collection("Facilities").document(facilityID)
+                        .get()
+                        .addOnCompleteListener(task -> {
+                            if (task.isSuccessful() && task.getResult() != null && task.getResult().exists()) {
+                                // Document exists, proceed with the update
+                                updateEventInFacility(eventID);
+                            } else {
+                                // Document doesn't exist, create it with the event
+                                System.out.println("Facility document not found. Creating document with event.");
+                                createFacilityWithEvent(eventID);
+                            }
+                        })
+                        .addOnFailureListener(e -> System.out.println("Error checking facility existence: " + e.getMessage()));
+            }
+            else{
+                if (allEvents == null)
+                    allEvents = new ArrayList<>();
+                if (!allEvents.contains(eventID))
+                    allEvents.add(eventID);
+            }
 
-
-            db.collection("Facilities").document(facilityID)
-                    .get()
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful() && task.getResult() != null && task.getResult().exists()) {
-                            // Document exists, proceed with the update
-                            updateEventInFacility(eventID);
-                        } else {
-                            // Document doesn't exist, create it with the event
-                            System.out.println("Facility document not found. Creating document with event.");
-                            createFacilityWithEvent(eventID);
-                        }
-                    })
-                    .addOnFailureListener(e -> System.out.println("Error checking facility existence: " + e.getMessage()));
         }
     }
 

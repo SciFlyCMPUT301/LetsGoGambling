@@ -34,6 +34,7 @@ public class UserManager {
     private Location currentBestLocation;
     private Context context;
     private GeoPoint geoLocation;
+//    private Boolean newUser = true;
 
     private UserManager(){
         organizerEvents = new ArrayList<>();
@@ -69,7 +70,7 @@ public class UserManager {
         this.currentUser.setEmail(user.getEmail());
         this.currentUser.setPhoneNumber(user.getPhoneNumber());
         this.currentUser.setProfilePictureUrl(user.getProfilePictureUrl());
-        this.currentUser.setdefaultProfilePictureUrl(user.getProfilePictureUrl());
+        this.currentUser.setdefaultProfilePictureUrl(user.getdefaultProfilePictureUrl());
         this.currentUser.setLocation(user.getLocation());
         this.currentUser.setAddress(user.getAddress());
         this.currentUser.setAdminLevel(user.isAdminLevel());

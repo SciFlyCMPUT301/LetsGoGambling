@@ -58,6 +58,7 @@ public class AdminFragment extends Fragment {
         ViewUsersFragment usersFragment = new ViewUsersFragment();
         ViewEventsFragment eventsFragment = new ViewEventsFragment();
         ViewFacilitiesFragment facilitiesFragment = new ViewFacilitiesFragment();
+        ViewImagesFragment imagesFragment = new ViewImagesFragment();
         TestFragment testFragment = new TestFragment();
 
         //set up on clicklistener
@@ -66,7 +67,7 @@ public class AdminFragment extends Fragment {
         viewFacilitiesButton.setOnClickListener(v -> replaceFragment(facilitiesFragment));
         viewTestPageButton.setOnClickListener(v -> replaceFragment(testFragment));
         //for now hiding it because not dealing with images, it doesnt work
-        viewImagesButton.setOnClickListener(v -> replaceFragment(new ViewImagesFragment()));
+        viewImagesButton.setOnClickListener(v -> replaceFragment(imagesFragment));
         backHomeButton.setOnClickListener(v -> navigateHome());
 
         return view;

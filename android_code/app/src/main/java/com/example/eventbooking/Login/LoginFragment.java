@@ -292,7 +292,7 @@ public class LoginFragment extends Fragment {
      * Sets the user to the default device ID for testing purposes.
      */
     private void setUserToDeviceID1() {
-        FirestoreAccess.getInstance().getUser("deviceID6").addOnSuccessListener(snapshot -> {
+        FirestoreAccess.getInstance().getUser("deviceID1").addOnSuccessListener(snapshot -> {
             if (snapshot.exists()) {
                 disableAllButtons();
                 Log.d("Login Activity", "User Snapshot Exists");

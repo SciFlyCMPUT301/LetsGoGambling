@@ -1,6 +1,7 @@
 package com.example.eventbooking.Testing;
 
 import android.util.Log;
+import android.widget.Toast;
 
 import com.example.eventbooking.Admin.Images.ImageClass;
 import com.example.eventbooking.Events.EventData.Event;
@@ -217,11 +218,24 @@ public class SampleTable {
             event.setDescription("Description for event " + i);
             event.setTimestamp(System.currentTimeMillis() + i * 100000);
             event.setMaxParticipants(20);
+            event.setWaitingListLimit(30);
             event.setOrganizerId(organizer_list.get(i-1).getDeviceID());
-            event.setEventPosterURL("Event Picture URL" + i);
+//            event.setEventPosterURL("Event Picture URL" + i);
+
+
             if(UniversalProgramValues.getInstance().getTestingMode()){
                 event.setDefaultEventPosterURL("https://fastly.picsum.photos/id/1033/200/300.jpg?hmac=856_WOyaGXSjI4FWe3_NCHU7frPtAEJaHnAJja5TMNk");
                 event.setEventPosterURL("https://fastly.picsum.photos/id/532/200/200.jpg?hmac=PPwpqfjXOagQmhd_K7H4NXyA4B6svToDi1IbkDW2Eos");
+            }
+            else{
+                event.uploadDefaultPoster(event.getEventTitle())
+                        .addOnSuccessListener(aVoid -> {
+                            Log.d("EventCreateFragment", "Default poster uploaded successfully.");
+                        })
+                        .addOnFailureListener(e -> {
+                            Log.e("EventCreateFragment", "Failed to upload default poster.", e);
+
+                        });
             }
 
 

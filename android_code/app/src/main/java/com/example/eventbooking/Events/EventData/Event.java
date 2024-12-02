@@ -859,12 +859,15 @@ public class Event implements Parcelable {
                     }
                     Uri downloadUri = task.getResult();
                     String downloadUrl = downloadUri.toString();
-                    this.imageUrl = downloadUrl;
+                    this.defaultEventPosterURL = downloadUrl;
+                    this.eventPosterURL = downloadUrl;
 
 
                     // Save the updated URL to Firestore
                     Map<String, Object> updates = new HashMap<>();
-                    updates.put("imageUrl", downloadUrl);
+                    updates.put("eventPosterURL", downloadUrl);
+                    updates.put("defaultEventPosterURL", downloadUrl);
+//                    updates.put("imageUrl", downloadUrl);
 
 
                     return db.collection("Events").document(eventId).update(updates);

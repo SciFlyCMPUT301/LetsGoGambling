@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.Toast;
@@ -16,12 +17,15 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.fragment.app.Fragment;
 import com.example.eventbooking.Events.EventData.Event;
+import com.example.eventbooking.Events.EventPageFragment.OragnizerEventFragment;
 import com.example.eventbooking.QRCode.QRcodeGenerator;
 import com.example.eventbooking.R;
 import com.example.eventbooking.UniversalProgramValues;
 import com.example.eventbooking.UserManager;
 import com.example.eventbooking.waitinglist.OrganizerMenuFragment;
 import com.squareup.picasso.Picasso;
+
+import java.util.Objects;
 
 public class EventEditFragment extends Fragment {
     private EditText editTitle, editDescription, editLocation, editMaxParticipants, editMaxWaitlistSize;
@@ -31,6 +35,7 @@ public class EventEditFragment extends Fragment {
     private ActivityResultLauncher<Intent> pickImageLauncher;
     private Uri selectedImageUri;
     private boolean isEditing = false;
+    private ImageButton topBackImage;
 
     private String currentUserID;
     private Event editEvent;
@@ -108,13 +113,15 @@ public class EventEditFragment extends Fragment {
         saveButton = view.findViewById(R.id.button_save_event);
         backButton = view.findViewById(R.id.button_back_home);
         moveToMoreOrganizerDetail = view.findViewById(R.id.button_navigate_to_menu);
+        topBackImage = view.findViewById(R.id.button_back);
 
         editButton.setOnClickListener(v -> toggleEditMode());
         uploadPosterButton.setOnClickListener(v -> launchTestImagePicker());
         removePosterButton.setOnClickListener(v -> removePoster());
         saveButton.setOnClickListener(v -> saveEventDetails());
-        backButton.setOnClickListener(v -> goBackToOrganizerPage());
-        moveToMoreOrganizerDetail.setOnClickListener(v -> navigateToOrganizerMenu());
+        backButton.setOnClickListener(v -> navigateToOrganizerMenu());
+        moveToMoreOrganizerDetail.setOnClickListener(v -> navigateToOrganizerPage());
+        topBackImage.setOnClickListener(v -> navigateToOrganizerMenu());
 
         setEditMode(false);
     }
@@ -220,22 +227,29 @@ public class EventEditFragment extends Fragment {
         }
 
         if (!UniversalProgramValues.getInstance().getTestingMode()) {
-            editEvent.deleteSelectedPosterFromFirebase(editEvent.getEventPosterURL())
-                    .addOnSuccessListener(aVoid -> {
-                        editEvent.uploadDefaultPoster(editEvent.getEventTitle())
-                                .addOnSuccessListener(defaultPoster -> {
-                                    displayCurrentPoster();
-                                    Toast.makeText(getContext(), "Custom poster removed. Default poster is now active.", Toast.LENGTH_SHORT).show();
-                                })
-                                .addOnFailureListener(e -> {
-                                    Toast.makeText(getContext(), "Failed to reset poster to default.", Toast.LENGTH_SHORT).show();
-                                    Log.e("OrganizerMenuFragment", "Error resetting poster to default", e);
-                                });
-                    })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(getContext(), "Failed to remove custom poster.", Toast.LENGTH_SHORT).show();
-                        Log.e("OrganizerMenuFragment", "Error removing poster", e);
-                    });
+            if(Objects.equals(editEvent.getEventPosterURL(), editEvent.getDefaultEventPosterURL()))
+            {
+                editEvent.deleteSelectedPosterFromFirebase(editEvent.getEventPosterURL())
+                        .addOnSuccessListener(aVoid -> {
+                            editEvent.uploadDefaultPoster(editEvent.getEventTitle())
+                                    .addOnSuccessListener(defaultPoster -> {
+                                        displayCurrentPoster();
+                                        Toast.makeText(getContext(), "Custom poster removed. Default poster is now active.", Toast.LENGTH_SHORT).show();
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Toast.makeText(getContext(), "Failed to reset poster to default.", Toast.LENGTH_SHORT).show();
+                                        Log.e("OrganizerMenuFragment", "Error resetting poster to default", e);
+                                    });
+                        })
+                        .addOnFailureListener(e -> {
+                            Toast.makeText(getContext(), "Failed to remove custom poster.", Toast.LENGTH_SHORT).show();
+                            Log.e("OrganizerMenuFragment", "Error removing poster", e);
+                        });
+            }
+            else{
+
+            }
+
         }
         else{
             editEvent.setEventPosterURL(editEvent.getDefaultEventPosterURL());
@@ -249,14 +263,14 @@ public class EventEditFragment extends Fragment {
      */
     private void navigateToOrganizerMenu() {
         Log.d("Organizer Event Detail", "Navigate to menu");
-        OrganizerMenuFragment organizerMenuFragment = OrganizerMenuFragment.newInstance(editEvent.getEventId());
+        OragnizerEventFragment organizerMenuFragment = OragnizerEventFragment.newInstance(editEvent.getEventId());
         getParentFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, organizerMenuFragment)
                 .addToBackStack(null)
                 .commit();
     }
 
-    private void goBackToOrganizerPage(){
+    private void navigateToOrganizerPage(){
         Log.d("Organizer Event Detail", "Navigate to menu");
         OrganizerMenuFragment organizerMenuFragment = OrganizerMenuFragment.newInstance(editEvent.getEventId());
         getParentFragmentManager().beginTransaction()
@@ -280,8 +294,12 @@ public class EventEditFragment extends Fragment {
         editTitle.setText(event.getEventTitle());
         editDescription.setText(event.getDescription());
         editLocation.setText(event.getLocation());
-        editMaxParticipants.setText(event.getMaxParticipants());
+        editMaxParticipants.setText(String.valueOf(event.getMaxParticipants()));
         geolocationSwitch.setChecked(event.isGeolocationRequired());
+        if(event.getWaitingListLimit() > 0)
+            editMaxWaitlistSize.setText(String.valueOf(event.getWaitingListLimit()));
+        else
+            editMaxWaitlistSize.setText(String.valueOf(0));
         displayCurrentPoster();
 
 //        editMaxWaitlistSize.setText(event.get)
@@ -307,6 +325,15 @@ public class EventEditFragment extends Fragment {
         editEvent.setLocation(editLocation.getText().toString().trim());
         editEvent.setMaxParticipants(Integer.parseInt(editMaxParticipants.getText().toString().trim()));
         editEvent.setGeolocationRequired(geolocationSwitch.isChecked());
+        String waitlistSizeInput = editMaxWaitlistSize.getText().toString().trim();
+        if (!waitlistSizeInput.isEmpty()) {
+            int i = Integer.parseInt(waitlistSizeInput);
+            if (i > 0) {
+                editEvent.setWaitingListLimit(i);
+            }
+        } else {
+            editEvent.setWaitingListLimit(-1);
+        }
 
         editEvent.saveEventDataToFirestore()
                 .addOnSuccessListener(aVoid -> {

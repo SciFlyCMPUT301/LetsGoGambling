@@ -43,7 +43,10 @@ public class FirebaseTestingActivity extends AppCompatActivity {
 
     private FirebaseFirestore db;
     private FirebaseStorage storage;
-
+    /**
+     * An instance of SampleTable used to generate and manage sample data
+     * for users, facilities, and events.
+     */
     private SampleTable sampleTable;
 
     /**
@@ -133,7 +136,8 @@ public class FirebaseTestingActivity extends AppCompatActivity {
     }
 
     /**
-     * Opens the device's file chooser for the user to select an image.
+     * Opens a file chooser to allow the user to select an image file from their device.
+     * This method launches an intent to open the device's content picker for image files.
      */
     private void openFileChooser() {
         Intent intent = new Intent();
@@ -225,11 +229,11 @@ public class FirebaseTestingActivity extends AppCompatActivity {
         }
 
         /**
-         * Constructs an ImageData object.
+         * Constructs an ImageData object for saving image information in Firestore.
          *
-         * @param imageUrl   The URL of the image.
-         * @param usage      The usage of the image (e.g., "Profile Picture").
-         * @param description A brief description of the image.
+         * @param imageUrl   The public URL of the image stored in Firebase Storage.
+         * @param usage      A short description of the purpose of the image (e.g., "Profile Picture").
+         * @param description A longer description or additional details about the image.
          */
         public ImageData(String imageUrl, String usage, String description) {
             this.imageUrl = imageUrl;

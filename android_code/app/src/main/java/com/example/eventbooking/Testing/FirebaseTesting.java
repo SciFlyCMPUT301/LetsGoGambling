@@ -16,7 +16,10 @@ import java.util.Map;
 /**
  * The FirebaseTesting class provides methods to interact with Firebase services, including
  * uploading images to Firebase Storage, storing metadata in Firestore, and loading data from Firestore.
- * It also provides methods to test Firebase operations by loading and saving data for users, facilities, and events.
+ *
+ * This class is designed for testing Firebase operations, including uploading and retrieving data
+ * for users, facilities, and events. It is primarily intended for developers during application
+ * development and debugging.
  */
 public class FirebaseTesting {
 
@@ -32,13 +35,15 @@ public class FirebaseTesting {
         storage = FirebaseStorage.getInstance();
     }
 
+
     /**
      * Uploads an image to Firebase Storage and stores its metadata (link, usage location, and description) in Firestore.
+     * The metadata is saved in the "Images" collection in Firestore.
      *
-     * @param localImagePath Path to the image file on the local storage
-     * @param usageLocation A description of where the image will be used
-     * @param description A detailed description of the image
-     * @throws IllegalArgumentException if the image path is invalid or empty
+     * @param localImagePath  Path to the image file on the local storage. Must be a valid file path.
+     * @param usageLocation   A short description of where the image will be used (e.g., "Profile Picture").
+     * @param description     A detailed description of the image.
+     * @throws IllegalArgumentException if the image path is null or empty.
      */
     public void uploadImage(String localImagePath, String usageLocation, String description) {
         if (localImagePath == null || localImagePath.isEmpty()) {
@@ -85,7 +90,7 @@ public class FirebaseTesting {
 
     /**
      * Loads image data from Firestore and logs the image details (link, usage location, and description).
-     * This can be extended to display images using a UI component such as an ImageView.
+     * This method is intended for testing purposes and does not update the UI.
      */
     public void loadImages() {
         db.collection("Images").get()
@@ -109,7 +114,7 @@ public class FirebaseTesting {
 
     /**
      * A method that demonstrates loading and saving data (users, facilities, events) in Firebase.
-     * This is intended for testing Firebase operations.
+     * This is intended for testing Firebase operations and is not part of production code.
      */
     public void testFirebaseOperations() {
         // Create a SampleTable instance and generate data

@@ -44,13 +44,13 @@
             android:layout_marginBottom="16dp" />
 
         <!-- Form Fields -->
-        <EditText
+        <!--<EditText
             android:id="@+id/event_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Event Name"
             android:inputType="text"
-            android:layout_marginBottom="8dp" />
+            android:layout_marginBottom="8dp" />-->
 
         <EditText
             android:id="@+id/event_image_url"
@@ -61,21 +61,21 @@
             android:layout_marginBottom="8dp"
             android:visibility="gone"/>
 
-        <EditText
+        <!--<EditText
             android:id="@+id/event_date_time"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Date,Time"
             android:inputType="datetime"
-            android:layout_marginBottom="8dp" />
+            android:layout_marginBottom="8dp" />-->
 
-        <EditText
+        <!--<EditText
             android:id="@+id/event_location"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Location"
             android:inputType="textPostalAddress"
-            android:layout_marginBottom="8dp" />
+            android:layout_marginBottom="8dp" />-->
 
         <EditText
             android:id="@+id/max_participants"

@@ -1,8 +1,10 @@
 package com.example.eventbooking.Events.EventCreate;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +17,7 @@ import android.widget.Switch;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.fragment.app.Fragment;
 import com.example.eventbooking.Events.EventData.Event;
 import com.example.eventbooking.Events.EventPageFragment.OragnizerEventFragment;
@@ -92,6 +95,16 @@ public class EventEditFragment extends Fragment {
         currentUserID = UserManager.getInstance().getUserId();
         displayEventDetails(editEvent);
 
+        pickImageLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                        selectedImageUri = result.getData().getData();
+                        editEvent.uploadPoster(selectedImageUri);
+                        eventPoster.setImageURI(selectedImageUri);
+                    }
+                });
+
 
         return view;
     }
@@ -152,8 +165,10 @@ public class EventEditFragment extends Fragment {
      * Directly uses a predefined image URI for testing purposes and initiates the upload process.
      */
     private void launchTestImagePicker() {
-        Uri selectedImageUri = Uri.parse(UniversalProgramValues.getInstance().getUploadProfileURL());
-        uploadPoster(selectedImageUri);
+//        Uri selectedImageUri = Uri.parse(UniversalProgramValues.getInstance().getUploadProfileURL());
+//        uploadPoster(selectedImageUri);
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        pickImageLauncher.launch(intent);
     }
 
     /**
@@ -338,6 +353,26 @@ public class EventEditFragment extends Fragment {
                     requireActivity().onBackPressed();
                 })
                 .addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to save event details.", Toast.LENGTH_SHORT).show());
+    }
+
+
+    /**
+     * Opens the image picker to upload a profile photo.
+     */
+    private void uploadPhoto() {
+        if(!UniversalProgramValues.getInstance().getTestingMode()){
+            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            pickImageLauncher.launch(intent);
+        }
+        else{
+//            currentUser.uploadImage(selectedImageUri);
+            String URI = UniversalProgramValues.getInstance().getUploadProfileURL();
+            selectedImageUri = Uri.parse(URI);
+            editEvent.setEventPosterURL(URI);
+//            profilePictureUrl = imageURL;
+            eventPoster.setImageURI(selectedImageUri);
+        }
+
     }
 
 

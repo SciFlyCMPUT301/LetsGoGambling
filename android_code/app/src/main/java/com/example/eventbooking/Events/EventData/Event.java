@@ -880,6 +880,7 @@ public class Event implements Parcelable {
      * @return A Task<Void> representing the completion of the upload process. The task fails if either the upload
      *         or Firestore update fails.
      */
+
     public Task<Void> uploadCustomPoster(Uri imageUri) {
         StorageReference posterRef = storage.getReference().child("event_posters/" + UUID.randomUUID().toString() + ".png");
 
@@ -904,6 +905,37 @@ public class Event implements Parcelable {
                 })
                 .addOnSuccessListener(aVoid -> Log.d("Event", "Poster uploaded and URL updated successfully"))
                 .addOnFailureListener(e -> Log.e("Event", "Failed to upload poster or update URL", e));
+    }
+
+    public void uploadPoster(Uri imageUri) {
+        final String randomKey = UUID.randomUUID().toString();
+//        StorageReference ref = storageReference.child("images/" + randomKey);
+        StorageReference posterRef = storage.getReference().child("event_posters/" + UUID.randomUUID().toString() + ".png");
+
+        posterRef.putFile(imageUri)
+                .addOnSuccessListener(taskSnapshot -> {
+                    // Get the download URL of the uploaded image
+                    posterRef.getDownloadUrl().addOnSuccessListener(downloadUrl -> {
+                        String imageURL = downloadUrl.toString();
+                        // Save the image URL to Firestore
+                        eventPosterURL = imageURL;
+                        Log.d("User", "Profile picture URL updated: " + imageURL);
+                        saveEventDataToFirestore()
+                                .addOnSuccessListener(aVoid -> {
+                                    Log.d("Event", "User data updated with new profile picture URL.");
+                                })
+                                .addOnFailureListener(e -> {
+                                    Log.e("Event", "Failed to update user data with new profile picture URL.", e);
+                                });
+                    }).addOnFailureListener(e -> {
+                        // Log the error if getting the download URL fails
+                        Log.e("Firebase", "Failed to get download URL", e);
+                    });
+                })
+                .addOnFailureListener(e -> {
+                    // Log the error if the upload fails
+                    Log.e("Firebase", "Image upload failed", e);
+                });
     }
 
     // Update event poster

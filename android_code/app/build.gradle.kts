@@ -52,7 +52,8 @@ dependencies {
     implementation("org.osmdroid:osmdroid-android:6.1.20")
 //    implementation("org.osmdroid:osmdroid-android")
 //    implementation("com.google.protobuf:protobuf-javalite:4.29.0")
-    //implementation(files("C:\\Users\\pilck\\AppData\\Local\\Android\\Sdk\\platforms\\android-35\\android.jar"))
+
+//    implementation(files("C:\\Users\\pilck\\AppData\\Local\\Android\\Sdk\\platforms\\android-35\\android.jar"))
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
@@ -80,7 +81,8 @@ dependencies {
     testImplementation("org.mockito:mockito-inline:5.0.0")
     testImplementation("org.mockito:mockito-android:2.28.2")
 //    testImplementation("com.linkedin.dexmaker:dexmaker-mockito:2.28.1")
-
+    testImplementation("org.powermock:powermock-module-junit4:2.0.9")
+    testImplementation("org.powermock:powermock-api-mockito2:2.0.9")
 
 
 

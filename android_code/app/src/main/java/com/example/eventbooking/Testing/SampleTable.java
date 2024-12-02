@@ -21,9 +21,9 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * The SampleTable class is designed to generate sample data for users, facilities, and events.
- * This data is intended to be sent to Firebase, and the class also supports saving, updating,
- * and deleting data for quick testing and loading.
+ * The SampleTable class provides methods to generate and manage
+ * sample data for users, facilities, events, and images. This class
+ * also includes functionality for saving the data to Firebase Firestore.
  */
 public class SampleTable {
 
@@ -34,7 +34,11 @@ public class SampleTable {
 
     private int userUpdateCount;
     private int facilityUpdateCount;
-
+    /**
+     * Generates a random location name from a predefined list.
+     *
+     * @return A random location name.
+     */
     private String getRandomLocation() {
         String[] locations = {"New York", "Los Angeles", "Chicago", "Houston", "Phoenix", "Philadelphia", "San Antonio", "San Diego", "Dallas", "San Jose"};
         Random rand = new Random();
@@ -43,12 +47,12 @@ public class SampleTable {
 
 
     /**
-     * Generates a random GeoPoint within a given radius from a base latitude and longitude.
+     * Generates a random GeoPoint within a given radius.
      *
      * @param baseLatitude The base latitude.
      * @param baseLongitude The base longitude.
-     * @param radiusInDegrees The radius around the base point in degrees.
-     * @return A random GeoPoint within the specified radius.
+     * @param radiusInDegrees The radius in degrees around the base point.
+     * @return A GeoPoint object within the specified radius.
      */
     private GeoPoint generateRandomGeoPoint(double baseLatitude, double baseLongitude, double radiusInDegrees) {
         Random random = new Random();
@@ -65,7 +69,7 @@ public class SampleTable {
 
 
     /**
-     * Generates a list of sample users with different roles (admin, organizer, and normal users).
+     * Creates a list of sample users with roles such as admin, organizer, and normal user.
      */
     public void makeUserList() {
         Log.d("Sample Table", "Making Users");
@@ -486,7 +490,9 @@ public class SampleTable {
         return null;
     }
 
-
+    /**
+     * Resets the lists of users, facilities, events, and images.
+     */
     public void resetLists(){
         UserList = new ArrayList<>();
         EventList = new ArrayList<>();

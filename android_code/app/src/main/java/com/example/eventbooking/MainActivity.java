@@ -524,6 +524,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
 
+    /**
+     * Displays the navigation UI elements: bottom navigation bar, sidebar, and toolbar.
+     */
     public void showNavigationUI() {
         BottomNavigationView nav = findViewById(R.id.bottom_navigation);
         NavigationView sidebar = findViewById(R.id.nav_view);
@@ -534,6 +537,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (toolbar != null) toolbar.setVisibility(View.VISIBLE);
     }
 
+    /**
+     * Hides the navigation UI elements: bottom navigation bar, sidebar, and toolbar.
+     */
     public void hideNavigationUI() {
         BottomNavigationView nav = findViewById(R.id.bottom_navigation);
         NavigationView sidebar = findViewById(R.id.nav_view);
@@ -544,25 +550,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (toolbar != null) toolbar.setVisibility(View.GONE);
     }
 
+    /**
+     * Retrieves the user's current location, ensuring that GPS is enabled and permissions are granted.
+     */
     private void getCurrentLocation() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
                 if (isGPSEnabled()) {
-                    LocationServices.getFusedLocationProviderClient(MainActivity.this)
+                    LocationServices.getFusedLocationProviderClient(this)
                             .requestLocationUpdates(locationRequest, new LocationCallback() {
                                 @Override
                                 public void onLocationResult(@NonNull LocationResult locationResult) {
                                     super.onLocationResult(locationResult);
                                     LocationServices.getFusedLocationProviderClient(MainActivity.this)
                                             .removeLocationUpdates(this);
-                                    if (locationResult != null && locationResult.getLocations().size() >0){
+
+                                    if (locationResult != null && locationResult.getLocations().size() > 0) {
                                         int index = locationResult.getLocations().size() - 1;
                                         double latitude = locationResult.getLocations().get(index).getLatitude();
                                         double longitude = locationResult.getLocations().get(index).getLongitude();
                                         GeoPoint point = new GeoPoint(latitude, longitude);
                                         currentGeoPoint = point;
-//                                        AddressText.setText("Latitude: "+ latitude + "\n" + "Longitude: "+ longitude);
                                         UserManager.getInstance().setGeolocation(point);
                                     }
                                 }
@@ -578,6 +587,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    /**
+     * Prompts the user to enable GPS if it is not already enabled.
+     */
     private void turnOnGPS() {
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
                 .addLocationRequest(locationRequest);
@@ -586,66 +598,59 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Task<LocationSettingsResponse> result = LocationServices.getSettingsClient(getApplicationContext())
                 .checkLocationSettings(builder.build());
 
-        result.addOnCompleteListener(new OnCompleteListener<LocationSettingsResponse>() {
-            @Override
-            public void onComplete(@NonNull Task<LocationSettingsResponse> task) {
-
-                try {
-                    LocationSettingsResponse response = task.getResult(ApiException.class);
-                    Toast.makeText(MainActivity.this, "GPS is already tured on", Toast.LENGTH_SHORT).show();
-
-                } catch (ApiException e) {
-
-                    switch (e.getStatusCode()) {
-                        case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-
-                            try {
-                                ResolvableApiException resolvableApiException = (ResolvableApiException) e;
-                                resolvableApiException.startResolutionForResult(MainActivity.this, 2);
-                            } catch (IntentSender.SendIntentException ex) {
-                                ex.printStackTrace();
-                            }
-                            break;
-
-                        case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                            //Device does not have location
-                            break;
-                    }
+        result.addOnCompleteListener(task -> {
+            try {
+                LocationSettingsResponse response = task.getResult(ApiException.class);
+                Toast.makeText(this, "GPS is already turned on", Toast.LENGTH_SHORT).show();
+            } catch (ApiException e) {
+                switch (e.getStatusCode()) {
+                    case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                        try {
+                            ResolvableApiException resolvable = (ResolvableApiException) e;
+                            resolvable.startResolutionForResult(MainActivity.this, 2);
+                        } catch (IntentSender.SendIntentException ex) {
+                            ex.printStackTrace();
+                        }
+                        break;
+                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                        // Device does not support location services
+                        break;
                 }
             }
         });
-
     }
-    //changed to public method to use inside join waitinglist
+
+    /**
+     * Checks if GPS is enabled on the device.
+     *
+     * @return true if GPS is enabled, false otherwise.
+     */
     public boolean isGPSEnabled() {
-        LocationManager locationManager = null;
-        boolean isEnabled = false;
-
-        if (locationManager == null) {
-            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        }
-
-        isEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        return isEnabled;
-
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        return locationManager != null && locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
     }
 
+    /**
+     * Handles the result of permission requests, specifically for location access.
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        if (requestCode == 1){
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
-
-                if (isGPSEnabled()) {
-                    getCurrentLocation();
-                }else {
-                    turnOnGPS();
-                }
+        if (requestCode == 1 && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            if (isGPSEnabled()) {
+                getCurrentLocation();
+            } else {
+                turnOnGPS();
             }
         }
     }
 
+    /**
+     * Creates a notification channel for sending notifications on devices running Android O and above.
+     *
+     * @param context Application context used to access the notification manager.
+     */
     public void createNotificationChannel(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             String channelId = "my_channel_id";
@@ -663,31 +668,42 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    private void moveToFragment(Fragment movingFragment){
+    /**
+     * Replaces the current fragment with the specified fragment.
+     *
+     * @param movingFragment The fragment to display.
+     */
+    private void moveToFragment(Fragment movingFragment) {
         drawerLayout.closeDrawer(GravityCompat.START);
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, movingFragment)
                 .commit();
     }
 
-    public void loadAdminSidePanel(){
+    /**
+     * Loads the admin-specific side panel menu.
+     */
+    public void loadAdminSidePanel() {
         Menu menu = navigationView.getMenu();
-        menu.clear();  // Clear existing items
+        menu.clear(); // Clear existing items
         navigationView.inflateMenu(R.menu.side_menu_admin);
     }
 
-    public void loadStandardSidePanel(){
+    /**
+     * Loads the standard user-specific side panel menu.
+     */
+    public void loadStandardSidePanel() {
         Menu menu = navigationView.getMenu();
-        menu.clear();  // Clear existing items
+        menu.clear(); // Clear existing items
         navigationView.inflateMenu(R.menu.side_menu_standard);
     }
 
-    public void loadTestSidePanel(){
+    /**
+     * Loads a test-specific side panel menu for debugging or testing purposes.
+     */
+    public void loadTestSidePanel() {
         Menu menu = navigationView.getMenu();
-        menu.clear();  // Clear existing items
+        menu.clear(); // Clear existing items
         navigationView.inflateMenu(R.menu.side_menu_testing);
     }
-
-
-
 }

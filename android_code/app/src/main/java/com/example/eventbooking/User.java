@@ -627,8 +627,6 @@ public class User implements Parcelable{
         }
 
     }
-
-
     /**
      * Checking to see if there is another URL for the user or not
      *
@@ -639,7 +637,6 @@ public class User implements Parcelable{
             return true;
         return false;
     }
-
     /**
      * Setting the called upon profile picture URL to the default
      */
@@ -650,7 +647,6 @@ public class User implements Parcelable{
     public interface OnUserIDGenerated {
         void onUserIDGenerated(String userID);
     }
-
     /**
      * Generating a new user deviceID for testing, in practice this is replaced with get device ID
      * and subsequent calls to that to a singleton

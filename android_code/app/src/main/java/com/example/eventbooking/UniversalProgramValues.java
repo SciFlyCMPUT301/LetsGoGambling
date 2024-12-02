@@ -11,6 +11,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+
+/**
+ * Singleton class to hold global program values and shared data across the application.
+ * Manages instances of users, events, facilities, and other data points, ensuring
+ * consistency throughout the app lifecycle.
+ */
+
 public class UniversalProgramValues {
     private static UniversalProgramValues instance;
     private User single_user;
@@ -43,7 +50,9 @@ public class UniversalProgramValues {
     }
 
 
-
+    /**
+     * Resets the singleton instance, clearing all stored data.
+     */
     public void resetInstance(){
         instance = null;
         single_user = null;

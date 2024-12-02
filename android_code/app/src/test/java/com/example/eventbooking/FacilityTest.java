@@ -3,6 +3,11 @@ package com.example.eventbooking;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+
+import android.util.Log;
 
 import com.example.eventbooking.Facility.Facility;
 import com.google.firebase.firestore.CollectionReference;
@@ -13,13 +18,17 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@RunWith(MockitoJUnitRunner.class)
+// Use PowerMockRunner for tests
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({Log.class}) // Tell PowerMock to prepare the Log class
 public class FacilityTest {
+
     @Mock
     private FirebaseFirestore mockDb;
 
@@ -30,7 +39,13 @@ public class FacilityTest {
 
     @Before
     public void setUp() {
-        // Mock FirebaseFirestore and CollectionReference to prevent real Firebase initialization
+        // Mock static Log methods
+        mockStatic(Log.class);
+
+        // Avoid exceptions when Log.d is called
+        when(Log.d(anyString(), anyString())).thenReturn(0);
+
+        // Initialize the test object
         MockitoAnnotations.initMocks(this);
         facility = new Facility(mockDb, mockFacilitiesRef);
     }
@@ -71,6 +86,7 @@ public class FacilityTest {
         events.add("Event1");
         events.add("Event2");
         facility.setAllEvents(events);
+
         assertEquals(events, facility.getAllEvents());
         assertTrue(facility.getAllEvents().contains("Event1"));
         assertTrue(facility.getAllEvents().contains("Event2"));

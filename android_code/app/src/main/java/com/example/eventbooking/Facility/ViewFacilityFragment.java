@@ -76,7 +76,9 @@ public class ViewFacilityFragment extends Fragment {
     }
 
     /**
-     * Load the facility for the current organizer from Firestore.
+     * Loads the facility for the current organizer from Firestore.
+     * It retrieves the facility associated with the current organizer and
+     * populates the fields in the fragment with the data.
      */
     private void loadFacility() {
         db.collection("Facilities")
@@ -96,9 +98,10 @@ public class ViewFacilityFragment extends Fragment {
                 })
                 .addOnFailureListener(e -> Toast.makeText(getContext(), "Error loading facility: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
-
     /**
-     * Save the facility details to Firestore.
+     * Saves the facility details to Firestore.
+     * This method checks whether the facility ID is null. If it is null, a new facility is created;
+     * otherwise, the existing facility is updated with the new data entered by the user.
      */
     private void saveFacility() {
         String facilityName = editFacilityName.getText().toString().trim();
@@ -134,9 +137,9 @@ public class ViewFacilityFragment extends Fragment {
         }
         navigateToHomeFragment();
     }
-
     /**
-     * Delete the current facility.
+     * Deletes the current facility.
+     * This method will delete the facility from Firestore if the facility ID exists.
      */
     private void deleteFacility() {
         if (facilityId == null) {
@@ -155,7 +158,8 @@ public class ViewFacilityFragment extends Fragment {
     }
 
     /**
-     * Clear the input form.
+     * Clears the input form fields and resets the facility ID.
+     * This is called after a successful deletion to reset the form for a new facility.
      */
     private void clearForm() {
         editFacilityName.setText("");
@@ -165,7 +169,8 @@ public class ViewFacilityFragment extends Fragment {
     }
 
     /**
-     * Navigate back to the HomeFragment.
+     * Navigates back to the HomeFragment.
+     * This method is called when the user clicks the cancel or go back button.
      */
     private void navigateToHomeFragment() {
         getParentFragmentManager().beginTransaction()

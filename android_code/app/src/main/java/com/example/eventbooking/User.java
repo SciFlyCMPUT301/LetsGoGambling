@@ -238,6 +238,8 @@ public class User implements Parcelable{
     }
 
 
+
+
     /**
      * This getter and setter is more unique as it is a set that we are looking at and wanting to
      * add or check if the role exists, also remove role if such a role exists

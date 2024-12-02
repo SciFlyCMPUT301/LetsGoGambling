@@ -5,6 +5,7 @@ import android.util.Log;
 import com.example.eventbooking.Admin.Images.ImageClass;
 import com.example.eventbooking.Events.EventData.Event;
 import com.example.eventbooking.Facility.Facility;
+import com.example.eventbooking.waitinglist.WaitingList;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -145,6 +146,15 @@ public class UniversalProgramValues {
         }
     }
 
+    public User queryUser(String deviceId){
+        for(int i = 0; i < userList.size(); i++){
+            if(Objects.equals(userList.get(i).getDeviceID(), deviceId)){
+                return userList.get(i);
+            }
+        }
+        return null;
+    }
+
     public void setEventList(List <Event> importList){
         eventList = new ArrayList<>();
         for(int i = 0; i<importList.size(); i++){
@@ -188,6 +198,33 @@ public class UniversalProgramValues {
         for(int i = 0; i < eventList.size(); i++){
             if(Objects.equals(eventList.get(i).getEventId(), eventID)){
                 eventList.remove(i);
+                return;
+            }
+        }
+    }
+
+    public void changeAllEventsOrganizer(String organizer){
+        for(int i = 0; i < eventList.size(); i++){
+            eventList.get(i).setOrganizerId(organizer);
+        }
+    }
+
+    public Event queryEvent(String eventId){
+        for(int i = 0; i < eventList.size(); i++){
+            if(Objects.equals(eventList.get(i).getEventId(), eventId)){
+                return eventList.get(i);
+            }
+        }
+        return null;
+    }
+
+    public void updateEventWaitlist(String eventId, WaitingList waitlist){
+        for(int i = 0; i < eventList.size(); i++){
+            if(Objects.equals(eventList.get(i).getEventId(), eventId)){
+                eventList.get(i).setAcceptedParticipantIds(waitlist.getAcceptedParticipantIds());
+                eventList.get(i).setCanceledParticipantIds(waitlist.getCanceledParticipantIds());
+                eventList.get(i).setWaitingParticipantIds(waitlist.getWaitingParticipantIds());
+                eventList.get(i).setSignedUpParticipantIds(waitlist.getSignedUpParticipantIds());
                 return;
             }
         }
@@ -244,6 +281,33 @@ public class UniversalProgramValues {
             }
         }
         return false;
+    }
+
+    public Facility queryFacility(String facilityId){
+        for(int i = 0; i < facilityList.size(); i++){
+            if(Objects.equals(facilityList.get(i).getFacilityID(), facilityId)){
+                return facilityList.get(i);
+            }
+        }
+        return null;
+    }
+
+    public Boolean queryFacilityOrganizer(String organizerId){
+        for(int i = 0; i < facilityList.size(); i++){
+            if(Objects.equals(facilityList.get(i).getOrganizer(), organizerId)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Facility queryFacilityByOrganizer(String organizerId){
+        for(int i = 0; i < facilityList.size(); i++){
+            if(Objects.equals(facilityList.get(i).getOrganizer(), organizerId)){
+                return facilityList.get(i);
+            }
+        }
+        return null;
     }
 
 

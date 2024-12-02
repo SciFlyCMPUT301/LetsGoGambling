@@ -86,6 +86,7 @@ public class SampleTable {
             user.addRole(Role.ORGANIZER);
             user.addRole(Role.ENTRANT);
             user.setLocation(getRandomLocation());
+            user.setFacilityAssociated(true);
             if(!UniversalProgramValues.getInstance().getTestingMode()) {
                 String profileURL = user.defaultProfilePictureUrl(user.getUsername()).toString();
                 user.setdefaultProfilePictureUrl(profileURL);
@@ -112,6 +113,7 @@ public class SampleTable {
             user.addRole(Role.ORGANIZER);
             user.addRole(Role.ENTRANT);
             user.setLocation(getRandomLocation());
+            user.setFacilityAssociated(true);
             if(!UniversalProgramValues.getInstance().getTestingMode()) {
                 String profileURL = user.defaultProfilePictureUrl(user.getUsername()).toString();
                 user.setdefaultProfilePictureUrl(profileURL);
@@ -213,6 +215,12 @@ public class SampleTable {
             event.setMaxParticipants(20);
             event.setOrganizerId(organizer_list.get(i-1).getDeviceID());
             event.setEventPictureUrl("Event Picture URL" + i);
+            if(UniversalProgramValues.getInstance().getTestingMode()){
+                event.setDefaultEventpictureurl("https://fastly.picsum.photos/id/1033/200/300.jpg?hmac=856_WOyaGXSjI4FWe3_NCHU7frPtAEJaHnAJja5TMNk");
+                event.setEventPictureUrl("https://fastly.picsum.photos/id/532/200/200.jpg?hmac=PPwpqfjXOagQmhd_K7H4NXyA4B6svToDi1IbkDW2Eos");
+            }
+
+
             QRcodeGenerator qrCodeGenerator = new QRcodeGenerator();
             String hashInput = event.getEventId() + Calendar.getInstance().getTime();
             String qrCodeHash = qrCodeGenerator.createQRCodeHash(hashInput);

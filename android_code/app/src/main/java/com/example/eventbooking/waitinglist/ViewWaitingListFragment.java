@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.example.eventbooking.R;
+import com.example.eventbooking.UniversalProgramValues;
 
 import java.util.List;
 
@@ -57,13 +58,22 @@ public class ViewWaitingListFragment extends Fragment {
         waitingList = new WaitingList(eventId);
 
         // Load data from Firebase for this WaitingList instance
-        waitingList.loadFromFirebase().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                displayWaitingList();
-            } else {
-                Toast.makeText(getContext(), "Failed to load waiting list data from Firebase.", Toast.LENGTH_SHORT).show();
-            }
-        });
+        if(!UniversalProgramValues.getInstance().getTestingMode()){
+            waitingList.loadFromFirebase().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    displayWaitingList();
+                } else {
+                    Toast.makeText(getContext(), "Failed to load waiting list data from Firebase.", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+        else{
+            waitingList.setWaitingParticipantIds(UniversalProgramValues.getInstance().queryEvent(eventId).getWaitingParticipantIds());
+            waitingList.setAcceptedParticipantIds(UniversalProgramValues.getInstance().queryEvent(eventId).getAcceptedParticipantIds());
+            waitingList.setSignedUpParticipantIds(UniversalProgramValues.getInstance().queryEvent(eventId).getSignedUpParticipantIds());
+            waitingList.setCanceledParticipantIds(UniversalProgramValues.getInstance().queryEvent(eventId).getCanceledParticipantIds());
+
+        }
     }
 
     @Override
@@ -77,6 +87,7 @@ public class ViewWaitingListFragment extends Fragment {
         Log.d("Waiting List View", "On Create View EventID: " + eventId);
         // Set up back button listener
         backButton.setOnClickListener(v -> navigateBackToOrganizerMenu());
+        displayWaitingList();
 
         return rootView;
     }

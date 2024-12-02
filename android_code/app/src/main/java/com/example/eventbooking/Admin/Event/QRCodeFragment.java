@@ -17,7 +17,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.eventbooking.Admin.AdminFragment;
-import com.example.eventbooking.Admin.QRcode.QRcodeViewAdapter;
 import com.example.eventbooking.Events.EventData.Event;
 import com.example.eventbooking.QRCode.QRcodeGenerator;
 import com.example.eventbooking.R;
@@ -37,7 +36,6 @@ import java.util.ArrayList;
 public class QRCodeFragment extends Fragment {
     private FirebaseFirestore db;
     private Button eventGoBack, removeButton;
-    private QRcodeViewAdapter qrcodeAdapter;
     private ArrayList<Event> qrcodeList;
     private ListView qrcodeListView;
     private Event selectedQRcode = null;

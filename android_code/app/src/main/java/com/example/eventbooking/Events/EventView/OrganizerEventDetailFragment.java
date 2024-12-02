@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.eventbooking.Events.EventData.Event;
 import com.example.eventbooking.R;
+import com.example.eventbooking.UniversalProgramValues;
 import com.example.eventbooking.waitinglist.OrganizerMenuFragment;
 import com.example.eventbooking.UserManager;
 
@@ -72,18 +73,26 @@ public class OrganizerEventDetailFragment extends Fragment {
         userId = UserManager.getInstance().getUserId();
 
         // Fetch event data based on eventId
-        Event.findEventById(eventId, event -> {
-            if (event != null) {
-                this.event = event;
-                displayEventDetails(event);
-            } else {
-                Toast.makeText(getContext(), "Event not found", Toast.LENGTH_SHORT).show();
+        if(!UniversalProgramValues.getInstance().getTestingMode()){
+            Event.findEventById(eventId, event -> {
+                if (event != null) {
+                    this.event = event;
+                    displayEventDetails(event);
+                } else {
+                    Toast.makeText(getContext(), "Event not found", Toast.LENGTH_SHORT).show();
+                    getActivity().getSupportFragmentManager().popBackStack();
+                }
+            }, e -> {
+                Toast.makeText(getContext(), "Error fetching event: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 getActivity().getSupportFragmentManager().popBackStack();
-            }
-        }, e -> {
-            Toast.makeText(getContext(), "Error fetching event: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            getActivity().getSupportFragmentManager().popBackStack();
-        });
+            });
+        }
+        else{
+            this.event = UniversalProgramValues.getInstance().queryEvent(eventId);
+            displayEventDetails(event);
+
+        }
+
 
         // Set up navigation to OrganizerMenuFragment
         organizerMenuButton.setOnClickListener(v -> navigateToOrganizerMenu());

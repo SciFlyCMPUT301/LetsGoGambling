@@ -478,6 +478,22 @@ FirebaseTesting --> "1" SampleTable : uses
 FirebaseTestingActivity +-- ImageData
 TestFragment +-- ImageData
 
+class MyNotificationManager {
+    - FirebaseFirestore fb
+    + MyNotificationManager(FirebaseFirestore fb)
+    + Task<QuerySnapshot> getUserNotifications(String userId)
+    + Task<Void> createNotification(Notification notification)
+    + Task<Void> updateNotification(Notification notification)
+    + void notifyUserUnread(String userId, Context context)
+}
+
+class NotificationArrayAdapter {
+    - Context context
+    - List<Notification> notificationList
+    + NotificationArrayAdapter(@NonNull Context context, List<Notification> notificationList)
+    + View getView(int position, View convertView, ViewGroup parent)
+}
+
 class NotificationFragment {
     - ARG_INTEGER : String
     - receivedInteger : int

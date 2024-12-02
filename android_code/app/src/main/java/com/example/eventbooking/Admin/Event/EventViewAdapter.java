@@ -67,7 +67,7 @@ public class EventViewAdapter extends ArrayAdapter<Event> {
 
 //        //get the image associated with this property
         // Load the event image using Picasso
-        String profilePictureUrl = event.getImageUrl();
+        String profilePictureUrl = event.getEventPosterURL();
         if (profilePictureUrl != null && !profilePictureUrl.isEmpty()) {
             Picasso.get()
                     .load(profilePictureUrl) // URL of the image

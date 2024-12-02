@@ -157,7 +157,7 @@ public class EventViewFragment extends Fragment {
 
         // Load event poster image (assume you have a method to do this)
         // loadImageIntoView(event.getImageUrl(), eventPosterImage);
-        String posterPictureUrl = event.getImageUrl();
+        String posterPictureUrl = event.getEventPosterURL();
         if (posterPictureUrl != null && !posterPictureUrl.isEmpty()) {
             Picasso.get()
                     .load(posterPictureUrl) // URL of the image

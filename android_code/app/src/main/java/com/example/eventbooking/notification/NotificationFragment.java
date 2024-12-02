@@ -55,8 +55,6 @@ public class NotificationFragment extends Fragment {
         if(!UniversalProgramValues.getInstance().getTestingMode())
         {
             MyNotificationManager nm = new MyNotificationManager(FirebaseFirestore.getInstance());
-
-
             // get user's notifications and display them
             nm.getUserNotifications(currentUserId).addOnSuccessListener(queryDocumentSnapshots -> {
                 List<Notification> notifications = new ArrayList<>();

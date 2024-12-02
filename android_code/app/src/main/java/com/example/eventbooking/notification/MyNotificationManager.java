@@ -2,8 +2,11 @@ package com.example.eventbooking.notification;
 
 import android.Manifest;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.util.Log;
 
 import androidx.core.app.ActivityCompat;
@@ -98,6 +101,46 @@ public class MyNotificationManager {
                 if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
                     notificationManager.notify(notif.getNotificationId().hashCode(), builder.build());
                 }
+            }
+        });
+    }
+
+
+    /**
+     * Creates a new notification in Firestore and sends a system notification with a deep link.
+     *
+     * @param notification The Notification object to be added to Firestore.
+     * @param eventUrl     The deep link URL to be included in the notification.
+     * @param context      The context in which the notification is created, typically an activity or service.
+     */
+    public void createNotificationWithUrl(Notification notification, String eventUrl, Context context) {
+        createNotification(notification).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                String channelId = "my_channel_id";
+
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(eventUrl));
+                PendingIntent pendingIntent = PendingIntent.getActivity(
+                        context,
+                        0,
+                        intent,
+                        PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+                );
+
+                NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelId)
+                        .setSmallIcon(R.drawable.ic_notification_foreground)
+                        .setContentTitle(notification.getTitle())
+                        .setContentText(notification.getText())
+                        .setContentIntent(pendingIntent)
+                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                        .setAutoCancel(true);
+
+                NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
+
+                if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+                    notificationManager.notify(notification.getNotificationId().hashCode(), builder.build());
+                }
+            } else {
+                Log.e("NotificationManager", "Failed to save notification to Firestore", task.getException());
             }
         });
     }

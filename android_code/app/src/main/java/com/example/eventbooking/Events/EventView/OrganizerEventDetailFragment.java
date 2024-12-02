@@ -70,7 +70,6 @@ public class OrganizerEventDetailFragment extends Fragment {
         // Retrieve arguments
         if (getArguments() != null) {
             eventId = getArguments().getString("eventId");
-
         }
         userId = UserManager.getInstance().getUserId();
 
@@ -92,7 +91,6 @@ public class OrganizerEventDetailFragment extends Fragment {
         else{
             this.event = UniversalProgramValues.getInstance().queryEvent(eventId);
             displayEventDetails(event);
-
         }
 
 

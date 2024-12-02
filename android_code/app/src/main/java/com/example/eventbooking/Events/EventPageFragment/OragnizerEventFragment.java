@@ -11,6 +11,7 @@ import android.widget.ListView;
 import androidx.fragment.app.Fragment;
 
 import com.example.eventbooking.Events.EventCreate.EventCreateFragment;
+import com.example.eventbooking.Events.EventCreate.EventEditFragment;
 import com.example.eventbooking.Events.EventData.Event;
 import com.example.eventbooking.Events.EventView.OrganizerEventDetailFragment;
 import com.example.eventbooking.Facility.FacilityCreateFragment;
@@ -19,6 +20,7 @@ import com.example.eventbooking.Home.HomeUserEventAdapter;
 import com.example.eventbooking.R;
 import com.example.eventbooking.UniversalProgramValues;
 import com.example.eventbooking.UserManager;
+import com.example.eventbooking.waitinglist.OrganizerMenuFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,11 +80,16 @@ public class OragnizerEventFragment  extends Fragment{
                 usersEventListView.setOnItemClickListener((parent, view, position, id) -> {
                     Event selectedEvent = organizerEvents.get(position);
                     // EventViewFragment eventViewFragment = EventViewFragment.newInstance(selectedEvent.getEventId(), currentUserId);
-                    OrganizerEventDetailFragment eventDetailView = OrganizerEventDetailFragment.newInstance(selectedEvent.getEventId());
+                    EventEditFragment eventEditFragment = EventEditFragment.newInstance(selectedEvent);
                     getParentFragmentManager().beginTransaction()
-                            .replace(R.id.fragment_container, eventDetailView)
+                            .replace(R.id.fragment_container, eventEditFragment)
                             .addToBackStack(null) // Ensures returning to OragnizerEventFragment
                             .commit();
+//                    OrganizerEventDetailFragment eventDetailView = OrganizerEventDetailFragment.newInstance(selectedEvent.getEventId());
+//                    getParentFragmentManager().beginTransaction()
+//                            .replace(R.id.fragment_container, eventDetailView)
+//                            .addToBackStack(null) // Ensures returning to OragnizerEventFragment
+//                            .commit();
                 });
             }, e -> {
                 Log.e("OragnizerEventFragment", "Failed to fetch events: " + e.getMessage());
@@ -98,11 +105,17 @@ public class OragnizerEventFragment  extends Fragment{
             usersEventListView.setOnItemClickListener((parent, view, position, id) -> {
                 Event selectedEvent = organizerEventList.get(position);
                 // EventViewFragment eventViewFragment = EventViewFragment.newInstance(selectedEvent.getEventId(), currentUserId);
-                OrganizerEventDetailFragment eventDetailView = OrganizerEventDetailFragment.newInstance(selectedEvent.getEventId());
+//                OrganizerEventDetailFragment eventDetailView = OrganizerEventDetailFragment.newInstance(selectedEvent.getEventId());
+//                getParentFragmentManager().beginTransaction()
+//                        .replace(R.id.fragment_container, eventDetailView)
+//                        .addToBackStack(null) // Ensures returning to OragnizerEventFragment
+//                        .commit();
+                EventEditFragment editEventFragment = EventEditFragment.newInstance(selectedEvent);
                 getParentFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, eventDetailView)
-                        .addToBackStack(null) // Ensures returning to OragnizerEventFragment
+                        .replace(R.id.fragment_container, editEventFragment)
+                        .addToBackStack(null)
                         .commit();
+
             });
 
         }
@@ -148,5 +161,8 @@ public class OragnizerEventFragment  extends Fragment{
         // Return the root view of the fragment
         return rootView;
     }
+
+
+
 
 }

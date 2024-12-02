@@ -335,28 +335,41 @@ public class Event implements Parcelable {
     }
     public void addAcceptedParticipantId(String participantId){acceptedParticipantIds.add(participantId);}
     public void setAcceptedParticipantIds(List <String> acceptedList){
-        this.acceptedParticipantIds = new ArrayList<>(acceptedList);
+        if(acceptedList != null)
+            this.acceptedParticipantIds = new ArrayList<>(acceptedList);
+        else
+            this.acceptedParticipantIds = new ArrayList<>();
     }
     public List<String> getCanceledParticipantIds() {
         return canceledParticipantIds;
     }
     public void addCanceledParticipantIds(String participantId){canceledParticipantIds.add(participantId);}
     public void setCanceledParticipantIds(List <String> canceledList){
-        this.canceledParticipantIds = new ArrayList<>(canceledList);
+        if(canceledList != null)
+            this.canceledParticipantIds = new ArrayList<>(canceledList);
+        else
+            this.canceledParticipantIds = new ArrayList<>();
     }
     public List<String> getSignedUpParticipantIds() {
         return signedUpParticipantIds;
     }
     public void addSignedUpParticipantIds(String participantId){signedUpParticipantIds.add(participantId);}
     public void setSignedUpParticipantIds(List <String> signedUpList){
-        this.signedUpParticipantIds = new ArrayList<>(signedUpList);
+        if(signedUpList != null)
+            this.signedUpParticipantIds = new ArrayList<>(signedUpList);
+        else
+            this.signedUpParticipantIds = new ArrayList<>();
     }
     public List<String> getWaitingParticipantIds() {
         return waitingparticipantIds;
     }
     public void addWaitingParticipantIds(String participantId){waitingparticipantIds.add(participantId);}
     public void setWaitingParticipantIds(List <String> waitingList){
-        this.waitingparticipantIds = new ArrayList<>(waitingList);
+        this.waitingparticipantIds = new ArrayList<>();
+        if(waitingList != null)
+            this.waitingparticipantIds = new ArrayList<>(waitingList);
+        else
+            this.waitingparticipantIds = new ArrayList<>();
     }
     public void removeWaitingParticipantId(String participantId){
         if(waitingparticipantIds.contains(participantId)){
@@ -656,7 +669,18 @@ public class Event implements Parcelable {
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     List<Event> userEvents = new ArrayList<>();
                     for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
-                        Event event = doc.toObject(Event.class);
+                        Event event = new Event();
+                        event = doc.toObject(Event.class);
+//                        if(event.getWaitingParticipantIds() == null)
+//                            event.setWaitingParticipantIds(new ArrayList<>());
+
+                        Log.d("Events", "UserID: " + userId);
+                        Log.d("Events", "eventID: " + event.getEventId());
+                        Log.d("Events", "Wait: " + event.getWaitingParticipantIds().size());
+                        Log.d("Events", "Accpet: " + event.getAcceptedParticipantIds().size());
+                        Log.d("Events", "canale: " + event.getCanceledParticipantIds().size());
+                        Log.d("Events", "sign: " + event.getSignedUpParticipantIds().size());
+
                         if (event != null &&
                                 (event.getAcceptedParticipantIds().contains(userId)
                                         || event.getWaitingParticipantIds().contains(userId)

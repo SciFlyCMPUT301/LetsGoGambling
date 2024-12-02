@@ -82,7 +82,12 @@ public class QRcodeGenerator {
             e.printStackTrace(); // Handle I/O errors
         }
     }
-
+    /**
+     * Creates a SHA-256 hash of the provided text.
+     *
+     * @param textToHash the text to hash
+     * @return the SHA-256 hash as a hexadecimal string, or null if an error occurs
+     */
     public String createQRCodeHash(String textToHash){
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -102,7 +107,13 @@ public class QRcodeGenerator {
 
     }
 
-
+    /**
+     * Generates a QR code for an event based on the event ID.
+     * The event URL is constructed by appending the event ID and its hash to the URL.
+     *
+     * @param eventId the unique event ID used to generate the QR code
+     * @return the generated QR code Bitmap, or null if an error occurs
+     */
     public static Bitmap generateAndSendBackQRCode(String eventId){
         Log.d("QR Code Generator", "Generate and Save: " + eventId);
         QRcodeGenerator temp = new QRcodeGenerator();

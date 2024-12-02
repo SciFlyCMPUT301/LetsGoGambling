@@ -1,3 +1,4 @@
+package com.example.eventbooking;
 /**
  * Model class representing a notification intended for a user.
  * Notifications provide information related to a specific event 

@@ -61,13 +61,13 @@
             android:layout_marginBottom="8dp"
             android:visibility="gone"/>
 
-        <EditText
+        <!--<EditText
             android:id="@+id/event_date_time"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Date,Time"
             android:inputType="datetime"
-            android:layout_marginBottom="8dp" />
+            android:layout_marginBottom="8dp" />-->
 
         <EditText
             android:id="@+id/event_location"

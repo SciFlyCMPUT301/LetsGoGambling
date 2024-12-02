@@ -39,6 +39,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EventMapFragment extends Fragment {
+    /**
+     * Fragment for displaying a Google Map with user locations for an event.
+     * Allows users to view and interact with participant markers based on selected list types.
+     */
 
     private MapView mapView;
     private EditText eventIdEditText;
@@ -51,6 +55,12 @@ public class EventMapFragment extends Fragment {
     private String eventID;
     private Event selectedEvent = null;
 
+    /**
+     * Creates a new instance of EventMapFragment with the specified Event ID.
+     *
+     * @param eventID The ID of the event.
+     * @return A new instance of EventMapFragment.
+     */
     public static EventMapFragment newInstance(String eventID) {
         EventMapFragment fragment = new EventMapFragment();
         Bundle args = new Bundle();
@@ -59,6 +69,12 @@ public class EventMapFragment extends Fragment {
         return fragment;
     }
 
+    /**
+     * Creates a new instance of EventMapFragment with the specified Event.
+     *
+     * @param selectedEvent parcelable instance of the event
+     * @return A new instance of EventMapFragment.
+     */
     public static EventMapFragment newInstance(Event selectedEvent) {
         EventMapFragment fragment = new EventMapFragment();
         Bundle args = new Bundle();
@@ -157,7 +173,13 @@ public class EventMapFragment extends Fragment {
         super.onDestroy();
         mapView.onDetach(); // Prevent memory leaks
     }
-
+    /**
+     * Loads a user from Firestore by their ID.
+     *
+     * @param userId   The ID of the user to load.
+     * @param onSuccess Callback for successful user loading.
+     * @param onFailure Callback for failure in user loading.
+     */
     private void loadUserFromFirebase(String userId, OnSuccessListener<User> onSuccess, OnFailureListener onFailure) {
         Log.d("Event Map", "Load UserID");
         db.collection("Users").document(userId).get().addOnSuccessListener(documentSnapshot -> {
@@ -171,7 +193,12 @@ public class EventMapFragment extends Fragment {
             }
         }).addOnFailureListener(onFailure);
     }
-
+    /**
+     * Loads event users from Firestore and adds markers to the map.
+     *
+     * @param eventId  The ID of the event.
+     * @param listType The type of user list to load (e.g., "Waitlist").
+     */
     private void loadEventUsers(String eventId, String listType) {
         if(eventID != null){
             db.collection("Events").document(eventId).get().addOnSuccessListener(documentSnapshot -> {
@@ -239,7 +266,11 @@ public class EventMapFragment extends Fragment {
         }
 
     }
-
+    /**
+     * Adds markers for users to the map based on their locations.
+     *
+     * @param userIds List of user IDs to add markers for.
+     */
     private void addMarkersForUsers(List<String> userIds) {
         Log.d("Event Map", "Marker start");
         mapView.getOverlays().clear(); // Clear previous markers
@@ -274,7 +305,11 @@ public class EventMapFragment extends Fragment {
 
         mapView.invalidate();
     }
-
+    /**
+     * Displays a popup with user details when a marker is clicked.
+     *
+     * @param user The User object attached to the marker.
+     */
     private void showUserDialog(User user) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle(user.getUsername());

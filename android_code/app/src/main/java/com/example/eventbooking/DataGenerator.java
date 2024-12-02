@@ -11,25 +11,25 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
-
 /**
  * This class is responsible for generating sample data for users, facilities, and events,
  * and uploading them to a Firebase Firestore database.
  * <p>
  * It creates a set of users with different roles (Admin, Organizer, Entrant), a set of facilities
- * with assigned organizers,and events that are linked to users and facilities.
- * The generated data is then uploaded asynchronously to Firestore.
+ * with assigned organizers, and events that are linked to users and facilities. The generated
+ * data is then uploaded asynchronously to Firestore.
  */
 public class DataGenerator {
 
     private List<User> userList;
     private List<Facility> facilityList;
     private List<Event> eventList;
-
     private FirebaseFirestore db;
 
     /**
-     * Constructor for the Data Generator class to instantiate the lists so they are not null
+     * Constructor for the DataGenerator class.
+     * <p>
+     * Initializes the Firebase Firestore instance and lists for users, facilities, and events.
      */
     public DataGenerator() {
         db = FirebaseFirestore.getInstance();
@@ -37,8 +37,11 @@ public class DataGenerator {
         facilityList = new ArrayList<>();
         eventList = new ArrayList<>();
     }
+
     /**
-     *
+     * Orchestrates the process of generating and uploading data.
+     * <p>
+     * Calls methods to generate users, facilities, and events, then uploads the data to Firestore.
      */
     public void generateAndUploadData() {
         generateUsers();
@@ -47,6 +50,11 @@ public class DataGenerator {
         uploadData();
     }
 
+    /**
+     * Generates a list of sample users with predefined roles.
+     * <p>
+     * Users are assigned the roles Admin, Organizer, or Entrant based on their index.
+     */
     private void generateUsers() {
         userList.clear();
         for (int i = 1; i <= 10; i++) {
@@ -69,6 +77,11 @@ public class DataGenerator {
         }
     }
 
+    /**
+     * Generates a list of sample facilities.
+     * <p>
+     * Each facility is associated with an organizer from the user list.
+     */
     private void generateFacilities() {
         facilityList.clear();
         for (int i = 3; i <= 5; i++) {
@@ -81,6 +94,11 @@ public class DataGenerator {
         }
     }
 
+    /**
+     * Generates a list of sample events.
+     * <p>
+     * Events are associated with facilities and organizers, and have a predefined list of participants.
+     */
     private void generateEvents() {
         eventList.clear();
         Random random = new Random();
@@ -89,7 +107,7 @@ public class DataGenerator {
             event.setEventId("event" + i);
             event.setEventTitle("Event Title " + i);
             event.setDescription("Description for event " + i);
-            event.setTimestamp(System.currentTimeMillis() + i * 86400000); // Next few days
+            event.setTimestamp(System.currentTimeMillis() + i * 86400000); // Scheduled for upcoming days
             event.setMaxParticipants(10);
 
             // Assign location from facilities
@@ -113,6 +131,11 @@ public class DataGenerator {
         }
     }
 
+    /**
+     * Uploads the generated data (users, facilities, and events) to Firebase Firestore.
+     * <p>
+     * The upload process is handled asynchronously in three steps: users, then facilities, and finally events.
+     */
     private void uploadData() {
         // Step 1: Upload Users
         List<Task<Void>> userUploadTasks = new ArrayList<>();

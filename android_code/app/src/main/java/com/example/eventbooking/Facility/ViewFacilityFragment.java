@@ -22,6 +22,14 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Fragment for viewing, editing, and deleting a facility.
+ * <p>
+ * This fragment allows organizers to view the details of their associated facility,
+ * update facility information, and delete the facility if necessary. Each organizer can
+ * only manage one facility.
+ * </p>
+ */
 public class ViewFacilityFragment extends Fragment {
 
     private EditText editFacilityName, editFacilityId, editFacilityLocation;
@@ -30,6 +38,15 @@ public class ViewFacilityFragment extends Fragment {
     private String organizerId; // Dynamically fetched organizer ID
     private String facilityId; // The ID of the facility associated with the organizer
 
+    /**
+     * Called when the fragment's view is created. Sets up UI components, initializes Firebase,
+     * and loads the organizer's facility details.
+     *
+     * @param inflater           The LayoutInflater object that can be used to inflate any views in the fragment.
+     * @param container          The parent view that the fragment's UI should be attached to.
+     * @param savedInstanceState A bundle containing saved state, if any.
+     * @return The view hierarchy associated with the fragment.
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

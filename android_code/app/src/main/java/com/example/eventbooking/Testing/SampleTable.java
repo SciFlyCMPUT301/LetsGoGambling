@@ -217,6 +217,7 @@ public class SampleTable {
             event.setDescription("Description for event " + i);
             event.setTimestamp(System.currentTimeMillis() + i * 100000);
             event.setMaxParticipants(20);
+            event.setMa
             event.setOrganizerId(organizer_list.get(i-1).getDeviceID());
             event.setEventPosterURL("Event Picture URL" + i);
             if(UniversalProgramValues.getInstance().getTestingMode()){

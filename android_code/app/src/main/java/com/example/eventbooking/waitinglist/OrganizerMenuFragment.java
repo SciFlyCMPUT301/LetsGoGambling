@@ -497,8 +497,11 @@ public class OrganizerMenuFragment extends Fragment {
 
     }
     /**
-     * dipslay the current poster, if there is a custom poster will display the current poster
-     * else would display the default poster */
+     * Displays the current poster image.
+     * <p>
+     * If there is a custom poster associated with the current event, it displays that poster.
+     * Otherwise, the default placeholder image will be shown.
+     */
     private void displayCurrentPoster() {
         if (currentEvent == null) {
             posterImageView.setImageResource(R.drawable.placeholder_image_foreground);
@@ -516,23 +519,30 @@ public class OrganizerMenuFragment extends Fragment {
                     .into(posterImageView);
         }
     }
+
     /**
-     * remove the user custom poster, replace with the default poster */
+     * Removes the custom poster for the current event and replaces it with the default poster.
+     * <p>
+     * Handles both production mode and testing mode scenarios.
+     * <p>
+     * In production, it removes the custom poster from Firebase, uploads the default poster,
+     * and updates the display. In testing mode, it directly updates the local values.
+     */
     private void removePoster() {
         if (currentEvent == null) {
             Toast.makeText(getContext(), "Event not loaded.", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Remove the custom poster and switch to default
-        if(!UniversalProgramValues.getInstance().getTestingMode()){
+        if (!UniversalProgramValues.getInstance().getTestingMode()) {
             currentEvent.deleteSelectedPosterFromFirebase(currentEvent.getImageUrl())
                     .addOnSuccessListener(aVoid -> {
                         currentEvent.uploadDefaultPoster(currentEvent.getEventTitle())
                                 .addOnSuccessListener(defaultPoster -> {
-                                    displayCurrentPoster(); // Display the default poster
+                                    displayCurrentPoster();
                                     Toast.makeText(getContext(), "Custom poster removed. Default poster is now active.", Toast.LENGTH_SHORT).show();
-                                }) .addOnFailureListener(e -> {
+                                })
+                                .addOnFailureListener(e -> {
                                     Toast.makeText(getContext(), "Failed to reset poster to default.", Toast.LENGTH_SHORT).show();
                                     Log.e("OrganizerMenuFragment", "Error resetting poster to default", e);
                                 });
@@ -541,26 +551,23 @@ public class OrganizerMenuFragment extends Fragment {
                         Toast.makeText(getContext(), "Failed to remove custom poster.", Toast.LENGTH_SHORT).show();
                         Log.e("OrganizerMenuFragment", "Error removing poster", e);
                     });
-        }
-        else{
+        } else {
             currentEvent.setEventPictureUrl(currentEvent.getDefaultEventpictureurl());
             UniversalProgramValues.getInstance().queryEvent(currentEvent.getEventId()).setEventPictureUrl(currentEvent.getDefaultEventpictureurl());
         }
-
     }
 
-
     /**
-     * let organizer to move all the accepted(selected) entrant to the cancelled list since
-     * they didn't sign up for the event*/
-    //cancel entrant didnot signup
-    //make up a click listener, retrive the accepted list, remove them and add to the cancelled
+     * Cancels participation of accepted entrants who did not sign up for the event.
+     * <p>
+     * Moves all participants from the accepted list to the canceled list and sends notifications to affected users.
+     * Updates Firebase in production mode or local data in testing mode.
+     */
     private void cancelEntrant() {
         if (waitingList == null) {
             Toast.makeText(getContext(), "Waiting list not loaded.", Toast.LENGTH_SHORT).show();
             return;
         }
-
 
         List<String> acceptedParticipants = waitingList.getAcceptedParticipantIds();
         if (acceptedParticipants.isEmpty()) {
@@ -568,48 +575,35 @@ public class OrganizerMenuFragment extends Fragment {
             return;
         }
 
-
-        // Move all accepted participants to the canceled list
         waitingList.getCanceledParticipantIds().addAll(acceptedParticipants);
-
-
-        // Clear the accepted participants list
         acceptedParticipants.clear();
 
-
-        // Update Firebase
-        if(!UniversalProgramValues.getInstance().getTestingMode()){
+        if (!UniversalProgramValues.getInstance().getTestingMode()) {
             waitingList.updateToFirebase().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
-
                     String notifText = "You have been removed from the accepted participant list.";
                     String notifTitle = "Removed from event list";
                     for (String user : waitingList.getCanceledParticipantIds()) {
                         Notification notif = new Notification(eventId, notifText, notifTitle, user);
                         notificationManager.createNotification(notif);
                     }
-
                     Toast.makeText(getContext(), "Non-signed-up participants canceled successfully.", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(getContext(), "Failed to update Firebase.", Toast.LENGTH_SHORT).show();
                 }
             });
-        }
-        else{
+        } else {
             UniversalProgramValues.getInstance().updateEventWaitlist(eventId, waitingList);
         }
     }
 
     /**
-     * This function is for testing and meant to replace the pickimagelauncher
+     * Launches a test image picker to simulate selecting an image for upload.
+     * <p>
+     * Directly uses a predefined image URI for testing purposes and initiates the upload process.
      */
-    private void launchTestImagePicker(){
+    private void launchTestImagePicker() {
         Uri selectedImageUri = Uri.parse(UniversalProgramValues.getInstance().getUploadProfileURL());
         uploadPoster(selectedImageUri);
-    }
+    }}
 
-
-
-
-
-}

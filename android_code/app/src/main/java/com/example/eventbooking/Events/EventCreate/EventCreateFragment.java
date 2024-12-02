@@ -231,6 +231,7 @@ public class EventCreateFragment extends Fragment {
             WaitingList waitingList = new WaitingList(newEventID);
             waitingList.setMaxParticipants(maxParticipants);
             if(waitingListLimit != null){
+                storeEvent.setWaitingListLimit(waitingListLimit);
                 waitingList.setWaitingListLimit(waitingListLimit);
             }
         }

@@ -1,6 +1,7 @@
 package com.example.eventbooking.notification;
 
 import android.Manifest;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.util.Log;
@@ -44,6 +45,7 @@ public class MyNotificationManager {
                 .set(notification);
     }
 
+
     public void notifyUserUnread(String userId, Context context) {
         String channelId = "my_channel_id";
 
@@ -72,4 +74,5 @@ public class MyNotificationManager {
             }
         });
     }
+
 }

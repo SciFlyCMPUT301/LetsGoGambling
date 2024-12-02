@@ -272,16 +272,15 @@ public class OrganizerMenuFragment extends Fragment {
      * */
 
     private void sampleAttendees() {
-        //retrive the max participant and passed in to the sampleParticipants function
         int maxParticipants = waitingList.getMaxParticipants();
         List<String> selectedParticipants = waitingList.sampleParticipants(maxParticipants);
-        //update the result into firebase and output message
+
         if (!selectedParticipants.isEmpty()) {
             sampleAttendeesButton.setEnabled(false);
             Toast.makeText(getContext(), "Sampled attendees: " + selectedParticipants, Toast.LENGTH_SHORT).show();
             waitingList.updateToFirebase().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
-
+                    // Notify selected participants
                     String notifText = "You have been selected for an event! Please sign up here.";
                     String notifTitle = "You were selected!";
                     for (String user : selectedParticipants) {
@@ -289,17 +288,27 @@ public class OrganizerMenuFragment extends Fragment {
                         notificationManager.createNotification(notif);
                     }
 
+                    // Notify non-selected participants (those who were not chosen)
+                    List<String> allParticipants = waitingList.getWaitingParticipantIds();  // Get all participants on the waiting list
+                    allParticipants.removeAll(selectedParticipants);  // Remove selected participants to get the non-selected ones
+                    String lossNotifText = "Unfortunately, you were not selected for the event this time.";
+                    String lossNotifTitle = "You were not selected!";
+                    for (String user : allParticipants) {
+                        Notification notif = new Notification(eventId, lossNotifText, lossNotifTitle, user);
+                        notificationManager.createNotification(notif);
+                    }
+
                     Toast.makeText(getContext(), "Sampled attendees updated to Firebase.", Toast.LENGTH_SHORT).show();
-                    navigateToViewAcceptedList(); //jump to the accepted fragment to let organizer see result
+                    navigateToViewAcceptedList(); // Navigate to the accepted list fragment
                 } else {
                     Toast.makeText(getContext(), "Failed to update Firebase with sampled attendees.", Toast.LENGTH_SHORT).show();
                 }
             });
         } else {
-            //message for organizer
             Toast.makeText(getContext(), "No participants available to sample.", Toast.LENGTH_SHORT).show();
         }
     }
+
 
     /**
      * pop up window, alert to let organizer input number
@@ -357,7 +366,7 @@ public class OrganizerMenuFragment extends Fragment {
             Toast.makeText(getContext(), "Replacements drawn: " + replacements, Toast.LENGTH_SHORT).show();
             waitingList.updateToFirebase().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
-
+                    // Notify selected participants for replacement
                     String notifText = "You have been selected for an event! Please sign up here.";
                     String notifTitle = "You were selected!";
                     for (String user : replacements) {
@@ -365,8 +374,18 @@ public class OrganizerMenuFragment extends Fragment {
                         notificationManager.createNotification(notif);
                     }
 
+                    // Notify non-selected participants (those who were not chosen for replacement)
+                    List<String> allParticipants = waitingList.getWaitingParticipantIds();  // Get all participants on the waiting list
+                    allParticipants.removeAll(replacements);  // Remove selected replacements to get the non-selected ones
+                    String lossNotifText = "Unfortunately, you were not selected for the event this time.";
+                    String lossNotifTitle = "You were not selected!";
+                    for (String user : allParticipants) {
+                        Notification notif = new Notification(eventId, lossNotifText, lossNotifTitle, user);
+                        notificationManager.createNotification(notif);
+                    }
+
                     Toast.makeText(getContext(), "Replacement attendees updated to Firebase.", Toast.LENGTH_SHORT).show();
-                    navigateToViewAcceptedList();
+                    navigateToViewAcceptedList(); // Navigate to the accepted list fragment
                 } else {
                     Toast.makeText(getContext(), "Failed to update Firebase with replacement attendees.", Toast.LENGTH_SHORT).show();
                 }
@@ -375,6 +394,7 @@ public class OrganizerMenuFragment extends Fragment {
             Toast.makeText(getContext(), "No participants available for replacement.", Toast.LENGTH_SHORT).show();
         }
     }
+
 
 
 
@@ -462,7 +482,7 @@ public class OrganizerMenuFragment extends Fragment {
         }
     }
     /**
-     * remove the user custom poster, replace with the deafult poster */
+     * remove the user custom poster, replace with the default poster */
     private void removePoster() {
         if (currentEvent == null) {
             Toast.makeText(getContext(), "Event not loaded.", Toast.LENGTH_SHORT).show();

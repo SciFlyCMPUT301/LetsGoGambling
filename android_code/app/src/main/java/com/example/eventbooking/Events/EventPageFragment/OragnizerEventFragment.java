@@ -29,18 +29,6 @@ public class OragnizerEventFragment  extends Fragment{
     //private Button addEvent;
 
     /**
-     * Creates a new instance of HomeFragment with the provided user ID.
-     * @param userId
-     * @return
-     */
-//    public static HomeFragment newInstance(String userId) {
-//        HomeFragment fragment = new HomeFragment();
-//        Bundle args = new Bundle();
-//        args.putString("userId", userId);
-//        fragment.setArguments(args);
-//        return fragment;
-//    }
-    /**
      * Factory method to create a new instance of {@code OragnizerEventFragment} with a specified user ID.
      *
      * @param userId The ID of the current user.
@@ -53,23 +41,15 @@ public class OragnizerEventFragment  extends Fragment{
         fragment.setArguments(args);
         return fragment;
     }
-
-
-
     /**
      * Inflates the fragment layout, initializes UI components, and sets up button click listeners for navigation.
      *
-     * @param inflater The LayoutInflater object that can be used to inflate
-     * any views in the fragment,
-     * @param container If non-null, this is the parent view that the fragment's
-     * UI should be attached to.  The fragment should not add the view itself,
-     * but this can be used to generate the LayoutParams of the view.
-     * @param savedInstanceState If non-null, this fragment is being re-constructed
-     * from a previous saved state as given here.
-     *
-     * @return
+     * @param inflater The LayoutInflater object that can be used to inflate any views in the fragment.
+     * @param container If non-null, this is the parent view that the fragment's UI should be attached to.
+     *                  The fragment should not add the view itself, but this can be used to generate the LayoutParams of the view.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state as given here.
+     * @return The root view for the fragment.
      */
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -130,7 +110,7 @@ public class OragnizerEventFragment  extends Fragment{
                     .addToBackStack(null)
                     .commit();
         });
-
+        // Return the root view of the fragment
         return rootView;
     }
 

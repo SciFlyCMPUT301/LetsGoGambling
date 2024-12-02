@@ -25,6 +25,7 @@ import com.example.eventbooking.profile.ProfileFragment;
 
 /**
  * EventViewFragment is a fragment that displays details of an event.
+ * It allows users to view event details and interact with the event (e.g., join waitlist, sign up).
  */
 public class EventViewFragment extends Fragment {
 
@@ -39,10 +40,11 @@ public class EventViewFragment extends Fragment {
     private String returnToFragment = null;
 
     /**
-     * Creates a new instance of EventViewFragment.
-     * @param eventID
-     * @param deviceID
-     * @return
+     * Creates a new instance of EventViewFragment with a specified event ID and device ID.
+     *
+     * @param eventID The ID of the event to display.
+     * @param deviceID The ID of the user's device.
+     * @return A new instance of EventViewFragment.
      */
     public static EventViewFragment newInstance(String eventID, String deviceID) {
         EventViewFragment fragment = new EventViewFragment();
@@ -52,8 +54,13 @@ public class EventViewFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
-
-
+    /**
+     * Creates a new instance of EventViewFragment with a specified event and device ID.
+     *
+     * @param selectedEvent The event to display.
+     * @param deviceID The ID of the user's device.
+     * @return A new instance of EventViewFragment.
+     */
     public static EventViewFragment newInstance(Event selectedEvent, String deviceID) {
         EventViewFragment fragment = new EventViewFragment();
         Bundle args = new Bundle();
@@ -63,7 +70,14 @@ public class EventViewFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
-
+    /**
+     * Inflates the layout for the fragment and initializes views. It retrieves event details based on the provided event ID.
+     *
+     * @param inflater The LayoutInflater object that can be used to inflate any views in the fragment.
+     * @param container The parent view that the fragment's UI should be attached to.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state.
+     * @return The root view for the fragment.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_event_view, container, false);
@@ -120,7 +134,8 @@ public class EventViewFragment extends Fragment {
 
     /**
      * Displays details of an event in the UI.
-     * @param event
+     *
+     * @param event The event whose details are to be displayed.
      */
     private void displayEventDetails(Event event) {
         if (event == null) {
@@ -138,8 +153,9 @@ public class EventViewFragment extends Fragment {
     }
 
     /**
-     * Configures buttons based on the user's list status in the event.
-     * @param selectedUserId
+     * Configures buttons based on the user's status in the event (e.g., signed up, waitlisted).
+     *
+     * @param selectedUserId The ID of the current user.
      */
     private void configureButtons(String selectedUserId) {
         Log.d("Event View Fragment", "Button Add Start");
@@ -166,12 +182,6 @@ public class EventViewFragment extends Fragment {
                     updateEventInFirestore(selectedEvent);
                 goBackToEventFragment();
             });
-
-            // Add "Decline" button to move user to declined list
-//            addButton("Decline", v -> {
-//                selectedEvent.addDeclinedParticipantId(selectedUserId); // Adds user to declined list
-//                updateEventInFirestore(selectedEvent);
-//            });
         } else if(selectedEvent.getWaitingParticipantIds().contains(selectedUserId)){
             Log.d("Event View Fragment", "Add WaitList");
             addButton("Leave Waitlist", v -> {
@@ -206,8 +216,9 @@ public class EventViewFragment extends Fragment {
 
     /**
      * Adds a button to the button container.
-     * @param text
-     * @param listener
+     *
+     * @param text The text to display on the button.
+     * @param listener The listener to handle button clicks.
      */
     private void addButton(String text, View.OnClickListener listener) {
         Button button = new Button(getContext());
@@ -215,10 +226,10 @@ public class EventViewFragment extends Fragment {
         button.setOnClickListener(listener);
         buttonContainer.addView(button);
     }
-
     /**
-     * Updates the event in Firestore.
-     * @param event
+     * Updates the event data in Firestore.
+     *
+     * @param event The event to update.
      */
     private void updateEventInFirestore(Event event) {
         if(!testMode){
@@ -229,13 +240,24 @@ public class EventViewFragment extends Fragment {
             });
         }
     }
-
+    /**
+     * Checks if the GPS is enabled on the device.
+     *
+     * @return true if the GPS is enabled, false otherwise.
+     */
     private boolean isGPSEnabled() {
         MainActivity mainActivity = (MainActivity) getActivity();
         return mainActivity != null && mainActivity.isGPSEnabled();
     }
-
-
+    /**
+     * Displays a warning dialog if the event requires geolocation to join the waiting list.
+     * If the user confirms, the system checks if GPS is enabled:
+     * - If GPS is enabled, the user is added to the waiting list.
+     * - If GPS is not enabled, the user is redirected to the profile.
+     *
+     * @param selectedEvent The event the user is interacting with.
+     * @param selectedUserId The ID of the user trying to join the waiting list.
+     */
     private void showGeolocationWarningDialog(Event selectedEvent, String selectedUserId) {
         new android.app.AlertDialog.Builder(requireContext())
                 .setTitle("Geolocation Requirement")
@@ -255,7 +277,10 @@ public class EventViewFragment extends Fragment {
                         Toast.makeText(getContext(), "Geolocation is required to join the waiting list.", Toast.LENGTH_SHORT).show())
                 .show();
     }
-
+    /**
+     * Navigates to the profile fragment for the user.
+     * This method is called when GPS is not enabled and the user is redirected to their profile.
+     */
     private void navigateToProfile() {
         getActivity().getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, new ProfileEntrantFragment())
@@ -263,9 +288,8 @@ public class EventViewFragment extends Fragment {
                 .commit();
     }
 
-
     /**
-     * Goes back to the EventFragment.
+     * Navigates back to the previous fragment, which is the EventFragment.
      */
     private void goBackToEventFragment(){
         getActivity().getSupportFragmentManager().beginTransaction()

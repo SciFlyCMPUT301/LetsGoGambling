@@ -65,7 +65,10 @@ public class MyNotificationManager {
                 NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
 
                 Log.d("NotificationManager", "notification title: "+notif.getTitle());
-                notificationManager.notify(notif.getNotificationId().hashCode(), builder.build());
+
+                if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+                    notificationManager.notify(notif.getNotificationId().hashCode(), builder.build());
+                }
             }
         });
     }

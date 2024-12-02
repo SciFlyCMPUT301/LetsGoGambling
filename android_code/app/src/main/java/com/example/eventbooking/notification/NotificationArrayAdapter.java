@@ -15,6 +15,9 @@ import com.example.eventbooking.R;
 
 import java.util.List;
 
+/**
+ * Adapter for notifications to be displayed in a list
+ */
 public class NotificationArrayAdapter extends ArrayAdapter<Notification> {
     private Context context;
     private List<Notification> notificationList;

@@ -167,8 +167,8 @@ public class UniversalProgramValues {
         dup_event.setEventId(event.getEventId());
         dup_event.setEventTitle(event.getEventTitle());
         dup_event.setDescription(event.getDescription());
-        dup_event.setEventPictureUrl(event.getEventPictureUrl());
-        dup_event.setDefaultEventpictureurl(event.getDefaultEventpictureurl());
+        dup_event.setEventPosterURL(event.getEventPosterURL());
+        dup_event.setDefaultEventPosterURL(event.getDefaultEventPosterURL());
         dup_event.setTimestamp(event.getTimestamp());
         dup_event.setAddress(event.getAddress());
         dup_event.setMaxParticipants(event.getMaxParticipants());

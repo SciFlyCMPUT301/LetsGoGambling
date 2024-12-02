@@ -92,13 +92,19 @@ public class EventViewFragment extends Fragment {
         if (getArguments() != null) {
             if(getArguments().getString("eventId") != null)
                 eventId = getArguments().getString("eventId");
-            if(getArguments().getString("deviceId") != null)
+            if(getArguments().getString("deviceId") != null){
                 deviceId = getArguments().getString("deviceId");
+                Log.d("Event View", "Bundle UserID: " + deviceId);
+            }
 
-            if(deviceId == null)
+
+            if(deviceId == null){
+                Log.d("Event View", "Usermanager UserID: " + deviceId);
                 deviceId = UserManager.getInstance().getUserId();
-//            String listchoice = getArguments().getString("listAdd");
+            }
 
+//            String listchoice = getArguments().getString("listAdd");
+            Log.d("Event View", "USerID: " + deviceId);
 //            if(getArguments().getString("returnFragment") != null){
 //                returnToFragment = getArguments().getString("returnFragment");
 //            }

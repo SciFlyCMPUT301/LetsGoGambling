@@ -214,10 +214,10 @@ public class SampleTable {
             event.setTimestamp(System.currentTimeMillis() + i * 100000);
             event.setMaxParticipants(20);
             event.setOrganizerId(organizer_list.get(i-1).getDeviceID());
-            event.setEventPictureUrl("Event Picture URL" + i);
+            event.setEventPosterURL("Event Picture URL" + i);
             if(UniversalProgramValues.getInstance().getTestingMode()){
-                event.setDefaultEventpictureurl("https://fastly.picsum.photos/id/1033/200/300.jpg?hmac=856_WOyaGXSjI4FWe3_NCHU7frPtAEJaHnAJja5TMNk");
-                event.setEventPictureUrl("https://fastly.picsum.photos/id/532/200/200.jpg?hmac=PPwpqfjXOagQmhd_K7H4NXyA4B6svToDi1IbkDW2Eos");
+                event.setDefaultEventPosterURL("https://fastly.picsum.photos/id/1033/200/300.jpg?hmac=856_WOyaGXSjI4FWe3_NCHU7frPtAEJaHnAJja5TMNk");
+                event.setEventPosterURL("https://fastly.picsum.photos/id/532/200/200.jpg?hmac=PPwpqfjXOagQmhd_K7H4NXyA4B6svToDi1IbkDW2Eos");
             }
 
 
@@ -282,7 +282,7 @@ public class SampleTable {
         }
 
         for(int i = 0; i < EventList.size(); i++){
-            ImageClass newImage = new ImageClass(EventList.get(i).getEventPictureUrl(),
+            ImageClass newImage = new ImageClass(EventList.get(i).getEventPosterURL(),
                     "Event: " + EventList.get(i).getEventTitle(),
                     EventList.get(i).getEventId(),
                     "Events");

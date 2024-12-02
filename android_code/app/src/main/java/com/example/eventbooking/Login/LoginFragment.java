@@ -223,6 +223,7 @@ public class LoginFragment extends Fragment {
     private void handleReturningUser(User user, String deviceId) {
 //        Log.d("LoginFragment", "Returning User: " + user.getUsername());
         UserManager.getInstance().setCurrentUser(user);
+        LoginFragment.isLoggedIn = true;
         if(user.isGeolocationAsk()){
             UserManager.getInstance().updateGeolocation();
         }
@@ -272,6 +273,7 @@ public class LoginFragment extends Fragment {
 
         FirestoreAccess.getInstance().getUser(documentId).addOnSuccessListener(snapshot -> {
             if (snapshot.exists()) {
+                disableAllButtons();
                 User user = snapshot.toObject(User.class);
                 user.saveUserDataToFirestore();
                 UserManager.getInstance().setCurrentUser(user);
@@ -292,6 +294,7 @@ public class LoginFragment extends Fragment {
     private void setUserToDeviceID1() {
         FirestoreAccess.getInstance().getUser("deviceID6").addOnSuccessListener(snapshot -> {
             if (snapshot.exists()) {
+                disableAllButtons();
                 Log.d("Login Activity", "User Snapshot Exists");
                 User user = snapshot.toObject(User.class);
                 deviceId = user.getDeviceID();
@@ -315,6 +318,7 @@ public class LoginFragment extends Fragment {
 
         FirestoreAccess.getInstance().getUsersByUsername(username).addOnSuccessListener(querySnapshot -> {
             if (!querySnapshot.isEmpty()) {
+                disableAllButtons();
                 User user = querySnapshot.getDocuments().get(0).toObject(User.class);
                 user.saveUserDataToFirestore();
                 UserManager.getInstance().setCurrentUser(user);
@@ -341,6 +345,12 @@ public class LoginFragment extends Fragment {
         if (handler != null) {
             handler.removeCallbacksAndMessages(null); // Cancel all pending callbacks
         }
+    }
+
+    private void disableAllButtons(){
+        setByDocumentIdButton.setEnabled(false);
+        setByUsernameButton.setEnabled(false);
+        setToDeviceID1.setEnabled(false);
     }
 
 

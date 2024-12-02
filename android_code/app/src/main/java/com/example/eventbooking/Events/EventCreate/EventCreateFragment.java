@@ -3,9 +3,7 @@ package com.example.eventbooking.Events.EventCreate;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,43 +13,27 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Switch;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.example.eventbooking.Events.EventPageFragment.OragnizerEventFragment;
-import com.example.eventbooking.Home.HomeFragment;
 import com.example.eventbooking.QRCode.QRcodeGenerator;
 import com.example.eventbooking.UniversalProgramValues;
 import com.example.eventbooking.waitinglist.WaitingList;
-import com.example.eventbooking.Location;
 import com.example.eventbooking.R;
 import com.example.eventbooking.Role;
 import com.example.eventbooking.User;
 import com.example.eventbooking.UserManager;
-import com.example.eventbooking.profile.ProfileFragment;
 import com.example.eventbooking.Events.EventData.Event;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.Firebase;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.picasso.Picasso;
-import com.example.eventbooking.waitinglist.OrganizerMenuFragment;
 
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
 /**
  * Fragment for creating new events. This fragment allows users to input event details, such as title, description,
  * image URL, location, and participant limits. The event is saved to Firestore, and if the user does not have
@@ -239,7 +221,7 @@ public class EventCreateFragment extends Fragment {
             storeEvent.setEventId(newEventID);
             storeEvent.setEventTitle(title);
             storeEvent.setDescription(description);
-            storeEvent.setEventPictureUrl(imageUrl);
+            storeEvent.setEventPosterURL(imageUrl);
             storeEvent.setTimestamp(System.currentTimeMillis());
             storeEvent.setLocation(locationStr);
             storeEvent.setMaxParticipants(maxParticipants);
@@ -305,7 +287,7 @@ public class EventCreateFragment extends Fragment {
             }
             else{
                 String url = UniversalProgramValues.getInstance().getUploadProfileURL();
-                currentEvent.setEventPictureUrl(url);
+                currentEvent.setEventPosterURL(url);
 //                UniversalProgramValues.getInstance().queryEvent(currentEvent.getEventId()).setEventPictureUrl(url);
                 displayCurrentPoster();
             }

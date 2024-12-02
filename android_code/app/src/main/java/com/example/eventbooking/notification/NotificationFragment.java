@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A fragment that displays a notification with an integer value and provides buttons to navigate
+ * A fragment that displays the users notifications and provides buttons to navigate
  * to the ProfileFragment or HomeFragment.
  */
 public class NotificationFragment extends Fragment {

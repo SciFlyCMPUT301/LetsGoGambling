@@ -1,6 +1,7 @@
 package com.example.eventbooking.Facility;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -68,9 +69,15 @@ public class FacilityCreateFragment extends Fragment {
         // Handle "Create Facility" button click
         createFacilityButton.setOnClickListener(v -> {
             checkAndCreateFacility();// Call the create facility method
-            getParentFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new OragnizerEventFragment())
-                    .commit(); // Navigate back to HomeFragment
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    getParentFragmentManager().beginTransaction()
+                            .replace(R.id.fragment_container, new OragnizerEventFragment())
+                            .commit(); // Navigate back to HomeFragment
+                }
+            }, 1000);   //5 seconds
+
         });
 
         cancelButton.setOnClickListener(v ->{

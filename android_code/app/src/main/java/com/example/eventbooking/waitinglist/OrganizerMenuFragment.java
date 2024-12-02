@@ -22,6 +22,8 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import com.example.eventbooking.Events.EventCreate.EventCreateFragment;
+import com.example.eventbooking.Events.EventCreate.EventEditFragment;
 import com.example.eventbooking.Events.EventPageFragment.OragnizerEventFragment;
 import com.example.eventbooking.Events.EventView.EventViewFragment;
 import com.example.eventbooking.Notification;
@@ -260,7 +262,9 @@ public class OrganizerMenuFragment extends Fragment {
         sampleAttendeesButton.setOnClickListener(v -> sampleAttendees());
         //drawReplacementButton.setOnClickListener(v -> drawReplacement(replacementSize));
         drawReplacementButton.setOnClickListener(v -> promptReplacementSize());
-        backToButton.setOnClickListener(v -> navigateBackToOrganizerPage());
+//        backToButton.setOnClickListener(v -> navigateBackToOrganizerPage());
+        backToButton.setOnClickListener(v -> navigateBackToEventEdit());
+
         eventMap.setOnClickListener(v -> navigateToMapView());
 
         generateQRCode.setOnClickListener(v -> generateAndDisplayQRCode());
@@ -506,14 +510,27 @@ public class OrganizerMenuFragment extends Fragment {
         }
     }
     /**
-     * navigate back to the event list that was created by the current organizer */
+     * navigate back to the event list that was created by the current organizer
+     */
 
     private void navigateBackToOrganizerPage(){
         getActivity().getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, new OragnizerEventFragment())
                 .addToBackStack(null)
                 .commit();
+    }
 
+
+    /**
+     * navigate back to the event list that was created by the current organizer
+     */
+
+    private void navigateBackToEventEdit(){
+        EventEditFragment editEventFragment = EventEditFragment.newInstance(currentEvent);
+        getParentFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, editEventFragment)
+                .addToBackStack(null)
+                .commit();
     }
     /**
      * initialize the intent to let user choose images */
@@ -665,7 +682,6 @@ public class OrganizerMenuFragment extends Fragment {
     private void launchTestImagePicker() {
         Uri selectedImageUri = Uri.parse(UniversalProgramValues.getInstance().getUploadProfileURL());
         uploadPoster(selectedImageUri);
-
     }
 
     private void navigateToMapView(){

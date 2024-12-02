@@ -296,6 +296,10 @@ public class EventEditFragment extends Fragment {
         editLocation.setText(event.getLocation());
         editMaxParticipants.setText(String.valueOf(event.getMaxParticipants()));
         geolocationSwitch.setChecked(event.isGeolocationRequired());
+        if(event.getWaitingListLimit() > 0)
+            editMaxWaitlistSize.setText(String.valueOf(event.getWaitingListLimit()));
+        else
+            editMaxWaitlistSize.setText(String.valueOf(0));
         displayCurrentPoster();
 
 //        editMaxWaitlistSize.setText(event.get)
@@ -321,6 +325,15 @@ public class EventEditFragment extends Fragment {
         editEvent.setLocation(editLocation.getText().toString().trim());
         editEvent.setMaxParticipants(Integer.parseInt(editMaxParticipants.getText().toString().trim()));
         editEvent.setGeolocationRequired(geolocationSwitch.isChecked());
+        String waitlistSizeInput = editMaxWaitlistSize.getText().toString().trim();
+        if (!waitlistSizeInput.isEmpty()) {
+            int i = Integer.parseInt(waitlistSizeInput);
+            if (i > 0) {
+                editEvent.setWaitingListLimit(i);
+            }
+        } else {
+            editEvent.setWaitingListLimit(-1);
+        }
 
         editEvent.saveEventDataToFirestore()
                 .addOnSuccessListener(aVoid -> {

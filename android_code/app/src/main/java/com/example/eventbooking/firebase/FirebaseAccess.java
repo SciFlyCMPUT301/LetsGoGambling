@@ -15,16 +15,19 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-
+/**
+ * A helper class to handle Firebase operations such as adding, getting user data,
+ * adding, getting event data, and uploading images to Firebase Storage.
+ */
 public class FirebaseAccess {
     private int deviceID;
     private User user;
     private Event event;
-//    private FirebaseDatabase database = FirebaseDatabase.getInstance();
-//    private DatabaseReference databaseReference = database.getReference();
-//    Firebase Storage link
-//    gs://letsgogambling-9ebb8.appspot.com
-
+    /**
+     * Adds a user to the Firebase Realtime Database under the "users" node.
+     *
+     * @param user The User object to be added to the database.
+     */
     public void addUserToDatabase(User user) {
         DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
         usersRef.child(String.valueOf(user.getDeviceID())).setValue(user)
@@ -36,8 +39,11 @@ public class FirebaseAccess {
                 });
 
     }
-
-
+    /**
+     * Retrieves a user from the Firebase Realtime Database by their UID.
+     *
+     * @param uid The UID of the user to be retrieved.
+     */
     public void getUserFromDatabase(String uid) {
         DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(uid);
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -57,9 +63,11 @@ public class FirebaseAccess {
             }
         });
     }
-
-
-
+    /**
+     * Adds an event to the Firebase Realtime Database under the "events" node.
+     *
+     * @param event The Event object to be added to the database.
+     */
     public void addEventToDatabase(Event event) {
         DatabaseReference eventsRef = FirebaseDatabase.getInstance().getReference("events");
         eventsRef.child(event.getEventId()).setValue(event)
@@ -71,8 +79,11 @@ public class FirebaseAccess {
                 });
     }
 
-
-
+    /**
+     * Retrieves an event from the Firebase Realtime Database by its event ID.
+     *
+     * @param eventId The ID of the event to be retrieved.
+     */
     public void getEventFromDatabase(String eventId) {
         DatabaseReference eventRef = FirebaseDatabase.getInstance().getReference("events").child(eventId);
         eventRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -92,22 +103,14 @@ public class FirebaseAccess {
             }
         });
     }
-
-
-
-
-//    Uri imageUri = /* get image URI */;
-//    String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-//    String storagePath = "users/" + userId + "/profile.jpg";
-//
-//    uploadImageToStorage(imageUri, storagePath, downloadUri -> {
-//        String imageUrl = downloadUri.toString();
-//        // Update user profile with imageUrl
-//        User user = new User(userId, name, email, imageUrl);
-//        addUserToFirestore(user);
-//    });
-
-
+    /**
+     * Uploads an image to Firebase Storage and retrieves its download URL upon success.
+     *
+     * @param imageUri The URI of the image to be uploaded.
+     * @param storagePath The path in Firebase Storage where the image will be uploaded.
+     * @param onSuccessListener The listener to be invoked upon a successful upload.
+     * @param onFailureListener The listener to be invoked if the upload fails.
+     */
     public void uploadImageToStorage(Uri imageUri, String storagePath, OnSuccessListener<Uri> onSuccessListener, OnFailureListener onFailureListener) {
         FirebaseStorage storage = FirebaseStorage.getInstance();
         StorageReference storageRef = storage.getReference().child(storagePath);

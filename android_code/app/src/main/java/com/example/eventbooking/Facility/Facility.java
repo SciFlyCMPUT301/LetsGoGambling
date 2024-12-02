@@ -15,7 +15,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+/**
+ * Represents a facility in the event booking system.
+ *
+ * <p>A facility is a location or venue associated with an organizer and optionally linked
+ * to events. The class supports managing facility details, associating events, and saving
+ * data to Firebase Firestore.</p>
+ *
+ * <p>The facility must have an organizer when instantiated. Otherwise, it is considered a
+ * "floating facility," meaning it is unassociated and cannot be duplicated by other organizers.</p>
+ */
 public class Facility {
     private String facilityID;
     private String name;
@@ -29,33 +38,36 @@ public class Facility {
     private boolean testing = true;
 
     /**
-     * The Facility class that has to have an organizer associated when we instantiate it, otherwise it
-     * is a floating facility. This description means that nobody else can create a similar facility
-     * (use case when we ban a facility).
+     * Default constructor for the Facility class.
      *
-     * Facilities must also have the ability to have an event associated with them when one is created.
-     * This is handled by the controller.
-     *
-     * @since   2024-11-04
+     * <p>Initializes Firestore and the list of associated events. If testing mode is enabled
+     * through {@link UniversalProgramValues}, Firestore initialization is skipped.</p>
      */
     public Facility() {
-        // Initialize Firebase instances
+        // Initialize Firestore and facilities collection reference
         if(!UniversalProgramValues.getInstance().getTestingMode()){
             this.db = FirebaseFirestore.getInstance();
             this.facilitiesRef = db.collection("facilities");
         }
 
-        // Initialize list to avoid NullPointerException
+        // Initialize events list to prevent null values
         this.allEvents = new ArrayList<>();
     }
 
-
+    /**
+     * Constructor for dependency injection (useful for testing).
+     *
+     * @param db            the Firestore database instance
+     * @param facilitiesRef the Firestore collection reference for facilities
+     */
     // Constructor for dependency injection (useful for testing)
     public Facility(FirebaseFirestore db, CollectionReference facilitiesRef) {
+        // Assign Firestore instances if not in testing mode
         if(!UniversalProgramValues.getInstance().getTestingMode()){
             this.db = FirebaseFirestore.getInstance();
             this.facilitiesRef = facilitiesRef;
         }
+        // Initialize events list
         this.allEvents = new ArrayList<>();
     }
 
@@ -98,11 +110,6 @@ public class Facility {
     public String getOrganizer() { return organizer; }
     public void setOrganizer(String organizer) { this.organizer = organizer; }
 
-//    public Location getLocation() { return location; }
-//    public void setLocation(Location location) { this.location = location; }
-    /**
-     *
-     */
     public String getFacilityID() {
         return facilityID;
     }
@@ -119,8 +126,9 @@ public class Facility {
     }
 
     /**
-     * Setting all the events for the facility to a given list
-     * @param allEvents
+     * Sets the list of all events associated with this facility.
+     *
+     * @param allEvents List of event IDs associated with this facility
      */
     public void setAllEvents(List<String> allEvents) {
         this.allEvents = allEvents;
@@ -128,15 +136,24 @@ public class Facility {
     public List<String> getAllEvents() {
         return allEvents;
     }
+    /**
+     * Adds an event ID to the list of all events.
+     *
+     * @param eventID The ID of the event to add
+     */
     public void addAllEventsItem(String eventID){
         allEvents.add(eventID);
     }
+    /**
+     * Removes an event ID from the list of all events.
+     *
+     * @param eventID The ID of the event to remove
+     */
     public void removeAllEventsItem(String eventID){
         if(allEvents.contains(eventID)){
             allEvents.remove(eventID);
         }
     }
-
     /**
      * Saves the facility profile to Firestore.
      *
@@ -169,7 +186,7 @@ public class Facility {
     /**
      * Deletes the facility by setting its organizer to null, allowing administrators to disassociate the organizer.
      *
-     * @throws IllegalArgumentException if facility name is invalid
+     * @throws IllegalArgumentException if facility ID is invalid
      */
     public void deleteFacility() {
         if (facilityID != null && !facilityID.isEmpty()) {
@@ -195,9 +212,9 @@ public class Facility {
     /**
      * Associates an event with a facility, creating the facility document if it doesn't exist.
      *
-     * @param eventID            the event ID to associate
+     * @param eventID the event ID to associate with the facility
+     * @param genEvent flag indicating whether the event is being generated or not
      */
-
     public void associateEvent(String eventID, boolean genEvent) {
         // Check if the facility document exists
         if(genEvent){
@@ -276,10 +293,6 @@ public class Facility {
      * @param eventName the event name to associate initially
      */
     private void createFacilityWithEvent(String eventName) {
-        // Making new facility ID
-//        Query query = db.collection("Facilities");
-//        AggregateQuery countQuery = query.count();
-
 
         allEvents.add(eventName);
         Map<String, Object> facilityData = new HashMap<>();
@@ -290,23 +303,6 @@ public class Facility {
         String newFacilityID = getNewFacilityID();
         setFacilityID(newFacilityID);
         facilityData.put("facilityID", newFacilityID);
-
-        // old getting new facilityID
-//        db.collection("Facilities").get().addOnCompleteListener(new
-//            OnCompleteListener<QuerySnapshot>() {
-//                @Override
-//                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-//                    if (task.isSuccessful()) {
-//                        String collectionSize = String.valueOf(task.getResult().size());
-//                        setFacilityID(collectionSize);
-//                        facilityData.put("facilityID", collectionSize);
-//                    }
-////                    } else {
-////                        Toast.makeTesxt(getContext(),"Error : " +
-////                                e.toString(),Toast.LENGHT_LONG).show;
-////                    }
-//                }
-//            });
 
         db.collection("Facilities").document(facilityID)
                 .set(facilityData)

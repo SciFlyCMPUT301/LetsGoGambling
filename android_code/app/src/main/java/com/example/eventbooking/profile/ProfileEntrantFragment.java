@@ -76,12 +76,11 @@ public class ProfileEntrantFragment extends Fragment {
     /**
      * Creates a new instance of the ProfileEntrantFragment with arguments for new user status, event ID, and device ID.
      *
-     * @param isNewUser   Flag indicating if the user is new
+     * @param isNewUser Flag indicating if the user is new
      * @param eventIdFromQR Event ID obtained from QR scan (if any)
-     * @param deviceId     Device ID of the user
+     * @param deviceId Device ID of the user
      * @return A new instance of ProfileEntrantFragment
      */
-
     public static ProfileEntrantFragment newInstance(boolean isNewUser, String eventIdFromQR, String deviceId) {
         ProfileEntrantFragment fragment = new ProfileEntrantFragment();
         Bundle args = new Bundle();
@@ -98,7 +97,6 @@ public class ProfileEntrantFragment extends Fragment {
      *
      * @param savedInstanceState Saved state bundle for the fragment
      */
-
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d("Profile On Create", "Before arg");
@@ -110,33 +108,15 @@ public class ProfileEntrantFragment extends Fragment {
 
         }
     }
+
     /**
      * Inflates the layout for this fragment and sets up the views, buttons, and listeners.
      *
-     * @param inflater           The LayoutInflater used to inflate the layout
-     * @param container          The parent view group
+     * @param inflater The LayoutInflater used to inflate the layout
+     * @param container The parent view group
      * @param savedInstanceState Saved state bundle for the fragment
      * @return The view for this fragment
      */
-
-//    /**
-//     * Getting and setting the current deviceID to load the user information
-//     *
-//     * @param view The View returned by {@link #onCreateView(LayoutInflater, ViewGroup, Bundle)}.
-//     * @param savedInstanceState If non-null, this fragment is being re-constructed
-//     * from a previous saved state as given here.
-//     */
-//    @Override
-//    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-//        super.onViewCreated(view, savedInstanceState);
-//
-//        // Retrieve the current user's information
-//        User currentUser = UserManager.getInstance().getCurrentUser();
-//        if (currentUser != null) {
-//            displayUserInfo(currentUser);  // Use existing method or UI setup
-//        }
-//    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -158,21 +138,14 @@ public class ProfileEntrantFragment extends Fragment {
         // Initialize EntrantProfileManager
         profileManager = new EntrantProfileManager();
 
-        // Load existing profile data
-        //loadUserProfile(); user data is already loaded
         if (!isNewUser) {
             Log.d("Profile", "Loading the profile");
-//            String testDeviceID = "deviceID1";
-//            loadUserByDeviceID(testDeviceID);
             onProfileLoaded(UserManager.getInstance().getCurrentUser());
         }else{
             Log.d("Profile", "New profile");
             currentUser = new User();
         }
         uploadButton.setVisibility(View.GONE);
-
-
-
 
         // Set up button listeners
         saveButton.setOnClickListener(v -> saveUserProfile());
@@ -181,17 +154,6 @@ public class ProfileEntrantFragment extends Fragment {
         editButton.setOnClickListener(v -> toggleEditMode());
         uploadButton.setOnClickListener(v-> uploadPhoto());
         removeImageButton.setOnClickListener(v-> removeImage());
-        // Handle testing switch
-//        testingSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-//                if (isChecked) {
-//                    testing = true;
-//                } else {
-//                    testing = false;
-//                }
-//            }
-//        });
-        // Image launcher to get images and store them temporarially
         pickImageLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -227,9 +189,8 @@ public class ProfileEntrantFragment extends Fragment {
         return view;
     }
 
-
     /**
-     * Will move to fragment home
+     * Navigates to the home fragment.
      */
     private void goToHome() {
         getParentFragmentManager().beginTransaction()
@@ -244,12 +205,12 @@ public class ProfileEntrantFragment extends Fragment {
         String deviceID = getDeviceID();
         profileManager.getProfile(deviceID, this::onProfileLoaded);
     }
+
     /**
      * Callback for when the profile is loaded from Firestore. Updates the UI with profile data.
      *
      * @param profile The loaded EntrantProfile object
      */
-
     private void onProfileLoaded(EntrantProfile profile) {
         if (profile != null) {
             currentProfile = profile;
@@ -291,46 +252,10 @@ public class ProfileEntrantFragment extends Fragment {
             Toast.makeText(getContext(), "No profile data found.", Toast.LENGTH_SHORT).show();
         }
     }
-
-//    /**
-//     * Fix in place because the singleton does not work in this code at all
-//     * This just loads a user from firebase into the program
-//     *
-//     *
-//     * @param deviceID
-//     */
-//    private void loadUserByDeviceID(String deviceID) {
-//        FirebaseFirestore db = FirebaseFirestore.getInstance();
-//
-//        // Query Firestore for the user with the specified deviceID
-//        db.collection("Users")
-//                .document(deviceID)
-//                .get()
-//                .addOnSuccessListener(documentSnapshot -> {
-//                    if (documentSnapshot.exists()) {
-//                        // Convert document snapshot to a User object
-//                        User loadedUser = documentSnapshot.toObject(User.class);
-//                        if (loadedUser != null) {
-//                            onProfileLoaded(loadedUser);
-//                        } else {
-//                            Log.e("Profile", "Failed to convert document to User.");
-//                            Toast.makeText(getContext(), "Failed to load user data.", Toast.LENGTH_SHORT).show();
-//                        }
-//                    } else {
-//                        Toast.makeText(getContext(), "No user found with this device ID.", Toast.LENGTH_SHORT).show();
-//                    }
-//                })
-//                .addOnFailureListener(e -> {
-//                    Log.e("Profile", "Error loading user: ", e);
-//                    Toast.makeText(getContext(), "Error loading user data.", Toast.LENGTH_SHORT).show();
-//                });
-//    }
-
     /**
      * Saves the user profile data to Firestore, either creating or updating the profile.
      * Also, handles saving user data for new users.
      */
-
     public void saveUserProfile() {
         if (currentProfile == null) {
             currentProfile = new EntrantProfile();
@@ -347,17 +272,8 @@ public class ProfileEntrantFragment extends Fragment {
         currentUser.setNotificationAsk(notificationsSwitch.isChecked());
         currentUser.setGeolocationAsk(geolocationSwitch.isChecked());
         Log.d("Profile save", "Profile " + currentUser.getdefaultProfilePictureUrl());
-//        if(selectedImageUri != null){
-//            currentUser.setProfilePictureUrl(selectedImageUri.toString());
-//        }
-
         UserManager.getInstance().setCurrentUser(currentUser);
-
-
-
         String deviceID = getDeviceID();
-// profileManager.createOrUpdateProfile(deviceID, currentProfile);
-
         Toast.makeText(getContext(), "Profile saved successfully.", Toast.LENGTH_SHORT).show();
         setEditMode(false);
         // Handle navigation after saving profile
@@ -408,12 +324,8 @@ public class ProfileEntrantFragment extends Fragment {
                                         Log.d("ProfileEntrant", "Found QR link: " + eventIDFromQR);
                                         getParentFragmentManager().beginTransaction()
                                                 .replace(R.id.fragment_container, EventViewFragment.newInstance(eventIDFromQR, deviceId))
-//                      .replace(R.id.fragment_container, EventViewFragment.newInstance(eventIdFromQR, deviceId))
                                                 .addToBackStack(null)
                                                 .commit();
-//                getParentFragmentManager().beginTransaction()
-//                        .replace(R.id.fragment_container, ScannedFragment.newInstance(eventIDFromQR))
-//                        .commit();
                                     }
                                 }).addOnFailureListener(e -> {
                                     Toast.makeText(getContext(), "Failed to save profile.", Toast.LENGTH_SHORT).show();
@@ -443,23 +355,19 @@ public class ProfileEntrantFragment extends Fragment {
 
 
     }
-
-
     /**
-     * Toggles the edit mode on and off. When enabled, the fields become editable, and the user can save changes.
+     * Toggles between editing and viewing mode for the profile.
      */
-
     public void toggleEditMode() {
         isEditing = !isEditing;
         setEditMode(isEditing);
         Toast.makeText(getContext(), isEditing ? "Edit mode enabled" : "Edit mode disabled", Toast.LENGTH_SHORT).show();
     }
     /**
-     * Sets the edit mode for the profile. When enabled, the user can edit the profile details.
+     * Enables or disables the editing mode of the profile.
      *
-     * @param enable Flag indicating whether edit mode should be enabled or not
+     * @param enable Flag to enable or disable edit mode
      */
-
     public void setEditMode(boolean enable) {
         editName.setEnabled(enable);
         editEmail.setEnabled(enable);
@@ -471,7 +379,7 @@ public class ProfileEntrantFragment extends Fragment {
         uploadButton.setVisibility(View.VISIBLE);
     }
     /**
-     * Retrieves the device ID of the current device.
+     * Retrieves the device ID from the settings.
      *
      * @return The device ID
      */
@@ -484,13 +392,15 @@ public class ProfileEntrantFragment extends Fragment {
 
 
     /**
-     * Uploading a photo to firebase
+     * Starts the activity to upload a profile photo.
      */
     public void uploadPhoto() {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         pickImageLauncher.launch(intent);
     }
-
+    /**
+     * Removes the profile picture from the user profile.
+     */
     public void removeImage() {
         if (!currentUser.isDefaultURLMain()) {
             currentUser.deleteSelectedImageFromFirebase(currentUser.getProfilePictureUrl());

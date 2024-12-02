@@ -33,10 +33,10 @@ public class OrganizerEventDetailFragment extends Fragment {
     private Button organizerMenuButton;
 
     /**
-     * Creates a new instance of OrganizerEventDetailFragment.
+     * Creates a new instance of OrganizerEventDetailFragment with the specified event ID.
      *
-     * @param eventID The ID of the event.
-     * @return A new fragment instance.
+     * @param eventID The ID of the event to display.
+     * @return A new instance of the OrganizerEventDetailFragment.
      */
     public static OrganizerEventDetailFragment newInstance(String eventID) {
         OrganizerEventDetailFragment fragment = new OrganizerEventDetailFragment();
@@ -45,7 +45,15 @@ public class OrganizerEventDetailFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
-
+    /**
+     * Inflates the view for this fragment, retrieves event data, and sets up the navigation button.
+     * It also fetches event details from the server based on the provided event ID.
+     *
+     * @param inflater The LayoutInflater object used to inflate the view.
+     * @param container The parent view group for the fragment's UI.
+     * @param savedInstanceState A Bundle containing any saved instance state.
+     * @return The inflated view for this fragment.
+     */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_organizer_event_detail, container, false);
@@ -91,11 +99,10 @@ public class OrganizerEventDetailFragment extends Fragment {
 
         return view;
     }
-
     /**
-     * Displays the event details on the screen.
+     * Displays the event details on the screen, such as title, description, and location.
      *
-     * @param event The event object to display.
+     * @param event The event object containing the event details to display.
      */
     private void displayEventDetails(Event event) {
         if (event == null) {
@@ -107,12 +114,9 @@ public class OrganizerEventDetailFragment extends Fragment {
         eventDescriptionText.setText(event.getDescription());
         eventLocationText.setText(event.getLocation()); // Assuming a "location" field is available.
 
-        // Optionally load event poster image
-        // loadImageIntoView(event.getImageUrl(), eventPosterImage);
     }
-
     /**
-     * Navigates to the OrganizerMenuFragment.
+     * Navigates to the OrganizerMenuFragment, which allows the event organizer to manage the event.
      */
     private void navigateToOrganizerMenu() {
         Log.d("Organizer Event Detail", "Navigate to menu");

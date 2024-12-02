@@ -137,26 +137,6 @@ public class WaitingList {
         this.canceledParticipantIds = canceledParticipantIds;
     }
 
-    // Methods to update the lists
-
-    /**
-     * Adds a participant to the waiting list.
-     *
-     * @param participantId The ID of the participant to add.
-     * @return true if the user has been added, false if the user already exist in related list
-     */
-    public boolean addParticipantToWaitingList(String participantId) {
-        //checks if any list contains the user id
-        //we allow someone declined the invitation to rejoin the waiting list
-        //thus, if condition exclude the canceledParticipantIds
-        if (!waitingParticipantIds.contains(participantId) ||
-                acceptedParticipantIds.contains(participantId) ||
-                signedUpParticipantIds.contains(participantId)
-        ) {
-            waitingParticipantIds.add(participantId);
-            return true;
-        }return false;
-    }
 
 
     /**

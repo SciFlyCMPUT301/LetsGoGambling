@@ -38,6 +38,11 @@ import java.util.Calendar;
 import java.util.Hashtable;
 import java.util.List;
 
+/**
+ * The {@code OrganizerEventDetailFragment} class displays detailed information
+ * about a specific event for organizers. It allows navigation to an organizer menu
+ * for further management of the event.
+ */
 public class OrganizerMenuFragment extends Fragment {
     //initialize variables
     private static final String ARG_EVENT_ID = "eventId";
@@ -284,7 +289,6 @@ public class OrganizerMenuFragment extends Fragment {
      * */
 
     private void sampleAttendees() {
-        //retrive the max participant and passed in to the sampleParticipants function
         int maxParticipants = waitingList.getMaxParticipants();
         List<String> selectedParticipants = waitingList.sampleParticipants(maxParticipants);
         //update the result into firebase and output message
@@ -293,7 +297,7 @@ public class OrganizerMenuFragment extends Fragment {
             Toast.makeText(getContext(), "Sampled attendees: " + selectedParticipants, Toast.LENGTH_SHORT).show();
             waitingList.updateToFirebase().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
-
+                    // Notify selected participants
                     String notifText = "You have been selected for an event! Please sign up here.";
                     String notifTitle = "You were selected!";
                     for (String user : selectedParticipants) {
@@ -301,8 +305,18 @@ public class OrganizerMenuFragment extends Fragment {
                         notificationManager.createNotification(notif);
                     }
 
+                    // Notify non-selected participants (those who were not chosen)
+                    List<String> allParticipants = waitingList.getWaitingParticipantIds();  // Get all participants on the waiting list
+                    allParticipants.removeAll(selectedParticipants);  // Remove selected participants to get the non-selected ones
+                    String lossNotifText = "Unfortunately, you were not selected for the event this time.";
+                    String lossNotifTitle = "You were not selected!";
+                    for (String user : allParticipants) {
+                        Notification notif = new Notification(eventId, lossNotifText, lossNotifTitle, user);
+                        notificationManager.createNotification(notif);
+                    }
+
                     Toast.makeText(getContext(), "Sampled attendees updated to Firebase.", Toast.LENGTH_SHORT).show();
-                    navigateToViewAcceptedList(); //jump to the accepted fragment to let organizer see result
+                    navigateToViewAcceptedList(); // Navigate to the accepted list fragment
                 } else {
                     Toast.makeText(getContext(), "Failed to update Firebase with sampled attendees.", Toast.LENGTH_SHORT).show();
                 }
@@ -318,10 +332,11 @@ public class OrganizerMenuFragment extends Fragment {
         }
     }
 
+
     /**
      * pop up window, alert to let organizer input number
      * of partipant they would like to select from waiting list*/
-    //This is for part 4, haven't worked yet !
+
 
     private void promptReplacementSize() {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
@@ -365,7 +380,7 @@ public class OrganizerMenuFragment extends Fragment {
      * function to trigger the draw replacement defined in waiting list
      * output message to organizer about the operation result */
 
-    //belong to part 4, haven't fixed yet
+
 
     private void drawReplacement(int replacementSize) {
         List<String> replacements = waitingList.drawReplacement(replacementSize);
@@ -375,14 +390,22 @@ public class OrganizerMenuFragment extends Fragment {
             if(!UniversalProgramValues.getInstance().getTestingMode()){
                 waitingList.updateToFirebase().addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-
+                        // Notify selected participants for replacement
                         String notifText = "You have been selected for an event! Please sign up here.";
                         String notifTitle = "You were selected!";
                         for (String user : replacements) {
                             Notification notif = new Notification(eventId, notifText, notifTitle, user);
                             notificationManager.createNotification(notif);
                         }
-
+                        // Notify non-selected participants (those who were not chosen for replacement)
+                        List<String> allParticipants = waitingList.getWaitingParticipantIds();  // Get all participants on the waiting list
+                        allParticipants.removeAll(replacements);  // Remove selected replacements to get the non-selected ones
+                        String lossNotifText = "Unfortunately, you were not selected for the event this time.";
+                        String lossNotifTitle = "You were not selected!";
+                        for (String user : allParticipants) {
+                            Notification notif = new Notification(eventId, lossNotifText, lossNotifTitle, user);
+                            notificationManager.createNotification(notif);
+                        }
                         Toast.makeText(getContext(), "Replacement attendees updated to Firebase.", Toast.LENGTH_SHORT).show();
                         navigateToViewAcceptedList();
                     } else {
@@ -398,6 +421,7 @@ public class OrganizerMenuFragment extends Fragment {
             Toast.makeText(getContext(), "No participants available for replacement.", Toast.LENGTH_SHORT).show();
         }
     }
+
 
 
 
@@ -426,6 +450,8 @@ public class OrganizerMenuFragment extends Fragment {
             Toast.makeText(getContext(), "Failed to generate QR code.", Toast.LENGTH_SHORT).show();
         }
     }
+    /**
+     * navigate back to the event list that was created by the current organizer */
 
     private void navigateBackToOrganizerPage(){
         getActivity().getSupportFragmentManager().beginTransaction()
@@ -434,11 +460,16 @@ public class OrganizerMenuFragment extends Fragment {
                 .commit();
 
     }
-    //poster stuff
+    /**
+     * initialize the intent to let user choose images */
     private void launchImagePicker() {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         pickImageLauncher.launch(intent);
     }
+    /**
+     * upload the poster the user has choose and display to let users see the format
+     * @param imageUri
+     * */
 
     private void uploadPoster(Uri imageUri) {
         if (currentEvent == null) {
@@ -465,6 +496,9 @@ public class OrganizerMenuFragment extends Fragment {
         }
 
     }
+    /**
+     * dipslay the current poster, if there is a custom poster will display the current poster
+     * else would display the default poster */
     private void displayCurrentPoster() {
         if (currentEvent == null) {
             posterImageView.setImageResource(R.drawable.placeholder_image_foreground);
@@ -482,6 +516,8 @@ public class OrganizerMenuFragment extends Fragment {
                     .into(posterImageView);
         }
     }
+    /**
+     * remove the user custom poster, replace with the default poster */
     private void removePoster() {
         if (currentEvent == null) {
             Toast.makeText(getContext(), "Event not loaded.", Toast.LENGTH_SHORT).show();
@@ -514,7 +550,9 @@ public class OrganizerMenuFragment extends Fragment {
     }
 
 
-
+    /**
+     * let organizer to move all the accepted(selected) entrant to the cancelled list since
+     * they didn't sign up for the event*/
     //cancel entrant didnot signup
     //make up a click listener, retrive the accepted list, remove them and add to the cancelled
     private void cancelEntrant() {

@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 /**
- * Event fragment here to display all events given parameters
+ * Fragment to display all events based on user role and context.
  */
 public class EventFragment extends Fragment {
     private Button addFacilityButton, backButton;
@@ -44,27 +44,24 @@ public class EventFragment extends Fragment {
     private EventViewAdapter eventAdapter;
     private UserManager userManager;
     /**
-     * Creates a new instance of EventFragment, used in itial testing
+     * Creates a new instance of EventFragment.
+     * Useful for testing and modular initialization.
      *
-     *
-     * @return A new instance of fragment EventFragment
+     * @return A new instance of the EventFragment class.
      */
     public static EventFragment newInstance() {
         EventFragment fragment = new EventFragment();
-//        Bundle args = new Bundle();
-//        args.putInt(ARG_INTEGER, integer);
-//        fragment.setArguments(args);
         return fragment;
     }
-
+    /**
+     * Called to do initial creation of the fragment.
+     * This is where any arguments or initial setup should be handled.
+     *
+     * @param savedInstanceState If the fragment is being re-created from a previous state, this contains the most recent data.
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Retrieve the integer from arguments
-//        if (getArguments() != null) {
-//            receivedInteger = getArguments().getInt(ARG_INTEGER);
-//        }
-
     }
 
     /**
@@ -81,11 +78,6 @@ public class EventFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_event, container, false);
-
-        // code here to get testing working
-//        currentUser = getUserData();
-//        UserManager tempUser = UserManager.getInstance();
-//        tempUser.setCurrentUser(currentUser);
 
         // Starting from here views
         backButton = view.findViewById(R.id.button_back_home);
@@ -109,7 +101,7 @@ public class EventFragment extends Fragment {
         // Set up add button to prompt facility creation if necessary
         addFacilityButton.setOnClickListener(v -> {
 
-            // Supersceeding if statement for testing, do not take seriously
+            // Supersceeding if statement for testing
             if(testing){
                 navigateToEventCreate();
             }
@@ -144,7 +136,6 @@ public class EventFragment extends Fragment {
 //                Log.e("eventId", "Event found with ID: " + selectedEvent.getEventId());
                 bundle.putString("deviceId", userDeviceId);
 
-                /// TODO:
                 // remove the list add when actually using the app
                 bundle.putString("listAdd", user1list);
 
@@ -185,91 +176,6 @@ public class EventFragment extends Fragment {
 
         return view;
     }
-
-//    private void checkIfUserIsOrganizer(){
-//        User currentUser = UserManager.getInstance().getCurrentUser();
-//        if(currentUser==null){
-//            organizerMenuButton.setVisibility(View.GONE);
-//            return;
-//        }
-//        String currentUserId = currentUser.getDeviceID();
-//        String organizerId= event.getOrganizerId();
-//        if(currentUserId.equals(organizerId)){
-//            organizerMenuButton.setVisibility(View.VISIBLE);
-//        }else{
-//            organizerMenuButton.setVisibility(View.GONE);
-//        }
-//    }
-
-    //allow current user to join the waiting list
-//    private void joinWaitingList(){
-//        if(waitingList==null){
-//            Toast.makeText(getContext(),"WaitingList not loaded yet", Toast.LENGTH_SHORT).show();
-//            return;
-//        }
-//        User currentUser = UserManager.getInstance().getCurrentUser();
-//        if(currentUser == null){
-//            Toast.makeText(getContext(),"User not found",Toast.LENGTH_SHORT).show();
-//            return;
-//        }
-//        String currentUserId = currentUser.getDeviceID();
-//        boolean success = waitingList.addParticipantToWaitingList(currentUserId);
-//        if(success){
-//            //update firebase
-//            //updateWaitingListInFirebase();
-//            Toast.makeText(getContext(),"Joined the waiting list",Toast.LENGTH_SHORT).show();
-//            updateButtonsState();
-//        }else{
-//            Toast.makeText(getContext(),"Failed to join the waitingList",Toast.LENGTH_SHORT).show();
-//        }
-//
-//
-//    }
-//
-//    //allow current user to leave waiting list
-//    private void leaveWaitingList(){
-//        if(waitingList==null){
-//            Toast.makeText(getContext(),"WaitingList not loaded yet", Toast.LENGTH_SHORT).show();
-//            return;
-//        }
-//        User currentUser = UserManager.getInstance().getCurrentUser();
-//        if(currentUser == null){
-//            Toast.makeText(getContext(),"User not found",Toast.LENGTH_SHORT).show();
-//            return;
-//        }
-//        String currentUserId = currentUser.getDeviceID();
-//        boolean success = waitingList.cancelParticipation(currentUserId);
-//        if(success){
-//            //update firebase
-//            //updateWaitingListInFirebase();
-//            Toast.makeText(getContext(),"left the waiting list",Toast.LENGTH_SHORT).show();
-//            updateButtonsState();
-//        }else{
-//            Toast.makeText(getContext(),"Failed to leave the waitingList",Toast.LENGTH_SHORT).show();
-//        }
-//    }
-//
-//    /**
-//     * update leave and join button state based on the status*/
-//    private void updateButtonsState(){
-//        User currentUser = UserManager.getInstance().getCurrentUser();
-//        if(currentUser ==  null){
-//            joinWaitingListButton.setEnabled(false);
-//            leaveWaitingListButton.setEnabled(false);
-//            return;
-//        }
-//        String currentUserId = currentUser.getDeviceID();
-//        if(waitingList.getWaitingParticipantIds().contains(currentUserId)
-//        ){
-//            //what should I do for user in other list
-//            joinWaitingListButton.setEnabled(false);
-//            leaveWaitingListButton.setEnabled(true);
-//        } else{
-//            joinWaitingListButton.setEnabled(true);
-//            leaveWaitingListButton.setEnabled(true);
-//        }
-//    }
-
    //test
     private User getUserData() {
         User Johhny = new User("deviceID1", "User1", "admin1@example.com", "555-001", null);
@@ -293,7 +199,6 @@ public class EventFragment extends Fragment {
             if (task.isSuccessful()) {
                 List<Event> randomEvents = task.getResult();
                 if (randomEvents != null) {
-//                    for (Event event : randomEvents) {
 //                        Log.d("EventList", "Event Title: " + event.getEventTitle() + ", Description: " + event.getDescription());
 //                    }
                 } else {
@@ -313,20 +218,6 @@ public class EventFragment extends Fragment {
             addFacilityButton.setVisibility(View.VISIBLE);
         }
 
-//        if (showUserEvents) {
-//            // Load user-related events where the user is a participant or in any list
-////            eventList.addAll(userManager.getUserEvents());
-//            eventList.addAll(findEventsByParticipantDeviceId("User1"));
-//
-//        } else {
-//            // Load organizer events where the user is the organizer and has a facility
-//            if (userManager.userHasFacility()) {
-////                eventList.addAll(userManager.getOrganizerEvents());
-//                eventList.addAll(findEventsByOrganizerDeviceId("User1"));
-//            } else {
-//                eventList.clear(); // No events to show if the user is an organizer without a facility
-//            }
-//        }
         eventAdapter.notifyDataSetChanged();
     }
     /**
@@ -368,9 +259,10 @@ public class EventFragment extends Fragment {
     }
 
     /**
-     * find event by participant device id
-     * @param deviceID
-     * @return
+     * Finds events where the participant is associated with the given device ID.
+     *
+     * @param deviceID The participant's device ID.
+     * @return List of events associated with the participant.
      */
     public List<Event> findEventsByParticipantDeviceId(String deviceID) {
         List<Event> participantEvents = new ArrayList<>();
@@ -387,9 +279,10 @@ public class EventFragment extends Fragment {
     }
 
     /**
-     * Method to find events where the user with the specified deviceID is the organizer
-     * @param deviceID
-     * @return
+     * Finds events organized by the user with the specified device ID.
+     *
+     * @param deviceID The organizer's device ID.
+     * @return List of events organized by the user.
      */
 
     public List<Event> findEventsByOrganizerDeviceId(String deviceID) {

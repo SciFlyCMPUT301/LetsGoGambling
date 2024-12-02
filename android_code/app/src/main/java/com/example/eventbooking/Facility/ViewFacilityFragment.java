@@ -26,6 +26,14 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Fragment for viewing, editing, and deleting a facility.
+ * <p>
+ * This fragment allows organizers to view the details of their associated facility,
+ * update facility information, and delete the facility if necessary. Each organizer can
+ * only manage one facility.
+ * </p>
+ */
 public class ViewFacilityFragment extends Fragment {
 
     private EditText editFacilityName, editFacilityId, editFacilityLocation;
@@ -34,6 +42,15 @@ public class ViewFacilityFragment extends Fragment {
     private String organizerId; // Dynamically fetched organizer ID
     private String facilityId; // The ID of the facility associated with the organizer
 
+    /**
+     * Called when the fragment's view is created. Sets up UI components, initializes Firebase,
+     * and loads the organizer's facility details.
+     *
+     * @param inflater           The LayoutInflater object that can be used to inflate any views in the fragment.
+     * @param container          The parent view that the fragment's UI should be attached to.
+     * @param savedInstanceState A bundle containing saved state, if any.
+     * @return The view hierarchy associated with the fragment.
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -66,7 +83,9 @@ public class ViewFacilityFragment extends Fragment {
     }
 
     /**
-     * Load the facility for the current organizer from Firestore.
+     * Loads the facility for the current organizer from Firestore.
+     * It retrieves the facility associated with the current organizer and
+     * populates the fields in the fragment with the data.
      */
     private void loadFacility() {
         if(!UniversalProgramValues.getInstance().getTestingMode()) {
@@ -95,9 +114,10 @@ public class ViewFacilityFragment extends Fragment {
             facilityId = temp_facility.getFacilityID();
         }
     }
-
     /**
-     * Save the facility details to Firestore.
+     * Saves the facility details to Firestore.
+     * This method checks whether the facility ID is null. If it is null, a new facility is created;
+     * otherwise, the existing facility is updated with the new data entered by the user.
      */
     private void saveFacility() {
         String newFacilityName = editFacilityName.getText().toString().trim();
@@ -151,9 +171,9 @@ public class ViewFacilityFragment extends Fragment {
 //        navigateToHomeFragment();
         navigateToOrganizerFragment();
     }
-
     /**
-     * Delete the current facility.
+     * Deletes the current facility.
+     * This method will delete the facility from Firestore if the facility ID exists.
      */
     private void deleteFacility() {
         if (facilityId == null) {
@@ -196,7 +216,8 @@ public class ViewFacilityFragment extends Fragment {
     }
 
     /**
-     * Clear the input form.
+     * Clears the input form fields and resets the facility ID.
+     * This is called after a successful deletion to reset the form for a new facility.
      */
     private void clearForm() {
         editFacilityName.setText("");
@@ -206,7 +227,8 @@ public class ViewFacilityFragment extends Fragment {
     }
 
     /**
-     * Navigate back to the HomeFragment.
+     * Navigates back to the HomeFragment.
+     * This method is called when the user clicks the cancel or go back button.
      */
     private void navigateToHomeFragment() {
         getParentFragmentManager().beginTransaction()

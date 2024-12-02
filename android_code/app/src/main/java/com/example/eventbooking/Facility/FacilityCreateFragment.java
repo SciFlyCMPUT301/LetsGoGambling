@@ -29,6 +29,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * FacilityCreateFragment is responsible for handling the creation of facilities
+ * by users with the Organizer role. The fragment provides a form where users can input
+ * the facility name, location, and ID. It also ensures that each organizer can only
+ * create one facility at a time.
+ */
 public class FacilityCreateFragment extends Fragment {
 
     private EditText editFacilityName, editFacilityLocation, editFacilityId;
@@ -36,6 +42,14 @@ public class FacilityCreateFragment extends Fragment {
     private FirebaseFirestore db;
     private boolean roleAssigned = false, testingFlag;
 
+    /**
+     * Called when the fragment's view is created. Initializes Firebase, views, and button listeners.
+     *
+     * @param inflater           The LayoutInflater object that can be used to inflate any views in the fragment.
+     * @param container          The parent view that the fragment's UI should be attached to.
+     * @param savedInstanceState A bundle containing saved state, if any.
+     * @return The view hierarchy associated with the fragment.
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -77,6 +91,11 @@ public class FacilityCreateFragment extends Fragment {
         return view;
     }
 
+
+    /**
+     * Checks if the organizer already has a facility. If so, prompts them to delete it first.
+     * Otherwise, proceeds with facility creation.
+     */
     private void checkAndCreateFacility() {
         User currentUser = UserManager.getInstance().getCurrentUser();
         if (currentUser == null) {

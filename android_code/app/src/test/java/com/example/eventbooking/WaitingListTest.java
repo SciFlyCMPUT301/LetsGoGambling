@@ -17,25 +17,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mockito;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class WaitingListTest {
     private WaitingList waitingList;
@@ -43,12 +26,96 @@ public class WaitingListTest {
 
     @Before
     public void setUp() {
-        // Manually create a new instance of WaitingList for each test
         waitingList = new WaitingList("event123");
         waitingList.setMaxParticipants(3);
         waitingList.setWaitingParticipantIds(new ArrayList<>(initialUserIds));
     }
 
+    @Test
+    public void testConstructorAndInitialization() {
+        assertEquals("event123", waitingList.getEventId());
+        assertEquals(3, waitingList.getMaxParticipants());
+        assertEquals(initialUserIds, waitingList.getWaitingParticipantIds());
+        assertTrue(waitingList.getAcceptedParticipantIds().isEmpty());
+        assertTrue(waitingList.getSignedUpParticipantIds().isEmpty());
+        assertTrue(waitingList.getCanceledParticipantIds().isEmpty());
+    }
+
+
+
+    @Test
+    public void testSampleParticipants() {
+        List<String> sampled = waitingList.sampleParticipants(2);
+
+        assertEquals(2, sampled.size());
+        assertEquals(1, waitingList.getWaitingParticipantIds().size());
+        assertTrue(waitingList.getAcceptedParticipantIds().containsAll(sampled));
+    }
+
+    @Test
+    public void testSampleParticipantsExceedingListSize() {
+        List<String> sampled = waitingList.sampleParticipants(10);
+
+        assertEquals(3, sampled.size());
+        assertTrue(waitingList.getWaitingParticipantIds().isEmpty());
+        assertTrue(waitingList.getAcceptedParticipantIds().containsAll(sampled));
+    }
+
+    @Test
+    public void testSampleParticipantsWithZeroOrNegativeSize() {
+        assertTrue(waitingList.sampleParticipants(0).isEmpty());
+        assertTrue(waitingList.sampleParticipants(-1).isEmpty());
+    }
+
+    @Test
+    public void testParticipantSignsUp() {
+        waitingList.sampleParticipants(1);
+        String sampledUser = waitingList.getAcceptedParticipantIds().get(0);
+
+        String result = waitingList.participantSignsUp(sampledUser);
+        assertEquals("Participant has confirmed attendance.Event hasn't full", result);
+        assertTrue(waitingList.getSignedUpParticipantIds().contains(sampledUser));
+        assertFalse(waitingList.getAcceptedParticipantIds().contains(sampledUser));
+    }
+
+    @Test
+    public void testParticipantSignsUpWithoutBeingSampled() {
+        String result = waitingList.participantSignsUp("nonexistentUser");
+        assertEquals("Participant is not in the selected list.", result);
+    }
+
+    @Test
+    public void testParticipantSignsUpWhenEventFull() {
+        waitingList.setMaxParticipants(2);
+        waitingList.sampleParticipants(2);
+        waitingList.participantSignsUp("user1");
+        waitingList.participantSignsUp("user2");
+
+        waitingList.sampleParticipants(1);
+        String result = waitingList.participantSignsUp("user3");
+
+        assertEquals("Event is full. Unable to confirm attendance.", result);
+    }
+
+    @Test
+    public void testDrawReplacement() {
+        waitingList.sampleParticipants(2);
+        waitingList.participantSignsUp("user1");
+        waitingList.participantSignsUp("user2");
+
+        List<String> replacements = waitingList.drawReplacement(1);
+        assertEquals(1, replacements.size());
+        assertTrue(waitingList.getAcceptedParticipantIds().contains(replacements.get(0)));
+    }
+
+
+
+    @Test
+    public void testDrawReplacementWithEmptyWaitingList() {
+        waitingList.setWaitingParticipantIds(new ArrayList<>());
+        List<String> replacements = waitingList.drawReplacement(1);
+        assertTrue(replacements.isEmpty());
+    }
 
     @Test
     public void testGetAndSetEventId() {
@@ -60,55 +127,6 @@ public class WaitingListTest {
     public void testGetAndSetMaxParticipants() {
         waitingList.setMaxParticipants(5);
         assertEquals(5, waitingList.getMaxParticipants());
-    }
-
-    @Test
-    public void testAddParticipantToWaitingList() {
-        assertTrue(waitingList.addParticipantToWaitingList("user4"));
-        assertTrue(waitingList.getWaitingParticipantIds().contains("user4"));
-
-        // Trying to add the same user should return false
-        assertFalse(waitingList.addParticipantToWaitingList("user1"));
-    }
-
-    @Test
-    public void testSampleParticipants() {
-        waitingList.addParticipantToWaitingList("user4");
-        waitingList.addParticipantToWaitingList("user5");
-
-        List<String> sampled = waitingList.sampleParticipants(2);
-        assertEquals(2, sampled.size());
-        assertTrue(waitingList.getAcceptedParticipantIds().containsAll(sampled));
-        assertEquals(3, waitingList.getWaitingParticipantIds().size());
-    }
-
-    @Test
-    public void testParticipantSignsUp() {
-        waitingList.addParticipantToWaitingList("user4");
-        waitingList.sampleParticipants(1);
-        String sampledUser = waitingList.getAcceptedParticipantIds().get(0);
-
-        String result = waitingList.participantSignsUp(sampledUser);
-        assertEquals("Participant has confirmed attendance.Event hasn't full", result);
-        assertTrue(waitingList.getSignedUpParticipantIds().contains(sampledUser));
-        assertFalse(waitingList.getAcceptedParticipantIds().contains(sampledUser));
-    }
-
-
-
-
-
-    @Test
-    public void testDrawReplacement() {
-        waitingList.sampleParticipants(2);
-        waitingList.participantSignsUp("user1");
-        waitingList.participantSignsUp("user2");
-
-//        waitingList.cancelParticipation("user1");
-        List<String> replacements = waitingList.drawReplacement(1);
-
-        assertEquals(1, replacements.size());
-        assertTrue(waitingList.getAcceptedParticipantIds().contains(replacements.get(0)));
     }
 
     @Test

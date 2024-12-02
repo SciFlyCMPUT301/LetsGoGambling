@@ -36,9 +36,13 @@ import com.example.eventbooking.notification.NotificationFragment;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.squareup.picasso.Picasso;
-
+/**
+ * ProfileFragment handles the display and management of a user's profile.
+ * It allows users to view and edit their profile information such as username, email, phone number,
+ * and notifications preferences. It also allows users to upload or remove profile images.
+ */
 public class ProfileFragment extends Fragment {
-
+    // UI components
     private EditText editName, editEmail, editPhone;
     private TextView profileTitle;
     private Button editButton, uploadButton, backButton, removeImageButton, saveButton, notification_button;
@@ -46,13 +50,21 @@ public class ProfileFragment extends Fragment {
     private ImageView userImage;
     private ActivityResultLauncher<Intent> pickImageLauncher;
     private Uri selectedImageUri;
+// User data and flags
 
     private User currentUser;
     private boolean isEditing = false;
     private boolean isNewUser = false;
     private String deviceId;
     private String eventIDFromQR;
-
+    /**
+     * Creates a new instance of ProfileFragment with the provided parameters.
+     *
+     * @param isNewUser Flag indicating if the user is new.
+     * @param eventId   Event ID for navigating to an event.
+     * @param deviceId  Device ID for identifying the user.
+     * @return A new instance of ProfileFragment.
+     */
     public static ProfileFragment newInstance(boolean isNewUser, String eventId, String deviceId) {
         ProfileFragment fragment = new ProfileFragment();
         Bundle args = new Bundle();
@@ -62,12 +74,15 @@ public class ProfileFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
-
+    /**
+     * Called when the fragment's view is created.
+     * Initializes the UI components and loads user data.
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile_view, container, false);
-
+        // Retrieve arguments passed to the fragment
         if (getArguments() != null) {
             Log.d("Profile Fragment", "Arguments passed");
             isNewUser = getArguments().getBoolean("isNewUser", false);
@@ -79,10 +94,11 @@ public class ProfileFragment extends Fragment {
         Log.d("Profile Fragment", "New User: " + isNewUser);
 
         initializeUI(view);
+        // Hide UI components for new users
         if(isNewUser)
             hideUIButtons();
 
-        // Load user data
+        // Load user data if not a new user
         if (!isNewUser) {
             Log.d("Profile Fragment", "Loading User Data");
             currentUser = UserManager.getInstance().getCurrentUser();
@@ -93,7 +109,7 @@ public class ProfileFragment extends Fragment {
             currentUser = UserManager.getInstance().getCurrentUser();
             setEditMode(true);
         }
-
+        // Image picker launcher
         pickImageLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -106,7 +122,11 @@ public class ProfileFragment extends Fragment {
 
         return view;
     }
-
+    /**
+     * Initializes the UI components and sets up click listeners.
+     *
+     * @param view The root view of the fragment.
+     */
     private void initializeUI(View view) {
         profileTitle = view.findViewById(R.id.profile_title);
         editName = view.findViewById(R.id.edit_name);
@@ -121,9 +141,10 @@ public class ProfileFragment extends Fragment {
         userImage = view.findViewById(R.id.user_image);
         removeImageButton = view.findViewById(R.id.button_remove_photo);
         notification_button = view.findViewById(R.id.button_notification);
+        // Hide buttons for image upload and removal initially
         uploadButton.setVisibility(View.GONE);
         removeImageButton.setVisibility(View.GONE);
-
+        // Set up button listeners
         saveButton.setOnClickListener(v -> saveUserProfile());
         backButton.setOnClickListener(v -> goToHome());
         editButton.setOnClickListener(v -> toggleEditMode());
@@ -132,7 +153,11 @@ public class ProfileFragment extends Fragment {
         notification_button.setOnClickListener(v -> navigateNotif());
 
     }
-
+    /**
+     * Populates the UI fields with the loaded user data.
+     *
+     * @param user The user whose profile data is being loaded.
+     */
     private void onProfileLoaded(User user) {
         if (user != null) {
             editName.setText(user.getUsername());
@@ -148,7 +173,9 @@ public class ProfileFragment extends Fragment {
             }
         }
     }
-
+    /**
+     * Saves the edited user profile data.
+     */
     private void saveUserProfile() {
         Log.d("Profile Fragment", "eventID" + eventIDFromQR);
         currentUser.setUsername(editName.getText().toString().trim());
@@ -156,15 +183,13 @@ public class ProfileFragment extends Fragment {
         currentUser.setPhoneNumber(editPhone.getText().toString().trim());
         currentUser.setNotificationAsk(notificationsSwitch.isChecked());
         currentUser.setGeolocationAsk(geolocationSwitch.isChecked());
+        // Handle new user profile creation
         if(isNewUser){
             if(!UniversalProgramValues.getInstance().getTestingMode()){
                 currentUser.defaultProfilePictureUrl(currentUser.getUsername()).addOnSuccessListener(aVoid -> {
                     Log.d("Profile Fragment", "Setting new User");
                     UserManager.getInstance().setCurrentUser(currentUser);
                 }).addOnFailureListener(e -> Log.d("User Manager", "Failed to Update Geopoint"));
-    //            String profileURL = currentUser.defaultProfilePictureUrl(currentUser.getUsername()).toString();
-    //            currentUser.setdefaultProfilePictureUrl(profileURL);
-    //            currentUser.setProfilePictureUrl(profileURL);
             }
             else{
                 currentUser.setProfilePictureUrl("NewDefaultTestURL");
@@ -172,17 +197,11 @@ public class ProfileFragment extends Fragment {
                 UserManager.getInstance().setCurrentUser(currentUser);
             }
         }
-
+// Save user data to Firestore if not in testing mode
         if(!UniversalProgramValues.getInstance().getTestingMode()) {
             currentUser.saveUserDataToFirestore().addOnSuccessListener(aVoid -> {
                 Toast.makeText(getContext(), "Profile saved successfully.", Toast.LENGTH_SHORT).show();
                 setEditMode(false);
-//                if (isNewUser) {
-//                    if (currentUser.isGeolocationAsk()) {
-//                        UserManager.getInstance().updateGeolocation();
-//                    }
-//
-//                }
                 UserManager.getInstance().setCurrentUser(currentUser);
                 if (currentUser.isGeolocationAsk()) {
                     UserManager.getInstance().updateGeolocation();
@@ -209,12 +228,18 @@ public class ProfileFragment extends Fragment {
         }
         isNewUser = false;
     }
-
+    /**
+     * Toggles between edit and view mode for the profile.
+     */
     private void toggleEditMode() {
         isEditing = !isEditing;
         setEditMode(isEditing);
     }
-
+    /**
+     * Sets the profile in either edit mode or view mode.
+     *
+     * @param enable True to enable edit mode, false to disable it.
+     */
     private void setEditMode(boolean enable) {
         if(!isNewUser && enable){
             uploadButton.setVisibility(View.VISIBLE);
@@ -234,7 +259,9 @@ public class ProfileFragment extends Fragment {
         saveButton.setEnabled(enable);
         editButton.setText(enable ? "Cancel" : "Edit");
     }
-
+    /**
+     * Opens the image picker to upload a profile photo.
+     */
     private void uploadPhoto() {
         if(!UniversalProgramValues.getInstance().getTestingMode()){
             Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -250,7 +277,9 @@ public class ProfileFragment extends Fragment {
         }
 
     }
-
+    /**
+     * Removes the profile image and resets to the default image.
+     */
     private void removeImage() {
         if (!currentUser.isDefaultURLMain()) {
             currentUser.deleteSelectedImageFromFirebase(currentUser.getProfilePictureUrl());
@@ -261,20 +290,26 @@ public class ProfileFragment extends Fragment {
             Toast.makeText(getContext(), "Default image is already set.", Toast.LENGTH_SHORT).show();
         }
     }
-
+    /**
+     * Navigates to the HomeFragment.
+     */
     private void goToHome() {
         Log.d("Profile Fragment", "Navigating to HomeFragment");
         getParentFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, new HomeFragment())
                 .commit();
     }
-
+    /**
+     * Navigates to the NotificationFragment.
+     */
     private void navigateNotif(){
         getParentFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, new NotificationFragment())
                 .commit();
     }
-
+    /**
+     * Hides UI elements for new users during profile setup.
+     */
     private void hideUIButtons(){
         editButton.setVisibility(View.GONE);
         uploadButton.setVisibility(View.GONE);
@@ -285,6 +320,9 @@ public class ProfileFragment extends Fragment {
         ((MainActivity) getActivity()).hideNavigationUI();
     }
 
+    /**
+     * Navigates to the EventViewFragment.
+     */
     private void goToEvent(){
         Log.d("Profile Fragment", "Navigating to Event View Fragment");
         if(UniversalProgramValues.getInstance().getTestingMode()){

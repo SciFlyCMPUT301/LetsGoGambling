@@ -80,12 +80,16 @@ public class EventCreateFragment extends Fragment {
     private QRcodeGenerator qrCodeGenerator;
     //empty constructor
     private boolean roleAssigned = false, testingFlag;
+    /**
+     * Default constructor for the EventCreateFragment.
+     */
     public EventCreateFragment(){}
 
     /**
      * Creates a new instance of EventCreateFragment, primarily for testing.
-     * @param testing
-     * @return
+     *
+     * @param testing Flag to indicate if the fragment is being used for testing.
+     * @return A new instance of EventCreateFragment.
      */
     public static EventCreateFragment newInstance(boolean testing) {
         EventCreateFragment fragment = new EventCreateFragment();
@@ -193,7 +197,7 @@ public class EventCreateFragment extends Fragment {
             Toast.makeText(getContext(),"Please enter valid participant", Toast.LENGTH_SHORT).show();
             return;
         }
-
+        // Parse and validate waiting list limit
         Integer waitingListLimit = null;
         if (!TextUtils.isEmpty(waitingListLimitStr)) {
             try {
@@ -206,7 +210,7 @@ public class EventCreateFragment extends Fragment {
         }
         //location, revise later after location class implemented
         //Location location = new Location(locationStr);
-
+        // get the current user
         User currentUser = UserManager.getInstance().getCurrentUser();
         if(currentUser == null){
             Toast.makeText(getContext(),"User not found",Toast.LENGTH_SHORT).show();
@@ -218,9 +222,11 @@ public class EventCreateFragment extends Fragment {
             CollectionReference eventRef = db.collection("Events");
             DocumentReference newEventRef = eventRef.document();
             String eventId = newEventRef.getId();
+            // Create event object
             storeEvent = new Event(eventId, title, description,imageUrl,System.currentTimeMillis(),locationStr,maxParticipants,currentUser.getDeviceID());
             currentEvent = storeEvent;
             storeEvent.setGeolocationRequired(geolocationSwitch.isChecked());
+            // Create and set up a waiting list for the event
             WaitingList waitingList = new WaitingList(eventId);
             waitingList.setMaxParticipants(maxParticipants);
             if(waitingListLimit != null){
@@ -309,6 +315,7 @@ public class EventCreateFragment extends Fragment {
 
         if(!UniversalProgramValues.getInstance().getTestingMode()){
             Event finalStoreEvent = storeEvent;
+            // Generate and save QR code for the event
             storeEvent.saveEventDataToFirestore()
                     .addOnSuccessListener(aVoid -> {
 //                    event
@@ -346,6 +353,11 @@ public class EventCreateFragment extends Fragment {
         editTextImageUrl.setText("");
         editTextLocation.setText("");
     }
+    /**
+     * Generates and displays a QR code for the given event ID.
+     *
+     * @param eventID The ID of the event for which the QR code is generated.
+     */
 
     private void generateAndDisplayQRCode(String eventID) {
         // URL to be encoded into the QR code (example URL with eventId)
@@ -367,6 +379,10 @@ public class EventCreateFragment extends Fragment {
             Toast.makeText(getContext(), "Failed to generate QR code.", Toast.LENGTH_SHORT).show();
         }
     }
+    /**
+     * Displays the current poster image for the event using Picasso. If no image URL is available,
+     * displays a placeholder.
+     */
 
     private void displayCurrentPoster() {
         if (currentEvent == null) {

@@ -1,5 +1,10 @@
 package com.example.eventbooking;
 
+/**
+ * Model class for holding information about a notification that
+ * should be shown to a user. Has references to the user it should be
+ * shown to and the event the notification is related to.
+ */
 public class Notification {
     private String notificationId;
     private String userId;

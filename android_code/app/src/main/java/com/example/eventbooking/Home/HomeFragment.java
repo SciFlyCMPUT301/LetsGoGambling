@@ -60,8 +60,9 @@ public class HomeFragment extends Fragment {
     private List<Event> eventList;
     /**
      * Creates a new instance of HomeFragment with the provided user ID.
-     * @param userId
-     * @return
+     *
+     * @param userId The ID of the user.
+     * @return A new instance of HomeFragment.
      */
     public static HomeFragment newInstance(String userId) {
         HomeFragment fragment = new HomeFragment();
@@ -70,37 +71,17 @@ public class HomeFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
-
-//    /**
-//     * Creates a bundle that we can get testing information off of to allow easier UI testing
-//     * @param testMode
-//     * @param deviceID
-//     * @param eventList
-//     * @return
-//     */
-//    public static HomeFragment newInstance(Boolean testMode, String deviceID, List <Event> eventList) {
-//        HomeFragment fragment = new HomeFragment();
-//        Bundle args = new Bundle();
-//        args.putBoolean("testMode", testMode);
-//        args.putString("deviceID", deviceID);
-//        args.putParcelableArrayList("eventList", new ArrayList<>(eventList));
-//        fragment.setArguments(args);
-//        return fragment;
-//    }
-
-
     /**
      * Inflates the fragment layout, initializes UI components, and sets up button click listeners for navigation.
      *
      * @param inflater The LayoutInflater object that can be used to inflate
-     * any views in the fragment,
+     *                 any views in the fragment.
      * @param container If non-null, this is the parent view that the fragment's
-     * UI should be attached to.  The fragment should not add the view itself,
-     * but this can be used to generate the LayoutParams of the view.
+     *                  UI should be attached to. The fragment should not add the view itself,
+     *                  but this can be used to generate the LayoutParams of the view.
      * @param savedInstanceState If non-null, this fragment is being re-constructed
-     * from a previous saved state as given here.
-     *
-     * @return
+     *                           from a previous saved state as given here.
+     * @return The view for the fragment's UI.
      */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -110,13 +91,14 @@ public class HomeFragment extends Fragment {
         initalizeUI(rootView);
 
         if(!testMode){
+            // Fetch and display user events from the database
             Event.getUserEvents(userId, userEvents -> {
                 if (isAdded() && getActivity() instanceof MainActivity) {
                     allEvents = new ArrayList<>(userEvents);
                     adapter = new HomeUserEventAdapter(getContext(), userEvents, userId);
                     usersEventListView.setAdapter(adapter);
                     setupSearchFilter();
-                    // Set item click listener
+                    // Set item click listener to navigate to event details
                     usersEventListView.setOnItemClickListener((parent, view, position, id) -> {
                         Event selectedEvent = userEvents.get(position);
                         EventViewFragment eventViewFragment = EventViewFragment.newInstance(selectedEvent.getEventId(), userId);
@@ -133,12 +115,12 @@ public class HomeFragment extends Fragment {
         }
 
         else{
-
+            // For test mode, use mock event list
             allEvents = new ArrayList<>(eventList);
             adapter = new HomeUserEventAdapter(getContext(), eventList, testDeviceID);
             usersEventListView.setAdapter(adapter);
             setupSearchFilter();
-            // Set item click listener
+            // Set item click listener for test mode
             usersEventListView.setOnItemClickListener((parent, view, position, id) -> {
                 Event selectedEvent = eventList.get(position);
                 EventViewFragment eventViewFragment = EventViewFragment.newInstance(selectedEvent.getEventId(), testDeviceID);
@@ -150,13 +132,11 @@ public class HomeFragment extends Fragment {
             });
 
         }
-
-
-
         return rootView;
     }
-
-
+    /**
+     * Sets up the search functionality and event filtering based on the search query and filter type.
+     */
     private void setupSearchFilter() {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -184,7 +164,12 @@ public class HomeFragment extends Fragment {
             }
         });
     }
-
+    /**
+     * Filters the event list based on the user's search query and selected filter type.
+     *
+     * @param query The search query entered by the user.
+     * @param filter The selected filter type (e.g., title, description, location).
+     */
     private void filterEvents(String query, String filter) {
         if (query.isEmpty()) {
             adapter.updateEvents(allEvents);
@@ -206,8 +191,12 @@ public class HomeFragment extends Fragment {
 
         adapter.updateEvents(filteredEvents);
     }
-
-
+    /**
+     * Initializes the UI components, including search view, filter spinner, and event list.
+     * Also handles the test mode setup if necessary.
+     *
+     * @param rootView The root view of the fragment.
+     */
     private void initalizeUI(View rootView){
         ((MainActivity) getActivity()).showNavigationUI();
         testMode = UniversalProgramValues.getInstance().getTestingMode();
@@ -225,9 +214,6 @@ public class HomeFragment extends Fragment {
         searchView = rootView.findViewById(R.id.search_bar);
         filterSpinner = rootView.findViewById(R.id.filter_spinner);
         userId = UserManager.getInstance().getUserId();
-
-
-
     }
 }
 

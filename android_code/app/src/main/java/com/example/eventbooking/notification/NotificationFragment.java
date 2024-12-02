@@ -23,21 +23,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A fragment that displays a notification with an integer value and provides buttons to navigate
+ * A fragment that displays the user's notifications and provides buttons to navigate
  * to the ProfileFragment or HomeFragment.
  */
 public class NotificationFragment extends Fragment {
-
     /**
-     * Inflates the fragment layout and sets up the view components.
+     * Inflates the fragment layout and sets up the view components, including buttons for navigation
+     * and a ListView to display notifications.
      *
      * @param inflater           The LayoutInflater object to inflate views.
      * @param container          The container that holds the fragment.
      * @param savedInstanceState The saved state of the fragment (not used here).
      * @return The root view of the fragment.
      */
-
-    // Inflate the layout and display the integer
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -51,7 +49,7 @@ public class NotificationFragment extends Fragment {
                     .replace(R.id.fragment_container, new ProfileFragment())
                     .commit();
         });
-
+        // Set up ListView to display notifications
         ListView notificationListView = rootView.findViewById(R.id.notification_list);
         String currentUserId = UserManager.getInstance().getUserId();
         if(!UniversalProgramValues.getInstance().getTestingMode())
@@ -65,16 +63,16 @@ public class NotificationFragment extends Fragment {
                 for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
                     notifications.add(doc.toObject(Notification.class));
                 }
-
+                // Set up the adapter for displaying the notifications
                 NotificationArrayAdapter adapter = new NotificationArrayAdapter(getContext(), notifications);
                 notificationListView.setAdapter(adapter);
 
-                // setup on clicks for each notif
+                // Set up an on-click listener for each notification
                 notificationListView.setOnItemClickListener((parent, view, position, id) -> {
                     Notification selectedNotification = notifications.get(position);
                     selectedNotification.setRead(true);
                     nm.updateNotification(selectedNotification);
-
+// Navigate to EventViewFragment with the selected notification's event
                     EventViewFragment eventViewFragment = EventViewFragment.newInstance(selectedNotification.getEventId(), currentUserId);
 
                     getParentFragmentManager().beginTransaction()
@@ -84,10 +82,6 @@ public class NotificationFragment extends Fragment {
                 });
             });
         }
-
-
-
-
         // Set up the Back button to navigate to HomeFragment
         Button backButton = rootView.findViewById(R.id.button_back_home);
         backButton.setOnClickListener(v -> {

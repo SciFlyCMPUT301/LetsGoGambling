@@ -82,9 +82,6 @@ public class Event implements Parcelable {
     private List<String> signedUpParticipantIds;
     private List<String> enrolledParticipantIds;
     private List<String> declinedParticipantIds;
-//    private String defaultEventpictureurl;
-    //private String customImageUrl;
-
     private WaitingList waitingList;
     private String organizerId;
     private FirebaseFirestore db;
@@ -94,7 +91,6 @@ public class Event implements Parcelable {
      * Default constructor that initializes Firebase Firestore and Storage instances, as well as
      * participant lists.
      */
-
     public Event() {
         if(!UniversalProgramValues.getInstance().getTestingMode()){
             storage = FirebaseStorage.getInstance();
@@ -111,12 +107,22 @@ public class Event implements Parcelable {
         this.declinedParticipantIds = new ArrayList<>();
 
     }
+    /**
+     * Constructs an Event with a given event ID.
+     *
+     * @param eventID The unique identifier of the event.
+     */
 
     public Event(int eventID) {
         storage = FirebaseStorage.getInstance();
         db = FirebaseFirestore.getInstance();
         this.waitingList=new WaitingList();
     }
+    /**
+     * Constructs an Event in test mode without Firebase dependencies.
+     *
+     * @param testMode Whether the event is in test mode.
+     */
 
     public Event(Boolean testMode){
         this.waitingList= new WaitingList();
@@ -130,9 +136,9 @@ public class Event implements Parcelable {
     }
 
     /**
-     * Secondary constructor
+     * Constructs an Event with a specific Firestore database instance.
      *
-     * @param db
+     * @param db The Firestore database instance.
      */
     public Event(FirebaseFirestore db) {
         this.db = db;
@@ -145,6 +151,12 @@ public class Event implements Parcelable {
         this.enrolledParticipantIds = new ArrayList<>();
         this.declinedParticipantIds = new ArrayList<>();
     }
+    /**
+     * Constructs an Event with Firestore and FirebaseStorage dependencies.
+     *
+     * @param db      The Firestore database instance.
+     * @param storage The Firebase storage instance.
+     */
     public Event(FirebaseFirestore db, FirebaseStorage storage) {
         this.db = db;
         this.storage = storage;
@@ -191,12 +203,17 @@ public class Event implements Parcelable {
     }
 
 
-    /** get event id
-     * @return eventId*/
+    /**
+     * Gets the event ID.
+     *
+     * @return The event ID.
+     */
     public String getEventId() { return eventId; }
     /**
-     * set event id
-     * @param eventId*/
+     * Sets the event ID.
+     *
+     * @param eventId The event ID to set.
+     */
     public void setEventId(String eventId) { this.eventId = eventId; }
     /**
      * get event id
@@ -228,22 +245,20 @@ public class Event implements Parcelable {
     public long getTimestamp() { return timestamp; }
     /**
      * set Time stamp
-     * @param timestamp*/
+     * @param timestamp */
     public void setTimestamp(long timestamp) { this.timestamp = timestamp; }
-
-//    public Location getLocation() { return location; }
-//    public void setLocation(Location new_location) { this.location = new_location; }
-// Ensure the field name matches the key in Firestore
-
-
+    /**
+     * checks geolocation
+     * @return geolocationRequired */
     public boolean isGeolocationRequired() {
         return geolocationRequired;
     }
+    /**
+     * get geolocation
+     * @param geolocationRequired  */
     public void setGeolocationRequired(boolean geolocationRequired) {
         this.geolocationRequired = geolocationRequired;
     }
-
-
     /**
      * get address
      * @return address */
@@ -285,28 +300,54 @@ public class Event implements Parcelable {
     public void setLocation(String location) {
         this.location = location;
     }
-
+    /**
+     * get qr code hashed
+     * @return qrcodehash
+     */
     public String getQRcodeHash() {
         return qrcodehash;
     }
+
+    /**
+     * set qr code hashed
+     * @param QRcodeHash
+     */
     public void setQRcodeHash(String QRcodeHash) {
         this.qrcodehash = QRcodeHash;
     }
 
+    /**
+     * get defaultEventPosterURL
+     * @return defaultEventPosterURL
+     */
+
     public String getDefaultEventpictureurl() {
         return defaultEventPosterURL;
     }
+
+    /**
+     * set defaultEventPosterURL
+     * @param defaultEventpictureurl
+     */
     public void setDefaultEventpictureurl(String defaultEventpictureurl) {
         this.defaultEventPosterURL = defaultEventpictureurl;
     }
 
+    /**
+     * get eventPosterURL
+     * @return eventPosterURL
+     */
+
     public String getEventPictureUrl() {
         return eventPosterURL;
     }
+    /**
+     * set eventPictureUrl
+     * @param eventPictureUrl
+     */
     public void setEventPictureUrl(String eventPictureUrl) {
         this.eventPosterURL = eventPictureUrl;
     }
-
     /**
      * Adding new information here for the different lists that are in the event
      * the first part is getters, the last bit are moving from one list to another,
@@ -401,7 +442,12 @@ public class Event implements Parcelable {
         if(waitingparticipantIds.contains(entrantId)){
             waitingparticipantIds.remove(entrantId);}
     }
-
+    /**
+     * Generates a URL for the event poster.
+     *
+     * @return A URL string for the event poster.
+     * @throws IllegalArgumentException If the event ID is invalid.
+     */
     public String createEventPosterUrl() {
         if (eventId != null && !eventId.isEmpty()) {
             return "https://firebasestorage.googleapis.com/v0/b/YOUR_FIREBASE_PROJECT_ID/o/Events%2F"
@@ -410,65 +456,11 @@ public class Event implements Parcelable {
             throw new IllegalArgumentException("Event ID is invalid");
         }
     }
-//    /**
-//     * Saves event data to Firestore with event details and participant lists.
-//     *
-//     * @return A task representing the asynchronous save operation.
-//     */
-//    public Task<Void> saveEventDataToFirestore() {
-//        if (eventId == null) {
-//            return getNewEventID().continueWithTask(newEventIDTask -> {
-//                if (!newEventIDTask.isSuccessful() || newEventIDTask.getResult() == null) {
-//                    throw new Exception("Failed to generate new Event ID");
-//                }
-//                String newEventID = newEventIDTask.getResult();
-//                this.eventId = newEventID;
-//
-//                Map<String, Object> eventData = new HashMap<>();
-//                eventData.put("eventId", newEventID);
-//                populateEventData(eventData);
-//
-//                return db.collection("Events").document(newEventID).set(eventData);
-//            });
-//        } else {
-//            Map<String, Object> eventData = new HashMap<>();
-//            eventData.put("eventId", eventId);
-//            populateEventData(eventData);
-//
-//            return db.collection("Events").document(eventId).set(eventData);
-//        }
-//    }
-
-
-//    public Task<Void> saveEventDataToFirestore() {
-////        Log.d("Event", "Saving Event to Firestore");
-//        Map<String, Object> eventData = new HashMap<>();
-//
-//        Task<Void> saveTask;
-//
-//        if (eventId == null) {
-//            return getNewEventID().continueWithTask(newEventIDTask -> {
-//                if (!newEventIDTask.isSuccessful() || newEventIDTask.getResult() == null) {
-//                    throw new Exception("Failed to generate new Event ID");
-//                }
-//                String newEventID = newEventIDTask.getResult();
-//                this.eventId = newEventID;
-//
-//                Map<String, Object> eventData = new HashMap<>();
-//                eventData.put("eventId", newEventID);
-//                populateEventData(eventData);
-//
-//                return db.collection("Events").document(newEventID).set(eventData);
-//            });
-//        } else {
-//            Map<String, Object> eventData = new HashMap<>();
-//            eventData.put("eventId", eventId);
-//            populateEventData(eventData);
-//
-//            return db.collection("Events").document(eventId).set(eventData);
-//        }
-//    }
-
+    /**
+     * Saves event data to Firestore.
+     *
+     * @return A Task representing the save operation.
+     */
 
     public Task<Void> saveEventDataToFirestore() {
 //        Log.d("Event", "Saving Event to Firestore");
@@ -513,6 +505,11 @@ public class Event implements Parcelable {
                 });
     }
 
+    /**
+     * Populates event data into the given map for Firebase storage.
+     *
+     * @param eventData Map to be populated with event properties.
+     */
 
     private void populateEventData(Map<String, Object> eventData) {
         eventData.put("eventTitle", eventTitle);
@@ -530,8 +527,6 @@ public class Event implements Parcelable {
         eventData.put("eventPosterURL", eventPosterURL);
         eventData.put("defaultEventPosterURL", defaultEventPosterURL);
         eventData.put("geolocationRequired", geolocationRequired);
-        //eventData.put("eventPictureUrl",eventPictureUrl);
-        //eventData.put("defaultEventpictureurl",defaultEventpictureurl);
         if(qrcodehash == null){
             QRcodeGenerator qrCodeGenerator = new QRcodeGenerator();
             String hashInput = eventId + Calendar.getInstance().getTime();
@@ -543,17 +538,17 @@ public class Event implements Parcelable {
     }
 
     /**
-     * update event data to the firebase
-     * @param newTitle
-     * @param newDescription
-     * @param newLocation
-     * @param newMaxParticipants
-     * @param newOrganizerId
-     * @param newWaitingparticipantIds
-     * @param newAcceptedParticipantIds
-     * @param newCanceledParticipantIds
-     * @param newSignedUpParticipantIds
-     * @return
+     * Updates event data in Firebase Firestore.
+     *
+     * @param newTitle                  New title for the event.
+     * @param newDescription            New description for the event.
+     * @param newLocation               New location for the event.
+     * @param newMaxParticipants        New maximum participant count.
+     * @param newOrganizerId            New organizer ID.
+     * @param newWaitingparticipantIds  Updated waiting list of participants.
+     * @param newAcceptedParticipantIds Updated list of accepted participants.
+     * @param newCanceledParticipantIds Updated list of canceled participants.
+     * @param newSignedUpParticipantIds Updated list of signed-up participants.
      */
     public Task<Void> updateEventData(String newTitle, String newDescription, String newLocation, int newMaxParticipants, String newOrganizerId,
                                       List<String> newWaitingparticipantIds, List<String> newAcceptedParticipantIds,
@@ -574,25 +569,6 @@ public class Event implements Parcelable {
         // Prepare the updated event data map
         Map<String, Object> eventData = new HashMap<>();
         populateEventData(eventData);
-//        eventData.put("eventId", eventId);
-//        eventData.put("eventTitle", eventTitle);
-//        eventData.put("description", description);
-//        eventData.put("location", location);
-//        eventData.put("maxParticipants", maxParticipants);
-//        eventData.put("waitingparticipantIds", waitingparticipantIds);
-//        eventData.put("acceptedParticipantIds", acceptedParticipantIds);
-//        eventData.put("canceledParticipantIds", canceledParticipantIds);
-//        eventData.put("signedUpParticipantIds", signedUpParticipantIds);
-//        eventData.put("organizerId", organizerId);
-//        eventData.put("imageUrl",imageUrl);
-//        eventData.put("eventPosterURL", eventPictureUrl);
-//        eventData.put("defaultEventPosterURL", defaultEventpictureurl);
-//        //eventData.put("customeImage",customImageUrl);
-//        String eventUrl = "eventbooking://eventDetail?eventID=" + eventId;
-//        QRcodeGenerator qrCodeGenerator = new QRcodeGenerator();
-//        String QRHash = qrCodeGenerator.createQRCodeHash(eventUrl);
-//        this.QRcodeHash = QRHash;
-//        eventData.put("qrcodehash", QRHash);
 
         // Save or update the event data in Firestore
         return db.collection("Events").document(eventId)
@@ -604,107 +580,38 @@ public class Event implements Parcelable {
 //                    Log.e("Event", "Error updating event data in Firestore: " + e.getMessage());
                 });
     }
-
-    /***
-     * upload the evnet poster to the firebase
-     * @param picture
-     */
-//    public void uploadEventPosterToFirebase(String picture) {
-//        if (eventId == null || eventId.isEmpty()) {
-//            throw new IllegalArgumentException("Event ID must be set before uploading an event poster.");
-//        }
-//        if (picture == null || picture.isEmpty()) {
-//            throw new IllegalArgumentException("Invalid picture path.");
-//        }
-//
-//        StorageReference storageRef = storage.getReference();
-//
-//        // Create a unique filename for the picture
-//        String fileName = "event_poster_" + System.currentTimeMillis() + ".jpg";
-//        StorageReference posterRef = storageRef.child("Events/" + eventId + "/event_poster/" + fileName);
-//
-//        // Convert the picture path to a Uri
-//        Uri fileUri = Uri.fromFile(new File(picture));
-//
-//        // Start the upload task
-//        UploadTask uploadTask = posterRef.putFile(fileUri);
-//        uploadTask.addOnSuccessListener(taskSnapshot -> {
-//            // Get the download URL after the upload is successful
-//            posterRef.getDownloadUrl().addOnSuccessListener(uri -> {
-//                imageUrl = uri.toString();
-//                System.out.println("Event Poster uploaded successfully: " + imageUrl);
-//                Map<String, Object> updates = new HashMap<>();
-//                updates.put("imageUrl", imageUrl);
-//
-//                db.collection("Events").document(eventId)
-//                        .update(updates)
-//                        .addOnSuccessListener(aVoid -> {
-//                            System.out.println("Image URL successfully updated in Firestore.");
-//                        })
-//                        .addOnFailureListener(e -> {
-//                            System.out.println("Error updating image URL in Firestore: " + e.getMessage());
-//                        });
-//            }).addOnFailureListener(exception -> {
-//                throw new IllegalArgumentException("Failed to retrieve download URL from Firebase.", exception);
-//            });
-//        }).addOnFailureListener(exception -> {
-//            throw new IllegalArgumentException("Failed to upload the event poster to Firebase.", exception);
-//        });
-//    }
-//
-//    /**
-//     * update the event poster to firebase
-//     * @param newPoster
-//     */
-//    public void updateEventPosterToFirebase(String newPoster) {
-//        uploadEventPosterToFirebase(newPoster);
-//    }
-
     /**
-     * geenrate new event id
-     * @return
+     * Generates a new event ID based on the number of existing events in Firestore.
+     *
+     * @return A Task containing the newly generated event ID as a String.
      */
-//    public Task<String> getNewEventID() {
-//        return db.collection("Events").get()
-//                .continueWith(task -> {
-//                    if (task.isSuccessful() && task.getResult() != null) {
-//                        int newIdNumber = task.getResult().size() + 1;
-//                        return "eventID" + newIdNumber;
-//                    } else {
-//                        String errorMessage = "Failed to fetch event count";
-//                        if (task.getException() != null) {
-//                            throw new Exception(errorMessage, task.getException());
-//                        } else {
-//                            throw new Exception(errorMessage);
-//                        }
-//                    }
-//                });
-//    }
+
     public Task<String> getNewEventID() {
+        // Retrieve all documents in the "Events" collection
         Task<QuerySnapshot> queryTask = db.collection("Events").get();
         if (queryTask == null) {
+            // Handle case where Firestore query fails
             return Tasks.forException(new NullPointerException("Firestore query returned null"));
         }
+        // Continue the task to generate a new event ID
         return queryTask.continueWith(task -> {
             if (!task.isSuccessful() || task.getResult() == null) {
+                // Throw an exception if the task fails or result is null
                 throw task.getException() != null
                         ? task.getException()
                         : new Exception("Failed to fetch event count");
             }
+            // Create a unique event ID by appending the current count of events
             int newIdNumber = task.getResult().size() + 1;
             return "eventID" + newIdNumber;
         });
     }
-
-
-
-
-
     /**
-     * retrive the event id from firebase
-     * @param eventId
-     * @param onSuccessListener
-     * @param onFailureListener
+     * Retrieves an event by its ID from Firestore.
+     *
+     * @param eventId           The ID of the event to retrieve.
+     * @param onSuccessListener Callback invoked when the event is successfully retrieved.
+     * @param onFailureListener Callback invoked when an error occurs during retrieval.
      */
     public static void findEventById(String eventId, OnSuccessListener<Event> onSuccessListener, OnFailureListener onFailureListener) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -712,9 +619,11 @@ public class Event implements Parcelable {
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
+                        // Convert the Firestore document to an Event object
                         Event event = documentSnapshot.toObject(Event.class);
                         onSuccessListener.onSuccess(event);
                     } else {
+                        // Return null if the event is not found
                         onSuccessListener.onSuccess(null); // Event not found
                     }
                 })
@@ -722,29 +631,31 @@ public class Event implements Parcelable {
     }
 
     /**
-     * add user to the declined list
-     * @param userId
+     * Adds a user to the declined participant list for the event.
+     *
+     * @param userId The ID of the user to add to the declined participant list.
      */
-    // Method to add a user to the declined list
     public void addDeclinedParticipantId(String userId) {
+        // Check if the user is already in the declined list
         if (!declinedParticipantIds.contains(userId)) {
+            // Add the user ID to the declined list if not present
             declinedParticipantIds.add(userId);
         }
     }
 
     /**
-     * get user ids from the decline participant
-     * @return declinedparticipantIds
+     * Retrieves the list of declined participant IDs.
+     *
+     * @return A list of IDs of participants who declined the event.
      */
-    // Getter for declined participant IDs (optional, if needed elsewhere in code)
     public List<String> getDeclinedParticipantIds() {
         return declinedParticipantIds;
     }
 
     /**
-     * Manually setting the firestore
+     * Sets a mock Firestore instance for testing purposes.
      *
-     * @param mockFirestore
+     * @param mockFirestore The mocked Firestore instance to use.
      */
     public void setFirestore(FirebaseFirestore mockFirestore) {
         db = mockFirestore;
@@ -752,12 +663,12 @@ public class Event implements Parcelable {
 
 
     /**
-     * This function is more of a stop gap measure for the HomeFragment in displaying the Users Events
-     * A Event that relates to the User means that the User is in some list for the event
+     * Retrieves events related to a specific user.
+     * A user-related event means the user is listed in one of the event's participant lists.
      *
-     * @param userId
-     * @param onSuccess
-     * @param onFailure
+     * @param userId     The ID of the user whose events are to be retrieved.
+     * @param onSuccess  Callback invoked with the list of user-related events on success.
+     * @param onFailure  Callback invoked if an error occurs during retrieval.
      */
     public static void getUserEvents(String userId, OnSuccessListener<List<Event>> onSuccess, OnFailureListener onFailure) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -773,24 +684,24 @@ public class Event implements Parcelable {
                                         || event.getWaitingParticipantIds().contains(userId)
                                         || event.getCanceledParticipantIds().contains(userId)
                                         || event.getSignedUpParticipantIds().contains(userId))) {
+                            // Add the event to the user's list if related
                             userEvents.add(event);
                         }
                     }
                     onSuccess.onSuccess(userEvents);
                 })
-                .addOnFailureListener(onFailure);
+                .addOnFailureListener(onFailure); // Handle errors
     }
 
     /**
-     * This function is more of a stop gap measure for the AdminEvent Fragment in displaying the Users Events
-     * All events in firebase
+     * Retrieves all events from Firestore.
      *
-     * @param onSuccess
-     * @param onFailure
+     * @param onSuccess Callback invoked with the list of all events on success.
+     * @param onFailure Callback invoked if an error occurs during retrieval.
      */
     public static void getAllEvents(OnSuccessListener<List<Event>> onSuccess, OnFailureListener onFailure) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-
+        // Query Firestore for all events in the "Events" collection
         db.collection("Events")
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
@@ -798,33 +709,41 @@ public class Event implements Parcelable {
                     for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
                         Event event = doc.toObject(Event.class);
                         if (event != null) {
+                            // Add each event to the list
                             Log.d("Event", "Adding event");
                             userEvents.add(event);
                         }
                     }
                     onSuccess.onSuccess(userEvents);
                 })
-                .addOnFailureListener(onFailure);
+                .addOnFailureListener(onFailure); // HANDLE ERRORS
     }
-
-    //get organizer event
+    /**
+     * Retrieves all events organized by a specific user.
+     *
+     * @param userId    The ID of the organizer whose events are to be retrieved.
+     * @param onSuccess Callback invoked with the list of organizer events on success.
+     * @param onFailure Callback invoked if an error occurs during retrieval.
+     */
     public static void getOrganizerEvents(String userId, OnSuccessListener<List<Event>> onSuccess, OnFailureListener onFailure) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-
+        // Query Firestore for events where the organizer ID matches the user ID
         db.collection("Events")
-                .whereEqualTo("organizerId",userId)
+                .whereEqualTo("organizerId",userId) // Query by organizer ID
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     List<Event> userEvents = new ArrayList<>();
+                    // Add all events organized by the user to the list
                     for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
                         Event event = doc.toObject(Event.class);
                         if (event != null) {
-                            userEvents.add(event);
+                            userEvents.add(event); // Add event if it belongs to the organizer
                         }
                     }
+                    // Invoke the success callback with the organizer's event list
                     onSuccess.onSuccess(userEvents);
                 })
-                .addOnFailureListener(onFailure);
+                .addOnFailureListener(onFailure); //HANDLE ERRORS
     }
 
     /**
@@ -858,6 +777,13 @@ public class Event implements Parcelable {
 
     //poster stuff
     //generat edeafult poster
+    /**
+     * Generates a default poster for the event as a bitmap image.
+     * The poster features the first letter of the event title or a default "E" if the title is not provided.
+     *
+     * @param eventTitle The title of the event. If null or empty, "E" is used as the default.
+     * @return A Bitmap image representing the generated poster.
+     */
     public Bitmap generateDefaultPoster(String eventTitle) {
         String letter = (eventTitle == null || eventTitle.isEmpty()) ? "E" : String.valueOf(eventTitle.charAt(0)).toUpperCase();
         int size = 300; // Larger size for poster
@@ -876,20 +802,32 @@ public class Event implements Parcelable {
 
         return bitmap;
     }
-
+    /**
+     * Generates a default poster for the given event title and uploads it to Firebase Storage.
+     * The poster is saved in the "default_posters" folder.
+     *
+     * @param eventTitle The title of the event. If null or empty, a default "E" will be used for the poster.
+     * @return A Task<Void> representing the completion of the upload process. The task fails if the upload or poster generation fails.
+     */
     public Task<Void> uploadDefaultPoster(String eventTitle) {
         Bitmap bitmap = generateDefaultPoster(eventTitle);
 
-
+        // Convert the bitmap to a byte array
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
         byte[] byteArray = byteArrayOutputStream.toByteArray();
 
-
+        // Upload to Firebase Storage
         return uploadPosterToFirebaseStorage(byteArray, "default_posters");
     }
-
-
+    /**
+     * Uploads a poster image to Firebase Storage and updates the event's Firestore document with the URL.
+     *
+     * @param imageBytes The byte array representing the poster image.
+     * @param folderName The folder in Firebase Storage where the poster will be uploaded.
+     * @return A Task that completes when the upload and Firestore update are successful.
+     * @throws Exception If any error occurs during upload or Firestore update.
+     */
     public Task<Void> uploadPosterToFirebaseStorage(byte[] imageBytes, String folderName) {
         String posterFileName = folderName + "/" + UUID.randomUUID().toString() + ".png";
         StorageReference posterRef = storage.getReference().child(posterFileName);
@@ -919,8 +857,13 @@ public class Event implements Parcelable {
                     return db.collection("Events").document(eventId).update(updates);
                 });
     }
-
-
+    /**
+     * Uploads a custom poster image to Firebase Storage and updates the event's image URL in Firestore.
+     *
+     * @param imageUri The URI of the custom poster image to upload.
+     * @return A Task<Void> representing the completion of the upload process. The task fails if either the upload
+     *         or Firestore update fails.
+     */
     public Task<Void> uploadCustomPoster(Uri imageUri) {
         StorageReference posterRef = storage.getReference().child("event_posters/" + UUID.randomUUID().toString() + ".png");
 
@@ -952,7 +895,13 @@ public class Event implements Parcelable {
         uploadCustomPoster(newPosterUri);
     }
 
-
+    /**
+     * Deletes the specified poster from Firebase Storage and resets the event poster to the default.
+     *
+     * @param posterUrl The URL of the poster to delete.
+     * @return A Task<Void> representing the completion of the deletion process. The task fails if the poster
+     *         deletion or default poster upload fails.
+     */
     public Task<Void> deleteSelectedPosterFromFirebase(String posterUrl) {
         StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl(posterUrl);
 
@@ -967,20 +916,18 @@ public class Event implements Parcelable {
                 .addOnSuccessListener(aVoid -> Log.d("FirebaseStorage", "Poster deleted and reset to default successfully."))
                 .addOnFailureListener(e -> Log.e("FirebaseStorage", "Failed to delete or reset poster.", e));
     }
-
-
-
-
     /**
-     * Checks if the default URL is currently being used for the event poster.
+     * Checks if the current event poster is the default poster.
      *
-     * @return true if the default URL is the main one, false otherwise.
+     * @return true if the event poster URL matches the default poster URL, false otherwise.
      */
     public boolean isDefaultPoster() {
         return imageUrl != null && imageUrl.equals(defaultEventPosterURL);
     }
-
-
+    /**
+     * Generates a new QR code hash for the event and saves the event data to Firestore.
+     * If the application is in testing mode, updates the hash locally instead.
+     */
     public void getNewEventQRHash(){
         QRcodeGenerator qrCodeGenerator = new QRcodeGenerator();
         this.qrcodehash = qrCodeGenerator.createQRCodeHash(eventId);
@@ -1002,6 +949,10 @@ public class Event implements Parcelable {
         }
 
     }
+    /**
+     * Represents an event with details such as title, description, participants, and organizer information.
+     * Implements Parcelable to enable passing Event objects between Android components.
+     */
 
     protected Event(Parcel in) {
         eventId = in.readString();
@@ -1024,6 +975,12 @@ public class Event implements Parcelable {
         organizerId = in.readString();
         qrcodehash = in.readString();
     }
+    /**
+     * Writes the Event object's data to a Parcel.
+     *
+     * @param dest  The Parcel in which the data should be written.
+     * @param flags Additional flags about how the object should be written.
+     */
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
@@ -1046,18 +1003,37 @@ public class Event implements Parcelable {
         dest.writeString(organizerId);
         dest.writeString(qrcodehash);
     }
+    /**
+     * Describes the contents of the Parcelable instance.
+     *
+     * @return An integer indicating the content type (default is 0).
+     */
 
     @Override
     public int describeContents() {
         return 0;
     }
+    /**
+     * A public static field that generates instances of the Event class from a Parcel.
+     */
 
     public static final Creator<Event> CREATOR = new Creator<Event>() {
+        /**
+         * Creates a new Event instance from the data in the Parcel.
+         *
+         * @param in The Parcel containing the Event data.
+         * @return A new Event object.
+         */
         @Override
         public Event createFromParcel(Parcel in) {
             return new Event(in);
         }
-
+        /**
+         * Creates a new array of the Event class.
+         *
+         * @param size The size of the array to be created.
+         * @return An array of Event objects.
+         */
         @Override
         public Event[] newArray(int size) {
             return new Event[size];

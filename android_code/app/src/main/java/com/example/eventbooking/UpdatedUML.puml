@@ -321,6 +321,31 @@ class UserManager {
     + getUserEvents() : List<Event>
     + getUserId() : String
 }
+
+class EventMapFragment {
+    - MapView mapView
+    - GoogleMap googleMap
+    - EditText eventIdEditText
+    - Button activateButton
+    - Spinner listSpinner
+    - FirebaseFirestore db
+    - String selectedListType = "Waitlist"
+    - List<User> userList
+    - String eventID
+
+    + static EventMapFragment newInstance(String eventID)
+    + View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    + void onMapReady(GoogleMap map)
+    + void showUserPopup(User user)
+    + void onResume()
+    + void onPause()
+    + void onDestroy()
+    + void onLowMemory()
+    - void loadUserFromFirebase(String userId, OnSuccessListener<User> onSuccess, OnFailureListener onFailure)
+    - void loadEventUsers(String eventId, String listType)
+    - void addMarkersForUsers(List<String> userIds)
+}
+
 class TestFragment {
     -- Attributes --
     - TAG : String

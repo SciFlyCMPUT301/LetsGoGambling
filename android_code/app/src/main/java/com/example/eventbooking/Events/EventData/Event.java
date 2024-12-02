@@ -174,7 +174,7 @@ public class Event implements Parcelable {
         this.eventId = eventId;
         this.eventTitle = eventTitle;
         this.description = description;
-        this.imageUrl = imageUrl;
+        this.eventPosterURL = imageUrl;
         this.timestamp = timestamp;
 
         //this.location = location;
@@ -827,6 +827,35 @@ public class Event implements Parcelable {
                 .addOnFailureListener(onFailure);
     }
 
+    /**
+     * This function deletes all events in Firebase where the organizerID matches the given ID.
+     *
+     * @param organizerID The ID of the organizer whose events need to be deleted.
+     * @param onSuccess Callback to be invoked if the deletion succeeds.
+     * @param onFailure Callback to be invoked if the deletion fails.
+     */
+    public static void deleteEventsByOrganizer(String organizerID, OnSuccessListener<Void> onSuccess, OnFailureListener onFailure) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        db.collection("Events")
+                .whereEqualTo("organizerID", organizerID)  // Query to find events with the specified organizerID
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
+                        // Delete the event document
+                        db.collection("Events")
+                                .document(doc.getId())
+                                .delete()
+                                .addOnSuccessListener(aVoid -> {
+                                    Log.d("Event", "Event with ID " + doc.getId() + " deleted successfully.");
+                                })
+                                .addOnFailureListener(onFailure);
+                    }
+                    onSuccess.onSuccess(null);
+                })
+                .addOnFailureListener(onFailure);
+    }
+
     //poster stuff
     //generat edeafult poster
     public Bitmap generateDefaultPoster(String eventTitle) {
@@ -926,7 +955,6 @@ public class Event implements Parcelable {
 
     public Task<Void> deleteSelectedPosterFromFirebase(String posterUrl) {
         StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl(posterUrl);
-
 
         return storageRef.delete()
                 .continueWithTask(task -> {

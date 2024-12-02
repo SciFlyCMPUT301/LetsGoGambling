@@ -17,10 +17,17 @@ import com.example.eventbooking.Facility.FacilityCreateFragment;
 import com.example.eventbooking.Facility.ViewFacilityFragment;
 import com.example.eventbooking.Home.HomeUserEventAdapter;
 import com.example.eventbooking.R;
+import com.example.eventbooking.UniversalProgramValues;
 import com.example.eventbooking.UserManager;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class OragnizerEventFragment  extends Fragment{
     private int someInteger = 42; // Example integer to pass
     private String userId;
+    private ListView usersEventListView;
+    private List<Event> organizerEventList;
     //private Button addEvent;
 
     /**
@@ -67,34 +74,66 @@ public class OragnizerEventFragment  extends Fragment{
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_organizer_event, container, false);
 
-        ListView usersEventListView = rootView.findViewById(R.id.user_events_list);
+        usersEventListView = rootView.findViewById(R.id.user_events_list);
         String currentUserId = UserManager.getInstance().getUserId();
 
         // Fetch events for the organizer
-        Event.getOrganizerEvents(currentUserId, organizerEvents -> {
-            HomeUserEventAdapter adapter = new HomeUserEventAdapter(getContext(), organizerEvents, currentUserId);
+        if(!UniversalProgramValues.getInstance().getTestingMode()){
+            Event.getOrganizerEvents(currentUserId, organizerEvents -> {
+                HomeUserEventAdapter adapter = new HomeUserEventAdapter(getContext(), organizerEvents, currentUserId);
+                usersEventListView.setAdapter(adapter);
+
+                // Set item click listener to navigate to EventViewFragment
+                usersEventListView.setOnItemClickListener((parent, view, position, id) -> {
+                    Event selectedEvent = organizerEvents.get(position);
+                    // EventViewFragment eventViewFragment = EventViewFragment.newInstance(selectedEvent.getEventId(), currentUserId);
+                    OrganizerEventDetailFragment eventDetailView = OrganizerEventDetailFragment.newInstance(selectedEvent.getEventId());
+                    getParentFragmentManager().beginTransaction()
+                            .replace(R.id.fragment_container, eventDetailView)
+                            .addToBackStack(null) // Ensures returning to OragnizerEventFragment
+                            .commit();
+                });
+            }, e -> {
+                Log.e("OragnizerEventFragment", "Failed to fetch events: " + e.getMessage());
+            });
+        }
+        else{
+            organizerEventList = new ArrayList<>();
+            organizerEventList.addAll(UniversalProgramValues.getInstance().getEventList());
+            HomeUserEventAdapter adapter = new HomeUserEventAdapter(getContext(), organizerEventList, currentUserId);
             usersEventListView.setAdapter(adapter);
 
             // Set item click listener to navigate to EventViewFragment
             usersEventListView.setOnItemClickListener((parent, view, position, id) -> {
-                Event selectedEvent = organizerEvents.get(position);
-               // EventViewFragment eventViewFragment = EventViewFragment.newInstance(selectedEvent.getEventId(), currentUserId);
+                Event selectedEvent = organizerEventList.get(position);
+                // EventViewFragment eventViewFragment = EventViewFragment.newInstance(selectedEvent.getEventId(), currentUserId);
                 OrganizerEventDetailFragment eventDetailView = OrganizerEventDetailFragment.newInstance(selectedEvent.getEventId());
                 getParentFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container, eventDetailView)
                         .addToBackStack(null) // Ensures returning to OragnizerEventFragment
                         .commit();
             });
-        }, e -> {
-            Log.e("OragnizerEventFragment", "Failed to fetch events: " + e.getMessage());
-        });
+
+        }
+
         // Button to create a new event
         Button addEventButton = rootView.findViewById(R.id.btn_add_event);
         Button addFacilityButton = rootView.findViewById(R.id.btn_add_facility);
         Button viewFacilityButton = rootView.findViewById(R.id.btn_view_facility);
-        addFacilityButton.setVisibility(View.VISIBLE);
-        addEventButton.setVisibility(View.VISIBLE);
-        viewFacilityButton.setVisibility(View.VISIBLE);
+
+
+        if(UserManager.getInstance().getCurrentUser().isFacilityAssociated()){
+            addFacilityButton.setVisibility(View.GONE);
+            viewFacilityButton.setVisibility(View.VISIBLE);
+            addEventButton.setVisibility(View.VISIBLE);
+        }
+        else{
+            addFacilityButton.setVisibility(View.VISIBLE);
+            viewFacilityButton.setVisibility(View.GONE);
+            addEventButton.setVisibility(View.GONE);
+        }
+
+
 
         viewFacilityButton.setOnClickListener(v -> {
             ViewFacilityFragment viewFacilityFragment = new ViewFacilityFragment();

@@ -39,10 +39,10 @@
 
         <!-- Back Button -->
         <Button
-            android:id="@+id/button_back_home"
+            android:id="@+id/button_back_organizer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Back to Home"
+            android:text="Back to Organizer"
             android:layout_gravity="start"
             android:layout_marginBottom="16dp"
             android:backgroundTint="@color/purple"
@@ -64,7 +64,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Facility ID"
-            android:inputType="number"
+            android:inputType="text"
             android:layout_marginBottom="8dp"
             android:background="@drawable/edit_text_background"
             android:padding="12dp" />

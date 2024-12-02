@@ -23,8 +23,10 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import com.example.eventbooking.Events.EventPageFragment.OragnizerEventFragment;
 import com.example.eventbooking.Home.HomeFragment;
 import com.example.eventbooking.QRCode.QRcodeGenerator;
+import com.example.eventbooking.UniversalProgramValues;
 import com.example.eventbooking.waitinglist.WaitingList;
 import com.example.eventbooking.Location;
 import com.example.eventbooking.R;
@@ -48,6 +50,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 /**
  * Fragment for creating new events. This fragment allows users to input event details, such as title, description,
@@ -61,6 +64,7 @@ public class EventCreateFragment extends Fragment {
     private EditText editTextLocation;
     private EditText editMaxParticipants;
     private EditText editWaitingListLimit;
+    private EditText editEventName;
     private Button createEventButton;
     private Button backButton;
     private FirebaseFirestore db;
@@ -125,6 +129,7 @@ public class EventCreateFragment extends Fragment {
         editTextDescription = rootView.findViewById(R.id.event_description);
         editTextLocation = rootView.findViewById(R.id.event_location);
         editMaxParticipants = rootView.findViewById(R.id.max_participants);
+        editEventName = rootView.findViewById(R.id.event_name);
         posterImageView = rootView.findViewById(R.id.event_poster_image);
         //remainder here , add the limit number to set up maximum entrant in witinglist
         editTextImageUrl = rootView.findViewById(R.id.event_image_url);
@@ -144,8 +149,11 @@ public class EventCreateFragment extends Fragment {
         Button backButton = rootView.findViewById(R.id.button_back_home);
         backButton.setOnClickListener(v -> {
             // Navigate back to HomeFragment
+//            getParentFragmentManager().beginTransaction()
+//                    .replace(R.id.fragment_container, new HomeFragment())
+//                    .commit();
             getParentFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new HomeFragment())
+                    .replace(R.id.fragment_container, new OragnizerEventFragment())
                     .commit();
         });
         //set up the create event button
@@ -163,14 +171,13 @@ public class EventCreateFragment extends Fragment {
      */
     private void createEvent(){
 
-
-        String title = editTextTitle.getText().toString().trim();
+        String title = editEventName.getText().toString().trim();
         String description = editTextDescription.getText().toString().trim();
         String imageUrl = editTextImageUrl.getText().toString().trim();
         String locationStr = editTextLocation.getText().toString().trim();
         String maxParticipantsStr= editMaxParticipants.getText().toString().trim();
         String waitingListLimitStr = editWaitingListLimit.getText().toString().trim();// make it to int later
-
+        Event storeEvent = new Event();
         //error handling
         if(TextUtils.isEmpty(title)||TextUtils.isEmpty(description)||TextUtils.isEmpty(locationStr)
                 ||TextUtils.isEmpty(maxParticipantsStr)){
@@ -206,67 +213,121 @@ public class EventCreateFragment extends Fragment {
             return;
         }
         //generate event id
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        CollectionReference eventRef = db.collection("Events");
-        DocumentReference newEventRef = eventRef.document();
-        String eventId = newEventRef.getId();
-        Event event = new Event(eventId, title, description,imageUrl,System.currentTimeMillis(),locationStr,maxParticipants,currentUser.getDeviceID());
-        currentEvent = event;
-        event.setGeolocationRequired(geolocationSwitch.isChecked());
-
-
-
-
-        WaitingList waitingList = new WaitingList(eventId);
-        waitingList.setMaxParticipants(maxParticipants);
-        if(waitingListLimit != null){
-            waitingList.setWaitingListLimit(waitingListLimit);
+        if(!UniversalProgramValues.getInstance().getTestingMode()){
+            db = FirebaseFirestore.getInstance();
+            CollectionReference eventRef = db.collection("Events");
+            DocumentReference newEventRef = eventRef.document();
+            String eventId = newEventRef.getId();
+            storeEvent = new Event(eventId, title, description,imageUrl,System.currentTimeMillis(),locationStr,maxParticipants,currentUser.getDeviceID());
+            currentEvent = storeEvent;
+            storeEvent.setGeolocationRequired(geolocationSwitch.isChecked());
+            WaitingList waitingList = new WaitingList(eventId);
+            waitingList.setMaxParticipants(maxParticipants);
+            if(waitingListLimit != null){
+                waitingList.setWaitingListLimit(waitingListLimit);
+            }
         }
+        else{
+            String newEventID = "eventID" + (UniversalProgramValues.getInstance().getEventList().size()+1);
+            storeEvent = new Event();
+            storeEvent.setEventId(newEventID);
+            storeEvent.setEventTitle(title);
+            storeEvent.setDescription(description);
+            storeEvent.setEventPictureUrl(imageUrl);
+            storeEvent.setTimestamp(System.currentTimeMillis());
+            storeEvent.setLocation(locationStr);
+            storeEvent.setMaxParticipants(maxParticipants);
+            storeEvent.setOrganizerId(currentUser.getDeviceID());
+            currentEvent = storeEvent;
+            storeEvent.setGeolocationRequired(geolocationSwitch.isChecked());
+            WaitingList waitingList = new WaitingList(newEventID);
+            waitingList.setMaxParticipants(maxParticipants);
+            if(waitingListLimit != null){
+                waitingList.setWaitingListLimit(waitingListLimit);
+            }
+        }
+
+
+
+
+
+//        WaitingList waitingList = new WaitingList(eventId);
+//        waitingList.setMaxParticipants(maxParticipants);
+//        if(waitingListLimit != null){
+//            waitingList.setWaitingListLimit(waitingListLimit);
+//        }
 
         //assign organizer to the current user
 
         if(!currentUser.hasRole(Role.ORGANIZER)){
             currentUser.addRole(Role.ORGANIZER);
             roleAssigned= true;
-
-
         }
 
 
         //update role in firebase
         if (roleAssigned) {
-            db = FirebaseFirestore.getInstance();
-            CollectionReference usersRef = db.collection("Users");
-            usersRef.document(currentUser.getDeviceID())
-                    .update("roles", currentUser.getRoles())
-                    .addOnSuccessListener(aVoid -> {
-                        Toast.makeText(getContext(), "User role updated successfully", Toast.LENGTH_SHORT).show();
-                    })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(getContext(), "Failed to update user role", Toast.LENGTH_SHORT).show();
-                    });
+            if(!UniversalProgramValues.getInstance().getTestingMode()){
+                db = FirebaseFirestore.getInstance();
+                CollectionReference usersRef = db.collection("Users");
+                usersRef.document(currentUser.getDeviceID())
+                        .update("roles", currentUser.getRoles())
+                        .addOnSuccessListener(aVoid -> {
+                            Toast.makeText(getContext(), "User role updated successfully", Toast.LENGTH_SHORT).show();
+                        })
+                        .addOnFailureListener(e -> {
+                            Toast.makeText(getContext(), "Failed to update user role", Toast.LENGTH_SHORT).show();
+                        });
+            }
+            else{
+//                List<String> role = UniversalProgramValues.getInstance().queryUser(currentUser.getDeviceID()).getRoles();
+                UniversalProgramValues.getInstance().queryUser(currentUser.getDeviceID()).setRoles(currentUser.getRoles());
+            }
+
         }
         if (currentEvent != null && TextUtils.isEmpty(currentEvent.getImageUrl())) {
-            currentEvent.uploadDefaultPoster(title)
-                    .addOnSuccessListener(aVoid -> {
-                        Log.d("EventCreateFragment", "Default poster uploaded successfully.");
+            if(!UniversalProgramValues.getInstance().getTestingMode()){
+                currentEvent.uploadDefaultPoster(title)
+                        .addOnSuccessListener(aVoid -> {
+                            Log.d("EventCreateFragment", "Default poster uploaded successfully.");
+                            displayCurrentPoster();
+                        })
+                        .addOnFailureListener(e -> {
+                            Log.e("EventCreateFragment", "Failed to upload default poster.", e);
+                            Toast.makeText(getContext(), "Failed to upload default poster.", Toast.LENGTH_SHORT).show();
+                        });
+            }
+            else{
+                String url = UniversalProgramValues.getInstance().getUploadProfileURL();
+                currentEvent.setEventPictureUrl(url);
+//                UniversalProgramValues.getInstance().queryEvent(currentEvent.getEventId()).setEventPictureUrl(url);
+                displayCurrentPoster();
+            }
 
-                        displayCurrentPoster();
-                    })
-                    .addOnFailureListener(e -> {
-                        Log.e("EventCreateFragment", "Failed to upload default poster.", e);
-                        Toast.makeText(getContext(), "Failed to upload default poster.", Toast.LENGTH_SHORT).show();
-                    });
         }
         Log.d("Create Event Fragment", "Save Event");
-        event.saveEventDataToFirestore()
-                .addOnSuccessListener(aVoid -> {
+
+        if(!UniversalProgramValues.getInstance().getTestingMode()){
+            Event finalStoreEvent = storeEvent;
+            storeEvent.saveEventDataToFirestore()
+                    .addOnSuccessListener(aVoid -> {
 //                    event
-                    QRCode.setImageBitmap(qrCodeGenerator.generateAndSendBackQRCode(event.getEventId()));
+                        QRCode.setImageBitmap(qrCodeGenerator.generateAndSendBackQRCode(finalStoreEvent.getEventId()));
 //                    generateAndDisplayQRCode(event.getEventId());
-                    Log.d("Event", "Event successfully saved!");
-                })
-                .addOnFailureListener(e -> Log.e("Event", "Error saving event", e));
+                        Log.d("Event", "Event successfully saved!");
+                    })
+                    .addOnFailureListener(e -> Log.e("Event", "Error saving event", e));
+
+        }
+        else{
+//            Event storetodelete = UniversalProgramValues.getInstance().queryEvent(currentEvent.getEventId());
+//            UniversalProgramValues.getInstance().getEventList().remove(storetodelete);
+            UniversalProgramValues.getInstance().getEventList().add(storeEvent);
+            QRCode.setImageBitmap(qrCodeGenerator.generateAndSendBackQRCode(storeEvent.getEventId()));
+        }
+
+
+        navigateToOrganizerFragment();
 
 
 
@@ -323,6 +384,15 @@ public class EventCreateFragment extends Fragment {
                     .error(R.drawable.error_image_foreground)
                     .into(posterImageView);
         }
+    }
+
+    /**
+     * Navigate back to the Organizer page.
+     */
+    private void navigateToOrganizerFragment(){
+        getParentFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, new OragnizerEventFragment())
+                .commit();
     }
 
 

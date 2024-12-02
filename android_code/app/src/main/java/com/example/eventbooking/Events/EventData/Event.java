@@ -506,6 +506,7 @@ public class Event implements Parcelable {
         eventData.put("timestamp", timestamp);
         eventData.put("location", address);
         eventData.put("maxParticipants", maxParticipants);
+        eventData.put("waitingListLimit", waitingListLimit);
         eventData.put("waitingparticipantIds", waitingparticipantIds);
         eventData.put("acceptedParticipantIds", acceptedParticipantIds);
         eventData.put("canceledParticipantIds", canceledParticipantIds);

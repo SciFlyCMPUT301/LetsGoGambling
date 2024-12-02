@@ -39,19 +39,35 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * Fragment for displaying a Google Map with user locations for an event.
+ * Allows users to view and interact with participant markers based on selected list types.
+ */
 public class EventMapFragment extends Fragment implements OnMapReadyCallback {
-
+    /** MapView for displaying the Google Map */
     private MapView mapView;
+    /** GoogleMap instance for interacting with the map */
     private GoogleMap googleMap;
+    /** EditText for entering the Event ID */
     private EditText eventIdEditText;
+    /** Button to activate and load users for the specified Event ID */
     private Button activateButton;
+    /** Spinner to select the list type (e.g., Waitlist, Accepted List) */
     private Spinner listSpinner;
+    /** FirebaseFirestore instance for database interaction */
     private FirebaseFirestore db;
+    /** Selected list type (e.g., "Waitlist") */
     private String selectedListType = "Waitlist";
+    /** List of users for the selected event */
     private List<User> userList;
+    /** Event ID for which users are being displayed */
     private String eventID;
-
+    /**
+     * Creates a new instance of EventMapFragment with the specified Event ID.
+     *
+     * @param eventID The ID of the event.
+     * @return A new instance of EventMapFragment.
+     */
     public static EventMapFragment newInstance(String eventID) {
         EventMapFragment fragment = new EventMapFragment();
         Bundle args = new Bundle();
@@ -62,6 +78,7 @@ public class EventMapFragment extends Fragment implements OnMapReadyCallback {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        //Inflate the fragment layout
         View view = inflater.inflate(R.layout.fragment_event_map, container, false);
 
         mapView = view.findViewById(R.id.mapView);
@@ -69,15 +86,15 @@ public class EventMapFragment extends Fragment implements OnMapReadyCallback {
         activateButton = view.findViewById(R.id.activateButton);
         listSpinner = view.findViewById(R.id.listSpinner);
 
-
+// Set up the MapView and load the map asynchronously
         mapView = view.findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
 
         userList = new ArrayList<>();
-
+        // Initialize the Firestore database and user list
         db = FirebaseFirestore.getInstance();
-
+        // Listener for the list spinner to update selectedListType based on user choice
         listSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -89,11 +106,12 @@ public class EventMapFragment extends Fragment implements OnMapReadyCallback {
                 selectedListType = "Waitlist";
             }
         });
+        // If fragment arguments contain an event ID, load users for that event
         if(getArguments() != null){
             eventID = getArguments().getString("eventId");
             loadEventUsers(eventID, selectedListType);
         }
-
+        // Listener for the activate button to load users for the specified event ID
         activateButton.setOnClickListener(v -> {
             String eventId = eventIdEditText.getText().toString().trim();
             if (eventId.isEmpty()) {
@@ -105,12 +123,16 @@ public class EventMapFragment extends Fragment implements OnMapReadyCallback {
 
         return view;
     }
-
+    /**
+     * Callback for when the map is ready.
+     *
+     * @param map The GoogleMap instance.
+     */
     @Override
     public void onMapReady(@NonNull GoogleMap map) {
         googleMap = map;
         googleMap.setOnMarkerClickListener(marker -> {
-            // Show popup with user details
+            // Listener for marker clicks to show user details in a popup
             User user = (User) marker.getTag(); // Assume User object is attached to the marker
             if (user != null) {
                 showUserPopup(user);
@@ -118,54 +140,18 @@ public class EventMapFragment extends Fragment implements OnMapReadyCallback {
             return true;
         });
     }
-
+    /**
+     * Displays a popup with user details when a marker is clicked.
+     *
+     * @param user The User object attached to the marker.
+     */
     private void showUserPopup(User user) {
         // Example: Show a Toast. Replace this with a custom dialog or bottom sheet.
         Toast.makeText(getContext(), "User: " + user.getUsername() + "\nEmail: " + user.getEmail(), Toast.LENGTH_LONG).show();
     }
 
-    private void setupMarkers() {
-
-        // Example here to dynamically allocated the data based on users or whatever
-//        for (MyLocationData data : locationList) {
-//            LatLng position = new LatLng(data.getLatitude(), data.getLongitude());
-//            googleMap.addMarker(new MarkerOptions()
-//                    .position(position)
-//                    .title(data.getName())
-//                    .snippet(data.getDescription()));
-//        }
-
-//        if (!locationList.isEmpty()) {
-//            LatLng firstLocation = new LatLng(locationList.get(0).getLatitude(), locationList.get(0).getLongitude());
-//            CameraPosition cameraPosition = new CameraPosition.Builder()
-//                    .target(firstLocation)
-//                    .zoom(14) // Adjust zoom level
-//                    .build();
-//            googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-//        }
-////
-//
-//
-//        // Example marker at a specific location
-//        LatLng location1 = new LatLng(53.5261, -113.5260);
-//        googleMap.addMarker(new MarkerOptions()
-//                .position(location1)
-//                .title("Marker 1")
-//                .snippet("This is marker 1's info."));
-//
-//        LatLng location2 = new LatLng(53.5270, -113.5250);
-//        googleMap.addMarker(new MarkerOptions()
-//                .position(location2)
-//                .title("Marker 2")
-//                .snippet("This is marker 2's info."));
-//
-//        // Move the camera to the first marker
-//        CameraPosition cameraPosition = new CameraPosition.Builder()
-//                .target(location1)
-//                .zoom(14) // Zoom level
-//                .build();
-//        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-    }
+    //private void setupMarkers() {
+    //}
 
     private void showMarkerPopup(Marker marker) {
         new AlertDialog.Builder(getContext())
@@ -198,6 +184,13 @@ public class EventMapFragment extends Fragment implements OnMapReadyCallback {
         super.onLowMemory();
         mapView.onLowMemory();
     }
+    /**
+     * Loads a user from Firestore by their ID.
+     *
+     * @param userId   The ID of the user to load.
+     * @param onSuccess Callback for successful user loading.
+     * @param onFailure Callback for failure in user loading.
+     */
 
     private void loadUserFromFirebase(String userId, OnSuccessListener<User> onSuccess, OnFailureListener onFailure) {
         Log.d("Event Map", "Load UserID");
@@ -212,7 +205,12 @@ public class EventMapFragment extends Fragment implements OnMapReadyCallback {
             }
         }).addOnFailureListener(onFailure);
     }
-
+    /**
+     * Loads event users from Firestore and adds markers to the map.
+     *
+     * @param eventId  The ID of the event.
+     * @param listType The type of user list to load (e.g., "Waitlist").
+     */
 
     private void loadEventUsers(String eventId, String listType) {
         db.collection("Events").document(eventId).get().addOnSuccessListener(documentSnapshot -> {
@@ -255,7 +253,11 @@ public class EventMapFragment extends Fragment implements OnMapReadyCallback {
             Toast.makeText(getContext(), "Failed to load event: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         });
     }
-
+    /**
+     * Adds markers for users to the map based on their locations.
+     *
+     * @param userIds List of user IDs to add markers for.
+     */
     private void addMarkersForUsers(List<String> userIds) {
         Log.d("Event Map", "Marker start");
         googleMap.clear(); // Clear previous markers

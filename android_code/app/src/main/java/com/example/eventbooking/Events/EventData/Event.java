@@ -54,6 +54,7 @@ public class Event implements Parcelable {
     private String address;
     private String location;
     private int maxParticipants; // limit number of entrants
+    private int waitingListLimit;
     private List<String> waitingparticipantIds;
     private List<String> acceptedParticipantIds;
     private List<String> canceledParticipantIds;
@@ -326,6 +327,15 @@ public class Event implements Parcelable {
     public void setEventPosterURL(String eventPictureUrl) {
         this.eventPosterURL = eventPictureUrl;
     }
+
+    public int getWaitingListLimit() {
+        return waitingListLimit;
+    }
+
+    public void setWaitingListLimit(int waitingListLimit) {
+        this.waitingListLimit = waitingListLimit;
+    }
+
     /**
      * Adding new information here for the different lists that are in the event
      * the first part is getters, the last bit are moving from one list to another,

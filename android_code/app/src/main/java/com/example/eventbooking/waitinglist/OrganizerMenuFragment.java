@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * The {@code OrganizerEventDetailFragment} class displays detailed information
@@ -607,22 +608,24 @@ public class OrganizerMenuFragment extends Fragment {
         }
 
         if (!UniversalProgramValues.getInstance().getTestingMode()) {
-            currentEvent.deleteSelectedPosterFromFirebase(currentEvent.getImageUrl())
-                    .addOnSuccessListener(aVoid -> {
-                        currentEvent.uploadDefaultPoster(currentEvent.getEventTitle())
-                                .addOnSuccessListener(defaultPoster -> {
-                                    displayCurrentPoster();
-                                    Toast.makeText(getContext(), "Custom poster removed. Default poster is now active.", Toast.LENGTH_SHORT).show();
-                                })
-                                .addOnFailureListener(e -> {
-                                    Toast.makeText(getContext(), "Failed to reset poster to default.", Toast.LENGTH_SHORT).show();
-                                    Log.e("OrganizerMenuFragment", "Error resetting poster to default", e);
-                                });
-                    })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(getContext(), "Failed to remove custom poster.", Toast.LENGTH_SHORT).show();
-                        Log.e("OrganizerMenuFragment", "Error removing poster", e);
-                    });
+            if(Objects.equals(currentEvent.getEventPosterURL(), currentEvent.getDefaultEventPosterURL())){
+                currentEvent.deleteSelectedPosterFromFirebase(currentEvent.getImageUrl())
+                        .addOnSuccessListener(aVoid -> {
+                            currentEvent.uploadDefaultPoster(currentEvent.getEventTitle())
+                                    .addOnSuccessListener(defaultPoster -> {
+                                        displayCurrentPoster();
+                                        Toast.makeText(getContext(), "Custom poster removed. Default poster is now active.", Toast.LENGTH_SHORT).show();
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Toast.makeText(getContext(), "Failed to reset poster to default.", Toast.LENGTH_SHORT).show();
+                                        Log.e("OrganizerMenuFragment", "Error resetting poster to default", e);
+                                    });
+                        })
+                        .addOnFailureListener(e -> {
+                            Toast.makeText(getContext(), "Failed to remove custom poster.", Toast.LENGTH_SHORT).show();
+                            Log.e("OrganizerMenuFragment", "Error removing poster", e);
+                        });
+            }
         }
         else{
             currentEvent.setEventPosterURL(currentEvent.getDefaultEventPosterURL());

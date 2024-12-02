@@ -200,7 +200,7 @@ public class EventEditFragment extends Fragment {
             return;
         }
 
-        String posterUrl = editEvent.getImageUrl();
+        String posterUrl = editEvent.getEventPosterURL();
         if (posterUrl == null || posterUrl.isEmpty()) {
             eventPoster.setImageResource(R.drawable.placeholder_image_foreground);
         } else {
@@ -245,9 +245,6 @@ public class EventEditFragment extends Fragment {
                             Toast.makeText(getContext(), "Failed to remove custom poster.", Toast.LENGTH_SHORT).show();
                             Log.e("OrganizerMenuFragment", "Error removing poster", e);
                         });
-            }
-            else{
-
             }
 
         }

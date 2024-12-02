@@ -895,9 +895,9 @@ public class Event implements Parcelable {
                     if (!downloadUriTask.isSuccessful()) {
                         throw downloadUriTask.getException();
                     }
-                    this.imageUrl = downloadUriTask.getResult().toString();
+                    this.eventPosterURL = downloadUriTask.getResult().toString();
                     Map<String, Object> updates = new HashMap<>();
-                    updates.put("imageUrl", this.imageUrl);
+                    updates.put("eventPosterURL", this.eventPosterURL);
 
 
                     return db.collection("Events").document(eventId).update(updates);

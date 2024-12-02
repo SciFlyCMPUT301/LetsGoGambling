@@ -3,6 +3,7 @@ package com.example.eventbooking.profile;
 /**
  * The EntrantProfile class represents the profile information of an event entrant,
  * including personal details such as name, email, phone number, and notification preferences.
+ * This class is used to manage and display an entrant's profile within the system.
  */
 public class EntrantProfile {
     private String name;
@@ -18,17 +19,18 @@ public class EntrantProfile {
 
     /**
      * Constructs an EntrantProfile with specified name, email, and phone number.
-     * Notifications are disabled by default.
-     * @param name of the entrant
-     * @param email of the entrant
-     * @param phoneNumber of the entrant
+     * Notifications are disabled by default upon profile creation.
+     *
+     * @param name The name of the entrant.
+     * @param email The email of the entrant.
+     * @param phoneNumber The phone number of the entrant.
      */
 
     public EntrantProfile(String name, String email, String phoneNumber) {
         this.name = name;
         this.email = email;
         this.phoneNumber = phoneNumber;
-        this.notificationsEnabled = false;
+        this.notificationsEnabled = false;// notifications are disabled by default
     }
 
     // Getters and setters
@@ -68,8 +70,9 @@ public class EntrantProfile {
     }
 
     /**
-     * sets notification preferences for the entrant
-     * @param enabled true to enable notifications and false for disabling them
+     * Sets the notification preferences for the entrant.
+     *
+     * @param enabled True to enable notifications, false to disable notifications.
      */
 
     public void setNotificationsEnabled(boolean enabled) {
@@ -77,11 +80,10 @@ public class EntrantProfile {
     }
     /**
      * Returns a string representation of the EntrantProfile object, including all profile details.
+     * This can be useful for debugging or displaying the profile in logs.
      *
      * @return A string representation of the entrant profile.
      */
-
-
     @Override
     public String toString() {
         return "EntrantProfile{" +

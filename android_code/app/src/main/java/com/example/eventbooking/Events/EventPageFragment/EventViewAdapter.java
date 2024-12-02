@@ -17,8 +17,6 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
-
-
 /// TODO:
 //Change this to event_adapter_layout
 
@@ -26,17 +24,21 @@ import java.util.List;
  * EventViewAdapter is a custom ArrayAdapter used for displaying events in a ListView.
  * Each item in the list represents an event with details such as event ID, title, date joined,
  * and the user's list status in relation to the event (e.g., Accepted, Waiting).
+ * It also loads the event's image into an ImageView.
+ *
+ * This adapter supports a test mode for displaying predefined event statuses.
  */
 public class EventViewAdapter extends ArrayAdapter<Event> {
 
     private Context context;
     private List<Event> eventList;
-    private String userId = "User1";
-    private boolean test;
+    private String userId = "User1";  // Default user ID for test purposes
+    private boolean test; // Boolean flag to switch between normal and test mode
 
     //constructor, call on creation
     /**
      * Constructor for EventViewAdapter.
+     * Initializes the adapter with the context, event list, and test flag.
      *
      * @param context   the context in which the adapter is used
      * @param eventList the list of Event objects to be displayed
@@ -51,9 +53,9 @@ public class EventViewAdapter extends ArrayAdapter<Event> {
 
     //called when rendering the list
 
-
     /**
      * Returns the view for a specific item in the list.
+     * This method is called for each item in the ListView to display its data.
      *
      * @param position    the position of the item within the adapter's data set
      * @param convertView the old view to reuse, if possible
@@ -69,17 +71,18 @@ public class EventViewAdapter extends ArrayAdapter<Event> {
         View view = inflater.inflate(R.layout.event_adapter_view, null);
 //        Log.d("Event Adapter", "asdasdasdasdasd");
 
+        // Initialize the views
         TextView deviceID = (TextView) view.findViewById(R.id.event_id);
         TextView username = (TextView) view.findViewById(R.id.event_name);
         TextView dateJoined = (TextView) view.findViewById(R.id.date_joined);
         TextView listStatus = (TextView) view.findViewById(R.id.user_list_status);
         ImageView eventPoster = view.findViewById(R.id.event_poster);
 
-
+        // Set event details to the respective views
         deviceID.setText(event.getEventId());
         username.setText(event.getEventTitle());
         dateJoined.setText("Today");
-
+        // Determine the user's list status in relation to the event
         String status;
         if(test == false){
             status = "";
@@ -95,9 +98,9 @@ public class EventViewAdapter extends ArrayAdapter<Event> {
             status = "Not in Any List";
         }
 
-        // Set the list status text
+        // Set the status text to indicate the user's involvement with the event
         listStatus.setText(status);
-
+        // Load the event's poster image using Picasso library
         String posterUrl = event.getImageUrl();
         if (posterUrl != null && !posterUrl.isEmpty()) {
             Picasso.get()
@@ -109,12 +112,7 @@ public class EventViewAdapter extends ArrayAdapter<Event> {
             // Set a placeholder image if no URL is provided
             eventPoster.setImageResource(R.drawable.ic_event_poster_placeholder);
         }
-
-
-//        //get the image associated with this property
-//        int imageID = context.getResources().getIdentifier(property.getImage(), "drawable", context.getPackageName());
-//        image.setImageResource(imageID);
-
+        // Return the view representing the event
         return view;
     }
 }

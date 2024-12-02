@@ -194,12 +194,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 //        locationRequest.setInterval(5000);
 //        locationRequest.setFastestInterval(2000);
+        handleIntent(getIntent());
         getCurrentLocation();
 
 
 
         // Getting the login fragment given intent
-        handleIntent(getIntent());
+//        handleIntent(getIntent());
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -359,6 +360,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      */
     @Override
     protected void onNewIntent(Intent intent) {
+        Log.d("INTENT", "New intent: " + intent.getData());
         super.onNewIntent(intent);
         handleIntent(intent);
     }
@@ -371,14 +373,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      */
     private void handleIntent(Intent intent) {
         Log.d("Main Activity", "Handle Intent: ");
-        boolean loggingin = false;
+        Log.d("MainActivity", "Intent: " + intent.getData());
+//        boolean loggingin = false;
         if (intent != null && intent.getData() != null) {
             String url = intent.getData().toString();
             Log.d(TAG, "Incoming URL: " + url);
 
             eventIdFromQR = extractEventIdFromUrl(url);
             String eventHash = extractEventHashFromUrl(url);
-
+            Log.d("MainActivity", "Incoming eventID: " + eventIdFromQR);
+            Log.d("MainActivity", "Incoming event Hash: " + eventHash);
+            FirestoreAccess fs = new FirestoreAccess();
             FirestoreAccess.getInstance().checkEventExists(eventIdFromQR, eventHash)
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
@@ -402,7 +407,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 } else {
                     // Show login screen first
                     Log.d("MainActivity Is not Loggedin", "Not Logged in");
-                    loggingin = true;
+//                    loggingin = true;
                     showLoginFragment(eventIdFromQR);
                 }
             } else {
@@ -423,12 +428,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      */
     private String extractEventIdFromUrl(String url) {
         // Assuming the URL is in the format: eventbooking://eventDetail?eventID=12345
-        String[] parts = url.split("eventID=");
-        String[] sub_parts = parts[1].split("hash=");
-        if (sub_parts.length > 1) {
-            return parts[0];
-        }
-        return null;
+        String[] eventIdParts = url.split("eventID=");
+        String[] splitParts = eventIdParts[1].split("\\?hash=");
+        String eventID = splitParts[0];
+        String hash = splitParts[1];
+        Log.d("Main Activity", "Parts1: " + eventIdParts[0]);
+        Log.d("Main Activity", "Parts2: " + eventIdParts[1]);
+        Log.d("Main Activity", "SUBParts1: " + splitParts[0]);
+        Log.d("Main Activity", "SUBParts2: " + splitParts[1]);
+        return eventID;
+
+
     }
 
     /**
@@ -440,12 +450,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private String extractEventHashFromUrl(String url) {
         // Assuming the URL is in the format: eventbooking://eventDetail?eventID=12345
 //        "eventbooking://eventDetail?eventID=12345?hash=" + qrCodeHash;
-        String[] parts = url.split("eventID=");
-        String[] sub_parts = parts[1].split("hash=");
-        if (sub_parts.length > 1) {
-            return parts[1];
-        }
-        return null;
+        String[] eventIdParts = url.split("eventID=");
+        String[] splitParts = eventIdParts[1].split("\\?hash=");
+        String eventID = splitParts[0];
+        String hash = splitParts[1];
+        Log.d("Main Activity", "Parts1: " + eventIdParts[0]);
+        Log.d("Main Activity", "Parts2: " + eventIdParts[1]);
+        Log.d("Main Activity", "SUBParts1: " + splitParts[0]);
+        Log.d("Main Activity", "SUBParts2: " + splitParts[1]);
+        return hash;
     }
 
     /**
@@ -456,9 +469,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void showLoginFragment(String eventIdFromQR) {
         // Show LoginFragment first
 //        if(!testMode){
-            Log.d("Main Activity", "No Test Show Login Fragment");
-            LoginFragment loginArgs = LoginFragment.newInstance(eventIdFromQR);
-            moveToFragment(loginArgs);
+        Log.d("Main Activity", "No Test Show Login Fragment");
+        LoginFragment loginArgs = LoginFragment.newInstance(eventIdFromQR);
+        moveToFragment(loginArgs);
 //        }
 //        else{
 //            Log.d("Main Activity", "No Test Show Login Fragment");
@@ -500,7 +513,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         args.putString("eventId", eventID);
 
         // Here get the userid and put it into it
-        args.putString("deviceId", "User1");
+//        args.putString("deviceId", "User1");
         eventViewFragment.setArguments(args);
 
         getSupportFragmentManager().beginTransaction()

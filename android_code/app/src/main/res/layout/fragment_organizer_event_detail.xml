@@ -38,6 +38,13 @@
         android:paddingTop="8dp"
         android:text="more action"/>
 
+    <Button
+        android:id= "@+id/button_edit_event"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:paddingTop="8dp"
+        android:text="Edit Event Details"/>
+
     <LinearLayout
         android:id="@+id/button_container"
         android:layout_width="match_parent"

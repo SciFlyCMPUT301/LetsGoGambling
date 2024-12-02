@@ -9,50 +9,28 @@ import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.os.UserManager;
-import android.provider.ContactsContract;
 import android.util.Log;
-import android.widget.Toast;
-
-import androidx.annotation.NonNull;
-
-import com.example.eventbooking.Admin.Images.ImageClass;
-import com.example.eventbooking.Location;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
-import com.example.eventbooking.MainActivity;
 import com.example.eventbooking.QRCode.QRcodeGenerator;
-import com.example.eventbooking.Role;
 import com.example.eventbooking.UniversalProgramValues;
-import com.example.eventbooking.User;
 
 import com.example.eventbooking.waitinglist.WaitingList;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -321,16 +299,16 @@ public class Event implements Parcelable {
      * @return defaultEventPosterURL
      */
 
-    public String getDefaultEventpictureurl() {
+    public String getDefaultEventPosterURL() {
         return defaultEventPosterURL;
     }
 
     /**
      * set defaultEventPosterURL
-     * @param defaultEventpictureurl
+     * @param defaultEventPosterURL
      */
-    public void setDefaultEventpictureurl(String defaultEventpictureurl) {
-        this.defaultEventPosterURL = defaultEventpictureurl;
+    public void setDefaultEventPosterURL(String defaultEventPosterURL) {
+        this.defaultEventPosterURL = defaultEventPosterURL;
     }
 
     /**
@@ -338,14 +316,14 @@ public class Event implements Parcelable {
      * @return eventPosterURL
      */
 
-    public String getEventPictureUrl() {
+    public String getEventPosterURL() {
         return eventPosterURL;
     }
     /**
      * set eventPictureUrl
      * @param eventPictureUrl
      */
-    public void setEventPictureUrl(String eventPictureUrl) {
+    public void setEventPosterURL(String eventPictureUrl) {
         this.eventPosterURL = eventPictureUrl;
     }
     /**

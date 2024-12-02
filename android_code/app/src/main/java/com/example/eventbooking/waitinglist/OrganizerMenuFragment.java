@@ -343,12 +343,12 @@ public class OrganizerMenuFragment extends Fragment {
                     String notifText = "You have been selected for an event! Please sign up here.";
                     String notifTitle = "You were selected!";
                     for (String user : selectedParticipants) {
-//                        Notification notif = new Notification(eventId, notifText, notifTitle, user);
-//                        notificationManager.createNotification(notif);
-                        String eventUrl = "eventbooking://eventDetail?eventID=" + eventId + "?hash=" + currentEvent.getQRcodeHash();
                         Notification notif = new Notification(eventId, notifText, notifTitle, user);
-//                            notificationManager.createNotification(notif);
-                        notificationManager.createNotificationWithUrl(notif, eventUrl, getContext());
+                        notificationManager.createNotification(notif);
+//                        String eventUrl = "eventbooking://eventDetail?eventID=" + eventId + "?hash=" + currentEvent.getQRcodeHash();
+//                        Notification notif = new Notification(eventId, notifText, notifTitle, user);
+                            notificationManager.createNotification(notif);
+//                        notificationManager.createNotificationWithUrl(notif, eventUrl, getContext());
                     }
 
                     // Notify non-selected participants (those who were not chosen)
@@ -357,12 +357,12 @@ public class OrganizerMenuFragment extends Fragment {
                     String lossNotifText = "Unfortunately, you were not selected for the event this time.";
                     String lossNotifTitle = "You were not selected!";
                     for (String user : allParticipants) {
-//                        Notification notif = new Notification(eventId, lossNotifText, lossNotifTitle, user);
-//                        notificationManager.createNotification(notif);
-                        String eventUrl = "eventbooking://eventDetail?eventID=" + eventId + "?hash=" + currentEvent.getQRcodeHash();
-                        Notification notif = new Notification(eventId, notifText, notifTitle, user);
-//                            notificationManager.createNotification(notif);
-                        notificationManager.createNotificationWithUrl(notif, eventUrl, getContext());
+                        Notification notif = new Notification(eventId, lossNotifText, lossNotifTitle, user);
+                        notificationManager.createNotification(notif);
+//                        String eventUrl = "eventbooking://eventDetail?eventID=" + eventId + "?hash=" + currentEvent.getQRcodeHash();
+//                        Notification notif = new Notification(eventId, notifText, notifTitle, user);
+                            notificationManager.createNotification(notif);
+//                        notificationManager.createNotificationWithUrl(notif, eventUrl, getContext());
                     }
 
                     Toast.makeText(getContext(), "Sampled attendees updated to Firebase.", Toast.LENGTH_SHORT).show();
@@ -449,8 +449,8 @@ public class OrganizerMenuFragment extends Fragment {
                             String eventUrl = "eventbooking://eventDetail?eventID=" + eventId + "?hash=" + currentEvent.getQRcodeHash();
 
                             Notification notif = new Notification(eventId, notifText, notifTitle, user);
-                            notificationManager.createNotificationWithUrl(notif, eventUrl, getContext());
-//                            notificationManager.createNotification(notif);
+//                            notificationManager.createNotificationWithUrl(notif, eventUrl, getContext());
+                            notificationManager.createNotification(notif);
                         }
                         // Notify non-selected participants (those who were not chosen for replacement)
                         List<String> allParticipants = waitingList.getWaitingParticipantIds();  // Get all participants on the waiting list
@@ -460,8 +460,8 @@ public class OrganizerMenuFragment extends Fragment {
                         for (String user : allParticipants) {
                             String eventUrl = "eventbooking://eventDetail?eventID=" + eventId + "?hash=" + currentEvent.getQRcodeHash();
                             Notification notif = new Notification(eventId, lossNotifText, lossNotifTitle, user);
-//                            notificationManager.createNotification(notif);
-                            notificationManager.createNotificationWithUrl(notif, eventUrl, getContext());
+                            notificationManager.createNotification(notif);
+//                            notificationManager.createNotificationWithUrl(notif, eventUrl, getContext());
                         }
                         Toast.makeText(getContext(), "Replacement attendees updated to Firebase.", Toast.LENGTH_SHORT).show();
                         navigateToViewAcceptedList();
@@ -545,8 +545,8 @@ public class OrganizerMenuFragment extends Fragment {
                     });
         }
         else{
-            currentEvent.setEventPictureUrl(String.valueOf(imageUri));
-            UniversalProgramValues.getInstance().queryEvent(currentEvent.getEventId()).setEventPictureUrl(String.valueOf(imageUri));
+            currentEvent.setEventPosterURL(String.valueOf(imageUri));
+            UniversalProgramValues.getInstance().queryEvent(currentEvent.getEventId()).setEventPosterURL(String.valueOf(imageUri));
 //            this.imageUrl
         }
 
@@ -606,9 +606,10 @@ public class OrganizerMenuFragment extends Fragment {
                         Toast.makeText(getContext(), "Failed to remove custom poster.", Toast.LENGTH_SHORT).show();
                         Log.e("OrganizerMenuFragment", "Error removing poster", e);
                     });
-        } else {
-            currentEvent.setEventPictureUrl(currentEvent.getDefaultEventpictureurl());
-            UniversalProgramValues.getInstance().queryEvent(currentEvent.getEventId()).setEventPictureUrl(currentEvent.getDefaultEventpictureurl());
+        }
+        else{
+            currentEvent.setEventPosterURL(currentEvent.getDefaultEventPosterURL());
+            UniversalProgramValues.getInstance().queryEvent(currentEvent.getEventId()).setEventPosterURL(currentEvent.getDefaultEventPosterURL());
         }
     }
 
@@ -639,12 +640,12 @@ public class OrganizerMenuFragment extends Fragment {
                     String notifText = "You have been removed from the accepted participant list.";
                     String notifTitle = "Removed from event list";
                     for (String user : waitingList.getCanceledParticipantIds()) {
-//                        Notification notif = new Notification(eventId, notifText, notifTitle, user);
-//                        notificationManager.createNotification(notif);
-                        String eventUrl = "eventbooking://eventDetail?eventID=" + eventId + "?hash=" + currentEvent.getQRcodeHash();
                         Notification notif = new Notification(eventId, notifText, notifTitle, user);
-//                            notificationManager.createNotification(notif);
-                        notificationManager.createNotificationWithUrl(notif, eventUrl, getContext());
+                        notificationManager.createNotification(notif);
+//                        String eventUrl = "eventbooking://eventDetail?eventID=" + eventId + "?hash=" + currentEvent.getQRcodeHash();
+//                        Notification notif = new Notification(eventId, notifText, notifTitle, user);
+                        notificationManager.createNotification(notif);
+//                        notificationManager.createNotificationWithUrl(notif, eventUrl, getContext());
                     }
                     Toast.makeText(getContext(), "Non-signed-up participants canceled successfully.", Toast.LENGTH_SHORT).show();
                 } else {

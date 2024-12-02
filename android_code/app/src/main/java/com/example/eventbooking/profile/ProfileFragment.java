@@ -26,6 +26,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.eventbooking.Events.EventView.EventViewFragment;
 import com.example.eventbooking.Home.HomeFragment;
+import com.example.eventbooking.Login.LoginFragment;
 import com.example.eventbooking.MainActivity;
 import com.example.eventbooking.R;
 import com.example.eventbooking.Role;
@@ -194,6 +195,7 @@ public class ProfileFragment extends Fragment {
             else{
                 currentUser.setProfilePictureUrl("NewDefaultTestURL");
                 currentUser.setdefaultProfilePictureUrl("NewDefaultTestURL");
+                LoginFragment.isLoggedIn = true;
                 UserManager.getInstance().setCurrentUser(currentUser);
             }
         }
@@ -203,6 +205,7 @@ public class ProfileFragment extends Fragment {
                 Toast.makeText(getContext(), "Profile saved successfully.", Toast.LENGTH_SHORT).show();
                 setEditMode(false);
                 UserManager.getInstance().setCurrentUser(currentUser);
+                LoginFragment.isLoggedIn = true;
                 if (currentUser.isGeolocationAsk()) {
                     UserManager.getInstance().updateGeolocation();
                 }

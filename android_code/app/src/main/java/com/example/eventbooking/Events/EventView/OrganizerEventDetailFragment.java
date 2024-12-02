@@ -31,6 +31,7 @@ public class OrganizerEventDetailFragment extends Fragment {
     private ImageView eventPosterImage;
     private TextView eventTitleText, eventDescriptionText, eventLocationText;
     private Button organizerMenuButton;
+    private Button editEvent;
 
     /**
      * Creates a new instance of OrganizerEventDetailFragment with the specified event ID.
@@ -64,6 +65,7 @@ public class OrganizerEventDetailFragment extends Fragment {
         eventDescriptionText = view.findViewById(R.id.event_description_text);
         eventLocationText = view.findViewById(R.id.event_location_text); // Add this ID to XML
         organizerMenuButton = view.findViewById(R.id.button_navigate_to_menu); // Add to XML
+        editEvent = view.findViewById(R.id.button_edit_event);
 
         // Retrieve arguments
         if (getArguments() != null) {
@@ -97,6 +99,8 @@ public class OrganizerEventDetailFragment extends Fragment {
         // Set up navigation to OrganizerMenuFragment
         organizerMenuButton.setOnClickListener(v -> navigateToOrganizerMenu());
 
+        editEvent.setOnClickListener(v -> navigateToEditEvent());
+
         return view;
     }
     /**
@@ -125,5 +129,12 @@ public class OrganizerEventDetailFragment extends Fragment {
                 .replace(R.id.fragment_container, organizerMenuFragment)
                 .addToBackStack(null)
                 .commit();
+    }
+
+    /**
+     * Navigates to the event fragment to change parts of the event.
+     */
+    private void navigateToEditEvent(){
+
     }
 }

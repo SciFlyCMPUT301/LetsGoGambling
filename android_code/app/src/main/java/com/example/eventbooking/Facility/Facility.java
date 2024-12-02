@@ -15,7 +15,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+/**
+ * Represents a facility in the event booking system.
+ *
+ * <p>A facility is a location or venue associated with an organizer and optionally linked
+ * to events. The class supports managing facility details, associating events, and saving
+ * data to Firebase Firestore.</p>
+ *
+ * <p>The facility must have an organizer when instantiated. Otherwise, it is considered a
+ * "floating facility," meaning it is unassociated and cannot be duplicated by other organizers.</p>
+ *
+ * @since 2024-11-04
+ */
 public class Facility {
     private String facilityID;
     private String name;
@@ -29,33 +40,36 @@ public class Facility {
     private boolean testing = true;
 
     /**
-     * The Facility class that has to have an organizer associated when we instantiate it, otherwise it
-     * is a floating facility. This description means that nobody else can create a similar facility
-     * (use case when we ban a facility).
+     * Default constructor for the Facility class.
      *
-     * Facilities must also have the ability to have an event associated with them when one is created.
-     * This is handled by the controller.
-     *
-     * @since   2024-11-04
+     * <p>Initializes Firestore and the list of associated events. If testing mode is enabled
+     * through {@link UniversalProgramValues}, Firestore initialization is skipped.</p>
      */
     public Facility() {
-        // Initialize Firebase instances
+        // Initialize Firestore and facilities collection reference
         if(!UniversalProgramValues.getInstance().getTestingMode()){
             this.db = FirebaseFirestore.getInstance();
             this.facilitiesRef = db.collection("facilities");
         }
 
-        // Initialize list to avoid NullPointerException
+        // Initialize events list to prevent null values
         this.allEvents = new ArrayList<>();
     }
 
-
+    /**
+     * Constructor for dependency injection (useful for testing).
+     *
+     * @param db            the Firestore database instance
+     * @param facilitiesRef the Firestore collection reference for facilities
+     */
     // Constructor for dependency injection (useful for testing)
     public Facility(FirebaseFirestore db, CollectionReference facilitiesRef) {
+        // Assign Firestore instances if not in testing mode
         if(!UniversalProgramValues.getInstance().getTestingMode()){
             this.db = FirebaseFirestore.getInstance();
             this.facilitiesRef = facilitiesRef;
         }
+        // Initialize events list
         this.allEvents = new ArrayList<>();
     }
 
@@ -100,9 +114,7 @@ public class Facility {
 
 //    public Location getLocation() { return location; }
 //    public void setLocation(Location location) { this.location = location; }
-    /**
-     *
-     */
+
     public String getFacilityID() {
         return facilityID;
     }

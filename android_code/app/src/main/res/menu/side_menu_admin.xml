@@ -12,13 +12,12 @@
         android:icon="@drawable/ic_events_foreground"
         android:title="Events"/>
     <item
-        android:id="@+id/standard_nav_sign_out"
-        android:icon="@drawable/ic_sign_out_foreground"
-        android:title="Sign Out"
-        />
-    <item
         android:id="@+id/standard_nav_admin"
         android:icon="@drawable/ic_admin_foreground"
-        android:title="Admin Panel"
-        />
+        android:title="Admin Panel" />
+    <item
+        android:id="@+id/standard_nav_sign_out"
+        android:icon="@drawable/ic_sign_out_foreground"
+        android:title="Sign Out" />
+
 </menu>

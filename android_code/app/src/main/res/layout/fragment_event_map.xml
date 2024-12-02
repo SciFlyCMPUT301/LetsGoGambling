@@ -23,6 +23,12 @@
             android:layout_height="wrap_content"
             android:text="Activate" />
 
+        <Button
+            android:id="@+id/backToOrganizer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Back To Organizer" />
+
         <Spinner
             android:id="@+id/listSpinner"
             android:layout_width="match_parent"
@@ -35,10 +41,15 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <com.google.android.gms.maps.MapView
+            <org.osmdroid.views.MapView
                 android:id="@+id/mapView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
+
+<!--            <com.google.android.gms.maps.MapView-->
+<!--                android:id="@+id/mapView"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="match_parent" />-->
 
         </LinearLayout>
     </LinearLayout>

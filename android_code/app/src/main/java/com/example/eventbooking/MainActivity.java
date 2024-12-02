@@ -261,6 +261,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 moveToFragment(adminFragment);
                 return true;
             }
+            else if(itemId == R.id.standard_nav_sign_out){
+                hideNavigationUI();
+                UserManager.getInstance().setCurrentUser(new User());
+                moveToFragment(loginFragment);
+            }
 
 
         }

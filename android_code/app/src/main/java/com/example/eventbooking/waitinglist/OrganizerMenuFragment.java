@@ -23,10 +23,12 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.example.eventbooking.Events.EventPageFragment.OragnizerEventFragment;
+import com.example.eventbooking.Events.EventView.EventViewFragment;
 import com.example.eventbooking.Notification;
 import com.example.eventbooking.QRCode.QRcodeGenerator;
 import com.example.eventbooking.R;
 import com.example.eventbooking.Events.EventPageFragment.EventFragment;
+import com.example.eventbooking.Testing.EventMapFragment;
 import com.example.eventbooking.UniversalProgramValues;
 import com.example.eventbooking.notification.MyNotificationManager;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -55,6 +57,7 @@ public class OrganizerMenuFragment extends Fragment {
     private Button drawReplacementButton;
     private Button backToButton;
     private Button generateQRCode;
+    private Button eventMap;
     private ImageView QRImage;
     private ImageView posterImageView;
     private QRcodeGenerator qrCodeGenerator;
@@ -64,7 +67,7 @@ public class OrganizerMenuFragment extends Fragment {
     private Button removePosterButton;
     private Button uploadPosterButton;
     private ActivityResultLauncher<Intent> pickImageLauncher;
-    private Event currentEvent;
+    private Event currentEvent = null;
     private Button CancelNonSignUp;
     private MyNotificationManager notificationManager;
 
@@ -87,6 +90,20 @@ public class OrganizerMenuFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
+
+    /**
+     * Creates a new instance of OrganizerMenuFragment with the provided eventId.
+     *
+     * @param selectedEvent Parcelable event to be passed through
+     * @return A new instance of OrganizerMenuFragment.
+     */
+    public static OrganizerMenuFragment newInstance(Event selectedEvent) {
+        OrganizerMenuFragment fragment = new OrganizerMenuFragment();
+        Bundle args = new Bundle();
+        args.putParcelable("selectedEvent", selectedEvent);
+        fragment.setArguments(args);
+        return fragment;
+    }
     /**
      * Called to initialize the fragment when it is created. Retrieves the `eventId` from the
      * fragment's arguments.
@@ -103,15 +120,22 @@ public class OrganizerMenuFragment extends Fragment {
         super.onCreate(savedInstanceState);
         // Retrieve eventId from arguments
         if (getArguments() != null) {
-            eventId = getArguments().getString("eventId");
+            if(getArguments().getString("eventId") != null)
+                eventId = getArguments().getString("eventId");
+            if(getArguments().getParcelable("selectedEvent") != null){
+                currentEvent = getArguments().getParcelable("selectedEvent");
+                eventId = currentEvent.getEventId();
+            }
             Log.d("Organizer Menu Fragment", "Found Event ID: " + eventId);
         }
-        if (eventId == null || eventId.isEmpty()) {
-            Log.d("Organizer Menu Fragment", "Couldnt Find Event ID");
-            Toast.makeText(getContext(), "Event ID is missing", Toast.LENGTH_SHORT).show();
-            Log.e("OrganizerMenuFragment", "Event ID is null or empty.");
-            getParentFragmentManager().popBackStack(); // Exit the fragment
-            return;
+        if(currentEvent == null){
+            if (eventId == null || eventId.isEmpty()) {
+                Log.d("Organizer Menu Fragment", "Couldnt Find Event ID");
+                Toast.makeText(getContext(), "Event ID is missing", Toast.LENGTH_SHORT).show();
+                Log.e("OrganizerMenuFragment", "Event ID is null or empty.");
+                getParentFragmentManager().popBackStack(); // Exit the fragment
+                return;
+            }
         }
 
 
@@ -123,35 +147,52 @@ public class OrganizerMenuFragment extends Fragment {
         //int maxParticipants = 3;
         // Initialize the WaitingList instance as a placeholder
         if(!UniversalProgramValues.getInstance().getTestingMode()) {
-            Event.findEventById(eventId, event -> {
-                if (event != null) {
-                    Log.d("Organizer Menu Fragment", "Loading Waiting List");
-                    currentEvent = event;
-                    waitingList = new WaitingList(eventId); // Initialize waitingList
-                    waitingList.setMaxParticipants(event.getMaxParticipants());
-                    Log.d("Organizer Menu Fragment", "Waiting list event ID: " + waitingList.getEventId());
-                    Log.d("Organizer Menu Fragment", "Waiting list max: " + waitingList.getMaxParticipants());
+            if(currentEvent == null){
+                Event.findEventById(eventId, event -> {
+                    if (event != null) {
+                        Log.d("Organizer Menu Fragment", "Loading Waiting List");
+                        currentEvent = event;
+                        waitingList = new WaitingList(eventId); // Initialize waitingList
+                        waitingList.setMaxParticipants(event.getMaxParticipants());
+                        Log.d("Organizer Menu Fragment", "Waiting list event ID: " + waitingList.getEventId());
+                        Log.d("Organizer Menu Fragment", "Waiting list max: " + waitingList.getMaxParticipants());
 
-                    waitingList.loadFromFirebase().addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            Toast.makeText(getContext(), "Waiting list loaded successfully.", Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(getContext(), "Failed to load waiting list from Firebase.", Toast.LENGTH_SHORT).show();
-                        }
-                    });
+                        waitingList.loadFromFirebase().addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                Toast.makeText(getContext(), "Waiting list loaded successfully.", Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(getContext(), "Failed to load waiting list from Firebase.", Toast.LENGTH_SHORT).show();
+                            }
+                        });
 
 
-                } else {
-                    Log.d("Organizer Menu Fragment", "Waiting list not made");
-                    Toast.makeText(getContext(), "Event not found.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Log.d("Organizer Menu Fragment", "Waiting list not made");
+                        Toast.makeText(getContext(), "Event not found.", Toast.LENGTH_SHORT).show();
+                        getParentFragmentManager().popBackStack();
+                    }
+                }, e -> {
+                    Log.d("Organizer Menu Fragment", "Error Waiting list not made");
+                    Toast.makeText(getContext(), "Error fetching event data.", Toast.LENGTH_SHORT).show();
+                    Log.e("OrganizerMenuFragment", "Error fetching event", e);
                     getParentFragmentManager().popBackStack();
-                }
-            }, e -> {
-                Log.d("Organizer Menu Fragment", "Error Waiting list not made");
-                Toast.makeText(getContext(), "Error fetching event data.", Toast.LENGTH_SHORT).show();
-                Log.e("OrganizerMenuFragment", "Error fetching event", e);
-                getParentFragmentManager().popBackStack();
-            });
+                });
+            }
+            else{
+                waitingList = new WaitingList(currentEvent.getEventId()); // Initialize waitingList
+                waitingList.setMaxParticipants(currentEvent.getMaxParticipants());
+                Log.d("Organizer Menu Fragment", "Waiting list event ID: " + waitingList.getEventId());
+                Log.d("Organizer Menu Fragment", "Waiting list max: " + waitingList.getMaxParticipants());
+
+                waitingList.loadFromFirebase().addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(getContext(), "Waiting list loaded successfully.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(getContext(), "Failed to load waiting list from Firebase.", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
 
 
             //just for testing
@@ -207,7 +248,7 @@ public class OrganizerMenuFragment extends Fragment {
         removePosterButton = rootView.findViewById(R.id.button_remove_poster);
         uploadPosterButton = rootView.findViewById(R.id.button_upload_poster);
         posterImageView = rootView.findViewById(R.id.poster_image_view);
-
+        eventMap = rootView.findViewById(R.id.view_event_map);
 
 
 
@@ -220,8 +261,9 @@ public class OrganizerMenuFragment extends Fragment {
         //drawReplacementButton.setOnClickListener(v -> drawReplacement(replacementSize));
         drawReplacementButton.setOnClickListener(v -> promptReplacementSize());
         backToButton.setOnClickListener(v -> navigateBackToOrganizerPage());
+        eventMap.setOnClickListener(v -> navigateToMapView());
 
-        generateQRCode.setOnClickListener(v -> generateAndDisplayQRCode(eventId));
+        generateQRCode.setOnClickListener(v -> generateAndDisplayQRCode());
         CancelNonSignUp.setOnClickListener(v->cancelEntrant());
         if(!UniversalProgramValues.getInstance().getTestingMode()){
             uploadPosterButton.setOnClickListener(v->launchImagePicker());
@@ -301,8 +343,12 @@ public class OrganizerMenuFragment extends Fragment {
                     String notifText = "You have been selected for an event! Please sign up here.";
                     String notifTitle = "You were selected!";
                     for (String user : selectedParticipants) {
+//                        Notification notif = new Notification(eventId, notifText, notifTitle, user);
+//                        notificationManager.createNotification(notif);
+                        String eventUrl = "eventbooking://eventDetail?eventID=" + eventId + "?hash=" + currentEvent.getQRcodeHash();
                         Notification notif = new Notification(eventId, notifText, notifTitle, user);
-                        notificationManager.createNotification(notif);
+//                            notificationManager.createNotification(notif);
+                        notificationManager.createNotificationWithUrl(notif, eventUrl, getContext());
                     }
 
                     // Notify non-selected participants (those who were not chosen)
@@ -311,8 +357,12 @@ public class OrganizerMenuFragment extends Fragment {
                     String lossNotifText = "Unfortunately, you were not selected for the event this time.";
                     String lossNotifTitle = "You were not selected!";
                     for (String user : allParticipants) {
-                        Notification notif = new Notification(eventId, lossNotifText, lossNotifTitle, user);
-                        notificationManager.createNotification(notif);
+//                        Notification notif = new Notification(eventId, lossNotifText, lossNotifTitle, user);
+//                        notificationManager.createNotification(notif);
+                        String eventUrl = "eventbooking://eventDetail?eventID=" + eventId + "?hash=" + currentEvent.getQRcodeHash();
+                        Notification notif = new Notification(eventId, notifText, notifTitle, user);
+//                            notificationManager.createNotification(notif);
+                        notificationManager.createNotificationWithUrl(notif, eventUrl, getContext());
                     }
 
                     Toast.makeText(getContext(), "Sampled attendees updated to Firebase.", Toast.LENGTH_SHORT).show();
@@ -394,8 +444,13 @@ public class OrganizerMenuFragment extends Fragment {
                         String notifText = "You have been selected for an event! Please sign up here.";
                         String notifTitle = "You were selected!";
                         for (String user : replacements) {
+//                            String hashInput = eventId + Calendar.getInstance().getTime();
+//                            String qrCodeHash = qrCodeGenerator.createQRCodeHash(hashInput);
+                            String eventUrl = "eventbooking://eventDetail?eventID=" + eventId + "?hash=" + currentEvent.getQRcodeHash();
+
                             Notification notif = new Notification(eventId, notifText, notifTitle, user);
-                            notificationManager.createNotification(notif);
+                            notificationManager.createNotificationWithUrl(notif, eventUrl, getContext());
+//                            notificationManager.createNotification(notif);
                         }
                         // Notify non-selected participants (those who were not chosen for replacement)
                         List<String> allParticipants = waitingList.getWaitingParticipantIds();  // Get all participants on the waiting list
@@ -403,8 +458,10 @@ public class OrganizerMenuFragment extends Fragment {
                         String lossNotifText = "Unfortunately, you were not selected for the event this time.";
                         String lossNotifTitle = "You were not selected!";
                         for (String user : allParticipants) {
+                            String eventUrl = "eventbooking://eventDetail?eventID=" + eventId + "?hash=" + currentEvent.getQRcodeHash();
                             Notification notif = new Notification(eventId, lossNotifText, lossNotifTitle, user);
-                            notificationManager.createNotification(notif);
+//                            notificationManager.createNotification(notif);
+                            notificationManager.createNotificationWithUrl(notif, eventUrl, getContext());
                         }
                         Toast.makeText(getContext(), "Replacement attendees updated to Firebase.", Toast.LENGTH_SHORT).show();
                         navigateToViewAcceptedList();
@@ -429,11 +486,9 @@ public class OrganizerMenuFragment extends Fragment {
      * This function will get the QR code associated with the event to be scanned and displayed when scanned
      * Once the QR code is generated then we display the QR code
      */
-    private void generateAndDisplayQRCode(String eventID) {
+    private void generateAndDisplayQRCode() {
         // URL to be encoded into the QR code (example URL with eventId)
-        String hashInput = eventID + Calendar.getInstance().getTime();
-        String qrCodeHash = qrCodeGenerator.createQRCodeHash(hashInput);
-        String eventUrl = "eventbooking://eventDetail?eventID=" + eventID + "?hash=" + qrCodeHash;
+        String eventUrl = "eventbooking://eventDetail?eventID=" + currentEvent.getEventId() + "?hash=" + currentEvent.getQRcodeHash();
 
 //        String eventUrl = "eventbooking://eventDetail?eventID=" + eventId;
 
@@ -443,7 +498,7 @@ public class OrganizerMenuFragment extends Fragment {
         if (qrCodeBitmap != null) {
             QRImage.setImageBitmap(qrCodeBitmap);
 
-            qrCodeGenerator.saveQRCode(qrCodeBitmap, eventID);
+//            qrCodeGenerator.saveQRCode(qrCodeBitmap, currentEvent.getEventId());
 
             Toast.makeText(getContext(), "QR code generated and saved.", Toast.LENGTH_SHORT).show();
         } else {
@@ -584,8 +639,12 @@ public class OrganizerMenuFragment extends Fragment {
                     String notifText = "You have been removed from the accepted participant list.";
                     String notifTitle = "Removed from event list";
                     for (String user : waitingList.getCanceledParticipantIds()) {
+//                        Notification notif = new Notification(eventId, notifText, notifTitle, user);
+//                        notificationManager.createNotification(notif);
+                        String eventUrl = "eventbooking://eventDetail?eventID=" + eventId + "?hash=" + currentEvent.getQRcodeHash();
                         Notification notif = new Notification(eventId, notifText, notifTitle, user);
-                        notificationManager.createNotification(notif);
+//                            notificationManager.createNotification(notif);
+                        notificationManager.createNotificationWithUrl(notif, eventUrl, getContext());
                     }
                     Toast.makeText(getContext(), "Non-signed-up participants canceled successfully.", Toast.LENGTH_SHORT).show();
                 } else {
@@ -605,5 +664,27 @@ public class OrganizerMenuFragment extends Fragment {
     private void launchTestImagePicker() {
         Uri selectedImageUri = Uri.parse(UniversalProgramValues.getInstance().getUploadProfileURL());
         uploadPoster(selectedImageUri);
-    }}
+
+    }
+
+    private void navigateToMapView(){
+
+        Log.d("Organizer Menu", "Nav to Map: " + currentEvent.getEventId());
+        EventMapFragment eventMapFragment = EventMapFragment.newInstance(currentEvent);
+        getParentFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, eventMapFragment)
+                .addToBackStack(null) // Ensures returning to HomeFragment
+                .commit();
+//        Bundle bundle = new Bundle();
+//        bundle.putString("eventId", "eventID5");
+//        EventMapFragment eventMapFragment = new EventMapFragment();
+////        eventMapFragment.setArguments(bundle);
+//        getActivity().getSupportFragmentManager().beginTransaction()
+//                .replace(R.id.fragment_container, new OragnizerEventFragment())
+//                .addToBackStack(null)
+//                .commit();
+    }
+
+
+}
 

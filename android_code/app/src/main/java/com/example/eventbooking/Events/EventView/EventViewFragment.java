@@ -22,6 +22,7 @@ import com.example.eventbooking.UniversalProgramValues;
 import com.example.eventbooking.UserManager;
 import com.example.eventbooking.profile.ProfileEntrantFragment;
 import com.example.eventbooking.profile.ProfileFragment;
+import com.squareup.picasso.Picasso;
 
 /**
  * EventViewFragment is a fragment that displays details of an event.
@@ -135,6 +136,16 @@ public class EventViewFragment extends Fragment {
 
         // Load event poster image (assume you have a method to do this)
         // loadImageIntoView(event.getImageUrl(), eventPosterImage);
+        String posterPictureUrl = event.getImageUrl();
+        if (posterPictureUrl != null && !posterPictureUrl.isEmpty()) {
+            Picasso.get()
+                    .load(posterPictureUrl) // URL of the image
+                    .placeholder(R.drawable.placeholder_image_foreground) // Placeholder image while loading
+                    .error(R.drawable.placeholder_image_foreground) // Error image if loading fails
+                    .into(eventPosterImage); // ImageView to load the image into
+        } else {
+            Log.w("EventViewFragment", "No poster image URL provided for event: " + event.getEventId());
+        }
     }
 
     /**

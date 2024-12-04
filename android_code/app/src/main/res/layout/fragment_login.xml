@@ -35,6 +35,18 @@
         android:padding="16dp">
 
         <EditText
+            android:id="@+id/input_event_id"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter Event ID" />
+
+        <Button
+            android:id="@+id/button_set_event_id"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Set Event ID To Mimic QRCode" />
+
+        <EditText
             android:id="@+id/input_document_id"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

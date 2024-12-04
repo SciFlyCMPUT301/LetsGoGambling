@@ -246,10 +246,13 @@ public class SampleTable {
 
             // Assign a facility to the event (if applicable)
             if (!FacilityList.isEmpty() && random.nextBoolean()) {
+                Log.d("Sample Table", "Generating event locations");
                 Facility facility = FacilityList.get(random.nextInt(FacilityList.size()));
-                event.setLocation(facility.getAddress());
+                event.setAddress(facility.getAddress());
                 facility.associateEvent(event.getEventId(), true);
+                Log.d("Sample Table", "Event Location: " + facility.getAddress());
             }
+
 
             // Assign participants with random statuses
             List<User> entrants = new ArrayList<>();
@@ -272,6 +275,9 @@ public class SampleTable {
                     case 2: event.addCanceledParticipantIds(entrant.getDeviceID()); break;
                     case 3: event.addWaitingParticipantIds(entrant.getDeviceID()); break;
                 }
+            }
+            if(event.getAddress() == null){
+                event.setAddress("No set location");
             }
 
             // Add the event to the EventList

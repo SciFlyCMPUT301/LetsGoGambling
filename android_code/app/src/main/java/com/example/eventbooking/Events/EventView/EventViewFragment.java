@@ -13,29 +13,37 @@ import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
+import com.example.eventbooking.Date;
 import com.example.eventbooking.Events.EventData.Event;
 import com.example.eventbooking.Events.EventPageFragment.EventFragment;
 import com.example.eventbooking.MainActivity;
 import com.example.eventbooking.Home.HomeFragment;
 import com.example.eventbooking.R;
 import com.example.eventbooking.UniversalProgramValues;
+import com.example.eventbooking.User;
 import com.example.eventbooking.UserManager;
+import com.example.eventbooking.firebase.FirestoreAccess;
 import com.example.eventbooking.profile.ProfileEntrantFragment;
 import com.example.eventbooking.profile.ProfileFragment;
 import com.squareup.picasso.Picasso;
+
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 
 /**
  * EventViewFragment is a fragment that displays details of an event.
  * It allows users to view event details and interact with the event (e.g., join waitlist, sign up).
  */
+@SuppressWarnings("all")
 public class EventViewFragment extends Fragment {
 
     private String eventId;
     private String deviceId = null;
 //    private String userId = "User1";
     private Event selectedEvent;
-    private ImageView eventPosterImage;
-    private TextView eventTitleText, eventDescriptionText;
+    private ImageView eventPosterImage, organizerProfileImage;
+    private TextView eventTitleText, eventDescriptionText, eventDate, eventLocation, organizerName;
     private LinearLayout buttonContainer;
     private Boolean testMode = false;
     private String returnToFragment = null;
@@ -88,6 +96,10 @@ public class EventViewFragment extends Fragment {
         eventTitleText = view.findViewById(R.id.event_title_text);
         eventDescriptionText = view.findViewById(R.id.event_description_text);
         buttonContainer = view.findViewById(R.id.button_container);
+        eventDate = view.findViewById(R.id.text_event_date);
+        eventLocation = view.findViewById(R.id.text_event_location);
+        organizerProfileImage = view.findViewById(R.id.organizer_profile);
+        organizerName = view.findViewById(R.id.text_organizer_name);
         testMode = UniversalProgramValues.getInstance().getTestingMode();
         // Retrieve eventId and deviceId from arguments
         if (getArguments() != null) {
@@ -153,6 +165,28 @@ public class EventViewFragment extends Fragment {
         Log.e("Display Event", "Event found with ID: " + event.getEventId());
         eventTitleText.setText(event.getEventTitle());
         eventDescriptionText.setText(event.getDescription());
+        Instant instant = Instant.ofEpochMilli(event.getTimestamp());
+        LocalDate date = instant.atZone(ZoneId.systemDefault()).toLocalDate();
+        String dateString = date.getDayOfMonth() +"/"+date.getMonthValue()+"/"+date.getYear();
+
+        eventDate.setText(dateString);
+        Log.d("Event View", "Event Address: " + event.getAddress());
+        eventLocation.setText(event.getLocation());
+        FirestoreAccess.getInstance().getUser(event.getOrganizerId()).addOnSuccessListener(snapshot -> {
+            if (snapshot.exists()) {
+                Log.d("Login Activity", "User Snapshot Exists");
+                User user = snapshot.toObject(User.class);
+                Picasso.get()
+                        .load(user.getProfilePictureUrl())
+                        .placeholder(R.drawable.placeholder_image_foreground)
+                        .error(R.drawable.placeholder_image_foreground)
+                        .into(organizerProfileImage);
+                organizerName.setText(user.getUsername());
+            } else {
+                Toast.makeText(getActivity(), "Device ID not found", Toast.LENGTH_SHORT).show();
+            }
+        });
+
         Log.e("Done Display Event", "Event found with ID: " + event.getEventId());
 
         // Load event poster image (assume you have a method to do this)

@@ -36,6 +36,7 @@ import java.util.Map;
  * the facility name, location, and ID. It also ensures that each organizer can only
  * create one facility at a time.
  */
+@SuppressWarnings("all")
 public class FacilityCreateFragment extends Fragment {
 
     private EditText editFacilityName, editFacilityLocation, editFacilityId;

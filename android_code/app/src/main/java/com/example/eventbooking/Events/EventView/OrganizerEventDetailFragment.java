@@ -23,6 +23,7 @@ import com.example.eventbooking.UserManager;
  * OrganizerEventDetailFragment displays event details for the organizer
  * and provides a button to navigate to the OrganizerMenuFragment.
  */
+@SuppressWarnings("all")
 public class OrganizerEventDetailFragment extends Fragment {
 
     private String eventId;

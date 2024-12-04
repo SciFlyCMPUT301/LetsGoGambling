@@ -42,6 +42,7 @@ import com.squareup.picasso.Picasso;
  * It allows users to view and edit their profile information such as username, email, phone number,
  * and notifications preferences. It also allows users to upload or remove profile images.
  */
+@SuppressWarnings("all")
 public class ProfileFragment extends Fragment {
     // UI components
     private EditText editName, editEmail, editPhone;

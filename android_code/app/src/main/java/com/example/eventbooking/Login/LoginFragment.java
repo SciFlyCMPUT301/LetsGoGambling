@@ -42,6 +42,7 @@ import java.util.List;
  * It handles user authentication, device ID handling, and navigation based on user status.
  * It also allows test mode for easier testing scenarios.
  */
+@SuppressWarnings("all")
 public class LoginFragment extends Fragment {
 
     private TextView deviceIdText, welcomeText;
@@ -55,8 +56,8 @@ public class LoginFragment extends Fragment {
 
     private Button testModeButton, normalButton;
     private LinearLayout testModeLayout, normalLoginLayout;
-    private EditText documentIdInput, usernameInput;
-    private Button setByDocumentIdButton, setByUsernameButton, setToDeviceID1;
+    private EditText documentIdInput, usernameInput, eventIDInput;
+    private Button setByDocumentIdButton, setByUsernameButton, setToDeviceID1, setEventID;
 
     private Handler handler;
     /**
@@ -110,6 +111,7 @@ public class LoginFragment extends Fragment {
         setByDocumentIdButton.setOnClickListener(v -> setUserByDocumentId());
         setByUsernameButton.setOnClickListener(v -> setUserByUsername());
         setToDeviceID1.setOnClickListener(v -> setUserToDeviceID1());
+        setEventID.setOnClickListener(v -> setEventIDMethod());
         Log.d("LoginFragment", "Buttons Set up");
 
         return rootView;
@@ -145,6 +147,9 @@ public class LoginFragment extends Fragment {
         setToDeviceID1 = rootView.findViewById(R.id.button_set_to_deviceID1);
         deviceIdText = rootView.findViewById(R.id.text_login_deviceid);
         welcomeText = rootView.findViewById(R.id.text_login_welcome);
+        eventIDInput = rootView.findViewById(R.id.input_event_id);
+        setEventID = rootView.findViewById(R.id.button_set_event_id);
+
         normalLoginLayout.setVisibility(View.GONE);
         testModeLayout.setVisibility(View.GONE);
         Log.d("LoginFragment", "Initalized Login UI");
@@ -270,7 +275,6 @@ public class LoginFragment extends Fragment {
             Toast.makeText(getActivity(), "Please enter a Document ID", Toast.LENGTH_SHORT).show();
             return;
         }
-
         FirestoreAccess.getInstance().getUser(documentId).addOnSuccessListener(snapshot -> {
             if (snapshot.exists()) {
                 disableAllButtons();
@@ -351,6 +355,13 @@ public class LoginFragment extends Fragment {
         setByDocumentIdButton.setEnabled(false);
         setByUsernameButton.setEnabled(false);
         setToDeviceID1.setEnabled(false);
+        setEventID.setEnabled(false);
+    }
+
+    private void setEventIDMethod(){
+        eventIdFromQR = eventIDInput.getText().toString().trim();
+        eventIDInput.setVisibility(View.GONE);
+        setEventID.setVisibility(View.GONE);
     }
 
 

@@ -33,20 +33,43 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     buildToolsVersion = "35.0.0"
 }
 
+tasks.register<Javadoc>("generateJavadoc") {
+    dependsOn("assembleDebug")
 
+    source = files(android.sourceSets["main"].java.srcDirs).asFileTree
+    classpath = files(android.bootClasspath.joinToString(File.separator))
+
+    // Exclude R class
+    exclude("**/R.class")
+}
+
+//configurations.all {
+//    resolutionStrategy {
+//        force("com.google.android:annotations:4.1.1.4")  // Or update to a version compatible with your project
+//    }
+//}
 
 dependencies {
+//    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
     implementation("com.journeyapps:zxing-android-embedded:4.3.0")
     implementation ("com.google.zxing:core:3.3.3")
     implementation(platform("com.google.firebase:firebase-bom:33.4.0"))
 //    implementation("com.google.firebase:firebase-storage:21.0.1")
+//    implementation("com.google.firebase:firebase-storage") {
+//        exclude(group = "com.google.android", module = "annotations")
+//    }
     implementation("com.google.firebase:firebase-storage")
+    implementation("com.google.android:annotations:4.1.1.4")
+//    implementation("com.squareup.picasso:picasso:2.8") {
+//        exclude(group = "com.google.android", module = "annotations")
+//    }
     implementation("com.squareup.picasso:picasso:2.8")
     implementation("com.google.firebase:firebase-messaging")
     implementation("org.osmdroid:osmdroid-android:6.1.20")

@@ -23,6 +23,7 @@ import java.util.List;
  * This fragment retrieves the accepted participants associated with a given event ID,
  * displays them in a ListView, and provides navigation back to the organizer's menu.
  */
+@SuppressWarnings("all")
 public class ViewAcceptedListFragment extends Fragment {
 
     private ListView acceptedListView;

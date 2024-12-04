@@ -21,6 +21,7 @@ import java.util.List;
  * This fragment retrieves a waiting list associated with an event ID, displays the list of signed-up
  * participants, and provides navigation back to the organizer's menu.
  */
+@SuppressWarnings("all")
 public class ViewSignedListFragment extends Fragment {
     private ListView signedUpListView;
     private Button backButton;

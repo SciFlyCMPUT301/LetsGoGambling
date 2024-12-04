@@ -16,7 +16,7 @@ import com.example.eventbooking.R;
 import com.example.eventbooking.UniversalProgramValues;
 
 import java.util.List;
-
+@SuppressWarnings("all")
 public class ViewCanceledListFragment extends Fragment {
     // initialize variables
     private ListView canceledListView;

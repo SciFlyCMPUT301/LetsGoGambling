@@ -91,6 +91,7 @@ import static android.Manifest.permission.ACCESS_FINE_LOCATION;
  * QR code intent to pass information to other models such as the LoginFragment and ScannedFragment
  *
  */
+@SuppressWarnings("all")
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, BottomNavigationView.OnNavigationItemSelectedListener{
     /**
      * Generating navigation controllers and instances to be utilized later

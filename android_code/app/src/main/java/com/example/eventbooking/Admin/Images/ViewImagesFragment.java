@@ -35,7 +35,7 @@ import java.util.Map;
  * This fragment loads images from "Users" and "Events" collections, displays them in a list,
  * and allows resetting image URLs to default values.
  */
-
+@SuppressWarnings("all")
 public class ViewImagesFragment extends Fragment {
     private ListView imagesListView;
     private ImageAdapter imageAdapter;

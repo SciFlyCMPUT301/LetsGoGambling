@@ -30,6 +30,7 @@ import java.util.List;
  * It displays a list of events created by the organizer, provides navigation to event details,
  * and includes options for creating events and facilities.
  */
+@SuppressWarnings("all")
 public class OragnizerEventFragment  extends Fragment{
     private int someInteger = 42; // Example integer to pass
     private String userId;

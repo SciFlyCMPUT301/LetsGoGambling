@@ -28,6 +28,7 @@ import java.util.List;
  * ViewUsersFragment is a Fragment that displays a list of users fetched from Firestore.
  * This fragment allows the admin to view user details, edit or delete users, and navigate back to the AdminFragment.
  */
+@SuppressWarnings("all")
 public class ViewUsersFragment extends Fragment {
     private FirebaseFirestore db; // Firestore instance for fetching user data.
     //    private ArrayList<String> documentIds = new ArrayList<>();

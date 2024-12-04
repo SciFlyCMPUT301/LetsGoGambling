@@ -33,6 +33,7 @@ import java.util.List;
  * <p>Administrators can edit user data, assign roles (entrant, organizer, admin),
  * enable/disable notifications and geolocation tracking, and save changes to Firebase Firestore.</p>
  */
+@SuppressWarnings("all")
 public class EditUserFragment extends Fragment {
     private TextView usernameTextView, deviceIdTextView, emailTextView, phoneNumberTextView, profilePictureUrlTextView, locationTextView, dateJoinedTextView, roleTextView;
     private Button deleteButton, cancelButton;

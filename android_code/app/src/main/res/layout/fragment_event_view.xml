@@ -27,14 +27,6 @@
                     android:contentDescription="Event Poster"
                     android:background="#F0F0F0" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:text="Poster Here"
-                    android:textColor="#888888"
-                    android:textSize="16sp"
-                    android:fontFamily="sans-serif" />
             </FrameLayout>
 
             <!-- Event Details -->
@@ -113,6 +105,7 @@
                     android:layout_marginBottom="16dp">
 
                     <ImageView
+                        android:id="@+id/organizer_profile"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
                         android:src="@drawable/ic_profile"

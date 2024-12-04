@@ -37,7 +37,7 @@ import org.osmdroid.views.overlay.Marker;
 
 import java.util.ArrayList;
 import java.util.List;
-
+@SuppressWarnings("all")
 public class EventMapFragment extends Fragment {
     /**
      * Fragment for displaying a Google Map with user locations for an event.

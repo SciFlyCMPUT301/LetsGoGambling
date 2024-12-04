@@ -41,6 +41,7 @@ import java.util.List;
  * <p>Dependencies include Firebase Firestore for database interactions and a custom
  * {@link Event} class representing the event data structure.</p>
  */
+@SuppressWarnings("all")
 public class EditEventFragment extends Fragment {
     private TextView eventTitleText, eventDescriptionText, maxParticipantsText, eventLocationText, organiserIDText;
     private Button saveButton, cancelButton, addParticipantButton, removeParticipantButton, removeEventButton;

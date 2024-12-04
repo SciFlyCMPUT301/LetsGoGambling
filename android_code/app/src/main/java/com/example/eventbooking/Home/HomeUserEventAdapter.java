@@ -22,6 +22,7 @@ import androidx.annotation.NonNull;
  * HomeUserEventAdapter is a custom adapter for displaying event information in a list view.
  * It binds event data to the views for each list item.
  */
+@SuppressWarnings("all")
 public class HomeUserEventAdapter extends ArrayAdapter<Event> {
     private Context context;
     private List<Event> eventList;

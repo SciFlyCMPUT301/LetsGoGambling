@@ -32,7 +32,7 @@ import java.util.ArrayList;
  * This fragment allows the administrator to view the QR code details of an event, generate a new QR code,
  * and navigate back to the event edit screen. It uses a custom QR code generator to display or update QR codes.
  */
-
+@SuppressWarnings("all")
 public class QRCodeFragment extends Fragment {
     private FirebaseFirestore db;
     private Button eventGoBack, removeButton;

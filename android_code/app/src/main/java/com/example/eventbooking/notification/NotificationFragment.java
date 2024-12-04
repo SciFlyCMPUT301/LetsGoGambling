@@ -1,6 +1,7 @@
 package com.example.eventbooking.notification;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,7 +27,9 @@ import java.util.List;
  * A fragment that displays the user's notifications and provides buttons to navigate
  * to the ProfileFragment or HomeFragment.
  */
+@SuppressWarnings("all")
 public class NotificationFragment extends Fragment {
+    private List<Notification> notifications;
     /**
      * Inflates the fragment layout and sets up the view components, including buttons for navigation
      * and a ListView to display notifications.
@@ -57,7 +60,8 @@ public class NotificationFragment extends Fragment {
             MyNotificationManager nm = new MyNotificationManager(FirebaseFirestore.getInstance());
             // get user's notifications and display them
             nm.getUserNotifications(currentUserId).addOnSuccessListener(queryDocumentSnapshots -> {
-                List<Notification> notifications = new ArrayList<>();
+//                List<Notification> notifications = new ArrayList<>();
+                notifications = new ArrayList<>();
                 for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
                     notifications.add(doc.toObject(Notification.class));
                 }
@@ -71,6 +75,8 @@ public class NotificationFragment extends Fragment {
                     selectedNotification.setRead(true);
                     nm.updateNotification(selectedNotification);
 // Navigate to EventViewFragment with the selected notification's event
+                    Log.d("Notification Fragmnet", "Notification: " + selectedNotification);
+                    Log.d("Notification Fragmnet", "Notification: " + selectedNotification.getEventId());
                     EventViewFragment eventViewFragment = EventViewFragment.newInstance(selectedNotification.getEventId(), currentUserId);
 
                     getParentFragmentManager().beginTransaction()
@@ -87,6 +93,22 @@ public class NotificationFragment extends Fragment {
            getParentFragmentManager().beginTransaction()
                    .replace(R.id.fragment_container, new HomeFragment())
                   .commit();
+        });
+
+        Button clearNotificationButton = rootView.findViewById(R.id.button_clear_notifications);
+        clearNotificationButton.setOnClickListener(v -> {
+            Notification notif = new Notification();
+            notif.deleteNotificationsByUserId(UserManager.getInstance().getUserId())
+                    .addOnSuccessListener(aVoid -> {
+                        List<Notification> notifications = new ArrayList<>();
+                        NotificationArrayAdapter adapter = new NotificationArrayAdapter(getContext(), notifications);
+                        notificationListView.setAdapter(adapter);
+                        Log.d("NotificationManager", "Successfully deleted notifications for userId.");
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e("NotificationManager", "Failed to delete notifications for userId.", e);
+                    });
+
         });
         // Return the root view to be displayed
         return rootView;

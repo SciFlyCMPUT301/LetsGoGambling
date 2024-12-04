@@ -24,6 +24,8 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
 /**
  * Manages notifications for users in the EventBooking app.
  * Handles fetching, creating, updating, and sending notifications to users.
@@ -67,8 +69,13 @@ public class MyNotificationManager {
      * @return A Task representing the Firestore operation to update the notification.
      */
     public Task<Void> updateNotification(Notification notification) {
-        return fb.collection("Notifications").document(notification.getNotificationId())
-                .set(notification);
+        Map<String, Object> updates = Map.of(
+                "read", true
+
+        );
+        return fb.collection("Notifications").document(notification.getNotificationId()).update(updates);
+//        return fb.collection("Notifications").document(notification.getNotificationId())
+//                .set(notification);
     }
     /**
      * Notifies the user of any unread notifications, displaying them as system notifications.
@@ -86,6 +93,15 @@ public class MyNotificationManager {
             for (DocumentSnapshot doc : queryDocumentSnapshots) {
                 notifications.add(doc.toObject(Notification.class));
             }
+//            String eventUrl = "eventbooking://eventDetail?eventID=" + eventId + "&hash=" + eventHash;
+//            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(eventUrl));
+//            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//            PendingIntent pendingIntent = PendingIntent.getActivity(
+//                    context,
+//                    0,
+//                    intent,
+//                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+//            );
             // Build and send a notification for each unread notification
             for (Notification notif : notifications) {
                 NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelId)
@@ -104,7 +120,6 @@ public class MyNotificationManager {
             }
         });
     }
-
 
     /**
      * Creates a new notification in Firestore and sends a system notification with a deep link.
@@ -140,6 +155,54 @@ public class MyNotificationManager {
                     notificationManager.notify(notification.getNotificationId().hashCode(), builder.build());
                 }
             } else {
+                Log.e("NotificationManager", "Failed to save notification to Firestore", task.getException());
+            }
+        });
+    }
+
+
+
+    /**
+     * Creates a new notification in Firestore and sends a system notification with a deep link.
+     *
+     * @param notification The Notification object to be added to Firestore.
+     * @param eventId      The eventID for the given event
+     * @param eventHash    The event hash for the given event
+     * @param givenContext      The context in which the notification is created, typically an activity or service.
+     */
+    public void createNotificationWithEventDetails(Notification notification, String eventId, String eventHash, Context givenContext) {
+        createNotification(notification).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                String channelId = "my_channel_id";
+
+                // Construct the deep link URL with eventId and hash
+                String eventUrl = "eventbooking://eventDetail?eventID=" + eventId + "&hash=" + eventHash;
+
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(eventUrl));
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                PendingIntent pendingIntent = PendingIntent.getActivity(
+                        givenContext,
+                        0,
+                        intent,
+                        PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+                );
+
+
+                NotificationCompat.Builder builder = new NotificationCompat.Builder(givenContext, channelId)
+                        .setSmallIcon(R.drawable.ic_notification_foreground)
+                        .setContentTitle(notification.getTitle())
+                        .setContentText(notification.getText())
+                        .setContentIntent(pendingIntent)
+                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                        .setAutoCancel(true);
+
+                NotificationManagerCompat notificationManager = NotificationManagerCompat.from(givenContext);
+                Log.d("Notification Manager", "Event URL: " + eventUrl);
+                Log.d("Notification Manager", "Noti Hash: " + notification.getNotificationId().hashCode());
+                if (ActivityCompat.checkSelfPermission(givenContext, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+                    notificationManager.notify(notification.getNotificationId().hashCode(), builder.build());
+                }
+            }else {
                 Log.e("NotificationManager", "Failed to save notification to Firestore", task.getException());
             }
         });

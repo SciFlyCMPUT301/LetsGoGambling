@@ -39,6 +39,7 @@ import java.util.Calendar;
  * image URL, location, and participant limits. The event is saved to Firestore, and if the user does not have
  * the organizer role, it is assigned to them and updated in Firestore.
  */
+@SuppressWarnings("all")
 public class EventCreateFragment extends Fragment {
     private EditText editTextTitle;
     private EditText editTextDescription;

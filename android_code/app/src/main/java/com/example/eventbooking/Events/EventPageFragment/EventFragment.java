@@ -32,6 +32,7 @@ import java.util.List;
 /**
  * Fragment to display all events based on user role and context.
  */
+@SuppressWarnings("all")
 public class EventFragment extends Fragment {
     private Button addFacilityButton, backButton;
     private String currentUserId = "User1";

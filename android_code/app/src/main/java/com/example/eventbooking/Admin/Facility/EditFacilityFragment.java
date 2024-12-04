@@ -39,7 +39,7 @@ import java.util.List;
  * This fragment also navigates to other fragments, such as the facility list view,
  * upon completing operations.
  */
-
+@SuppressWarnings("all")
 public class EditFacilityFragment extends Fragment {
 
     private EditText faciltyNameEditText, facilityIdEditText, facilityOrganizerEditText, facilityLocationEditText;

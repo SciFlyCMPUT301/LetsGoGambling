@@ -1,5 +1,14 @@
 package com.example.eventbooking;
 
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.Firebase;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Model class for holding information about a notification that
  * should be shown to a user. Has references to the user it should be
@@ -71,4 +80,30 @@ public class Notification {
     public void setNotificationId(String notificationId) {
         this.notificationId = notificationId;
     }
+
+    /**
+     * Deletes documents in the "Notifications" collection where the userId field matches the specified string.
+     *
+     * @param userId The userId to match.
+     * @return A Task<Void> that completes when all matching documents are deleted.
+     */
+    public Task<Void> deleteNotificationsByUserId(String userId) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        return db.collection("Notifications")
+                .whereEqualTo("userId", userId)
+                .get()
+                .continueWithTask(task -> {
+                    if (task.isSuccessful()) {
+                        List<Task<Void>> deleteTasks = new ArrayList<>();
+                        for (DocumentSnapshot document : task.getResult()) {
+                            deleteTasks.add(document.getReference().delete());
+                        }
+                        // Combine all delete tasks into one
+                        return Tasks.whenAll(deleteTasks);
+                    } else {
+                        throw task.getException();
+                    }
+                });
+    }
+
 }

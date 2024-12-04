@@ -26,6 +26,7 @@ import com.example.eventbooking.Testing.TestFragment;
  * such as users, events, facilities, QR codes, and images. The fragment allows the admin to easily switch between
  * different management screens.
  */
+@SuppressWarnings("all")
 public class AdminFragment extends Fragment {
     private Button viewUsersButton, viewEventsButton, viewFacilitiesButton, viewImagesButton, viewTestPageButton;
     private Button backHomeButton;

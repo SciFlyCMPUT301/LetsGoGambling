@@ -44,6 +44,7 @@ import java.util.UUID;
  * for generating and saving sample data to Firebase, loading data from Firebase, selecting and
  * uploading images, and deleting all generated data from Firebase.
  */
+@SuppressWarnings("all")
 public class TestFragment extends Fragment {
 
     private static final String TAG = "FirebaseTestingFragment";

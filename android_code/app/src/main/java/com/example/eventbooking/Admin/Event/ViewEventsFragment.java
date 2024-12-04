@@ -41,6 +41,7 @@ import java.util.stream.Collectors;
  * the admin home. Events are displayed in a ListView and loaded asynchronously from the
  * Firestore database.</p>
  */
+@SuppressWarnings("all")
 public class ViewEventsFragment extends Fragment {
     private Button adminGoBack;
     private EventViewAdapter eventAdapter;
@@ -174,6 +175,7 @@ public class ViewEventsFragment extends Fragment {
 
     private void initalizeUI(View view){
         if(!UniversalProgramValues.getInstance().getTestingMode()){
+            viewEventList = new ArrayList<>();
             eventListView = view.findViewById(R.id.event_list);
             adminGoBack = view.findViewById(R.id.admin_go_back);
             searchView = view.findViewById(R.id.search_bar);
@@ -184,6 +186,7 @@ public class ViewEventsFragment extends Fragment {
                     for(int i=0; i < eventGetList.size(); i++){
 
                         eventList.add(eventGetList.get(i));
+                        viewEventList.add(eventGetList.get(i));
                         Log.d("View Events", "EventID: " + eventList.get(i).getEventId());
                     }
 //                    eventList = new ArrayList<>(eventGetList);

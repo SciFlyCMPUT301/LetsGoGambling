@@ -27,6 +27,7 @@ import java.util.ArrayList;
  * Fragment for displaying and managing a list of facilities.
  * This fragment loads facility data from Firestore and allows the user to view or edit facility details.
  */
+@SuppressWarnings("all")
 public class ViewFacilitiesFragment extends Fragment {
     private Button adminGoBack, removeButton;
     private FirebaseFirestore db;

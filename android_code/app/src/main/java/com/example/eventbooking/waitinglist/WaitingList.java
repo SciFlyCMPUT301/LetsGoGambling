@@ -258,6 +258,7 @@ public class WaitingList {
                 "canceledParticipantIds", canceledParticipantIds
         );
 
+
         return eventRef.update(updates).addOnSuccessListener(aVoid -> {
             System.out.println("Waiting list data successfully synchronized with Firebase.");
         }).addOnFailureListener(e -> {

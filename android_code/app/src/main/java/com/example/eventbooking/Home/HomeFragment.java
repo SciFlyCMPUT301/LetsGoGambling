@@ -45,6 +45,7 @@ import java.util.stream.Collectors;
  * HomeFragment serves as the main landing page for users after login or device recognition.
  * It displays the user's options, including event creation, viewing events, notifications, and profile management.
  */
+@SuppressWarnings("all")
 public class HomeFragment extends Fragment {
     private int someInteger = 42; // Example integer to pass
     private String userId;

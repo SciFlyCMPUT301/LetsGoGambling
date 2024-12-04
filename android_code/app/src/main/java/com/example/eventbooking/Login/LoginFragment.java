@@ -237,7 +237,7 @@ public class LoginFragment extends Fragment {
             ((MainActivity) getActivity()).loadAdminSidePanel();
         }
 
-        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
@@ -248,7 +248,7 @@ public class LoginFragment extends Fragment {
             ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 1001);
         }
         if(!UniversalProgramValues.getInstance().getTestingMode()){
-            new MyNotificationManager(FirebaseFirestore.getInstance()).notifyUserUnread(user.getDeviceID(), getContext());
+            new MyNotificationManager(FirebaseFirestore.getInstance()).notifyUserUnread(user.getDeviceID(), getActivity());
         }
         new Handler().postDelayed(() -> {
             if (eventIdFromQR != null) {

@@ -415,10 +415,48 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Log.e(TAG, "No event ID found in URL");
             }
         }
+
+        Log.d("Main Activity", "Notif intent: " + intent.getStringExtra("event_url"));
+        String eventUrl = intent.getStringExtra("event_url");
+        if (eventUrl != null) {
+            Log.d("MainActivity", "Incoming event URL: " + eventUrl);
+            eventIdFromQR = extractEventIdFromUrl(eventUrl);
+            String eventHash = extractEventHashFromUrl(eventUrl);
+            Log.d("MainActivity", "Incoming notif eventID: " + eventIdFromQR);
+            Log.d("MainActivity", "Incoming notif event Hash: " + eventHash);
+            FirestoreAccess.getInstance().checkEventExists(eventIdFromQR, eventHash)
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            boolean exists = task.getResult();
+                            if(!exists){
+                                eventIdFromQR = null;
+                            }
+                            Log.d("Firestore", "Event exists: " + exists);
+                        } else {
+                            Log.e("Firestore", "Error checking event existence", task.getException());
+                        }
+                    });
+
+            if (eventIdFromQR != null) {
+                Log.d(TAG, "Event ID from URL: " + eventIdFromQR);
+
+                // If the user is logged in, navigate to event view
+                if (LoginFragment.isLoggedIn) {
+                    openEventViewFragment(eventIdFromQR);
+                } else {
+                    // Show login screen
+                    showLoginFragment(eventIdFromQR);
+                }
+            } else {
+                Log.e(TAG, "No event ID found in URL from notification");
+            }
+        }
+
         if (!LoginFragment.isLoggedIn) {
             Log.d("Main Activity", "Login Fragment");
             showLoginFragment(null);
         }
+
     }
 
     /**
@@ -429,8 +467,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      */
     private String extractEventIdFromUrl(String url) {
         // Assuming the URL is in the format: eventbooking://eventDetail?eventID=12345
+        Log.d("Main Activity", "URL: " + url);
         String[] eventIdParts = url.split("eventID=");
+
+        Log.d("Main Activity", "WHoleParts1: " + eventIdParts[0]);
+        Log.d("Main Activity", "WHoleParts1: " + eventIdParts[1]);
+//        String[] splitParts = eventIdParts[1].split("\\?hash=");
         String[] splitParts = eventIdParts[1].split("\\?hash=");
+        Log.d("Main Activity", "WHoleParts2: " + splitParts[0]);
         String eventID = splitParts[0];
         String hash = splitParts[1];
         Log.d("Main Activity", "Parts1: " + eventIdParts[0]);
@@ -452,7 +496,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // Assuming the URL is in the format: eventbooking://eventDetail?eventID=12345
 //        "eventbooking://eventDetail?eventID=12345?hash=" + qrCodeHash;
         String[] eventIdParts = url.split("eventID=");
+        Log.d("Main Activity", "Parts1: " + eventIdParts[0]);
+        Log.d("Main Activity", "Parts2: " + eventIdParts[1]);
         String[] splitParts = eventIdParts[1].split("\\?hash=");
+        Log.d("Main Activity", "SUBParts1: " + splitParts[0]);
+        Log.d("Main Activity", "SUBParts2: " + splitParts[1]);
         String eventID = splitParts[0];
         String hash = splitParts[1];
         Log.d("Main Activity", "Parts1: " + eventIdParts[0]);

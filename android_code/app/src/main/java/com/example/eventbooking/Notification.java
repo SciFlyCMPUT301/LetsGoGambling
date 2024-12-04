@@ -18,6 +18,7 @@ public class Notification {
     private String notificationId;
     private String userId;
     private String eventId;
+    private String eventHash;
 
     private String text;
     private String title;
@@ -25,12 +26,21 @@ public class Notification {
 
     public Notification() {}
 
-    public Notification(String eventId, String text, String title, String userId) {
+    public Notification(String eventId, String text, String title, String userId, String eventHash) {
         this.eventId = eventId;
         this.text = text;
         this.title = title;
         this.userId = userId;
         this.read = false;
+        this.eventHash = eventHash;
+    }
+
+    public String getEventHash() {
+        return eventHash;
+    }
+
+    public void setEventHash(String eventHash) {
+        this.eventHash = eventHash;
     }
 
     public String getEventId() {

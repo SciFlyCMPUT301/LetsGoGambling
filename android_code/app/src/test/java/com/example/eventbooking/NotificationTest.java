@@ -12,7 +12,7 @@ public class NotificationTest {
     @Before
     public void setUp() {
         // This method is called before each test
-        notification = new Notification("event123", "Event text", "Event title", "user123");
+        notification = new Notification("event123", "Event text", "Event title", "user123", "eventHash");
     }
 
     @Test

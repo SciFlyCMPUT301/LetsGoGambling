@@ -351,7 +351,7 @@ public class OrganizerMenuFragment extends Fragment {
                     for (String user : selectedParticipants) {
                         String eventId = currentEvent.getEventId();
                         String eventHash = currentEvent.getQRcodeHash();
-                        Notification notification = new Notification(eventId, notifText, notifTitle, user);
+                        Notification notification = new Notification(eventId, notifText, notifTitle, user, eventHash);
                         notificationManager.createNotificationWithEventDetails(notification, eventId, eventHash, getActivity());
 //                        Notification notif = new Notification(eventId, notifText, notifTitle, user);
 //                        notificationManager.createNotification(notif);
@@ -369,7 +369,7 @@ public class OrganizerMenuFragment extends Fragment {
                     for (String user : allParticipants) {
                         String eventId = currentEvent.getEventId();
                         String eventHash = currentEvent.getQRcodeHash();
-                        Notification notification = new Notification(eventId, notifText, notifTitle, user);
+                        Notification notification = new Notification(eventId, notifText, notifTitle, user, eventHash);
                         notificationManager.createNotificationWithEventDetails(notification, eventId, eventHash, getActivity());
 //                        Notification notif = new Notification(eventId, lossNotifText, lossNotifTitle, user);
 //                        notificationManager.createNotification(notif);
@@ -464,7 +464,7 @@ public class OrganizerMenuFragment extends Fragment {
                             Log.d("Notification", "Event Hash: " + eventId);
                             Log.d("Notification", "Noti Text: " + eventId);
                             Log.d("Notification", "Noti TItle: " + eventId);
-                            Notification notification = new Notification(eventId, notifText, notifTitle, user);
+                            Notification notification = new Notification(eventId, notifText, notifTitle, user, eventHash);
                             notificationManager.createNotificationWithEventDetails(notification, eventId, eventHash, getActivity());
 //                            String hashInput = eventId + Calendar.getInstance().getTime();
 //                            String qrCodeHash = qrCodeGenerator.createQRCodeHash(hashInput);
@@ -482,7 +482,7 @@ public class OrganizerMenuFragment extends Fragment {
                         for (String user : allParticipants) {
                             String eventId = currentEvent.getEventId();
                             String eventHash = currentEvent.getQRcodeHash();
-                            Notification notification = new Notification(eventId, notifText, notifTitle, user);
+                            Notification notification = new Notification(eventId, notifText, notifTitle, user, eventHash);
                             notificationManager.createNotificationWithEventDetails(notification, eventId, eventHash, getActivity());
 //                            String eventUrl = "eventbooking://eventDetail?eventID=" + eventId + "?hash=" + currentEvent.getQRcodeHash();
 //                            Notification notif = new Notification(eventId, lossNotifText, lossNotifTitle, user);
@@ -683,7 +683,7 @@ public class OrganizerMenuFragment extends Fragment {
                     for (String user : waitingList.getCanceledParticipantIds()) {
                         String eventId = currentEvent.getEventId();
                         String eventHash = currentEvent.getQRcodeHash();
-                        Notification notification = new Notification(eventId, notifText, notifTitle, user);
+                        Notification notification = new Notification(eventId, notifText, notifTitle, user, eventHash);
                         notificationManager.createNotificationWithEventDetails(notification, eventId, eventHash, getActivity());
 //                        Notification notif = new Notification(eventId, notifText, notifTitle, user);
 //                        notificationManager.createNotification(notif);

@@ -13,6 +13,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
+import com.example.eventbooking.MainActivity;
 import com.example.eventbooking.Notification;
 import com.example.eventbooking.R;
 import com.google.android.gms.tasks.Task;
@@ -71,7 +72,6 @@ public class MyNotificationManager {
     public Task<Void> updateNotification(Notification notification) {
         Map<String, Object> updates = Map.of(
                 "read", true
-
         );
         return fb.collection("Notifications").document(notification.getNotificationId()).update(updates);
 //        return fb.collection("Notifications").document(notification.getNotificationId())
@@ -93,22 +93,27 @@ public class MyNotificationManager {
             for (DocumentSnapshot doc : queryDocumentSnapshots) {
                 notifications.add(doc.toObject(Notification.class));
             }
-//            String eventUrl = "eventbooking://eventDetail?eventID=" + eventId + "&hash=" + eventHash;
-//            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(eventUrl));
-//            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//            PendingIntent pendingIntent = PendingIntent.getActivity(
-//                    context,
-//                    0,
-//                    intent,
-//                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
-//            );
+
             // Build and send a notification for each unread notification
             for (Notification notif : notifications) {
+                String eventUrl = "eventbooking://eventDetail?eventID=" + notif.getEventId() + "?hash=" + notif.getEventHash();
+                Intent intent = new Intent(context, MainActivity.class);
+                intent.putExtra("event_url", eventUrl);
+//                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                PendingIntent pendingIntent = PendingIntent.getActivity(
+                        context,
+                        0,
+                        intent,
+                        PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+                );
                 NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelId)
                         .setSmallIcon(R.drawable.ic_notification_foreground)
                         .setContentTitle(notif.getTitle())
                         .setContentText(notif.getText())
-                        .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                        .setContentIntent(pendingIntent)
+                        .setAutoCancel(true);
 
                 NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
 
